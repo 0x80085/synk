@@ -4,9 +4,9 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "start": "tsc && ts-node dist/server.js",
+    "start": "tsc && ts-node dist/index.js",
     "watch-ts": "tsc -w",
-    "watch-node": "nodemon dist/server.js"
+    "watch-node": "nodemon dist/index.js"
   },
   "author": "gonzhq",
   "license": "MIT",
