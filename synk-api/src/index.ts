@@ -5,6 +5,7 @@ import { Request, Response } from "express-serve-static-core";
 
 import * as dotenv from "dotenv";
 import { RoomService } from "./room-service";
+import { AuthService } from "./auth-service";
 dotenv.config();
 
 const PORT = process.env.HOST_PORT;
@@ -23,14 +24,23 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 const roomService = new RoomService(io);
+const authService = new AuthService();
 
-// Setup Socket.io listener for 'connection' event
-io.on("connection", socket => {
-  //   io.emit("this", { will: "be received by everyone" });
+// Setup middleware (auth, flood detect, b& filter, etc)
+io.use((socket, next) => {
+  var handshakeData = socket.request;
+  if (!authService.authorize()) {
+    next(new Error("not authorized"));
+  }
 
-  // listen for room related events
   roomService.setupListeners(socket);
+
+  next();
 });
+
+// Setup Socket.io listener for 'connection' event &
+// listen for room related events
+// io.on("connection", socket => {});
 
 // Go
 wsHttp.listen(3000, function() {

@@ -29,7 +29,7 @@ export class RoomService {
   }
 
   joinRoom(socket: socketio.Socket, roomName: string) {
-    if (!this.roomExists(roomName)) {
+    if (!this.doesRoomExist(roomName)) {
       this.addRoomToDirectory({ name: roomName });
     }
 
@@ -42,7 +42,7 @@ export class RoomService {
     this.publicRooms.push(room);
   }
 
-  private roomExists(roomName: string) {
+  private doesRoomExist(roomName: string) {
     return this.publicRooms.filter(r => r.name === roomName).length > 0;
   }
 }
