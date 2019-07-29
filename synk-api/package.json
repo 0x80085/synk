@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "start": "tsc && ts-node dist/server.js",
     "watch-ts": "tsc -w",
     "watch-node": "nodemon dist/server.js"
   },

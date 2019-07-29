@@ -1,0 +1,18 @@
+{
+  "name": "synk",
+  "version": "1.0.0",
+  "description": "Back and Front end for SYNK",
+  "main": "index.js",
+  "dependencies": {
+    "nodemon": "^1.19.1"
+  },
+  "devDependencies": {
+    "concurrently": "^4.1.1"
+  },
+  "scripts": {
+    "start": "npx concurrently \"cd synk-client && npm start\" \"cd synk-api && npm start\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "0x80085",
+  "license": "MIT"
+}
