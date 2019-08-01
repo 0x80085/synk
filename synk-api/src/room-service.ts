@@ -24,6 +24,8 @@ export class RoomService {
     });
 
     socket.on("disconnect", () => {
+      console.log("disconnect");
+      
       this.io.emit("user disconnected");
     });
   }
