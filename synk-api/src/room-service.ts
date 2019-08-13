@@ -19,24 +19,22 @@ export class RoomService {
     });
 
     socket.on("join room", roomName => {
-      console.log("tryna create raum", roomName);
+      console.log("tryna join raum", roomName);
       this.joinRoom(socket, roomName);
     });
 
     socket.on("disconnect", () => {
       console.log("disconnect");
-      
       this.io.emit("user disconnected");
     });
   }
 
-  joinRoom(socket: socketio.Socket, roomName: string) {
+  private joinRoom(socket: socketio.Socket, roomName: string) {
+    
     if (!this.doesRoomExist(roomName)) {
       this.addRoomToDirectory({ name: roomName });
     }
-
     socket.join(roomName);
-
     this.io.to(roomName).emit("user joined");
   }
 

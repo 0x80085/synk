@@ -15,4 +15,8 @@ export class ChatService {
   joinRoom(name: string) {
     this.socket.emit('join room', name);
   }
+
+  sendDM(msg: string) {
+    this.socket.emit('private message', msg);
+  }
 }

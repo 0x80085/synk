@@ -32,7 +32,8 @@ io.use((socket, next) => {
   if (!authService.authorize()) {
     next(new Error("not authorized"));
   }
-
+  console.log('user connected', socket.id);
+  
   roomService.setupListeners(socket);
 
   next();
