@@ -35,7 +35,7 @@ export class RoomService {
       this.addRoomToDirectory({ name: roomName });
     }
     socket.join(roomName);
-    this.io.to(roomName).emit("user joined");
+    this.io.to(roomName).emit("group message", {msg: 'user joined'});
   }
 
   private addRoomToDirectory(room: Room) {

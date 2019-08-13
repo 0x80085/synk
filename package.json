@@ -10,7 +10,7 @@
     "concurrently": "^4.1.1"
   },
   "scripts": {
-    "start": "npx concurrently \"cd synk-client && npm start\" \"cd synk-api && npm start\"",
+    "start": "npx concurrently \"cd synk-client && ng s --live-reload\" \"cd synk-api && npm start\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "0x80085",
