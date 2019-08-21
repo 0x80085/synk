@@ -2,7 +2,9 @@
   <nz-comment nzAuthor="Han Solo">
     <nz-avatar nz-comment-avatar nzIcon="user" nzSrc="favicon.ico"></nz-avatar>
     <nz-comment-content>
-      {{ (message | async)?.msg }}
+      <p *ngFor="let message of messages">
+        {{ message.msg }}
+      </p>
     </nz-comment-content>
     <nz-comment-action>Do I rerefesh</nz-comment-action>
   </nz-comment>

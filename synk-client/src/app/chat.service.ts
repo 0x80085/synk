@@ -11,19 +11,18 @@ export interface Message {
   providedIn: 'root'
 })
 export class ChatService {
-  private socket: SocketIOClient.Socket;
-
-  public messageQueue: Observable<string[]>;
-
   disconnect$: Observable<string[]>;
   groupMessage$: Observable<Message>;
   privateMessage$: Observable<string[]>;
+
+  private socket: SocketIOClient.Socket;
 
   constructor() {
     this.socket = io('http://localhost:3000');
 
     this.disconnect$ = fromEvent(this.socket, 'disconnect');
     this.privateMessage$ = fromEvent(this.socket, 'private message');
+    // this.groupMessage$ = fromEvent(this.socket, 'group message');
 
     this.groupMessage$ = new Observable(observer => {
       this.socket.on('group message', (data: Message) => {
