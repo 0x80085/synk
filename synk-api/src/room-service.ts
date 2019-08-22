@@ -4,6 +4,15 @@ export interface Room {
   name: string;
 }
 
+export interface Message {
+  msg: string;
+}
+
+export interface GroupMessage {
+  msg: Message;
+  roomName: string
+}
+
 export class RoomService {
   public publicRooms: Room[] = [];
 
@@ -23,6 +32,13 @@ export class RoomService {
       this.joinRoom(socket, roomName);
     });
 
+    socket.on("group message", (data: GroupMessage) => {
+      socket.to(data.roomName).emit("group message", data);
+      this.io.to(data.roomName).emit("group message", data)
+      console.log('gm', data);
+
+    });
+
     socket.on("disconnect", () => {
       console.log("disconnect");
       this.io.emit("user disconnected");
@@ -30,12 +46,12 @@ export class RoomService {
   }
 
   private joinRoom(socket: socketio.Socket, roomName: string) {
-    
+
     if (!this.doesRoomExist(roomName)) {
       this.addRoomToDirectory({ name: roomName });
     }
     socket.join(roomName);
-    this.io.to(roomName).emit("group message", {msg: 'user joined'});
+    this.io.to(roomName).emit("group message", { roomName, msg: 'user joined' });
   }
 
   private addRoomToDirectory(room: Room) {

@@ -1,10 +1,15 @@
 import { Injectable } from '@angular/core';
 
 import * as io from 'socket.io-client';
-import { Observable, fromEvent } from 'rxjs';
+import { Observable, fromEvent, timer } from 'rxjs';
 
 export interface Message {
   msg: string;
+}
+
+export interface GroupMessage {
+  msg: Message;
+  roomName: string
 }
 
 @Injectable({
@@ -13,10 +18,10 @@ export interface Message {
 export class ChatService {
   private socket: SocketIOClient.Socket;
 
-  public messageQueue: Observable<string[]>;
+  public messageQueue: Message[] = [];
 
   disconnect$: Observable<string[]>;
-  groupMessage$: Observable<Message>;
+  groupMessages$: Observable<Message[]>;
   privateMessage$: Observable<string[]>;
 
   constructor() {
@@ -25,9 +30,10 @@ export class ChatService {
     this.disconnect$ = fromEvent(this.socket, 'disconnect');
     this.privateMessage$ = fromEvent(this.socket, 'private message');
 
-    this.groupMessage$ = new Observable(observer => {
-      this.socket.on('group message', (data: Message) => {
-        observer.next(data);
+    this.groupMessages$ = new Observable(observer => {
+      this.socket.on('group message', (data: GroupMessage) => {
+        this.messageQueue = this.messageQueue.concat(data.msg);
+        observer.next(this.messageQueue);
         console.log(data);
       });
     });
@@ -39,5 +45,28 @@ export class ChatService {
 
   sendDM(msg: string) {
     this.socket.emit('private message', msg);
+  }
+
+  sendGM(msg: Message, roomName: string) {
+    this.socket.emit('group message', { msg, roomName });
+  }
+
+  setupMessageQueueGCTimer() {
+    timer(500).pipe()
+      .subscribe(
+        value => {
+          console.log(value);
+
+          // clear last x items from queue
+        },
+        err => console.log(err),
+      );
+  }
+
+  flushQueue() {
+    this.messageQueue = [];
+    this.groupMessages$ = new Observable(observer => {
+      observer.next(this.messageQueue)
+    })
   }
 }

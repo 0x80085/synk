@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ChatService, Message } from '../chat.service';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+import { take, toArray, map, distinctUntilChanged, throttleTime, scan } from 'rxjs/operators';
 
 @Component({
   selector: 'app-chat-room',
@@ -10,15 +11,28 @@ import { Observable } from 'rxjs';
 export class ChatRoomComponent implements OnInit {
   @Input() name: string;
 
-  message: Observable<Message> = new Observable();
+  msgBoxValue: string;
 
-  constructor(private chatServ: ChatService) {}
+  messages: Observable<Message[]> = new Observable();
+
+  constructor(private chatServ: ChatService) { }
 
   ngOnInit() {
-    this.message = this.chatServ.groupMessage$;
+    this.messages = this.chatServ.groupMessages$
+      .pipe(
+      distinctUntilChanged(),
+      throttleTime(100),
+      take(50)
+      );
+
   }
 
   onJoinRoom() {
     this.chatServ.joinRoom(this.name);
+  }
+
+  onSendMessageToGroup(){
+    this.chatServ.sendGM({msg :this.msgBoxValue}, this.name);
+    this.msgBoxValue = "";
   }
 }
