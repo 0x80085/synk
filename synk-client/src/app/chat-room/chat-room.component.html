@@ -1,19 +1,19 @@
-<nz-card style="width:300px;" nzTitle="Chat">
-  <nz-comment nzAuthor="Han Solo">
-    <nz-avatar nz-comment-avatar nzIcon="user" nzSrc="favicon.ico"></nz-avatar>
-    <nz-comment-content>
-      <div *ngFor="let message of messages | async">
-        {{ message.msg }}
-      </div>
-    </nz-comment-content>
-    <textarea nz-input placeholder="Autosize height based on content lines" [(ngModel)]="msgBoxValue" nzAutosize></textarea>
-
-    <nz-comment-action>Send</nz-comment-action>
-  </nz-comment>
-  <button nz-button nzType="primary" [nzSize]="'large'" nzShape="round" (click)="onJoinRoom()">
+<nz-card style="width:300px;" [nzTitle]="name">
+  <button nz-button nzType="primary" [nzSize]="'small'" nzShape="round" (click)="onJoinRoom()">
     <i nz-icon nzType="import" nzTheme="outline"></i>Join room 2Dbooty
   </button>
-  <button nz-button nzType="primary" [nzSize]="'large'" nzShape="round" (click)="onSendMessageToGroup()">
-    <i nz-icon nzType="import" nzTheme="outline"></i>Send
-  </button>
+  <nz-comment nzAuthor="unkwn" *ngFor="let message of messages | async">
+    <nz-comment-content>
+      {{ message.msg }}
+    </nz-comment-content>
+  </nz-comment>
 </nz-card>
+
+<nz-card style="width:300px; margin-top: 16px" [nzActions]="[sendIcon]">"
+  <textarea nz-input placeholder="Autosize height based on content lines" [(ngModel)]="msgBoxValue"
+    (keyup.enter)="onSendMessageToGroup()" nzAutosize></textarea>
+</nz-card>
+
+<ng-template #sendIcon>
+  <i nz-icon nzType="edit" title="Send message" (click)="onSendMessageToGroup()"></i>
+</ng-template>

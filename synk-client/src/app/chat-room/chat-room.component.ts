@@ -22,7 +22,7 @@ export class ChatRoomComponent implements OnInit {
       .pipe(
       distinctUntilChanged(),
       throttleTime(100),
-      take(50)
+      take(10)
       );
 
   }
