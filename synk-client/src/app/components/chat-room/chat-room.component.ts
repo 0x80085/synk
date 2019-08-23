@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { ChatService, Message } from '../chat.service';
-import { Observable, Subject } from 'rxjs';
-import { take, toArray, map, distinctUntilChanged, throttleTime, scan } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { take, distinctUntilChanged, throttleTime, scan } from 'rxjs/operators';
+import { ChatService, Message } from '../../services/chat.service';
 
 @Component({
   selector: 'app-chat-room',
@@ -20,9 +20,9 @@ export class ChatRoomComponent implements OnInit {
   ngOnInit() {
     this.messages = this.chatServ.groupMessages$
       .pipe(
-      distinctUntilChanged(),
-      throttleTime(100),
-      take(10)
+        distinctUntilChanged(),
+        throttleTime(100),
+        take(10)
       );
 
   }
@@ -31,8 +31,8 @@ export class ChatRoomComponent implements OnInit {
     this.chatServ.joinRoom(this.name);
   }
 
-  onSendMessageToGroup(){
-    this.chatServ.sendGM({msg :this.msgBoxValue}, this.name);
+  onSendMessageToGroup() {
+    this.chatServ.sendGM({ msg: this.msgBoxValue }, this.name);
     this.msgBoxValue = "";
   }
 }
