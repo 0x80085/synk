@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Observable } from 'rxjs';
-import { take, distinctUntilChanged, throttleTime, scan } from 'rxjs/operators';
+import { Observable, from } from 'rxjs';
+import { take, distinctUntilChanged, throttleTime, scan, map, debounceTime, filter, switchMap, tap } from 'rxjs/operators';
 import { ChatService, Message } from '../../services/chat.service';
 
 @Component({
@@ -20,9 +20,8 @@ export class ChatRoomComponent implements OnInit {
   ngOnInit() {
     this.messages = this.chatServ.groupMessages$
       .pipe(
-        distinctUntilChanged(),
-        throttleTime(100),
-        take(10)
+          debounceTime(10),
+          distinctUntilChanged(), 
       );
 
   }

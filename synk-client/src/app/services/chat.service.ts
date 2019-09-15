@@ -57,7 +57,7 @@ export class ChatService {
         value => {
           console.log(value);
 
-          // clear last x items from queue
+          this.messageQueue = this.messageQueue.slice(0,-50)
         },
         err => console.log(err),
       );

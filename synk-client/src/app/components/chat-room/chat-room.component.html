@@ -2,7 +2,7 @@
   <button nz-button nzType="primary" [nzSize]="'small'" nzShape="round" (click)="onJoinRoom()">
     <i nz-icon nzType="import" nzTheme="outline"></i>Join room 2Dbooty
   </button>
-  <nz-comment nzAuthor="unkwn" *ngFor="let message of messages | async">
+  <nz-comment nzAuthor="unkwn" *ngFor="let message of messages | async | slice:-10">
     <nz-comment-content>
       {{ message.msg }}
     </nz-comment-content>
