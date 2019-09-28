@@ -1,0 +1,22 @@
+<nz-card style="width:300px;" [nzTitle]="name">
+  <button nz-button nzType="primary" [nzSize]="'small'" nzShape="round" (click)="onJoinRoom()">
+    <i nz-icon nzType="import" nzTheme="outline"></i>Join room 2Dbooty
+  </button>
+  <nz-empty *ngIf="empty"></nz-empty>
+  <ng-container *ngIf="!empty">
+    <nz-comment nzAuthor="unkwn" *ngFor="let message of messages | async | slice:-10">
+      <nz-comment-content>
+        {{ message.msg }}
+      </nz-comment-content>
+    </nz-comment>
+  </ng-container>
+</nz-card>
+
+<nz-card style="width:300px; margin-top: 16px" [nzActions]="[sendIcon]">"
+  <textarea nz-input placeholder="Autosize height based on content lines" [(ngModel)]="msgBoxValue" name="textarea"
+    rows="5" cols="30" minlength="10" maxlength="512" (keyup.enter)="onSendMessageToGroup()" nzAutosize></textarea>
+</nz-card>
+
+<ng-template #sendIcon>
+  <i nz-icon nzType="edit" title="Send message" (click)="onSendMessageToGroup()"></i>
+</ng-template>
