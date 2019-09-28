@@ -9,34 +9,35 @@ export interface Message {
 
 export interface GroupMessage {
   msg: Message;
-  roomName: string
+  roomName: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
-  private socket: SocketIOClient.Socket;
 
-  public messageQueue: Message[] = [];
+  messageQueue: Message[] = [];
 
   disconnect$: Observable<string[]>;
-  groupMessages$: Observable<Message[]>;
+
   privateMessage$: Observable<string[]>;
+
+  groupMessages$: Observable<Message[]> = new Observable(observer => {
+    this.socket.on('group message', (data: GroupMessage) => {
+      this.messageQueue = this.messageQueue.concat(data.msg);
+      observer.next(this.messageQueue);
+      console.log(data);
+    });
+  });
+
+  private socket: SocketIOClient.Socket;
 
   constructor() {
     this.socket = io('http://localhost:3000');
 
     this.disconnect$ = fromEvent(this.socket, 'disconnect');
     this.privateMessage$ = fromEvent(this.socket, 'private message');
-
-    this.groupMessages$ = new Observable(observer => {
-      this.socket.on('group message', (data: GroupMessage) => {
-        this.messageQueue = this.messageQueue.concat(data.msg);
-        observer.next(this.messageQueue);
-        console.log(data);
-      });
-    });
   }
 
   joinRoom(name: string) {
@@ -57,7 +58,7 @@ export class ChatService {
         value => {
           console.log(value);
 
-          this.messageQueue = this.messageQueue.slice(0,-50)
+          this.messageQueue = this.messageQueue.slice(0, -50);
         },
         err => console.log(err),
       );
@@ -66,7 +67,7 @@ export class ChatService {
   flushQueue() {
     this.messageQueue = [];
     this.groupMessages$ = new Observable(observer => {
-      observer.next(this.messageQueue)
-    })
+      observer.next(this.messageQueue);
+    });
   }
 }
