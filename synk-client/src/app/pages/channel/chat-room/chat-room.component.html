@@ -1,16 +1,14 @@
 <nz-card style="width:300px;" [nzTitle]="name">
-  <button nz-button nzType="primary" [nzSize]="'small'" nzShape="round" (click)="onJoinRoom()">
+  <!-- <button nz-button nzType="primary" [nzSize]="'small'" nzShape="round" (click)="onJoinRoom()">
     <i nz-icon nzType="import" nzTheme="outline"></i>
     Join room {{ name }}
-  </button>
-  <nz-empty *ngIf="empty"></nz-empty>
-  <!-- <ng-container *ngIf="!empty"> -->
+  </button> -->
+  <!-- <nz-empty *ngIf="empty$ | async"></nz-empty> -->
   <nz-comment nzAuthor="unkwn" *ngFor="let message of messages$ | async | slice:-10">
     <nz-comment-content>
       {{ message.msg }}
     </nz-comment-content>
   </nz-comment>
-  <!-- </ng-container> -->
 </nz-card>
 
 <nz-card style="width:300px; margin-top: 16px" [nzActions]="[sendIcon]">

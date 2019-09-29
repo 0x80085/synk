@@ -5,6 +5,7 @@ import { ChannelRoutingModule } from './channel/channel-routing.module';
 import { ChatRoomComponent } from './chat-room/chat-room.component';
 import { NgZorroAntdModule } from 'ng-zorro-antd';
 import { FormsModule } from '@angular/forms';
+import { ChatService } from './chat.service';
 
 @NgModule({
   declarations: [ChannelComponent, ChatRoomComponent],
@@ -13,6 +14,7 @@ import { FormsModule } from '@angular/forms';
     FormsModule,
     ChannelRoutingModule,
     NgZorroAntdModule
-  ]
+  ],
+  providers: [ChatService]
 })
 export class ChannelModule { }

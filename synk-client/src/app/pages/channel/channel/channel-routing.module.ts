@@ -3,7 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { ChannelComponent } from './channel.component';
 
 const routes: Routes = [
-  { path: ':name', component: ChannelComponent },
+  { path: 'channel/:name', component: ChannelComponent },
 ];
 
 @NgModule({
