@@ -1,0 +1,16 @@
+<nz-list [nzDataSource]="data$ | async" [nzRenderItem]="item"
+  [nzGrid]="{ gutter: 16, xs: 24, sm: 12, md: 6, lg: 6, xl: 4 }" [nzNoResult]="noResults">
+  <ng-template #item let-item>
+    <nz-list-item [ngClass]="'item'" routerLink="/channel/{{item.roomName}}" [nzContent]="nzContent">
+      <ng-template #nzContent>
+        <nz-card [nzTitle]="item.roomName">
+            {{item.description}}
+        </nz-card>
+      </ng-template>
+    </nz-list-item>
+  </ng-template>
+</nz-list>
+
+<ng-template #noResults>
+    <nz-empty></nz-empty>
+</ng-template>
