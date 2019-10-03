@@ -27,7 +27,6 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
       this.player = new YT.Player('player', {
         height: '390',
         width: '640',
-        videoId: 'M7lc1UVf-VE',
         events: {
           onReady: this.onPlayerReady,
           onStateChange: this.onPlayerStateChange
