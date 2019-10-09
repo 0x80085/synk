@@ -21,15 +21,15 @@ const PORT = process.env.HOST_PORT;
 
 createConnection().then(async connection => {
 
-  console.log("Inserting a new user into the database...");
-  const user = new User();
-  user.email = "Timber";
-  user.username = "Saw";
-  user.id = uuid();
-  user.passwordash = 'root';
+  // console.log("Inserting a new user into the database...");
+  // const user = new User();
+  // user.email = "Timber";
+  // user.username = "Saw";
+  // user.id = uuid();
+  // user.passwordash = 'root';
 
-  await connection.manager.save(user);
-  console.log("Saved a new user with id: " + user.id);
+  // await connection.manager.save(user);
+  // console.log("Saved a new user with id: " + user.id);
 
   console.log("Loading users from the database...");
   const users = await connection.manager.find(User);
