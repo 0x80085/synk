@@ -5,7 +5,7 @@ import * as express from "express";
 import { Request, Response } from "express-serve-static-core";
 
 import "reflect-metadata";
-import {  createConnection } from "typeorm";
+import { createConnection } from "typeorm";
 
 import * as userController from "./api/controllers/user";
 import { RoomService } from "./socket/room-service";
@@ -23,7 +23,7 @@ export async function run() {
   // Init express js
   const app = express();
   app.set("port", PORT);
-  
+
   // setup PassportJS
   setupPassport(app, connection)
 
@@ -63,5 +63,5 @@ export async function run() {
 
 run()
   .then()
-  .catch()
+  .catch(err => console.log(err))
   .finally()
