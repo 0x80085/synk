@@ -24,7 +24,7 @@ export class MediaHostDirective {
   templateUrl: './media.component.html',
   styleUrls: ['./media.component.scss']
 })
-export class MediaComponent implements BaseMediaComponent, OnInit {
+export class MediaComponent implements  OnInit {
 
   @Input() mediaUrl: string;
 
@@ -55,7 +55,7 @@ export class MediaComponent implements BaseMediaComponent, OnInit {
     viewContainerRef.clear();
 
     this.ref = viewContainerRef.createComponent(componentFactory);
-    (this.ref.instance as BaseMediaComponent).start(this.mediaUrl);
+    (this.ref.instance as BaseMediaComponent).url = this.mediaUrl;
   }
 
   getCompatibleMediaComponent(url: string): Type<BaseMediaComponent> {
