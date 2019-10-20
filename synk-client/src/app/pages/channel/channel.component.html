@@ -1,5 +1,11 @@
 <p>Channel: {{ name }}</p>
 
-<app-chat-room [name]="name"></app-chat-room>
+<div nz-row nzSpan="24" nzType="flex" nzJustify="space-between" nzAlign="center" class="container">
+    <div nz-col nzSpan="6">
+        <app-chat-room [name]="name"></app-chat-room>
+    </div>
+    <div nz-col nzSpan="18">
+        <app-media mediaUrl="http://www.youtube.com/watch?v=hHW1oY26kxQ"></app-media>
+    </div>
+  </div>
 
-<app-media mediaUrl="http://www.youtube.com/watch?v=hHW1oY26kxQ"></app-media>
