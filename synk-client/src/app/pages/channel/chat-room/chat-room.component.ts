@@ -37,7 +37,7 @@ export class ChatRoomComponent implements OnDestroy, OnInit {
   }
 
   ngOnDestroy() {
-    this.chatServ.exit();
+    this.chatServ.exit(this.name);
   }
 
 

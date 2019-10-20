@@ -28,15 +28,16 @@ export class RoomService {
     });
 
     socket.on("join room", roomName => {
-      console.log("tryna join raum", roomName);
       this.joinRoom(socket, roomName);
     });
 
-    socket.on("group message", (data: GroupMessage) => {
-      socket.to(data.roomName).emit("group message", data);
-      this.io.to(data.roomName).emit("group message", data)
-      console.log('gm', data);
+    socket.on("exit room", roomName => {
+      this.exitRoom(socket, roomName);
+    });
 
+    socket.on("group message", (data: GroupMessage) => {
+      // socket.to(data.roomName).emit("group message", data);
+      this.io.to(data.roomName).emit("group message", data)
     });
 
     socket.on("disconnect", () => {
@@ -46,13 +47,27 @@ export class RoomService {
   }
 
   private joinRoom(socket: socketio.Socket, roomName: string) {
+    console.log("join raum", roomName);
 
     if (!this.doesRoomExist(roomName)) {
       this.addRoomToDirectory({ name: roomName });
     }
+    
     socket.join(roomName);
     const response: GroupMessage = { msg: { msg: 'user joined' }, roomName };
     this.io.to(roomName).emit("group message", response);
+  }
+
+  private exitRoom(socket: socketio.Socket, roomName: string) {
+    console.log("exit raum", roomName);
+
+    if (!this.doesRoomExist(roomName)) {
+      return;
+    }
+    
+    const response: GroupMessage = { msg: { msg: 'user left' }, roomName };
+    this.io.to(roomName).emit("group message", response)
+    socket.leave(roomName);
   }
 
   private addRoomToDirectory(room: Room) {

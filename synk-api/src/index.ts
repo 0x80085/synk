@@ -1,79 +1,67 @@
 import * as socketio from "socket.io";
 import * as http from "http";
+import * as dotenv from "dotenv";
 import * as express from "express";
 import { Request, Response } from "express-serve-static-core";
 
-import * as dotenv from "dotenv";
-import { RoomService } from "./room-service";
-import { AuthService } from "./auth-service";
-
 import "reflect-metadata";
-import { createConnection } from "typeorm";
-import { User } from "./entity/User";
-import { v4 as uuid } from "uuid";
+import {  createConnection } from "typeorm";
 
+import * as userController from "./api/controllers/user";
+import { RoomService } from "./socket/room-service";
+import setupPassport, * as auth from "./auth/auth-service";
 
-dotenv.config();
+export async function run() {
 
-const PORT = process.env.HOST_PORT;
+  dotenv.config();
 
-// Init DB Connection
+  const PORT = process.env.HOST_PORT;
 
-createConnection().then(async connection => {
+  // Init Db 
+  const connection = await createConnection();
 
-  // console.log("Inserting a new user into the database...");
-  // const user = new User();
-  // user.email = "Timber";
-  // user.username = "Saw";
-  // user.id = uuid();
-  // user.passwordash = 'root';
+  // Init express js
+  const app = express();
+  app.set("port", PORT);
+  
+  // setup PassportJS
+  setupPassport(app, connection)
 
-  // await connection.manager.save(user);
-  // console.log("Saved a new user with id: " + user.id);
+  // Bind SocketIO to Express server
+  const wsHttp = new http.Server(app);
+  const io = socketio(wsHttp);
 
-  console.log("Loading users from the database...");
-  const users = await connection.manager.find(User);
-  console.log("Loaded users: ", users);
+  // Setup chat Rooms
+  const roomService = new RoomService(io);
 
-  console.log("Here you can setup and run express/koa/any other framework.");
+  io.use((socket, next) => {
+    console.log('user connected', socket.id);
 
-}).catch(error => console.log(error));
+    roomService.setupListeners(socket);
+    next();
 
+  });
 
-// Init express js
-const app = express();
-app.set("port", PORT);
+  // Setup api http server routes
+  app.get("/", (req: Request, res: Response) => {
+    res.send("herro from chink town");
+  });
+  app.get("/account", auth.ensureAuthenticated, userController.getAccount);
+  app.patch("/account/update", auth.ensureAuthenticated, userController.patchUpdateProfile);
+  app.patch("/account/password", auth.ensureAuthenticated, userController.patchUpdatePassword);
+  app.delete("/account/delete", auth.ensureAuthenticated, userController.deleteAccount);
+  app.post("/login", userController.postLogin);
+  app.get("/logout", userController.getLogout);
+  app.post("/signup", userController.postSignup);
 
-// Bind Socket.io to http server
-const wsHttp = new http.Server(app);
-const io = socketio(wsHttp);
+  // Go
+  wsHttp.listen(3000, function () {
+    console.log(`Started on port ${PORT}`);
+  });
 
-// Setup http server listener for path '/'
-app.get("/", (req: Request, res: Response) => {
-  res.send("herro from chink town");
-});
+};
 
-const roomService = new RoomService(io);
-const authService = new AuthService();
-
-// Setup middleware (auth, flood detect, b& filter, etc)
-io.use((socket, next) => {
-  var handshakeData = socket.request;
-  if (!authService.authorize()) {
-    next(new Error("not authorized"));
-  }
-  console.log('user connected', socket.id);
-
-  roomService.setupListeners(socket);
-
-  next();
-});
-
-// Setup Socket.io listener for 'connection' event &
-// listen for room related events
-// io.on("connection", socket => {});
-
-// Go
-wsHttp.listen(3000, function () {
-  console.log(`Started on port ${PORT}`);
-});
+run()
+  .then()
+  .catch()
+  .finally()

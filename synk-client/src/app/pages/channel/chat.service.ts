@@ -28,6 +28,8 @@ export class ChatService {
 
   groupMessages$: Observable<Message[]> = new Observable(observer => {
     this.socket.on('group message', (data: GroupMessage) => {
+      console.log(data);
+      
       this.messageQueue = this.messageQueue.concat(data.msg);
       observer.next(this.messageQueue);
     });
@@ -54,9 +56,10 @@ export class ChatService {
     this.socket.emit('join room', name);
   }
 
-  exit() {
+  exit(name: string) {
+    this.socket.emit('exit room', name);
     this.socket.off('group message');
-    this.socket.disconnect();
+    // this.socket.disconnect();
     this.messageQueue = [];
   }
 
