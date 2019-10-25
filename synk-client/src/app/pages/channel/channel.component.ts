@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { MediaComponent } from './media/media.component';
 
 @Component({
   selector: 'app-channel',
@@ -8,9 +9,12 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class ChannelComponent implements OnInit {
 
-  name: string;
+  @ViewChild('player', { static: true }) player: MediaComponent;
 
-  constructor(private route: ActivatedRoute) { }
+  name: string;
+  mediaUrl = 'https://www.youtube.com/watch?v=_Jw7_DLlU4s';
+
+  constructor(private route: ActivatedRoute) {}
 
   ngOnInit() {
     this.name = this.route.snapshot.paramMap.get('name');

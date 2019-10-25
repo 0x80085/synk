@@ -48,7 +48,7 @@ export class MediaComponent implements  OnInit {
     this.ref.instance.seek(to);
   }
 
-  loadComponent() {
+  private loadComponent() {
     const componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.getCompatibleMediaComponent(this.mediaUrl));
 
     const viewContainerRef = this.host.viewContainerRef;
@@ -58,7 +58,7 @@ export class MediaComponent implements  OnInit {
     (this.ref.instance as BaseMediaComponent).url = this.mediaUrl;
   }
 
-  getCompatibleMediaComponent(url: string): Type<BaseMediaComponent> {
+  private getCompatibleMediaComponent(url: string): Type<BaseMediaComponent> {
     return YoutubeComponent;
   }
 
