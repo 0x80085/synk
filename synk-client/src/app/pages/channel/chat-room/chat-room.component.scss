@@ -1,5 +1,21 @@
-textarea {
-  min-height: 50px;
-  height: auto;
-  overflow: hidden;
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .feed {
+    flex: 1;
+    overflow-y: hidden;
+  }
+
+  .textbox {
+    width: 100%;
+    margin-top: 16px;
+
+    textarea {
+      min-height: 50px;
+      height: auto;
+      overflow: hidden;
+    }
+  }
 }

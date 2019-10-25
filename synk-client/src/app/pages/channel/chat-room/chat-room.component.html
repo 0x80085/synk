@@ -1,16 +1,37 @@
-<nz-card style="width:100%" [nzTitle]="name">
-  <nz-comment nzAuthor="unkwn" *ngFor="let message of messages$ | async | slice:-10">
-    <nz-comment-content>
-      {{ message.msg }}
-    </nz-comment-content>
-  </nz-comment>
-</nz-card>
+<div class="wrapper">
+  <nz-card [nzTitle]="name" class="feed" [nzBodyStyle]="{ overflowY : 'auto', height: '90%' }">
+    <nz-comment
+      nzAuthor="unkwn"
+      *ngFor="let message of messages$ | async | slice: -10"
+    >
+      <nz-comment-content>
+        {{ message.msg }}
+      </nz-comment-content>
+    </nz-comment>
+  </nz-card>
 
-<nz-card style="width:100%; margin-top: 16px" [nzActions]="[sendIcon]">
-  <textarea nz-input placeholder="Autosize height based on content lines" [(ngModel)]="msgBoxValue" name="textarea"
-    rows="5" cols="30" minlength="10" maxlength="512" (keyup.enter)="onSendMessageToGroup()" nzAutosize></textarea>
-</nz-card>
+  <nz-card [nzActions]="[sendIcon]" class="textbox">
+    <textarea
+      nz-input
+      placeholder="Autosize height based on content lines"
+      [(ngModel)]="msgBoxValue"
+      name="textarea"
+      rows="5"
+      cols="30"
+      minlength="10"
+      maxlength="512"
+      (keyup.enter)="onSendMessageToGroup()"
+      nzAutosize
+    ></textarea>
+  </nz-card>
+</div>
 
+<!-- Send Icon Template-->
 <ng-template #sendIcon>
-  <i nz-icon nzType="edit" title="Send message" (click)="onSendMessageToGroup()"></i>
+  <i
+    nz-icon
+    nzType="edit"
+    title="Send message"
+    (click)="onSendMessageToGroup()"
+  ></i>
 </ng-template>
