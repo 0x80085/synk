@@ -7,11 +7,18 @@ import { Observable, fromEvent, timer } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 export interface Message {
-  msg: string;
+  userName?: string;
+  text: string;
 }
 
-export interface GroupMessage {
-  msg: Message;
+export interface RoomMessage {
+  content: Message;
+  roomName: string;
+}
+
+export interface MediaEvent {
+  mediaUrl: string;
+  currentTime: number;
   roomName: string;
 }
 
@@ -19,19 +26,22 @@ export interface GroupMessage {
   providedIn: 'root'
 })
 export class ChatService {
-
   messageQueue: Message[] = [];
 
   disconnect$: Observable<string[]>;
 
   privateMessage$: Observable<string[]>;
 
-  groupMessages$: Observable<Message[]> = new Observable(observer => {
-    this.socket.on('group message', (data: GroupMessage) => {
-      console.log(data);
-      
-      this.messageQueue = this.messageQueue.concat(data.msg);
+  roomMessages$: Observable<Message[]> = new Observable(observer => {
+    this.socket.on('group message', (data: RoomMessage) => {
+      this.messageQueue = this.messageQueue.concat(data.content);
       observer.next(this.messageQueue);
+    });
+  });
+
+  roomMediaEvent$: Observable<MediaEvent> = new Observable(observer => {
+    this.socket.on('media event', (data: MediaEvent) => {
+      observer.next(data);
     });
   });
 
@@ -47,11 +57,15 @@ export class ChatService {
     this.socket.emit('private message', msg);
   }
 
-  sendGM(msg: Message, roomName: string) {
-    this.socket.emit('group message', { msg, roomName });
+  sendMessageToRoom(msg: Message, roomName: string) {
+    const message: RoomMessage = {
+      roomName,
+      content: msg
+    };
+    this.socket.emit('group message', message);
   }
 
-  enter(name: string) {
+  enterRoom(name: string) {
     this.socket.connect();
     this.socket.emit('join room', name);
   }
@@ -59,7 +73,6 @@ export class ChatService {
   exit(name: string) {
     this.socket.emit('exit room', name);
     this.socket.off('group message');
-    // this.socket.disconnect();
     this.messageQueue = [];
   }
 

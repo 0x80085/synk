@@ -1,0 +1,119 @@
+import * as socketio from "socket.io";
+
+import {
+  MediaEvent,
+  OutgoingGroupMessage,
+  IncomingGroupMessage
+} from "./messages";
+
+export enum Roles {
+  Leader = "Leader",
+  Mod = "Mod",
+  Janitor = "Janitor",
+  Regular = "Regular",
+  Newbie = "Newbie"
+}
+
+export type PermissionLevels = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+
+export interface RoomUser {
+  id: string;
+  userName: string;
+  role: Roles;
+  permissionLevel: PermissionLevels;
+}
+
+export class Room {
+  name: string;
+  users: RoomUser[] = [];
+
+  private io: socketio.Server;
+
+  constructor(name: string, creator: socketio.Socket, _io: socketio.Server) {
+    this.io = _io;
+    this.name = name;
+    const leader = this.CreateLeaderFromUser(creator);
+    this.users.push(leader);
+    console.log(`Created room [${name}] with leader [${leader.userName}]`);
+  }
+
+  join(socket: socketio.Socket) {
+    socket.join(this.name);
+
+    const response: OutgoingGroupMessage = {
+      roomName: this.name,
+      content: {
+        userName: "info",
+        text: "user joined"
+      }
+    };
+    this.io.to(this.name).emit("group message", response);
+  }
+
+  exitRoom(socket: socketio.Socket) {
+    console.log("exit raum", this.name);
+
+    const response: OutgoingGroupMessage = {
+      roomName: this.name,
+      content: { userName: "info", text: "user left" }
+    };
+    socket.to(this.name).emit("group message", response);
+    socket.leave(this.name);
+  }
+
+  sendMessageToRoom(socket: socketio.Socket, msg: IncomingGroupMessage) {
+    const message: OutgoingGroupMessage = {
+      roomName: this.name,
+      content: {
+        text: msg.content.text,
+        userName: socket.id
+      }
+    };
+    this.io.to(this.name).emit("group message", message);
+  }
+
+  emitMediaEventToUsers(socket: socketio.Socket, data: MediaEvent) {
+    const user = this.getUserFromSocket(socket);
+    this.throwIfNotRole(user.role, Roles.Leader);
+
+    socket.to(this.name).emit("media event", data);
+  }
+
+  private getUserFromSocket(socket: socketio.Socket): RoomUser {
+    const user = this.users.find(u => u.id === socket.id);
+
+    if (!user) {
+      throw Error("User not in room");
+    }
+
+    return user;
+  }
+
+  private CreateLeaderFromUser(socket: socketio.Socket): RoomUser {
+    return {
+      id: socket.id,
+      permissionLevel: 10,
+      role: Roles.Leader,
+      userName: `${socket.id.substring(5)}-LEADR`
+    };
+  }
+
+  private AssignRoleToUser(socket: socketio.Socket) {}
+
+  private AssignPermissionToUser(socket: socketio.Socket) {}
+
+  private throwIfNotPermitted(
+    userPermissionLevel: number,
+    RequiredPermissionLevel: number
+  ): void {
+    if (userPermissionLevel < RequiredPermissionLevel) {
+      throw Error("Not Permitted");
+    }
+  }
+
+  private throwIfNotRole(userRole: Roles, requiredRole: Roles): void {
+    if (userRole !== requiredRole) {
+      throw Error("Not Permitted");
+    }
+  }
+}

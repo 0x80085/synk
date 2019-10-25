@@ -1,17 +1,10 @@
 import * as socketio from "socket.io";
 
-export interface Room {
-  name: string;
-}
-
-export interface Message {
-  msg: string;
-}
-
-export interface GroupMessage {
-  msg: Message;
-  roomName: string
-}
+import { Room } from "./room";
+import {
+  IncomingGroupMessage,
+  MediaEvent
+} from "./messages";
 
 export class RoomService {
   public publicRooms: Room[] = [];
@@ -35,9 +28,18 @@ export class RoomService {
       this.exitRoom(socket, roomName);
     });
 
-    socket.on("group message", (data: GroupMessage) => {
-      // socket.to(data.roomName).emit("group message", data);
-      this.io.to(data.roomName).emit("group message", data)
+    socket.on("group message", (data: IncomingGroupMessage) => {
+      const room = this.getRoom(data.roomName);
+
+      if (!room) {
+        throw Error("Room non-existant");
+      }
+
+      room.sendMessageToRoom(socket, data)
+    });
+
+    socket.on("media event", (data: MediaEvent) => {
+      this.io.to(data.roomName).emit("media event", data);
     });
 
     socket.on("disconnect", () => {
@@ -47,34 +49,39 @@ export class RoomService {
   }
 
   private joinRoom(socket: socketio.Socket, roomName: string) {
-    console.log("join raum", roomName);
+    const room = this.getRoom(roomName);
 
-    if (!this.doesRoomExist(roomName)) {
-      this.addRoomToDirectory({ name: roomName });
+    if (!room) {
+      const newRoom = this.createNewRoom(socket, roomName);
+      this.addRoomToDirectory(newRoom);
+      newRoom.join(socket);
+      return;
     }
-    
-    socket.join(roomName);
-    const response: GroupMessage = { msg: { msg: 'user joined' }, roomName };
-    this.io.to(roomName).emit("group message", response);
+
+    room.join(socket);
   }
 
   private exitRoom(socket: socketio.Socket, roomName: string) {
     console.log("exit raum", roomName);
 
-    if (!this.doesRoomExist(roomName)) {
-      return;
+    const room = this.getRoom(roomName);
+
+    if (!room) {
+      throw Error("Room non-existant");
     }
-    
-    const response: GroupMessage = { msg: { msg: 'user left' }, roomName };
-    this.io.to(roomName).emit("group message", response)
-    socket.leave(roomName);
+
+    room.exitRoom(socket);
   }
 
   private addRoomToDirectory(room: Room) {
     this.publicRooms.push(room);
   }
 
-  private doesRoomExist(roomName: string) {
-    return this.publicRooms.filter(r => r.name === roomName).length > 0;
+  private getRoom(roomName: string) {
+    return this.publicRooms.find(r => r.name === roomName);
+  }
+
+  private createNewRoom(socket: socketio.Socket, roomName: string) {
+    return new Room(roomName, socket, this.io);
   }
 }
