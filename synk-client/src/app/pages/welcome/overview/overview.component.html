@@ -3,7 +3,7 @@
   <ng-template #item let-item>
     <nz-list-item [ngClass]="'item'" routerLink="/channel/{{item.roomName}}" [nzContent]="nzContent">
       <ng-template #nzContent>
-        <nz-card [nzTitle]="item.roomName">
+        <nz-card [nzTitle]="item.roomName" [nzHoverable]="true">
             {{item.description}}
         </nz-card>
       </ng-template>
