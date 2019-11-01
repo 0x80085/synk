@@ -37,10 +37,6 @@ export const createRoom = (
   console.log("##### ROOM CREATION TRY");
 
   try {
-    console.log(req);
-    console.log(req.body);
-    console.log(typeof req.body);
-
     roomService.createRoom(req.body);
 
     res.status(200).send("OK");
