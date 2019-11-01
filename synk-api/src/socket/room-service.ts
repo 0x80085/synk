@@ -1,18 +1,19 @@
 import * as socketio from "socket.io";
 
 import { Room } from "./room";
-import {
-  IncomingGroupMessage,
-  MediaEvent
-} from "./messages";
+import { IncomingGroupMessage, MediaEvent } from "./messages";
+import { RoomDto } from "../api/controllers/chat-room";
 
 export class RoomService {
-  public publicRooms: Room[] = [];
-
   private io: socketio.Server;
+
+  public publicRooms: Room[] = [];
 
   constructor(_io: socketio.Server) {
     this.io = _io;
+
+    const defaultRoom = new Room("SNKD", null, this.io);
+    this.publicRooms.push(defaultRoom);
   }
 
   public setupListeners(socket: socketio.Socket) {
@@ -32,10 +33,10 @@ export class RoomService {
       const room = this.getRoom(data.roomName);
 
       if (!room) {
-        throw Error("Room non-existant");
+        return Error("Room non-existant");
       }
 
-      room.sendMessageToRoom(socket, data)
+      room.sendMessageToRoom(socket, data);
     });
 
     socket.on("media event", (data: MediaEvent) => {
@@ -46,6 +47,13 @@ export class RoomService {
       console.log("disconnect");
       this.io.emit("user disconnected");
     });
+  }
+
+  public createRoom(data: { name: string; description: string }) {
+    const newRoom = new Room(data.name, null, this.io);
+    newRoom.description = data.description;
+
+    this.addRoomToDirectory(newRoom);
   }
 
   private joinRoom(socket: socketio.Socket, roomName: string) {
@@ -62,18 +70,20 @@ export class RoomService {
   }
 
   private exitRoom(socket: socketio.Socket, roomName: string) {
-    console.log("exit raum", roomName);
-
     const room = this.getRoom(roomName);
 
     if (!room) {
-      throw Error("Room non-existant");
+      return Error("Room non-existant");
     }
 
-    room.exitRoom(socket);
+    room.exit(socket);
   }
 
   private addRoomToDirectory(room: Room) {
+    if (this.getRoom(room.name)) {
+      console.log("##### ERR ROOM ALREADY EXiSTS");
+      throw Error("Room already exists");
+    }
     this.publicRooms.push(room);
   }
 

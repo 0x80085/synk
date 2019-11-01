@@ -16,7 +16,6 @@ import { createConnection, FindConditions, getConnection } from "typeorm";
 export const postLogin: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
     check("email", "Email is not valid").isEmail();
     check("password", "Password cannot be blank").isLength({ min: 1 });
-    // eslint-disable-next-line @typescript-eslint/camelcase
     sanitize("email").normalizeEmail({ gmail_remove_dots: false });
 
     const errors = validationResult(req);
@@ -56,7 +55,7 @@ export const postSignup: RequestHandler = async (req: Request, res: Response, ne
     check("email", "Email is not valid").isEmail();
     check("username", "username not valid").isLength({ min: 4 });
     check("password", "Password must be at least 4 characters long").isLength({ min: 4 });
-    // eslint-disable-next-line @typescript-eslint/camelcase
+
     sanitize("email").normalizeEmail({ gmail_remove_dots: false });
 
     const errors = validationResult(req);
@@ -66,7 +65,6 @@ export const postSignup: RequestHandler = async (req: Request, res: Response, ne
     }
 
     const connection = getConnection()
-
 
     console.log("Loading users from the database...");
     var qry: FindConditions<User> = {

@@ -1,16 +1,32 @@
-<nz-list [nzDataSource]="data$ | async" [nzRenderItem]="item"
-  [nzGrid]="{ gutter: 16, xs: 24, sm: 12, md: 6, lg: 6, xl: 4 }" [nzNoResult]="noResults">
+<nz-list
+  [nzDataSource]="data$ | async"
+  [nzRenderItem]="item"
+  [nzGrid]="{ gutter: 16, xs: 24, sm: 12, md: 6, lg: 6, xl: 4 }"
+  [nzNoResult]="noResults"
+>
   <ng-template #item let-item>
-    <nz-list-item [ngClass]="'item'" routerLink="/channel/{{item.roomName}}" [nzContent]="nzContent">
+    <nz-list-item
+      [ngClass]="'item'"
+      routerLink="/channel/{{ item.roomName }}"
+      [nzContent]="nzContent"
+    >
       <ng-template #nzContent>
         <nz-card [nzTitle]="item.roomName" [nzHoverable]="true">
-            {{item.description}}
+          {{ item.description }}
         </nz-card>
       </ng-template>
     </nz-list-item>
   </ng-template>
 </nz-list>
 
+<div nz-row>
+  <div nz-col nzSpan="4">
+    <nz-card nzTitle="New room">
+      <app-create-room-form></app-create-room-form>
+    </nz-card>
+  </div>
+</div>
+
 <ng-template #noResults>
-    <nz-empty></nz-empty>
+  <nz-empty></nz-empty>
 </ng-template>

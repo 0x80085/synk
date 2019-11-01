@@ -1,17 +1,17 @@
-import * as socketio from "socket.io";
 import * as http from "http";
 import * as dotenv from "dotenv";
 import * as express from "express";
-import { Request, Response } from "express-serve-static-core";
+import * as cors from "cors";
 
 import "reflect-metadata";
 import { createConnection } from "typeorm";
 
-import * as userController from "./api/controllers/user";
-import { RoomService } from "./socket/room-service";
-import setupPassport, * as auth from "./auth/auth-service";
+import setupPassport from "./auth/auth-service";
+import { setupRoutes } from "./api/routes";
+import { setupSockets } from "./socket/setup";
+import bodyParser = require("body-parser");
 
-export async function run() {
+async function configure() {
   dotenv.config();
 
   const PORT = process.env.HOST_PORT;
@@ -21,55 +21,32 @@ export async function run() {
 
   // Init express js
   const app = express();
+  app.use(cors());
+  // parse application/x-www-form-urlencoded
+  app.use(bodyParser.urlencoded({ extended: false }));
+  // parse application/json
+  app.use(bodyParser.json());
+
   app.set("port", PORT);
-
-  // setup PassportJS
-  setupPassport(app, connection);
-
-  // Bind SocketIO to Express server
   const wsHttp = new http.Server(app);
-  const io = socketio(wsHttp);
 
-  // Setup chat Rooms
-  const roomService = new RoomService(io);
+  setupPassport(app, connection);
+  const { roomService } = setupSockets(app, wsHttp);
+  // setupHandlers(connection, )
+  setupRoutes(app, roomService);
 
-  io.use((socket, next) => {
-    console.log("user connected", socket.id);
+  return { app, wsHttp, connection, PORT };
+}
 
-    roomService.setupListeners(socket);
-    next();
-  });
-
-  // Setup api http server routes
-  app.get("/", (req: Request, res: Response) => {
-    res.send("herro from chink town");
-  });
-  app.get("/account", auth.ensureAuthenticated, userController.getAccount);
-  app.patch(
-    "/account/update",
-    auth.ensureAuthenticated,
-    userController.patchUpdateProfile
-  );
-  app.patch(
-    "/account/password",
-    auth.ensureAuthenticated,
-    userController.patchUpdatePassword
-  );
-  app.delete(
-    "/account/delete",
-    auth.ensureAuthenticated,
-    userController.deleteAccount
-  );
-  app.post("/login", userController.postLogin);
-  app.get("/logout", userController.getLogout);
-  app.post("/signup", userController.postSignup);
+async function run() {
+  const { app, wsHttp, connection, PORT } = await configure();
 
   // Go
   wsHttp.listen(3000, function() {
     console.info(`###########################`);
-    console.info(`SERVER LAUNCHED`);
+    console.info(`\t SERVER LAUNCHED`);
     console.info(`###########################`);
-    console.info(`Started on port ${PORT}`);
+    console.info(`\t Started on port ${PORT}`);
     console.info(`###########################`);
   });
 }
