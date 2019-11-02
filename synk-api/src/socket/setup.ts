@@ -2,7 +2,7 @@ import * as http from "http";
 import * as express from "express";
 import * as socketio from "socket.io";
 
-import { RoomService } from "./room-service";
+import { RoomService } from "./services/room-service";
 
 export function setupSockets(app: express.Application, wsHttp: http.Server) {
   // Bind SocketIO to Express server

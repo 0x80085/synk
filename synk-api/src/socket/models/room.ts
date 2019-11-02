@@ -1,27 +1,11 @@
 import * as socketio from "socket.io";
 
+import { RoomUser, Roles } from "./user";
 import {
-  MediaEvent,
   OutgoingGroupMessage,
-  IncomingGroupMessage
-} from "./messages";
-
-export enum Roles {
-  Leader = "Leader",
-  Mod = "Mod",
-  Janitor = "Janitor",
-  Regular = "Regular",
-  Newbie = "Newbie"
-}
-
-export type PermissionLevels = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
-
-export interface RoomUser {
-  id: string;
-  userName: string;
-  role: Roles;
-  permissionLevel: PermissionLevels;
-}
+  IncomingGroupMessage,
+  MediaEvent
+} from "./message";
 
 export class Room {
   name: string;

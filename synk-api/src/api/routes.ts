@@ -4,7 +4,7 @@ import { Request, Response } from "express-serve-static-core";
 import * as userController from "./controllers/user";
 import * as chatroomController from "./controllers/chat-room";
 import * as auth from "../auth/auth-service";
-import { RoomService } from "../socket/room-service";
+import { RoomService } from "../socket/services/room-service";
 
 export function setupRoutes(
   app: express.Application,

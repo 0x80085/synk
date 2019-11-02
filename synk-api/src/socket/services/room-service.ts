@@ -1,8 +1,7 @@
 import * as socketio from "socket.io";
 
-import { Room } from "./room";
-import { IncomingGroupMessage, MediaEvent } from "./messages";
-import { RoomDto } from "../api/controllers/chat-room";
+import { Room } from "../models/room";
+import { IncomingGroupMessage, MediaEvent } from "../models/message";
 
 export class RoomService {
   private io: socketio.Server;
