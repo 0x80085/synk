@@ -6,6 +6,7 @@ import {
   FormBuilder,
   Validators
 } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-create-room-form',
@@ -18,7 +19,11 @@ export class CreateRoomFormComponent implements OnInit {
     description: new FormControl('')
   });
 
-  constructor(private service: OverviewService, private fb: FormBuilder) {}
+  constructor(
+    private service: OverviewService,
+    private fb: FormBuilder,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -35,6 +40,8 @@ export class CreateRoomFormComponent implements OnInit {
       description: this.form.controls.description.value
     };
     console.log(results);
-    this.service.createChannel(results);
+    this.service.createChannel(results).subscribe(() => {
+      this.router.navigate(['/channel', results.name]);
+    });
   }
 }

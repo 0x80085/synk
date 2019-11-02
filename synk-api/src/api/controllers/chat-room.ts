@@ -39,7 +39,7 @@ export const createRoom = (
   try {
     roomService.createRoom(req.body);
 
-    res.status(200).send("OK");
+    res.status(200).json("OK");
   } catch (error) {
     console.log(error);
 

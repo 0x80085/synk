@@ -31,13 +31,10 @@ export class OverviewService {
   }
 
   createChannel(channel: ChannelDraft) {
-    const headers = new HttpHeaders().set(
-      'Content-Type',
-      'application/json'
-    );
+    const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
-    return this.http
-      .post(`${environment.api}/create-room`, channel, { headers })
-      .subscribe();
+    return this.http.post(`${environment.api}/create-room`, channel, {
+      headers
+    });
   }
 }
