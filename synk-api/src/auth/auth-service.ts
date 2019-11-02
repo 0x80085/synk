@@ -18,7 +18,7 @@ export default async function setupPassport(server: Express, connection: Connect
       if (!user) {
         done(null, false, { message: 'Could not find that user' })
       } else {
-        const passwordIsCorrect = user.passwordash === password;
+        const passwordIsCorrect = user.passwordHash === password;
 
         if (passwordIsCorrect) {
           setTimeout(() => done(null, user), Math.floor(Math.random() * 20))
