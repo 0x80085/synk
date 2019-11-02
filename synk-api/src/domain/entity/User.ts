@@ -10,7 +10,7 @@ export class User {
   email: string;
 
   @Column()
-  passwordash: string;
+  passwordHash: string;
 
   @Column()
   username: string;
