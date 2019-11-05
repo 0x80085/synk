@@ -41,11 +41,17 @@ export class MediaComponent implements  OnInit {
   play(): void {
     this.ref.instance.play();
   }
+
   pause(): void {
     this.ref.instance.pause();
   }
+
   seek(to: number): void {
     this.ref.instance.seek(to);
+  }
+
+  getCurrentTime(){
+    return this.ref.instance.getCurrentTime();
   }
 
   private loadComponent() {

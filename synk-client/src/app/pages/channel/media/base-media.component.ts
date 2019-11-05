@@ -4,4 +4,5 @@ export interface BaseMediaComponent {
   play(): void;
   pause(): void;
   seek(to: number): void;
+  getCurrentTime(): number;
 }

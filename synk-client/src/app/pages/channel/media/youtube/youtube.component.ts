@@ -45,6 +45,10 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
     this.player.seekTo(to, true);
   }
 
+  getCurrentTime(): number {
+    return this.player.getCurrentTime();
+  }
+
   onPlayerReady(event) {
     this.player = event.target;
     this.play();

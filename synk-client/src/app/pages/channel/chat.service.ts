@@ -41,6 +41,8 @@ export class ChatService {
 
   roomMediaEvent$: Observable<MediaEvent> = new Observable(observer => {
     this.socket.on('media event', (data: MediaEvent) => {
+      console.log('media event received', data.currentTime);
+
       observer.next(data);
     });
   });
@@ -63,6 +65,15 @@ export class ChatService {
       content: msg
     };
     this.socket.emit('group message', message);
+  }
+
+  sendMediaEvent(mediaUrl: string, currentTime: number, roomName: string) {
+    const ev: MediaEvent = {
+      currentTime,
+      mediaUrl,
+      roomName
+    };
+    this.socket.emit('media event', ev);
   }
 
   enterRoom(name: string) {

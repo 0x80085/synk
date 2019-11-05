@@ -39,6 +39,8 @@ export class RoomService {
     });
 
     socket.on("media event", (data: MediaEvent) => {
+      console.log("media event received", data.currentTime);
+
       this.io.to(data.roomName).emit("media event", data);
     });
 
