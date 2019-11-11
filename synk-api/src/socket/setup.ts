@@ -15,13 +15,16 @@ export function setupSockets(app: express.Application, wsHttp: http.Server) {
   io.use((socket, next) => {
     console.log("user connecting to socket", socket.id);
 
-    if (ensureAuthenticated(socket.request, socket.request, next)) {
-      roomService.setupListeners(socket);
-      return next();
-    }
+    roomService.setupListeners(socket);
+    return next();
+
+    // if (ensureAuthenticated(socket.request, socket.request, next, socket)) {
+    // roomService.setupListeners(socket);
+    //   return next();
+    // }
 
     // Not allowed
-    socket.disconnect();
+    // socket.disconnect();
   });
 
   return { roomService, io };

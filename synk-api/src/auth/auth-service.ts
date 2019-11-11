@@ -93,17 +93,27 @@ export default async function setupAuthMiddleware(
 export function ensureAuthenticated(
   req: Request,
   res: Response,
-  next: Function
+  next: Function,
+  socket?: socketio.Socket
 ) {
+  const isAuthenticated = socket
+    ? socket.client.request.isAuthenticated()
+    : req.isAuthenticated();
+  console.log("autthing ! by:: ", socket ? "socket " : "req");
 
-  if (req.isAuthenticated()) {
-    console.log("user", req.user);
-    console.log("session", req.session);
-    console.log(`user authenticated`);
+  if (!isAuthenticated) {
+    if (socket) {
+      console.log(socket.client.request.session);
 
-    return next();
+      console.log("socket::", "not authorized");
+      return next(new Error("authentication error"));
+    } else {
+      console.log("http::", "not authorized");
+      return res.sendStatus(403);
+    }
   }
 
-  console.log(`user NOT! authenticated`);
-  res.sendStatus(403);
+  console.log("authenticatd ! by:: ", socket ? "socket " : "req");
+
+  return next();
 }

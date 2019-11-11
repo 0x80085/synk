@@ -2,7 +2,6 @@ import * as socketio from "socket.io";
 
 import { Room } from "../models/room";
 import { IncomingGroupMessage, MediaEvent } from "../models/message";
-import { ensureAuthenticated } from "../../auth/auth-service";
 
 export class RoomService {
   private io: socketio.Server;

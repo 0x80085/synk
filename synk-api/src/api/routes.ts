@@ -5,6 +5,7 @@ import * as userController from "./controllers/user";
 import * as chatroomController from "./controllers/chat-room";
 import * as auth from "../auth/auth-service";
 import { RoomService } from "../socket/services/room-service";
+import { NextFunction } from "connect";
 
 export function setupRoutes(
   app: express.Application,
@@ -50,7 +51,8 @@ export function setupRoutes(
 
   app.post(
     "/create-room",
-    auth.ensureAuthenticated,
+    (req: Request, res: Response, next: NextFunction) =>
+      auth.ensureAuthenticated(req, res, next),
     (req: Request, res: Response) =>
       chatroomController.createRoom(req, res, roomService)
   );
