@@ -1,6 +1,6 @@
 import * as socketio from "socket.io";
 
-import { RoomUser, Roles } from "./user";
+import { RoomUser, Roles, PermissionLevels } from "./user";
 import {
   OutgoingGroupMessage,
   IncomingGroupMessage,
@@ -8,17 +8,19 @@ import {
 } from "./message";
 
 export class Room {
+
   name: string;
   description: string;
   users: RoomUser[] = [];
+  leader: RoomUser = null;
 
   private io: socketio.Server;
 
   constructor(name: string, creator: socketio.Socket, _io: socketio.Server) {
     this.io = _io;
     this.name = name;
-    const leader = this.CreateLeaderFromUser(creator);
-    this.users.push(leader);
+    const leader = this.setLeader(creator);
+    // this.setAdmin(creator);
     console.log(`Created room [${name}] with leader [${leader.userName}]`);
   }
 
@@ -33,6 +35,29 @@ export class Room {
       }
     };
     this.io.to(this.name).emit("group message", response);
+  }
+
+  setLeader(socket: socketio.Socket) {
+    const ld = socket
+      ? {
+          id: socket.id,
+          permissionLevel: 10 as PermissionLevels,
+          role: Roles.Leader,
+          userName: `${socket.id.substring(5)}-LEADR`
+        }
+      : {
+          id: "_NO_LEADER_ID_",
+          permissionLevel: 10 as PermissionLevels,
+          role: Roles.Leader,
+          userName: "NO LEADER"
+        };
+
+    this.leader = ld;
+    return this.leader;
+  }
+
+  setAdmin(socket: socketio.Socket) {
+    // this.admin = getUserByScket(socket);
   }
 
   exit(socket: socketio.Socket) {
@@ -74,25 +99,9 @@ export class Room {
     return user;
   }
 
-  private CreateLeaderFromUser(socket?: socketio.Socket): RoomUser {
-    return socket
-      ? {
-          id: socket.id,
-          permissionLevel: 10,
-          role: Roles.Leader,
-          userName: `${socket.id.substring(5)}-LEADR`
-        }
-      : {
-          id: "_NO_LEADER_ID_",
-          permissionLevel: 10,
-          role: Roles.Leader,
-          userName: "NO LEADER"
-        };
-  }
+  private assignRoleToUser(socket: socketio.Socket) {}
 
-  private AssignRoleToUser(socket: socketio.Socket) {}
-
-  private AssignPermissionToUser(socket: socketio.Socket) {}
+  private assignPermissionToUser(socket: socketio.Socket) {}
 
   private throwIfNotPermitted(
     userPermissionLevel: number,

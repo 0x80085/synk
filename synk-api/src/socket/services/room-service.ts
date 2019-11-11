@@ -2,6 +2,7 @@ import * as socketio from "socket.io";
 
 import { Room } from "../models/room";
 import { IncomingGroupMessage, MediaEvent } from "../models/message";
+import { ensureAuthenticated } from "../../auth/auth-service";
 
 export class RoomService {
   private io: socketio.Server;
@@ -15,12 +16,13 @@ export class RoomService {
     this.publicRooms.push(defaultRoom);
   }
 
-  public setupListeners(socket: socketio.Socket) {
+  public setupListeners(socket: socketio.Socket){
     socket.on("private message", (from, msg) => {
       console.log("I received a private message by ", from, " saying ", msg);
     });
 
     socket.on("join room", roomName => {
+      console.log(socket.request.session);
       this.joinRoom(socket, roomName);
     });
 
@@ -30,6 +32,7 @@ export class RoomService {
 
     socket.on("group message", (data: IncomingGroupMessage) => {
       const room = this.getRoom(data.roomName);
+      console.log(socket.request.session);
 
       if (!room) {
         return Error("Room non-existant");

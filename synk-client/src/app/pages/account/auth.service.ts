@@ -17,7 +17,8 @@ export class AuthService {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
     return this.http.post(`${environment.api}/signup`, userCreds, {
-      headers
+      headers,
+      withCredentials: true
     });
   }
 
@@ -25,7 +26,8 @@ export class AuthService {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
     return this.http.post(`${environment.api}/login`, userCreds, {
-      headers
+      headers,
+      withCredentials: true
     });
   }
 }

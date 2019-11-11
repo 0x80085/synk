@@ -48,7 +48,10 @@ export function setupRoutes(
     chatroomController.getRooms(req, res, roomService)
   );
 
-  app.post("/create-room", (req: Request, res: Response) =>
-    chatroomController.createRoom(req, res, roomService)
+  app.post(
+    "/create-room",
+    auth.ensureAuthenticated,
+    (req: Request, res: Response) =>
+      chatroomController.createRoom(req, res, roomService)
   );
 }

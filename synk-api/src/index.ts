@@ -6,7 +6,7 @@ import * as cors from "cors";
 import "reflect-metadata";
 import { createConnection } from "typeorm";
 
-import setupPassport from "./auth/auth-service";
+import setupAuthMiddleware from "./auth/auth-service";
 import { setupRoutes } from "./api/routes";
 import { setupSockets } from "./socket/setup";
 import bodyParser = require("body-parser");
@@ -21,15 +21,15 @@ async function configure() {
 
   // Init express js
   const app = express();
-  app.use(cors());
-  app.use(bodyParser.urlencoded({ extended: false }));
-  app.use(bodyParser.json());
-
   app.set("port", PORT);
+  app.use(cors({ credentials: true, origin: "http://localhost:4200" }));
+  app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: false }));
+
   const wsHttp = new http.Server(app);
 
-  setupPassport(app, connection);
-  const { roomService } = setupSockets(app, wsHttp);
+  const { roomService, io } = setupSockets(app, wsHttp);
+  setupAuthMiddleware(app, connection, io);
   setupRoutes(app, roomService);
 
   return { app, wsHttp, connection, PORT };

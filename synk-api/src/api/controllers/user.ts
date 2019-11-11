@@ -25,7 +25,7 @@ export const postLogin: RequestHandler = (
 
   if (!errors.isEmpty()) {
     res.status(400).send(["login failed", errors]);
-    next();
+    // next();
   }
 
   passport.authenticate(
@@ -39,9 +39,17 @@ export const postLogin: RequestHandler = (
       }
       req.logIn(user, err => {
         if (err) {
+          console.log(err);
           return next(err);
         }
-        res.status(200).send("user logged in");
+        req.login(user, error => {
+          if (!error) {
+            return res.status(200).send(["ok", "user logged in"]);
+          }
+          console.log(error);
+          return next(err);
+        });
+        // next(user);
       });
     }
   )(req, res, next);
@@ -52,6 +60,7 @@ export const postLogin: RequestHandler = (
  * Log out.
  */
 export const getLogout = (req: Request, res: Response) => {
+  req.logOut();
   req.logout();
   res.status(200).send("user logged out");
 };

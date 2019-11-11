@@ -26,7 +26,7 @@ export class OverviewService {
 
     return this.http.get<OverviewlistItem[]>(
       `${environment.api}/public-rooms`,
-      { params }
+      { params, withCredentials: true }
     );
   }
 
@@ -34,7 +34,8 @@ export class OverviewService {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
     return this.http.post(`${environment.api}/create-room`, channel, {
-      headers
+      headers,
+      withCredentials: true
     });
   }
 }

@@ -1,16 +1,25 @@
 import * as passport from "passport";
-import { Express, Response, Request } from "express";
-import { User } from "../domain/entity/User";
-import { Connection } from "typeorm";
 import * as bcrypt from "bcrypt";
+import * as uuid from "uuid";
+import * as socketio from "socket.io";
+import * as session from "express-session";
 
-let LocalStrategy = require("passport-local").Strategy;
+import { Express, Response, Request } from "express";
+import { Connection } from "typeorm";
+import { TypeormStore } from "typeorm-store";
 
-export default async function setupPassport(
+import { User } from "../domain/entity/User";
+import { Session } from "../domain/entity/Session";
+
+import { Strategy as LocalStrategy } from "passport-local";
+
+export default async function setupAuthMiddleware(
   server: Express,
-  connection: Connection
+  connection: Connection,
+  io: socketio.Server
 ) {
   const userRepo = connection.getRepository(User);
+  const sessionRepo = connection.getRepository(Session);
 
   passport.use(
     "local",
@@ -19,10 +28,7 @@ export default async function setupPassport(
       password: string,
       done: Function
     ) {
-      const searchUser = new User();
       const user = await userRepo.findOne({ username });
-
-      searchUser.username = username;
 
       if (!user) {
         done(null, false, { message: "Could not find that user" });
@@ -44,17 +50,38 @@ export default async function setupPassport(
     })
   );
 
-  passport.serializeUser(function(user: User, done: Function) {
+  passport.serializeUser((user: User, done: Function) => {
+    console.log("serializeUser", user);
+
     done(null, user.id);
   });
 
-  passport.deserializeUser(async function(id: number, done) {
-    const user = await userRepo.findByIds([id]);
-    if (user[0]) {
-      done(null, user[0]);
+  passport.deserializeUser(async (id: number, done) => {
+    const user = await userRepo.findOne({ where: { id } });
+    if (user) {
+      console.log("deserializeUser", user);
+      done(null, user);
     } else {
-      done("404", user[0]);
+      done("404", user);
     }
+  });
+
+  // generate & configure session/passport middleware
+  const sessionMiddleware = session({
+    genid: req => {
+      return uuid(); // use UUIDs for session IDs
+    },
+    secret: "whatisthissecretidowntknow",
+    resave: false,
+    saveUninitialized: false,
+    store: new TypeormStore({ repository: sessionRepo }),
+    cookie: {
+      maxAge: 3600000
+    }
+  });
+  server.use(sessionMiddleware);
+  io.use((socket, next) => {
+    sessionMiddleware(socket.request, socket.request.res, next);
   });
 
   server.use(passport.initialize());
@@ -68,10 +95,15 @@ export function ensureAuthenticated(
   res: Response,
   next: Function
 ) {
-  console.log(req.user);
+
   if (req.isAuthenticated()) {
+    console.log("user", req.user);
+    console.log("session", req.session);
+    console.log(`user authenticated`);
+
     return next();
   }
 
+  console.log(`user NOT! authenticated`);
   res.sendStatus(403);
 }
