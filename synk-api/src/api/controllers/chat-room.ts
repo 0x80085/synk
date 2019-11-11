@@ -20,7 +20,7 @@ export const getRooms = (
   roomService: RoomService
 ) => {
   const rooms = roomService.publicRooms;
-  const dtos = convertToRoomsDto(rooms);
+  const dtos = toDto(rooms);
 
   res.send(dtos);
 };
@@ -47,7 +47,7 @@ export const createRoom = (
   }
 };
 
-function convertToRoomsDto(rooms: Room[]): RoomDto[] {
+function toDto(rooms: Room[]): RoomDto[] {
   return rooms.map(room => {
     return {
       roomName: room.name,
