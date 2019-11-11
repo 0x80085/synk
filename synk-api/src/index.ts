@@ -28,8 +28,8 @@ async function configure() {
 
   const wsHttp = new http.Server(app);
 
-  const { roomService, io } = setupSockets(app, wsHttp);
-  setupAuthMiddleware(app, connection, io);
+  const { sessionMiddleware } = await setupAuthMiddleware(app, connection);
+  const { roomService } = setupSockets(app, wsHttp, sessionMiddleware);
   setupRoutes(app, roomService);
 
   return { app, wsHttp, connection, PORT };

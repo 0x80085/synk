@@ -22,6 +22,7 @@ export class RoomService {
 
     socket.on("join room", roomName => {
       console.log(socket.request.session);
+      console.log(socket.request.isAuthenticated());
       this.joinRoom(socket, roomName);
     });
 
@@ -32,6 +33,7 @@ export class RoomService {
     socket.on("group message", (data: IncomingGroupMessage) => {
       const room = this.getRoom(data.roomName);
       console.log(socket.request.session);
+      console.log(socket.request.isAuthenticated());
 
       if (!room) {
         return Error("Room non-existant");

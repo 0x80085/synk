@@ -15,8 +15,7 @@ import { Strategy as LocalStrategy } from "passport-local";
 
 export default async function setupAuthMiddleware(
   server: Express,
-  connection: Connection,
-  io: socketio.Server
+  connection: Connection
 ) {
   const userRepo = connection.getRepository(User);
   const sessionRepo = connection.getRepository(Session);
@@ -80,14 +79,11 @@ export default async function setupAuthMiddleware(
     }
   });
   server.use(sessionMiddleware);
-  io.use((socket, next) => {
-    sessionMiddleware(socket.request, socket.request.res, next);
-  });
 
   server.use(passport.initialize());
   server.use(passport.session());
 
-  return server;
+  return { server, sessionMiddleware };
 }
 
 export function ensureAuthenticated(
