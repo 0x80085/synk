@@ -1,6 +1,6 @@
 <div nz-row>
   <div nz-col nzSpan="8">
-    <nz-card nzTitle="Login">
+    <nz-card nzTitle="Create account">
       <form
         nz-form
         [formGroup]="form"
@@ -32,23 +32,9 @@
           </nz-form-control>
         </nz-form-item>
         <nz-form-item>
-          <nz-form-control>
-            <label nz-checkbox formControlName="remember">
-              <span>Remember me</span>
-            </label>
-            <a class="login-form-forgot" class="login-form-forgot"
-              >Forgot password</a
-            >
-            <button nz-button class="login-form-button" [nzType]="'primary'">
-              Log in
-            </button>
-            Or
-            <a
-              [routerLink]="['/account/new']"
-              routerLinkActive="router-link-active"
-              >register now!</a
-            >
-          </nz-form-control>
+          <button nz-button class="login-form-button" [nzType]="'primary'">
+            Create
+          </button>
         </nz-form-item>
       </form>
     </nz-card>

@@ -5,10 +5,11 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AccountComponent } from './account.component';
 import { NgZorroAntdModule } from 'ng-zorro-antd';
 import { AccountRoutingModule } from './account-routing.module';
+import { RegisterComponent } from './register/register.component';
 
 
 @NgModule({
-  declarations: [LoginComponent, AccountComponent],
+  declarations: [LoginComponent, AccountComponent, RegisterComponent],
   imports: [
     CommonModule,
     FormsModule,

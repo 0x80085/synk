@@ -20,4 +20,12 @@ export class AuthService {
       headers
     });
   }
+
+  login(userCreds: LoginInfo) {
+    const headers = new HttpHeaders().set('Content-Type', 'application/json');
+
+    return this.http.post(`${environment.api}/login`, userCreds, {
+      headers
+    });
+  }
 }

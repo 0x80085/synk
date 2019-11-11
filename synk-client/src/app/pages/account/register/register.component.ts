@@ -3,11 +3,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../auth.service';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  selector: 'app-register',
+  templateUrl: './register.component.html',
+  styleUrls: ['./register.component.css']
 })
-export class LoginComponent implements OnInit {
+export class RegisterComponent implements OnInit {
   form: FormGroup;
 
   submitForm(): void {
@@ -21,7 +21,7 @@ export class LoginComponent implements OnInit {
     };
 
     console.log('submitted');
-    this.service.login(creds).subscribe();
+    this.service.createAccount(creds).subscribe();
   }
 
   constructor(private fb: FormBuilder, private service: AuthService) {}
