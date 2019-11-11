@@ -7,6 +7,7 @@ import { check, sanitize, validationResult } from "express-validator";
 import { User } from "../../domain/entity/User";
 import uuid = require("uuid");
 import { createConnection, FindConditions, getConnection } from "typeorm";
+import * as bcrypt from "bcrypt";
 
 /**
  * POST /login
@@ -17,9 +18,8 @@ export const postLogin: RequestHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  check("email", "Email is not valid").isEmail();
+  check("username", "Email is not valid").isEmail();
   check("password", "Password cannot be blank").isLength({ min: 1 });
-  sanitize("email").normalizeEmail({ gmail_remove_dots: false });
 
   const errors = validationResult(req);
 
@@ -90,10 +90,12 @@ export const postSignup: RequestHandler = async (
 
   console.log("Inserting a new user into the database...");
 
+  const hash = await bcrypt.hash(req.body.password, 10);
+
   const newRecord = new User();
   newRecord.id = uuid();
   newRecord.username = req.body.username;
-  newRecord.passwordHash = req.body.password;
+  newRecord.passwordHash = hash;
 
   await connection.manager.save(newRecord);
   console.log("Saved a new user with id: " + newRecord.id);
