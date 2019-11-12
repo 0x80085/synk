@@ -15,10 +15,10 @@ import { Strategy as LocalStrategy } from "passport-local";
 
 export default async function setupAuthMiddleware(
   server: Express,
-  connection: Connection
+  connection: Connection,
+  sessionMw: session.SessionOptions
 ) {
   const userRepo = connection.getRepository(User);
-  const sessionRepo = connection.getRepository(Session);
 
   passport.use(
     "local",
@@ -66,22 +66,11 @@ export default async function setupAuthMiddleware(
   });
 
   // generate & configure session/passport middleware
-  const sessionMiddleware = session({
-    genid: req => {
-      return uuid(); // use UUIDs for session IDs
-    },
-    secret: "whatisthissecretidowntknow",
-    resave: false,
-    saveUninitialized: false,
-    store: new TypeormStore({ repository: sessionRepo }),
-    cookie: {
-      maxAge: 3600000
-    }
-  });
-  server.use(sessionMiddleware);
+  const sessionMiddleware = session(sessionMw);
 
-  server.use(passport.initialize());
-  server.use(passport.session());
+
+  // server.use(passport.initialize());
+  // server.use(passport.session());
 
   return { server, sessionMiddleware };
 }

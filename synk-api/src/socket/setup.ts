@@ -1,44 +1,50 @@
 import * as http from "http";
-import * as express from "express";
 import * as socketio from "socket.io";
 
 import { RoomService } from "./services/room-service";
-import { ensureAuthenticated } from "../auth/auth-service";
+import * as e from "express";
+import passport = require("passport");
 
 export function setupSockets(
-  app: express.Application,
   wsHttp: http.Server,
-  sessionMiddleware: Function
+  sessionMiddleware: e.RequestHandler
 ) {
-  // Bind SocketIO to Express server
   const io = socketio(wsHttp);
-
-  // Setup chat Rooms
   const roomService = new RoomService(io);
 
-  io.use((socket, next) => {
-    sessionMiddleware(socket.request, socket.request.res, next);
-  });
+  // Set up the Socket.IO server
+  io.use(function(socket, next) {
+    // Wrap the express middleware
+    sessionMiddleware(socket.client.request, {} as any, next);
+  })
+    .use((socket, next) => {
+      console.log("user trying to connect ", socket.id);
+      console.log("user authed? ", socket.client.request.isAuthenticated());
+      next();
+    })
+    .use((socket, next) => {
+      try {
+        console.log(socket.client.request.session);
+        console.log(socket.request.session);
+        console.log(socket.request.isAuthenticated);
+        console.log(socket.client.request.isAuthenticated);
+        console.log(socket.request.session.passport.user);
+        console.log(socket.request.session.passport);
 
-  io.use((socket, next) => {
-    // sessionMiddleware(socket.client.request, socket.client.request.res, next);
+      } catch (error) {}
 
-    console.log("user connecting to socket", socket.id);
-
-    roomService.setupListeners(socket);
-    return next();
-
-    // if (ensureAuthenticated(socket.request, socket.request, next, socket)) {
-    // roomService.setupListeners(socket);
-    //   return next();
-    // }
-
-    // Not allowed
-    // socket.disconnect();
-  }).on("connection", socket => {
-    var userId = socket.request.session.passport.user;
-    console.log("Your User ID is", userId);
-  });
+      if (socket.client.request.isAuthenticated()) {
+        console.log("user authed", socket.id);
+        roomService.setupListeners(socket);
+        return next();
+      }
+      // Not allowed
+      console.log("socket:: Not allowed");
+      next(new Error("unauthorized"));
+    })
+    .on("connection", () => {
+      console.log("connected!");
+    });
 
   return { roomService };
 }

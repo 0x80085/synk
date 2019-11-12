@@ -9,7 +9,12 @@ import { createConnection } from "typeorm";
 import setupAuthMiddleware from "./auth/auth-service";
 import { setupRoutes } from "./api/routes";
 import { setupSockets } from "./socket/setup";
-import bodyParser = require("body-parser");
+import * as bodyParser from "body-parser";
+import * as cookieParser from "cookie-parser";
+import { TypeormStore } from "typeorm-store";
+import { Session } from "./domain/entity/Session";
+import uuid = require("uuid");
+import passport = require("passport");
 
 async function configure() {
   dotenv.config();
@@ -28,22 +33,46 @@ async function configure() {
 
   const wsHttp = new http.Server(app);
 
-  const { sessionMiddleware } = await setupAuthMiddleware(app, connection);
-  const { roomService } = setupSockets(app, wsHttp, sessionMiddleware);
+  const sessionRepo = connection.getRepository(Session);
+  const sessionMiddlewareConfig = {
+    genid: () => {
+      return uuid(); // use UUIDs for session IDs
+    },
+    cookieParser: cookieParser,
+    secret: "whatisthissecretidowntknow",
+    resave: false,
+    saveUninitialized: false,
+    store: new TypeormStore({ repository: sessionRepo }),
+    cookie: {
+      maxAge: 3600000
+    }
+  };
+
+  const { sessionMiddleware } = await setupAuthMiddleware(
+    app,
+    connection,
+    sessionMiddlewareConfig
+  );
+  const { roomService } = setupSockets(wsHttp, sessionMiddleware);
+  app.use(sessionMiddleware);
+
+  app.use(passport.initialize());
+  app.use(passport.session());
+
   setupRoutes(app, roomService);
 
-  return { app, wsHttp, connection, PORT };
+  return { wsHttp };
 }
 
 async function run() {
-  const { app, wsHttp, connection, PORT } = await configure();
+  const { wsHttp } = await configure();
 
   // Go
   wsHttp.listen(3000, function() {
     console.info(`###########################`);
     console.info(`\t SERVER LAUNCHED`);
     console.info(`###########################`);
-    console.info(`\t Started on port ${PORT}`);
+    console.info(`\t Started on port ${process.env.HOST_PORT}`);
     console.info(`###########################`);
   });
 }

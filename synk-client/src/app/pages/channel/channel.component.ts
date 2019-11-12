@@ -1,8 +1,9 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MediaComponent } from './media/media.component';
-import { ChatService, MediaEvent } from './chat.service';
-import { timer, Subscription } from 'rxjs';
+import { ChatService, MediaEvent, Message } from './chat.service';
+import { timer, Subscription, Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-channel',
@@ -18,6 +19,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   mediaUpdateTimer$: Subscription;
   mediaSyncEvent$: Subscription;
+  errorEvent$: Observable<Message[]>;
 
   constructor(
     private route: ActivatedRoute,
@@ -28,6 +30,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
     this.name = this.route.snapshot.paramMap.get('name');
     this.syncPlayerState();
     this.sendPeriodicUpdate();
+    this.quitOnError();
   }
 
   sendPeriodicUpdate() {
@@ -46,6 +49,15 @@ export class ChannelComponent implements OnInit, OnDestroy {
         this.syncIfNeeded(ev);
       }
     });
+  }
+
+  quitOnError() {
+    this.errorEvent$ = this.chatService.permissionErrorEvent$.pipe(
+      tap((x) => {
+        this.mediaUpdateTimer$.unsubscribe();
+        this.mediaSyncEvent$.unsubscribe();
+      })
+    );
   }
 
   private sendMediaUpdate() {

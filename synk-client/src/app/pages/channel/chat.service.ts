@@ -47,12 +47,32 @@ export class ChatService {
     });
   });
 
+  permissionErrorEvent$: Observable<Message[]> = new Observable(observer => {
+    this.socket.on('error', (data: any) => {
+      console.log('error event received', data);
+      this.messageQueue = this.messageQueue.concat([
+        { text: 'Error connecting', userName: '>:)' }
+      ]);
+      observer.next(this.messageQueue);
+      this.socket.close();
+    });
+  });
+
   private socket: SocketIOClient.Socket;
 
   constructor() {
+    this.init();
+  }
+
+  init() {
     this.socket = io(`${environment.api}`);
     this.disconnect$ = fromEvent(this.socket, 'disconnect');
     this.privateMessage$ = fromEvent(this.socket, 'private message');
+  }
+
+  reconnect() {
+    this.socket.close();
+    this.socket.open();
   }
 
   sendDM(msg: string) {

@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { ChatService } from '../channel/chat.service';
+import { tap, mapTo } from 'rxjs/operators';
 
 interface LoginInfo {
   username: string;
@@ -11,7 +13,7 @@ interface LoginInfo {
   providedIn: 'root'
 })
 export class AuthService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private chatServ: ChatService) {}
 
   createAccount(userCreds: LoginInfo) {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
@@ -25,9 +27,15 @@ export class AuthService {
   login(userCreds: LoginInfo) {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
-    return this.http.post(`${environment.api}/login`, userCreds, {
-      headers,
-      withCredentials: true
-    });
+    return this.http
+      .post(`${environment.api}/login`, userCreds, {
+        headers,
+        withCredentials: true
+      })
+      .pipe(
+        tap(() => {
+          this.chatServ.reconnect();
+        })
+      );
   }
 }

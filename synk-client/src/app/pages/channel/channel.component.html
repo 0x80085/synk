@@ -10,6 +10,7 @@
   class="container"
 >
   <div nz-col nzSpan="6" class="column">
+    <nz-alert *ngFor="let item of errorEvent$ | async" [nzMessage]="item.text" ></nz-alert>
     <app-chat-room [name]="name"></app-chat-room>
   </div>
   <div nz-col nzSpan="18" class="column">
