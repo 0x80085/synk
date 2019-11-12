@@ -34,6 +34,7 @@ async function configure() {
   const wsHttp = new http.Server(app);
 
   const sessionRepo = connection.getRepository(Session);
+  const sessionStore = new TypeormStore({ repository: sessionRepo });
   const sessionMiddlewareConfig = {
     genid: () => {
       return uuid(); // use UUIDs for session IDs
@@ -42,7 +43,7 @@ async function configure() {
     secret: "whatisthissecretidowntknow",
     resave: false,
     saveUninitialized: false,
-    store: new TypeormStore({ repository: sessionRepo }),
+    store: sessionStore,
     cookie: {
       maxAge: 3600000
     }
@@ -53,7 +54,7 @@ async function configure() {
     connection,
     sessionMiddlewareConfig
   );
-  const { roomService } = setupSockets(wsHttp, sessionMiddleware);
+  const { roomService } = setupSockets(wsHttp, sessionMiddlewareConfig);
   app.use(sessionMiddleware);
 
   app.use(passport.initialize());

@@ -15,14 +15,12 @@ export class RoomService {
     this.publicRooms.push(defaultRoom);
   }
 
-  public setupListeners(socket: socketio.Socket){
+  public setupListeners(socket: socketio.Socket) {
     socket.on("private message", (from, msg) => {
       console.log("I received a private message by ", from, " saying ", msg);
     });
 
     socket.on("join room", roomName => {
-      console.log(socket.request.session);
-      console.log(socket.request.isAuthenticated());
       this.joinRoom(socket, roomName);
     });
 
