@@ -28,7 +28,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.name = this.route.snapshot.paramMap.get('name');
-    this.chatService.init();
+    this.chatService.reconnect();
     this.syncPlayerState();
     this.sendPeriodicUpdate();
     this.quitOnError();
