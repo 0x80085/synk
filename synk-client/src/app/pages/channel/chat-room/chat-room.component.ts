@@ -14,30 +14,25 @@ export class ChatRoomComponent implements OnDestroy, OnInit {
 
   msgBoxValue: string;
 
-  messages$: Observable<Message[]> = this.chatServ.groupMessages$
+  messages$: Observable<Message[]> = this.chatServ.roomMessages$
     .pipe(
       debounceTime(10),
       distinctUntilChanged()
     );
 
-  // empty$ = this.chatServ.groupMessages$.pipe(
-  //   map(ls => ls.length === 0),
-  //   tap(d => console.log(d))
-  // );
-
   constructor(private chatServ: ChatService) { }
 
   onSendMessageToGroup() {
-    this.chatServ.sendGM({ msg: this.msgBoxValue.trim() }, this.name);
+    this.chatServ.sendMessageToRoom({ text: this.msgBoxValue.trim() }, this.name);
     this.msgBoxValue = '';
   }
 
   ngOnInit() {
-    this.chatServ.enter(this.name);
+    this.chatServ.enterRoom(this.name);
   }
 
   ngOnDestroy() {
-    this.chatServ.exit();
+    this.chatServ.exit(this.name);
   }
 
 

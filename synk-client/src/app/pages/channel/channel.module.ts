@@ -6,9 +6,20 @@ import { ChatRoomComponent } from './chat-room/chat-room.component';
 import { NgZorroAntdModule } from 'ng-zorro-antd';
 import { FormsModule } from '@angular/forms';
 import { ChatService } from './chat.service';
+import { MediaComponent, MediaHostDirective } from './media/media.component';
+import { YoutubeComponent } from './media/youtube/youtube.component';
 
 @NgModule({
-  declarations: [ChannelComponent, ChatRoomComponent],
+  entryComponents: [
+    YoutubeComponent
+  ],
+  declarations: [
+    ChannelComponent,
+    ChatRoomComponent,
+    MediaComponent,
+    MediaHostDirective,
+    YoutubeComponent
+  ],
   imports: [
     CommonModule,
     FormsModule,

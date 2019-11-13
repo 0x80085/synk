@@ -1,0 +1,29 @@
+<form nz-form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <nz-form-item>
+    <nz-form-control nzErrorTip="Please enter the channel name">
+      <nz-input-group>
+        <input
+          type="text"
+          nz-input
+          formControlName="name"
+          placeholder="Channel name"
+        />
+      </nz-input-group>
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-control nzErrorTip="Please enter the channel description">
+      <nz-input-group>
+        <input
+          type="text"
+          nz-input
+          formControlName="description"
+          placeholder="Channel description"
+        />
+      </nz-input-group>
+    </nz-form-control>
+  </nz-form-item>
+  <button nz-button class="login-form-button" [nzType]="'primary'">
+    Create
+  </button>
+</form>

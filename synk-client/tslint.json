@@ -17,6 +17,7 @@
     ],
     "component-selector": [
       true,
+      "attribute",
       "element",
       "app",
       "kebab-case"

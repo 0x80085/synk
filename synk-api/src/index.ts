@@ -1,49 +1,84 @@
-import * as socketio from "socket.io";
 import * as http from "http";
-import * as express from "express";
-import { Request, Response } from "express-serve-static-core";
-
 import * as dotenv from "dotenv";
-import { RoomService } from "./room-service";
-import { AuthService } from "./auth-service";
-dotenv.config();
+import * as express from "express";
+import * as cors from "cors";
 
-const PORT = process.env.HOST_PORT;
+import "reflect-metadata";
+import { createConnection } from "typeorm";
 
-// Init express js
-const app = express();
-app.set("port", PORT);
+import setupAuthMiddleware from "./auth/auth-service";
+import { setupRoutes } from "./api/routes";
+import { setupSockets } from "./socket/setup";
+import * as bodyParser from "body-parser";
+import * as cookieParser from "cookie-parser";
+import { TypeormStore } from "typeorm-store";
+import { Session } from "./domain/entity/Session";
+import uuid = require("uuid");
+import passport = require("passport");
 
-// Bind Socket.io to http server
-const wsHttp = new http.Server(app);
-const io = socketio(wsHttp);
+async function configure() {
+  dotenv.config();
 
-// Setup http server listener for path '/'
-app.get("/", (req: Request, res: Response) => {
-  res.send("herro from chink town");
-});
+  const PORT = process.env.HOST_PORT;
 
-const roomService = new RoomService(io);
-const authService = new AuthService();
+  // Init Db
+  const connection = await createConnection();
 
-// Setup middleware (auth, flood detect, b& filter, etc)
-io.use((socket, next) => {
-  var handshakeData = socket.request;
-  if (!authService.authorize()) {
-    next(new Error("not authorized"));
-  }
-  console.log('user connected', socket.id);
-  
-  roomService.setupListeners(socket);
+  // Init express js
+  const app = express();
+  app.set("port", PORT);
+  app.use(cors({ credentials: true, origin: "http://localhost:4200" }));
+  app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: false }));
 
-  next();
-});
+  const wsHttp = new http.Server(app);
 
-// Setup Socket.io listener for 'connection' event &
-// listen for room related events
-// io.on("connection", socket => {});
+  const sessionRepo = connection.getRepository(Session);
+  const sessionStore = new TypeormStore({ repository: sessionRepo });
+  const sessionMiddlewareConfig = {
+    genid: () => {
+      return uuid(); // use UUIDs for session IDs
+    },
+    cookieParser: cookieParser,
+    secret: "whatisthissecretidowntknow",
+    resave: false,
+    saveUninitialized: false,
+    store: sessionStore,
+    cookie: {
+      maxAge: 3600000
+    }
+  };
 
-// Go
-wsHttp.listen(3000, function() {
-  console.log(`Started on port ${PORT}`);
-});
+  const { sessionMiddleware } = await setupAuthMiddleware(
+    app,
+    connection,
+    sessionMiddlewareConfig
+  );
+  const { roomService } = setupSockets(wsHttp, sessionMiddlewareConfig);
+  app.use(sessionMiddleware);
+
+  app.use(passport.initialize());
+  app.use(passport.session());
+
+  setupRoutes(app, roomService);
+
+  return { wsHttp };
+}
+
+async function run() {
+  const { wsHttp } = await configure();
+
+  // Go
+  wsHttp.listen(3000, function() {
+    console.info(`###########################`);
+    console.info(`\t SERVER LAUNCHED`);
+    console.info(`###########################`);
+    console.info(`\t Started on port ${process.env.HOST_PORT}`);
+    console.info(`###########################`);
+  });
+}
+
+run()
+  .then()
+  .catch(err => console.log(err))
+  .finally();
