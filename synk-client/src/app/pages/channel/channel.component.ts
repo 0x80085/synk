@@ -11,7 +11,7 @@ import { tap } from 'rxjs/operators';
   styleUrls: ['./channel.component.scss']
 })
 export class ChannelComponent implements OnInit, OnDestroy {
-  @ViewChild('player', { static: true }) player: MediaComponent;
+  @ViewChild('player', { static: false }) player: MediaComponent;
 
   name: string;
   mediaUrl = 'https://www.youtube.com/watch?v=_Jw7_DLlU4s';
@@ -28,6 +28,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.name = this.route.snapshot.paramMap.get('name');
+    this.chatService.init();
     this.syncPlayerState();
     this.sendPeriodicUpdate();
     this.quitOnError();
@@ -36,7 +37,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   sendPeriodicUpdate() {
     const source = timer(1000, 2000);
     this.mediaUpdateTimer$ = source.subscribe(val => {
-      if (this.isLeader) {
+      if (this.isLeader && this.player) {
         console.log('sending update');
         this.sendMediaUpdate();
       }
@@ -53,7 +54,9 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   quitOnError() {
     this.errorEvent$ = this.chatService.permissionErrorEvent$.pipe(
-      tap((x) => {
+      tap(x => {
+        console.log(x);
+
         this.mediaUpdateTimer$.unsubscribe();
         this.mediaSyncEvent$.unsubscribe();
       })
@@ -69,6 +72,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
       );
     } catch (error) {
       console.log(error);
+      // throw Error('');
     }
   }
 

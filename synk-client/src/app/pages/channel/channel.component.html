@@ -9,13 +9,32 @@
   nzAlign="center"
   class="container"
 >
+  <nz-alert
+    nz-col
+    *ngFor="let item of errorEvent$ | async"
+    nzSpan="6"
+    nzType="error"
+    [nzShowIcon]="true"
+    [nzMessage]="item.text"
+  ></nz-alert>
+  <div
+    *ngIf="!(errorEvent$ | async); then channelStage; else errorConnecting"
+  ></div>
+</div>
+
+<ng-template #channelStage>
   <div nz-col nzSpan="6" class="column">
-    <nz-alert *ngFor="let item of errorEvent$ | async" [nzMessage]="item.text" ></nz-alert>
     <app-chat-room [name]="name"></app-chat-room>
   </div>
   <div nz-col nzSpan="18" class="column">
-    <app-media #player
-      [mediaUrl]="mediaUrl"
-    ></app-media>
+    <app-media #player [mediaUrl]="mediaUrl"></app-media>
   </div>
-</div>
+</ng-template>
+
+<ng-template #errorConnecting>
+  <div nz-col nzSpan="24" class="column">
+    <nz-empty
+      nzNotFoundContent="Can't connect to channel. Did you log in?"
+    ></nz-empty>
+  </div>
+</ng-template>

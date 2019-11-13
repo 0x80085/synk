@@ -50,9 +50,7 @@ export class ChatService {
   permissionErrorEvent$: Observable<Message[]> = new Observable(observer => {
     this.socket.on('error', (data: any) => {
       console.log('error event received', data);
-      this.messageQueue = this.messageQueue.concat([
-        { text: 'Error connecting', userName: '>:)' }
-      ]);
+      this.messageQueue = [{ text: 'Error connecting', userName: '>:)' }];
       observer.next(this.messageQueue);
       this.socket.close();
     });
