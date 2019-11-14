@@ -2,6 +2,8 @@ import * as http from "http";
 import * as dotenv from "dotenv";
 import * as express from "express";
 import * as cors from "cors";
+import * as uuid from "uuid";
+import * as passport from "passport";
 
 import "reflect-metadata";
 import { createConnection } from "typeorm";
@@ -13,21 +15,30 @@ import * as bodyParser from "body-parser";
 import * as cookieParser from "cookie-parser";
 import { TypeormStore } from "typeorm-store";
 import { Session } from "./domain/entity/Session";
-import uuid = require("uuid");
-import passport = require("passport");
 
 async function configure() {
+  // Config
   dotenv.config();
 
-  const PORT = process.env.HOST_PORT;
+  const port = +process.env.HOST_PORT;
+
+  // CORS
+  const corsUseCredentials = process.env.CORS_USE_CREDENTIAL === "TRUE";
+  const corsOrigin = process.env.CORS_ALLOWED_ORIGIN;
+
+  // Auth, sessions
+  const sessionSecret = process.env.SESSION_SECRET;
+  const saveUninitialized = process.env.SESSION_SAVEUNINITIALIZED === "TRUE";
+  const resave = process.env.SESSION_RESAVE === "TRUE";
+  const cookieMaxAge = +process.env.SESSION_COOKIE_MAXAGE;
 
   // Init Db
   const connection = await createConnection();
 
   // Init express js
   const app = express();
-  app.set("port", PORT);
-  app.use(cors({ credentials: true, origin: "http://localhost:4200" }));
+  app.set("port", port);
+  app.use(cors({ credentials: corsUseCredentials, origin: corsOrigin }));
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -40,12 +51,12 @@ async function configure() {
       return uuid(); // use UUIDs for session IDs
     },
     cookieParser: cookieParser,
-    secret: "whatisthissecretidowntknow",
-    resave: false,
-    saveUninitialized: false,
+    secret: sessionSecret,
+    resave: resave,
+    saveUninitialized: saveUninitialized,
     store: sessionStore,
     cookie: {
-      maxAge: 3600000
+      maxAge: cookieMaxAge
     }
   };
 
@@ -80,5 +91,10 @@ async function run() {
 
 run()
   .then()
-  .catch(err => console.log(err))
-  .finally();
+  .catch(err => {
+    console.error(`#########><::> ###############><::> ###`);
+    console.error(`\t SERVER CRASHED`);
+    console.error(`><::> ###################><::> ########`);
+    console.error(err);
+  })
+  .finally(() => {});
