@@ -1,15 +1,12 @@
 import * as passport from "passport";
 import * as bcrypt from "bcrypt";
-import * as uuid from "uuid";
 import * as socketio from "socket.io";
 import * as session from "express-session";
 
 import { Express, Response, Request } from "express";
 import { Connection } from "typeorm";
-import { TypeormStore } from "typeorm-store";
 
 import { User } from "../domain/entity/User";
-import { Session } from "../domain/entity/Session";
 
 import { Strategy as LocalStrategy } from "passport-local";
 
@@ -52,25 +49,21 @@ export default async function setupAuthMiddleware(
   passport.serializeUser((user: User, done: Function) => {
     console.log("serializeUser", user);
 
-    done(null, user.id);
+    done(null, { id: user.id, username: user.username });
   });
 
-  passport.deserializeUser(async (id: number, done) => {
-    const user = await userRepo.findOne({ where: { id } });
-    if (user) {
-      console.log("deserializeUser", user);
-      done(null, user);
-    } else {
-      done("404", user);
+  passport.deserializeUser(
+    async ({ id }: { id: string; username: string }, done) => {
+      const user = await userRepo.findOne({ where: { id } });
+      if (user) {
+        done(null, { id: user.id, username: user.username });
+      } else {
+        done("404", null);
+      }
     }
-  });
+  );
 
-  // generate & configure session/passport middleware
   const sessionMiddleware = session(sessionMw);
-
-
-  // server.use(passport.initialize());
-  // server.use(passport.session());
 
   return { server, sessionMiddleware };
 }
