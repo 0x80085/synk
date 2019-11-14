@@ -41,14 +41,16 @@ export function setupSockets(
       })
     )
     .use((socket, next) => {
-      try {
-        console.log("@@@@@@@");
-        console.log(socket.client.request.cookie);
-        console.log(socket.handshake.headers.cookie);
-        console.log("@@@@@@@");
-      } catch (error) {
-        console.log(error);
-      }
+      // try {
+      //   // DEBUG
+      //   // console.log("@@@@@@@");
+      //   // console.log(socket.client.request.cookie);
+      //   // console.log(socket.handshake.headers.cookie);
+      //   // console.log(socket.request.user);
+      //   // console.log("@@@@@@@");
+      // } catch (error) {
+      //   console.log(error);
+      // }
 
       if (socket.client.request.isAuthenticated()) {
         console.log("user authed", socket.id);
