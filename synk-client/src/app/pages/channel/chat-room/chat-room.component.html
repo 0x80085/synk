@@ -1,8 +1,8 @@
 <div class="wrapper">
   <nz-card [nzTitle]="name" class="feed" [nzBodyStyle]="{ overflowY : 'auto', height: '90%' }">
     <nz-comment
-      nzAuthor="unkwn"
-      *ngFor="let message of messages$ | async | slice: -10"
+    *ngFor="let message of messages$ | async | slice: -10"
+      [nzAuthor]="message.userName"
     >
       <nz-comment-content>
         {{ message.text }}

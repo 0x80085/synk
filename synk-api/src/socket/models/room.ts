@@ -8,7 +8,6 @@ import {
 } from "./message";
 
 export class Room {
-
   name: string;
   description: string;
   users: RoomUser[] = [];
@@ -76,7 +75,7 @@ export class Room {
       roomName: this.name,
       content: {
         text: msg.content.text,
-        userName: socket.id
+        userName: socket.request.user.username
       }
     };
     this.io.to(this.name).emit("group message", message);
