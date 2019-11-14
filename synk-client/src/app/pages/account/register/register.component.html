@@ -1,6 +1,6 @@
 <div nz-row>
   <div nz-col nzSpan="8">
-    <nz-card nzTitle="Create account">
+    <nz-card nzTitle="Create account" *ngIf="!registerSuccess">
       <form
         nz-form
         [formGroup]="form"
@@ -37,6 +37,13 @@
           </button>
         </nz-form-item>
       </form>
+    </nz-card>
+    <nz-card *ngIf="registerSuccess">
+      <nz-alert
+        [nzShowIcon]="true"
+        nzType="success"
+        [nzMessage]="'User registered, try loggin in!'"
+      ></nz-alert>
     </nz-card>
   </div>
 </div>

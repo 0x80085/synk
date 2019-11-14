@@ -10,6 +10,8 @@ import { AuthService } from '../auth.service';
 export class LoginComponent implements OnInit {
   form: FormGroup;
 
+  isLoginSuccess = false;
+
   submitForm(): void {
     // for (const i in this.validateForm.controls) {
     //   this.validateForm.controls[i].markAsDirty();
@@ -21,7 +23,16 @@ export class LoginComponent implements OnInit {
     };
 
     console.log('submitted');
-    this.service.login(creds).subscribe();
+    this.service.login(creds).subscribe(
+      ob => {
+        console.log('logged in');
+        this.isLoginSuccess = true;
+        this.isLoginSuccess = true;
+      },
+      () => {
+        this.isLoginSuccess = false;
+      }
+    );
   }
 
   constructor(private fb: FormBuilder, private service: AuthService) {}

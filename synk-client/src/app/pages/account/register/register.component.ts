@@ -8,6 +8,8 @@ import { AuthService } from '../auth.service';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit {
+  registerSuccess = false;
+
   form: FormGroup;
 
   submitForm(): void {
@@ -21,7 +23,12 @@ export class RegisterComponent implements OnInit {
     };
 
     console.log('submitted');
-    this.service.createAccount(creds).subscribe();
+    this.service.createAccount(creds).subscribe(
+      () => {
+        this.registerSuccess = true;
+      },
+      () => {}
+    );
   }
 
   constructor(private fb: FormBuilder, private service: AuthService) {}

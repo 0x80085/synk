@@ -13,6 +13,8 @@ interface LoginInfo {
   providedIn: 'root'
 })
 export class AuthService {
+  isLoggedIn = false;
+
   constructor(private http: HttpClient, private chatServ: ChatService) {}
 
   createAccount(userCreds: LoginInfo) {
@@ -34,6 +36,7 @@ export class AuthService {
       })
       .pipe(
         tap(() => {
+          this.isLoggedIn = true;
           this.chatServ.reconnect();
         })
       );

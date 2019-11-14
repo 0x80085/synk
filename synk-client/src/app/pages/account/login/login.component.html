@@ -1,6 +1,6 @@
 <div nz-row>
   <div nz-col nzSpan="8">
-    <nz-card nzTitle="Login">
+    <nz-card nzTitle="Login" *ngIf="!isLoginSuccess">
       <form
         nz-form
         [formGroup]="form"
@@ -51,6 +51,9 @@
           </nz-form-control>
         </nz-form-item>
       </form>
+    </nz-card>
+    <nz-card *ngIf="isLoginSuccess">
+      <nz-alert [nzShowIcon]="true" nzType="success" [nzMessage]="'User logged in!'"></nz-alert>
     </nz-card>
   </div>
 </div>
