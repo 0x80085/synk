@@ -42,6 +42,8 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
   }
 
   seek(to: number): void {
+    console.log('seeking');
+
     this.player.seekTo(to, true);
   }
 

@@ -1,6 +1,6 @@
 import * as socketio from "socket.io";
 
-import { RoomUser, Roles, PermissionLevels } from "./user";
+import { RoomUser, RoomUserConfig, Roles, PermissionLevels } from "./user";
 import {
   OutgoingGroupMessage,
   IncomingGroupMessage,
@@ -18,41 +18,38 @@ export class Room {
   constructor(name: string, creator: socketio.Socket, _io: socketio.Server) {
     this.io = _io;
     this.name = name;
-    const leader = this.setLeader(creator);
-    // this.setAdmin(creator);
-    console.log(`Created room [${name}] with leader [${leader.userName}]`);
+
+    console.log(`Created room [${name}]`);
   }
 
   join(socket: socketio.Socket) {
     socket.join(this.name);
 
-    const response: OutgoingGroupMessage = {
+    const newuser = this.createUserFromSocket(socket);
+
+    console.log(newuser);
+
+    if (this.users.length === 0) {
+      this.setLeader(newuser);
+    }
+
+    this.users.push(newuser);
+
+    const userJoined: OutgoingGroupMessage = {
       roomName: this.name,
       content: {
         userName: "info",
         text: "user joined"
       }
     };
-    this.io.to(this.name).emit("group message", response);
+
+    this.sendUserRoomConfig(socket);
+
+    this.io.to(this.name).emit("group message", userJoined);
   }
 
-  setLeader(socket: socketio.Socket) {
-    const ld = socket
-      ? {
-          id: socket.id,
-          permissionLevel: 10 as PermissionLevels,
-          role: Roles.Leader,
-          userName: `${socket.id.substring(5)}-LEADR`
-        }
-      : {
-          id: "_NO_LEADER_ID_",
-          permissionLevel: 10 as PermissionLevels,
-          role: Roles.Leader,
-          userName: "NO LEADER"
-        };
-
-    this.leader = ld;
-    return this.leader;
+  setLeader(user: RoomUser) {
+    this.leader = user;
   }
 
   setAdmin(socket: socketio.Socket) {
@@ -83,37 +80,45 @@ export class Room {
 
   emitMediaEventToUsers(socket: socketio.Socket, data: MediaEvent) {
     const user = this.getUserFromSocket(socket);
-    this.throwIfNotRole(user.role, Roles.Leader);
 
     socket.to(this.name).emit("media event", data);
   }
 
-  private getUserFromSocket(socket: socketio.Socket): RoomUser {
+  private createUserFromSocket(socket: socketio.Socket): RoomUser {
+    const isLeader =
+      this.leader && this.leader.userName === socket.request.user.username;
+
+    return {
+      id: socket.id,
+      permissionLevel: 1,
+      isLeader,
+      userName: socket.request.user.username,
+      role: Roles.Regular
+    };
+  }
+
+  private getUserFromSocket(socket: socketio.Socket): RoomUser | null {
     const user = this.users.find(u => u.id === socket.id);
-
-    if (!user) {
-      throw Error("User not in room");
-    }
-
     return user;
+  }
+
+  private sendUserRoomConfig(socket: socketio.Socket) {
+    const isLeader =
+      this.leader && this.leader.userName === socket.request.user.username;
+
+    const userConfig: RoomUserConfig = {
+      isLeader,
+      isAdmin: false,
+      permissionLevel: 1,
+      role: Roles.Regular
+    };
+
+    console.log(userConfig);
+
+    socket.emit("user config", userConfig);
   }
 
   private assignRoleToUser(socket: socketio.Socket) {}
 
   private assignPermissionToUser(socket: socketio.Socket) {}
-
-  private throwIfNotPermitted(
-    userPermissionLevel: number,
-    RequiredPermissionLevel: number
-  ): void {
-    if (userPermissionLevel < RequiredPermissionLevel) {
-      throw Error("Not Permitted");
-    }
-  }
-
-  private throwIfNotRole(userRole: Roles, requiredRole: Roles): void {
-    if (userRole !== requiredRole) {
-      throw Error("Not Permitted");
-    }
-  }
 }

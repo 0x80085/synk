@@ -5,32 +5,13 @@ import * as io from 'socket.io-client';
 import { Observable, fromEvent, timer } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
-
-export interface Message {
-  userName?: string;
-  text: string;
-}
-
-export interface RoomMessage {
-  content: Message;
-  roomName: string;
-}
-
-export interface MediaEvent {
-  mediaUrl: string;
-  currentTime: number;
-  roomName: string;
-}
+import { Message, RoomMessage, MediaEvent, RoomUserConfig } from './models/room.models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
   messageQueue: Message[] = [];
-
-  disconnect$: Observable<string[]>;
-
-  privateMessage$: Observable<string[]>;
 
   roomMessages$: Observable<Message[]> = new Observable(observer => {
     this.socket.on('group message', (data: RoomMessage) => {
@@ -42,6 +23,14 @@ export class ChatService {
   roomMediaEvent$: Observable<MediaEvent> = new Observable(observer => {
     this.socket.on('media event', (data: MediaEvent) => {
       console.log('media event received', data.currentTime);
+
+      observer.next(data);
+    });
+  });
+
+  roomUserConfig$: Observable<RoomUserConfig> = new Observable(observer => {
+    this.socket.on('user config', (data: RoomUserConfig) => {
+      console.log('config event received', data);
 
       observer.next(data);
     });
@@ -64,8 +53,6 @@ export class ChatService {
 
   init() {
     this.socket = io(`${environment.api}`);
-    this.disconnect$ = fromEvent(this.socket, 'disconnect');
-    this.privateMessage$ = fromEvent(this.socket, 'private message');
   }
 
   reconnect() {

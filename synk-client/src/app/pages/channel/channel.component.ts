@@ -1,9 +1,12 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { MediaComponent } from './media/media.component';
-import { ChatService, MediaEvent, Message } from './chat.service';
-import { timer, Subscription, Observable } from 'rxjs';
+
 import { tap } from 'rxjs/operators';
+import { timer, Subscription, Observable } from 'rxjs';
+
+import { MediaComponent } from './media/media.component';
+import { ChatService } from './chat.service';
+import { MediaEvent, Message, RoomUserConfig } from './models/room.models';
 
 @Component({
   selector: 'app-channel',
@@ -14,12 +17,13 @@ export class ChannelComponent implements OnInit, OnDestroy {
   @ViewChild('player', { static: false }) player: MediaComponent;
 
   name: string;
-  mediaUrl = 'https://www.youtube.com/watch?v=_Jw7_DLlU4s';
-  isLeader?: boolean = true;
+  mediaUrl = 'https://www.youtube.com/watch?v=T-BF_KaG7rg';
+  isLeader = false;
 
   mediaUpdateTimer$: Subscription;
   mediaSyncEvent$: Subscription;
   errorEvent$: Observable<Message[]>;
+  roomUserConfig$: Subscription;
 
   constructor(
     private route: ActivatedRoute,
@@ -32,6 +36,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
     this.syncPlayerState();
     this.sendPeriodicUpdate();
     this.quitOnError();
+    this.receiveRoomConfig();
   }
 
   sendPeriodicUpdate() {
@@ -49,6 +54,14 @@ export class ChannelComponent implements OnInit, OnDestroy {
       if (!this.isLeader) {
         this.syncIfNeeded(ev);
       }
+    });
+  }
+
+  receiveRoomConfig() {
+    this.roomUserConfig$ = this.chatService.roomUserConfig$.subscribe(ev => {
+      console.log(ev);
+
+      this.isLeader = ev.isLeader;
     });
   }
 
@@ -94,6 +107,8 @@ export class ChannelComponent implements OnInit, OnDestroy {
       this.player.play();
     }
     if (this.clientCurrenttimeIsOutOfSync(ev.currentTime)) {
+      console.log(this.clientCurrenttimeIsOutOfSync(ev.currentTime));
+
       this.player.seek(ev.currentTime);
     }
   }
@@ -111,7 +126,25 @@ export class ChannelComponent implements OnInit, OnDestroy {
       const maxTimeBehind = originTime - 2;
       const maxTimeAhead = originTime + 2;
 
-      return clientTime < maxTimeAhead && clientTime > maxTimeBehind;
+      console.log(
+        `
+        Client time:\t${clientTime}
+        maxTimeBehind :\t${maxTimeBehind}
+        maxTimeAhead :\t${maxTimeAhead}
+        Leader time:\t${originTime}
+        `
+      );
+
+      console.log(
+        `
+        client in sync:\t${clientTime < maxTimeBehind ||
+          clientTime > maxTimeBehind}
+        client behind :\t${clientTime < maxTimeBehind}
+        maxTimeAhead :\t${clientTime > maxTimeAhead}
+        `
+      );
+
+      return clientTime < maxTimeBehind || clientTime > maxTimeAhead;
     } catch (error) {
       return false; // getCurrentTime failed prob
     }

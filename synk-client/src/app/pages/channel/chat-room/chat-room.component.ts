@@ -1,7 +1,8 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { distinctUntilChanged, debounceTime } from 'rxjs/operators';
-import { ChatService, Message } from '../chat.service';
+import { ChatService } from '../chat.service';
+import { Message } from '../models/room.models';
 
 @Component({
   selector: 'app-chat-room',

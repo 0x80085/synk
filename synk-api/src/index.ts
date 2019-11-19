@@ -92,9 +92,9 @@ async function run() {
 run()
   .then()
   .catch(err => {
-    console.error(`#########><::> ###############><::> ###`);
+    console.error(`\t#########><::> ###############><::> ###`);
     console.error(`\t SERVER CRASHED`);
-    console.error(`><::> ###################><::> ########`);
+    console.error(`\t><::> ###################><::> ########`);
     console.error(err);
   })
   .finally(() => {});
