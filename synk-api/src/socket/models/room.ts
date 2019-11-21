@@ -6,12 +6,16 @@ import {
   IncomingGroupMessage,
   MediaEvent
 } from "./message";
+import { Playlist } from "./playlist";
 
 export class Room {
   name: string;
   description: string;
-  users: RoomUser[] = [];
+
   leader: RoomUser = null;
+  users: RoomUser[] = [];
+
+  playlists: Playlist[] = [];
 
   private io: socketio.Server;
 
