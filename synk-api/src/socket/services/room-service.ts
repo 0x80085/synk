@@ -15,7 +15,7 @@ export class RoomService {
     this.publicRooms.push(defaultRoom);
   }
 
-  public setupListeners(socket: socketio.Socket) {
+  public setupListeners(socket: socketio.Socket) { // Room should know this info - or refactor to socket handlers
     socket.on("private message", (from, msg) => {
       console.log("I received a private message by ", from, " saying ", msg);
     });
