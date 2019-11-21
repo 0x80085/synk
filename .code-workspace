@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "synk-api"
+		},
+		{
+			"path": "synk-client"
+		}
+	],
+	"settings": {
+		
+	}
+}
