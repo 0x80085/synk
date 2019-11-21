@@ -79,8 +79,6 @@ export class Room {
   }
 
   emitMediaEventToUsers(socket: socketio.Socket, data: MediaEvent) {
-    const user = this.getUserFromSocket(socket);
-
     socket.to(this.name).emit("media event", data);
   }
 

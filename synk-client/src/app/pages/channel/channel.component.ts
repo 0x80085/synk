@@ -40,8 +40,8 @@ export class ChannelComponent implements OnInit, OnDestroy {
   }
 
   sendPeriodicUpdate() {
-    const source = timer(1000, 2000);
-    this.mediaUpdateTimer$ = source.subscribe(val => {
+    const timer$ = timer(1000, 2000);
+    this.mediaUpdateTimer$ = timer$.subscribe(val => {
       if (this.isLeader && this.player) {
         console.log('sending update');
         this.sendMediaUpdate();
@@ -125,6 +125,8 @@ export class ChannelComponent implements OnInit, OnDestroy {
       const clientTime = this.player.getCurrentTime();
       const maxTimeBehind = originTime - 2;
       const maxTimeAhead = originTime + 2;
+      const isOutOfSync =
+        clientTime < maxTimeBehind || clientTime > maxTimeAhead;
 
       console.log(
         `
@@ -132,21 +134,17 @@ export class ChannelComponent implements OnInit, OnDestroy {
         maxTimeBehind :\t${maxTimeBehind}
         maxTimeAhead :\t${maxTimeAhead}
         Leader time:\t${originTime}
-        `
-      );
 
-      console.log(
-        `
-        client in sync:\t${clientTime < maxTimeBehind ||
-          clientTime > maxTimeBehind}
+        client out of sync:\t${isOutOfSync}
         client behind :\t${clientTime < maxTimeBehind}
         maxTimeAhead :\t${clientTime > maxTimeAhead}
         `
       );
 
-      return clientTime < maxTimeBehind || clientTime > maxTimeAhead;
+      return isOutOfSync;
     } catch (error) {
-      return false; // getCurrentTime failed prob
+      console.log(error.toString && error.toString());
+      return false;
     }
   }
 
