@@ -1,6 +1,6 @@
 import * as socketio from "socket.io";
 
-import { RoomUser, RoomUserConfig, Roles, PermissionLevels } from "./user";
+import { RoomUser, RoomUserConfig, Roles } from "./user";
 import {
   OutgoingGroupMessage,
   IncomingGroupMessage,
@@ -11,17 +11,29 @@ import { Playlist } from "./playlist";
 export class Room {
   name: string;
   description: string;
+  creator: string;
 
   leader: RoomUser = null;
   users: RoomUser[] = [];
 
   playlists: Playlist[] = [];
+  currentPlayList: Playlist | null = null;
 
   private io: socketio.Server;
 
-  constructor(name: string, creator: socketio.Socket, _io: socketio.Server) {
+  constructor(
+    name: string,
+    originSocket: socketio.Socket,
+    _io: socketio.Server
+  ) {
     this.io = _io;
     this.name = name;
+
+    this.creator = originSocket ? originSocket.request.user.username : "Lain";
+
+    const defaultPlaylist = new Playlist("default");
+    this.currentPlayList = defaultPlaylist;
+    this.playlists.push(defaultPlaylist);
 
     console.log(`Created room [${name}]`);
   }
@@ -54,10 +66,6 @@ export class Room {
 
   setLeader(user: RoomUser) {
     this.leader = user;
-  }
-
-  setAdmin(socket: socketio.Socket) {
-    // this.admin = getUserByScket(socket);
   }
 
   exit(socket: socketio.Socket) {

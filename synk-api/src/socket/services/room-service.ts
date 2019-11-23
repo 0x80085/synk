@@ -2,6 +2,7 @@ import * as socketio from "socket.io";
 
 import { Room } from "../models/room";
 import { IncomingGroupMessage, MediaEvent } from "../models/message";
+import { MediaContent } from "../models/playlist";
 
 export class RoomService {
   private io: socketio.Server;
@@ -15,7 +16,8 @@ export class RoomService {
     this.publicRooms.push(defaultRoom);
   }
 
-  public setupListeners(socket: socketio.Socket) { // Room should know this info - or refactor to socket handlers
+  public setupListeners(socket: socketio.Socket) {
+    // Room should know this info - or refactor to socket handlers
     socket.on("private message", (from, msg) => {
       console.log("I received a private message by ", from, " saying ", msg);
     });
@@ -43,7 +45,22 @@ export class RoomService {
     socket.on("media event", (data: MediaEvent) => {
       console.log("media event received", data.currentTime);
 
-      this.io.to(data.roomName).emit("media event", data);
+      const afterPlaylistUpdate = (state: MediaContent) => {
+        const update: MediaEvent = { ...state, roomName: data.roomName };
+        this.io.to(data.roomName).emit("media event", update);
+      };
+
+      const room = this.getRoom(data.roomName);
+      room.currentPlayList.handleListUpdate(data, afterPlaylistUpdate);
+    });
+
+    socket.on("add media", (data: MediaEvent) => {
+      console.log("add media received", data.currentTime);
+
+      const room = this.getRoom(data.roomName);
+      room.currentPlayList.add(data, false, socket.request.user.username);
+
+      // this.io.to(data.roomName).emit("playlist update", update);
     });
 
     socket.on("disconnect", () => {
