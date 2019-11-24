@@ -28,11 +28,8 @@ export class Playlist {
     this.name = name;
   }
 
-  add(media: MediaContent, isPermenant: boolean, addedBy: string) {
-    const item = new PlaylistItem(media.mediaUrl, addedBy);
-    item.isPermenant = isPermenant;
-
-    this.list.push(item);
+  add(media:PlaylistItem) {
+    this.list.push(media);
   }
 
   next(media: MediaContent, isPermenant: boolean, addedBy: string) {
@@ -92,14 +89,26 @@ export class Playlist {
     afterUpdateCallback: (arg: MediaEvent) => void
   ) => {
     this.update(ev);
+
     this.publish(afterUpdateCallback);
+    console.log('### this.current', this.current);
   };
 
   update = (ev: MediaEvent) => {
     const selectedItem = this.list.find(it => it.mediaUrl === ev.mediaUrl);
 
-    this.current = selectedItem ? selectedItem : this.current; // hmmm
-    this.current.currentTime = ev.currentTime;
+    if (!selectedItem) {
+      // delete/throw when add media is implemnted
+      this.add({
+        addedByUsername: "lain",
+        currentTime: ev.currentTime,
+        isPermenant: false,
+        mediaUrl: ev.mediaUrl
+      });
+
+      this.current = this.list.find(it => it.mediaUrl === ev.mediaUrl);
+      this.current.currentTime = ev.currentTime;
+    }
   };
 
   publish = (callback: (arg: MediaContent) => void) => {

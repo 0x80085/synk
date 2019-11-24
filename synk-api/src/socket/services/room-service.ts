@@ -46,19 +46,32 @@ export class RoomService {
       console.log("media event received", data.currentTime);
 
       const afterPlaylistUpdate = (state: MediaContent) => {
-        const update: MediaEvent = { ...state, roomName: data.roomName };
+        const update: MediaEvent = {
+          ...state,
+          roomName: data.roomName,
+          currentTime: data.currentTime
+        };
+        console.log("## UPDATE", update);
+
         this.io.to(data.roomName).emit("media event", update);
       };
 
       const room = this.getRoom(data.roomName);
-      room.currentPlayList.handleListUpdate(data, afterPlaylistUpdate);
+      const isLeader = room.leader.userName === socket.request.user.username;
+      if (isLeader) {
+        room.currentPlayList.handleListUpdate(data, afterPlaylistUpdate);
+      }
     });
 
     socket.on("add media", (data: MediaEvent) => {
       console.log("add media received", data.currentTime);
 
       const room = this.getRoom(data.roomName);
-      room.currentPlayList.add(data, false, socket.request.user.username);
+      room.currentPlayList.add({
+        ...data,
+        isPermenant: false,
+        addedByUsername: socket.request.user.username
+      });
 
       // this.io.to(data.roomName).emit("playlist update", update);
     });

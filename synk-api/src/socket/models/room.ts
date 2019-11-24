@@ -108,7 +108,9 @@ export class Room {
   }
 
   private getUserFromSocket(socket: socketio.Socket): RoomUser | null {
-    const user = this.users.find(u => u.id === socket.id);
+    const user = this.users.find(
+      u => u.userName === socket.request.user.username
+    );
     return user;
   }
 
