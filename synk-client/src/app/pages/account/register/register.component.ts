@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../auth.service';
+import { NzNotificationService } from 'ng-zorro-antd';
 
 @Component({
   selector: 'app-register',
@@ -12,26 +13,11 @@ export class RegisterComponent implements OnInit {
 
   form: FormGroup;
 
-  submitForm(): void {
-    // for (const i in this.validateForm.controls) {
-    //   this.validateForm.controls[i].markAsDirty();
-    //   this.validateForm.controls[i].updateValueAndValidity();
-    // }
-    const creds = {
-      username: this.form.controls.userName.value,
-      password: this.form.controls.password.value
-    };
-
-    console.log('submitted');
-    this.service.createAccount(creds).subscribe(
-      () => {
-        this.registerSuccess = true;
-      },
-      () => {}
-    );
-  }
-
-  constructor(private fb: FormBuilder, private service: AuthService) {}
+  constructor(
+    private fb: FormBuilder,
+    private service: AuthService,
+    private notification: NzNotificationService
+  ) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -50,5 +36,27 @@ export class RegisterComponent implements OnInit {
       ],
       remember: [true]
     });
+  }
+
+  submitForm(): void {
+    const creds = {
+      username: this.form.controls.userName.value,
+      password: this.form.controls.password.value
+    };
+
+    this.service.createAccount(creds).subscribe(
+      () => {
+        this.registerSuccess = true;
+      },
+      err => {
+        this.notification.create(
+          'error',
+          'Registration failed',
+          `
+          AAaaaaah
+        `
+        );
+      }
+    );
   }
 }
