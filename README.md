@@ -1,5 +1,7 @@
 # Synk Project
 
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/0x80085/synk//graphs/commit-activity)
+
 > Watch youtube vids in sync and chat with friends
 
 ## Install 
