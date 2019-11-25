@@ -3,6 +3,17 @@ import * as socketio from "socket.io";
 import { Room } from "../models/room";
 import { IncomingGroupMessage, MediaEvent } from "../models/message";
 import { MediaContent } from "../models/playlist";
+import { SocketPassport } from "../models/socket.passport";
+
+export enum Commands {
+  PM = "private message",
+  JOIN_ROOM = "join room",
+  EXIT_ROOM = "exit room",
+  GROUP_MESSAGE = "group message",
+  MEDIA_EVENT = "media event",
+  ADD_MEDIA = "add media",
+  DISCONNECT = "disconnect"
+}
 
 export class RoomService {
   private io: socketio.Server;
@@ -16,73 +27,36 @@ export class RoomService {
     this.publicRooms.push(defaultRoom);
   }
 
-  public setupListeners(socket: socketio.Socket) {
-    // Room should know this info - or refactor to socket handlers
-    socket.on("private message", (from, msg) => {
-      console.log("I received a private message by ", from, " saying ", msg);
-    });
+  registerCommands = (socket: SocketPassport, next: (err?: any) => void) => {
+    this.setupCommandHandlers(socket);
+    next();
+  };
 
-    socket.on("join room", roomName => {
+  private setupCommandHandlers(socket: SocketPassport) {
+    socket.on(Commands.JOIN_ROOM, (roomName: string) => {
       this.joinRoom(socket, roomName);
     });
 
-    socket.on("exit room", roomName => {
+    socket.on(Commands.EXIT_ROOM, (roomName: string) => {
       this.exitRoom(socket, roomName);
     });
 
-    socket.on("group message", (data: IncomingGroupMessage) => {
-      const room = this.getRoom(data.roomName);
-      console.log(socket.request.session);
-      console.log(socket.request.isAuthenticated());
+    socket.on(Commands.GROUP_MESSAGE, (data: IncomingGroupMessage) =>
+      this.onGroupMessage(data, socket)
+    );
 
-      if (!room) {
-        return Error("Room non-existant");
-      }
+    socket.on(Commands.MEDIA_EVENT, (data: MediaEvent) =>
+      this.onMediaEvent(data, socket)
+    );
 
-      room.sendMessageToRoom(socket, data);
-    });
+    socket.on(Commands.ADD_MEDIA, (data: MediaEvent) =>
+      this.onAddMedia(data, socket)
+    );
 
-    socket.on("media event", (data: MediaEvent) => {
-      console.log("media event received", data.currentTime);
-
-      const afterPlaylistUpdate = (state: MediaContent) => {
-        const update: MediaEvent = {
-          ...state,
-          roomName: data.roomName,
-          currentTime: data.currentTime
-        };
-        console.log("## UPDATE", update);
-
-        this.io.to(data.roomName).emit("media event", update);
-      };
-
-      const room = this.getRoom(data.roomName);
-      const isLeader = room.leader.userName === socket.request.user.username;
-      if (isLeader) {
-        room.currentPlayList.handleListUpdate(data, afterPlaylistUpdate);
-      }
-    });
-
-    socket.on("add media", (data: MediaEvent) => {
-      console.log("add media received", data.currentTime);
-
-      const room = this.getRoom(data.roomName);
-      room.currentPlayList.add({
-        ...data,
-        isPermenant: false,
-        addedByUsername: socket.request.user.username
-      });
-
-      // this.io.to(data.roomName).emit("playlist update", update);
-    });
-
-    socket.on("disconnect", () => {
-      console.log("disconnect");
-      this.io.emit("user disconnected");
-    });
+    socket.on(Commands.DISCONNECT, this.disconnect);
   }
 
-  public createRoom(data: { name: string; description: string }) {
+  createRoom(data: { name: string; description: string }) {
     const newRoom = new Room(data.name, null, this.io);
     newRoom.description = data.description;
 
@@ -101,6 +75,62 @@ export class RoomService {
 
     room.join(socket);
   }
+
+  private onMediaEvent = (data: MediaEvent, socket: SocketPassport) => {
+    console.log("media event received", data.currentTime);
+
+    const afterPlaylistUpdate = (state: MediaContent) => {
+      const update: MediaEvent = {
+        ...state,
+        roomName: data.roomName,
+        currentTime: data.currentTime
+      };
+      console.log("## UPDATE", update);
+      this.io.to(data.roomName).emit("media event", update);
+    };
+
+    const room = this.getRoom(data.roomName);
+    const isLeader =
+      room.leader && room.leader.userName === socket.request.user.username;
+
+    if (isLeader) {
+      room.currentPlayList.handleListUpdate(data, afterPlaylistUpdate);
+    }
+  };
+
+  private onAddMedia = (data: MediaEvent, socket: SocketPassport) => {
+    console.log("add media received", data.currentTime);
+
+    const room = this.getRoom(data.roomName);
+    room.currentPlayList.add({
+      ...data,
+      isPermenant: false,
+      addedByUsername: socket.request.user.username
+    });
+
+    // this.io.to(data.roomName).emit("playlist update", update);
+  };
+
+  private onGroupMessage = (
+    data: IncomingGroupMessage,
+    socket: SocketPassport
+  ) => {
+    const room = this.getRoom(data.roomName);
+    console.log(socket.request.session);
+    console.log(socket.request.user);
+
+    if (!room) {
+      return Error("Room non-existant");
+    }
+
+    room.sendMessageToRoom(socket, data);
+  };
+
+  private disconnect = (socket: SocketPassport) => {
+    console.log("disconnect");
+
+    console.log(socket.rooms);
+  };
 
   private exitRoom(socket: socketio.Socket, roomName: string) {
     const room = this.getRoom(roomName);

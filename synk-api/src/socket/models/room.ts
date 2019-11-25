@@ -55,7 +55,7 @@ export class Room {
       roomName: this.name,
       content: {
         userName: "info",
-        text: "user joined"
+        text: `${newuser.userName} joined`
       }
     };
 
@@ -64,19 +64,29 @@ export class Room {
     this.io.to(this.name).emit("group message", userJoined);
   }
 
-  setLeader(user: RoomUser) {
-    this.leader = user;
+  exit(socket: socketio.Socket) {
+    const user = this.getUserFromSocket(socket);
+
+    if (user.isLeader) {
+      const newLeader = this.users[0] || null;
+      this.setLeader(newLeader);
+    }
+
+    this.users = this.users.filter(it => it.userName === user.userName);
+    const userLeft: OutgoingGroupMessage = {
+      roomName: this.name,
+      content: {
+        userName: "info",
+        text: `${user.userName} left`
+      }
+    };
+
+    socket.to(this.name).emit("group message", userLeft);
+    socket.leave(this.name);
   }
 
-  exit(socket: socketio.Socket) {
-    console.log("exit raum", this.name);
-
-    const response: OutgoingGroupMessage = {
-      roomName: this.name,
-      content: { userName: "info", text: "user left" }
-    };
-    socket.to(this.name).emit("group message", response);
-    socket.leave(this.name);
+  setLeader(user: RoomUser) {
+    this.leader = user;
   }
 
   sendMessageToRoom(socket: socketio.Socket, msg: IncomingGroupMessage) {

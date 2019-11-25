@@ -91,7 +91,6 @@ export class Playlist {
     this.update(ev);
 
     this.publish(afterUpdateCallback);
-    console.log('### this.current', this.current);
   };
 
   update = (ev: MediaEvent) => {

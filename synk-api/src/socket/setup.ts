@@ -1,10 +1,11 @@
 import * as http from "http";
 import * as socketio from "socket.io";
 import * as passportSocketIo from "passport.socketio";
+import * as cookieParser from "cookie-parser";
 
 import { RoomService } from "./services/room-service";
-import cookieParser = require("cookie-parser");
 import { TypeormStore } from "typeorm-store";
+import { SocketPassport } from "./models/socket.passport";
 
 export interface MiddlewareConfig {
   genid: () => string;
@@ -26,7 +27,7 @@ export function setupSockets(
   const roomService = new RoomService(io);
 
   // Set up the Socket.IO server
-  io.use((socket, next) => {
+  io.use((socket: SocketPassport, next) => {
     console.log("user trying to connect ", socket.id);
     console.log("user authed? ", socket.client.request.isAuthenticated());
     next();
@@ -40,30 +41,8 @@ export function setupSockets(
         fail: onAuthorizeFail // *optional* callback on fail/error
       })
     )
-    .use((socket, next) => {
-      // try {
-      //   // DEBUG
-      //   // console.log("@@@@@@@");
-      //   // console.log(socket.client.request.cookie);
-      //   // console.log(socket.handshake.headers.cookie);
-      //   // console.log(socket.request.user);
-      //   // console.log("@@@@@@@");
-      // } catch (error) {
-      //   console.log(error);
-      // }
-
-      if (socket.client.request.isAuthenticated()) {
-        console.log("user authed", socket.id);
-        roomService.setupListeners(socket);
-        return next();
-      }
-      // Not allowed
-      console.log("socket:: Not allowed");
-      next(new Error("unauthorized"));
-    })
-    .on("connection", () => {
-      console.log("connected!");
-    });
+    .use(roomService.registerCommands)
+    .on("connection", () => console.log("connected!"));
 
   return { roomService };
 }
