@@ -20,4 +20,6 @@ RUN()
     console.error(`\t><::> ###################><::> ########`);
     console.error(err);
   })
-  .finally(() => {});
+  .finally(() => {
+    // send telegram when kill? npm install telegraf
+  });
