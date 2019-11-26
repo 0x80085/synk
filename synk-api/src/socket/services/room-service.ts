@@ -116,8 +116,6 @@ export class RoomService {
     socket: SocketPassport
   ) => {
     const room = this.getRoomByName(data.roomName);
-    console.log(socket.request.session);
-    console.log(socket.request.user);
 
     if (!room) {
       return Error("Room non-existant");
@@ -128,7 +126,6 @@ export class RoomService {
 
   private disconnect = (socket: SocketPassport) => {
     console.log("disconnect");
-
     console.log(socket.rooms);
   };
 
