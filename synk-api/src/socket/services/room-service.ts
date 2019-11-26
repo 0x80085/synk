@@ -64,10 +64,10 @@ export class RoomService {
   }
 
   private joinRoom(socket: socketio.Socket, roomName: string) {
-    const room = this.getRoom(roomName);
+    const room = this.getRoomByName(roomName);
 
     if (!room) {
-      const newRoom = this.createNewRoom(socket, roomName);
+      const newRoom = new Room(roomName, socket, this.io);
       this.addRoomToDirectory(newRoom);
       newRoom.join(socket);
       return;
@@ -89,7 +89,7 @@ export class RoomService {
       this.io.to(data.roomName).emit("media event", update);
     };
 
-    const room = this.getRoom(data.roomName);
+    const room = this.getRoomByName(data.roomName);
     const isLeader =
       room.leader && room.leader.userName === socket.request.user.username;
 
@@ -101,7 +101,7 @@ export class RoomService {
   private onAddMedia = (data: MediaEvent, socket: SocketPassport) => {
     console.log("add media received", data.currentTime);
 
-    const room = this.getRoom(data.roomName);
+    const room = this.getRoomByName(data.roomName);
     room.currentPlayList.add({
       ...data,
       isPermenant: false,
@@ -115,7 +115,7 @@ export class RoomService {
     data: IncomingGroupMessage,
     socket: SocketPassport
   ) => {
-    const room = this.getRoom(data.roomName);
+    const room = this.getRoomByName(data.roomName);
     console.log(socket.request.session);
     console.log(socket.request.user);
 
@@ -133,7 +133,7 @@ export class RoomService {
   };
 
   private exitRoom(socket: socketio.Socket, roomName: string) {
-    const room = this.getRoom(roomName);
+    const room = this.getRoomByName(roomName);
 
     if (!room) {
       return Error("Room non-existant");
@@ -143,18 +143,14 @@ export class RoomService {
   }
 
   private addRoomToDirectory(room: Room) {
-    if (this.getRoom(room.name)) {
+    if (this.getRoomByName(room.name)) {
       console.log("##### ERR ROOM ALREADY EXiSTS");
       throw Error("Room already exists");
     }
     this.publicRooms.push(room);
   }
 
-  private getRoom(roomName: string) {
+  private getRoomByName(roomName: string) {
     return this.publicRooms.find(r => r.name === roomName);
-  }
-
-  private createNewRoom(socket: socketio.Socket, roomName: string) {
-    return new Room(roomName, socket, this.io);
   }
 }
