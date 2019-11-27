@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { BaseMediaComponent } from '../base-media.component';
 
 @Component({
@@ -8,6 +8,8 @@ import { BaseMediaComponent } from '../base-media.component';
 })
 export class YoutubeComponent implements BaseMediaComponent, OnInit {
   @Input() url: string;
+
+  @Output() videoEnded = new EventEmitter();
 
   isReady = false;
 
@@ -33,7 +35,18 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
     }
   }
 
-  play(): void {
+  start(url?: string): void {
+    if (url) {
+      // debugger;
+      this.player.loadVideoByUrl(url, 0, 'large');
+    }
+    this.player.playVideo();
+  }
+
+  play(url?: string): void {
+    if (url) {
+      this.player.loadVideoByUrl(url, 0, 'large');
+    }
     this.player.playVideo();
   }
 
@@ -59,6 +72,9 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
 
   onPlayerStateChange(event) {
     console.log(event);
+    if (event.data === 0) {
+      this.videoEnded.emit();
+    }
   }
 
   stopVideo() {

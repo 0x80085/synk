@@ -17,13 +17,15 @@ export class ChannelComponent implements OnInit, OnDestroy {
   @ViewChild('player', { static: false }) player: MediaComponent;
 
   name: string;
-  mediaUrl = 'https://www.youtube.com/watch?v=T-BF_KaG7rg';
+  mediaUrl: string = '';
   isLeader = false;
 
   mediaUpdateTimer$: Subscription;
   mediaSyncEvent$: Subscription;
   errorEvent$: Observable<Message[]>;
   roomUserConfig$: Subscription;
+
+  playlist: string[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -37,6 +39,17 @@ export class ChannelComponent implements OnInit, OnDestroy {
     this.sendPeriodicUpdate();
     this.quitOnError();
     this.receiveRoomConfig();
+  }
+
+  onVideoEnded() {
+    console.log('onVideoEnded');
+    console.log(this.playlist);
+
+    const next =
+      this.playlist.find(i => i !== this.mediaUrl) || this.playlist[0];
+    this.mediaUrl = next;
+    console.log(next);
+    this.player.start(this.mediaUrl);
   }
 
   sendPeriodicUpdate() {
@@ -62,6 +75,10 @@ export class ChannelComponent implements OnInit, OnDestroy {
       console.log(ev);
 
       this.isLeader = ev.isLeader;
+      this.playlist = ev.playlist.map(i => {
+        return i.mediaUrl;
+      });
+      this.mediaUrl = this.playlist[0];
     });
   }
 
@@ -85,7 +102,6 @@ export class ChannelComponent implements OnInit, OnDestroy {
       );
     } catch (error) {
       console.log(error);
-      // throw Error('');
     }
   }
 

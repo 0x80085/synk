@@ -33,6 +33,7 @@ export interface RoomUser {
 }
 
 export interface RoomUserConfig {
+  playlist: { currentTime: null; mediaUrl: string }[];
   role: Roles;
   permissionLevel: PermissionLevels;
   isLeader: boolean;

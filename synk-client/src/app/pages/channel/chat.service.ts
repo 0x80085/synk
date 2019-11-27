@@ -5,7 +5,12 @@ import * as io from 'socket.io-client';
 import { Observable, fromEvent, timer } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
-import { Message, RoomMessage, MediaEvent, RoomUserConfig } from './models/room.models';
+import {
+  Message,
+  RoomMessage,
+  MediaEvent,
+  RoomUserConfig
+} from './models/room.models';
 
 @Injectable({
   providedIn: 'root'

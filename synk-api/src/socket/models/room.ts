@@ -129,6 +129,7 @@ export class Room {
       this.leader && this.leader.userName === socket.request.user.username;
 
     const userConfig: RoomUserConfig = {
+      playlist: this.currentPlayList.list,
       isLeader,
       isAdmin: false,
       permissionLevel: 1,

@@ -8,15 +8,17 @@ import {
   Type,
   ViewChild,
   ViewContainerRef,
+  Output
 } from '@angular/core';
 
 import { BaseMediaComponent } from './base-media.component';
 import { YoutubeComponent } from './youtube/youtube.component';
+import { EventEmitter } from '@angular/core';
 
 // tslint:disable-next-line: directive-selector
 @Directive({ selector: '[mediaHost]' })
 export class MediaHostDirective {
-  constructor(public viewContainerRef: ViewContainerRef) { }
+  constructor(public viewContainerRef: ViewContainerRef) {}
 }
 
 @Component({
@@ -24,18 +26,23 @@ export class MediaHostDirective {
   templateUrl: './media.component.html',
   styleUrls: ['./media.component.scss']
 })
-export class MediaComponent implements  OnInit {
-
+export class MediaComponent implements OnInit {
   @Input() mediaUrl: string;
+
+  @Output() mediaEndedEvent: EventEmitter<any> = new EventEmitter();
 
   @ViewChild(MediaHostDirective, { static: true }) host: MediaHostDirective;
 
   ref: ComponentRef<BaseMediaComponent>;
 
-  constructor(private componentFactoryResolver: ComponentFactoryResolver) { }
+  constructor(private componentFactoryResolver: ComponentFactoryResolver) {}
 
   ngOnInit() {
     this.loadComponent();
+  }
+
+  start(url: string) {
+    this.ref.instance.start(url);
   }
 
   play(): void {
@@ -52,23 +59,27 @@ export class MediaComponent implements  OnInit {
     this.ref.instance.seek(to);
   }
 
-  getCurrentTime(){
+  getCurrentTime() {
     return this.ref.instance.getCurrentTime();
   }
 
   private loadComponent() {
-    const componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.getCompatibleMediaComponent(this.mediaUrl));
+    const componentFactory = this.componentFactoryResolver.resolveComponentFactory(
+      this.getCompatibleMediaComponent(this.mediaUrl)
+    );
 
     const viewContainerRef = this.host.viewContainerRef;
     viewContainerRef.clear();
 
     this.ref = viewContainerRef.createComponent(componentFactory);
     (this.ref.instance as BaseMediaComponent).url = this.mediaUrl;
+
+    this.ref.instance.videoEnded.subscribe(ev => {
+      this.mediaEndedEvent.emit();
+    });
   }
 
   private getCompatibleMediaComponent(url: string): Type<BaseMediaComponent> {
     return YoutubeComponent;
   }
-
 }
-

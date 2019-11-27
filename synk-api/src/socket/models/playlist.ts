@@ -19,16 +19,39 @@ export class PlaylistItem extends MediaContent {
   }
 }
 
+const mockList: PlaylistItem[] = [
+  {
+    addedByUsername: "lain",
+    currentTime: null,
+    isPermenant: false,
+    mediaUrl: "https://www.youtube.com/watch?v=8B-Xn3Jfpls"
+  },
+
+  {
+    addedByUsername: "lain",
+    currentTime: null,
+    isPermenant: false,
+    mediaUrl: "https://www.youtube.com/watch?v=H8ZKCNCSHtU"
+  },
+  {
+    addedByUsername: "lain",
+    currentTime: null,
+    isPermenant: false,
+    mediaUrl: "https://www.youtube.com/watch?v=p2ahxlTlwIQ"
+  },
+
+];
+
 export class Playlist {
   name: string;
-  list: PlaylistItem[] = [];
-  current: PlaylistItem | null = null;
+  list: PlaylistItem[] = mockList;
+  current: PlaylistItem | null = mockList[0];
 
   constructor(name: string) {
     this.name = name;
   }
 
-  add(media:PlaylistItem) {
+  add(media: PlaylistItem) {
     this.list.push(media);
   }
 
@@ -46,7 +69,7 @@ export class Playlist {
 
   skip() {
     const nextIndex = this.getIndexOfCurrentPlaying() + 1;
-    this.current = this.list[nextIndex];
+    this.current = this.list[nextIndex] || this.list[nextIndex - 1];
   }
 
   shuffle() {

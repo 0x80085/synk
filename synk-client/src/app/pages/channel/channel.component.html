@@ -27,7 +27,7 @@
     <app-chat-room [name]="name"></app-chat-room>
   </div>
   <div nz-col nzSpan="18" class="column">
-    <app-media #player [mediaUrl]="mediaUrl"></app-media>
+    <app-media #player (mediaEndedEvent)="onVideoEnded()" [mediaUrl]="mediaUrl"></app-media>
   </div>
 </ng-template>
 
