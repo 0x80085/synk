@@ -27,8 +27,6 @@ export class MediaHostDirective {
   styleUrls: ['./media.component.scss']
 })
 export class MediaComponent implements OnInit {
-  @Input() mediaUrl: string;
-
   @Output() mediaEndedEvent: EventEmitter<any> = new EventEmitter();
 
   @ViewChild(MediaHostDirective, { static: true }) host: MediaHostDirective;
@@ -45,8 +43,8 @@ export class MediaComponent implements OnInit {
     this.ref.instance.start(url);
   }
 
-  play(): void {
-    this.ref.instance.play();
+  play(url: string): void {
+    this.ref.instance.play(url);
   }
 
   pause(): void {
@@ -65,21 +63,16 @@ export class MediaComponent implements OnInit {
 
   private loadComponent() {
     const componentFactory = this.componentFactoryResolver.resolveComponentFactory(
-      this.getCompatibleMediaComponent(this.mediaUrl)
+      YoutubeComponent
     );
 
     const viewContainerRef = this.host.viewContainerRef;
     viewContainerRef.clear();
 
     this.ref = viewContainerRef.createComponent(componentFactory);
-    (this.ref.instance as BaseMediaComponent).url = this.mediaUrl;
 
     this.ref.instance.videoEnded.subscribe(ev => {
       this.mediaEndedEvent.emit();
     });
-  }
-
-  private getCompatibleMediaComponent(url: string): Type<BaseMediaComponent> {
-    return YoutubeComponent;
   }
 }

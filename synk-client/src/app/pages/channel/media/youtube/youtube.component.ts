@@ -7,8 +7,6 @@ import { BaseMediaComponent } from '../base-media.component';
   styleUrls: ['./youtube.component.scss']
 })
 export class YoutubeComponent implements BaseMediaComponent, OnInit {
-  @Input() url: string;
-
   @Output() videoEnded = new EventEmitter();
 
   isReady = false;
@@ -38,15 +36,24 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
   start(url?: string): void {
     if (url) {
       // debugger;
-      this.player.loadVideoByUrl(url, 0, 'large');
+      this.player.loadVideoById(YouTubeGetID(url), 0, 'large');
+      return;
     }
     this.player.playVideo();
   }
 
-  play(url?: string): void {
-    if (url) {
-      this.player.loadVideoByUrl(url, 0, 'large');
+  play(url: string): void {
+    if (!this.player) {
+      console.log('no player ..setup ongoing');
+      return;
     }
+    if (url) {
+      debugger;
+      this.player.loadVideoById(YouTubeGetID(url), 0);
+    }
+    console.log('ddddddd');
+
+    debugger;
     this.player.playVideo();
   }
 
@@ -66,7 +73,7 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
 
   onPlayerReady(event) {
     this.player = event.target;
-    this.play();
+    // this.play();
     this.isReady = true;
   }
 
@@ -85,7 +92,7 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
     this.player = new YT.Player('player', {
       height: '100%',
       width: '100%',
-      videoId: YouTubeGetID(this.url),
+      videoId: '',
       events: {
         onReady: ev => this.onPlayerReady(ev),
         onError: ev => console.log(ev),

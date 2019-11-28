@@ -79,6 +79,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
         return i.mediaUrl;
       });
       this.mediaUrl = this.playlist[0];
+      this.player.play(this.mediaUrl);
     });
   }
 
@@ -120,7 +121,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   private syncPlayer(ev: MediaEvent) {
     if (this.mediaUrl !== ev.mediaUrl) {
       this.mediaUrl = ev.mediaUrl;
-      this.player.play();
+      this.player.play(this.mediaUrl);
     }
     if (this.clientCurrenttimeIsOutOfSync(ev.currentTime)) {
       console.log(this.clientCurrenttimeIsOutOfSync(ev.currentTime));
