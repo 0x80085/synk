@@ -4,10 +4,9 @@
   nz-row
   nzSpan="24"
   nzType="flex"
-  [nzGutter]="{ xs: 8, sm: 16, md: 24, lg: 32, xl: 32, xxl: 32 }"
+  nzGutter="16"
   nzJustify="space-between"
-  nzAlign="center"
-  class="container"
+  nzAlign="stretch"
 >
   <nz-alert
     nz-col
@@ -18,15 +17,26 @@
     [nzMessage]="item.text"
   ></nz-alert>
   <div
+    nz-row
+    nzType="flex"
+    [nzGutter]="{ xs: 8, sm: 16, md: 24, lg: 32, xl: 32, xxl: 32 }"
+    nzJustify="space-between"
+    nzAlign="stretch"
     *ngIf="!(errorEvent$ | async); then channelStage; else errorConnecting"
   ></div>
 </div>
 
 <ng-template #channelStage>
-  <div nz-col nzSpan="6" class="column">
+  <div
+    nz-col
+    nzSpan="6"
+    ngType="flex"
+    class="column gutter-row"
+    style="display:flex;"
+  >
     <app-chat-room [name]="name"></app-chat-room>
   </div>
-  <div nz-col nzSpan="18" class="column">
+  <div nz-col nzSpan="18" class="column gutter-row">
     <app-media #player (mediaEndedEvent)="onVideoEnded()"></app-media>
   </div>
   <div nz-col nzSpan="18" nzOffset="6" class="playlist">

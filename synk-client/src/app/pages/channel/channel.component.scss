@@ -1,15 +1,15 @@
-.container{
-    height: 80%;
-    max-height: 70vh;
+.container {
+  height: 80%;
 }
 
-.column{
+.column {
   height: 100%;
+  min-height: calc(100vh - 250px);
 }
 
-.playlist{
+.playlist {
   margin-top: 1rem;
 }
-.playlist-item{
+.playlist-item {
   height: auto;
 }
