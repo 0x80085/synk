@@ -45,11 +45,12 @@ export class ChannelComponent implements OnInit, OnDestroy {
     console.log('onVideoEnded');
     console.log(this.playlist);
 
-    const next =
-      this.playlist.find(i => i !== this.mediaUrl) || this.playlist[0];
+    const i = this.playlist.findIndex(it => it === this.mediaUrl);
+    const next = this.playlist[i] + 1 || this.playlist[0];
     this.mediaUrl = next;
-    console.log(next);
-    this.player.start(this.mediaUrl);
+
+    console.log('next::', next);
+    this.player.play(this.mediaUrl);
   }
 
   sendPeriodicUpdate() {
@@ -65,7 +66,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   syncPlayerState() {
     this.mediaSyncEvent$ = this.chatService.roomMediaEvent$.subscribe(ev => {
       if (!this.isLeader) {
-        this.syncIfNeeded(ev);
+        this.syncPlayer(ev);
       }
     });
   }
@@ -97,35 +98,31 @@ export class ChannelComponent implements OnInit, OnDestroy {
   private sendMediaUpdate() {
     try {
       this.chatService.sendMediaEvent(
-        this.mediaUrl,
+        this.player.getCurrentUrl(),
         this.player.getCurrentTime(),
         this.name
       );
     } catch (error) {
-      console.log(error);
-    }
-  }
-
-  private syncIfNeeded(ev: MediaEvent) {
-    try {
-      if (this.shouldSyncPlayer(ev)) {
-        console.log('updating player');
-
-        this.syncPlayer(ev);
-      }
-    } catch (error) {
-      console.log(error);
+      console.log('Player may not be loaded yet', error);
     }
   }
 
   private syncPlayer(ev: MediaEvent) {
+    if (!this.shouldSyncPlayer(ev)) {
+      return;
+    }
     if (this.mediaUrl !== ev.mediaUrl) {
+      console.log('url out of sync;');
+      console.log(`wanted: ${ev.mediaUrl}, got ${this.mediaUrl}. Syncing..`);
+
       this.mediaUrl = ev.mediaUrl;
       this.player.play(this.mediaUrl);
     }
     if (this.clientCurrenttimeIsOutOfSync(ev.currentTime)) {
-      console.log(this.clientCurrenttimeIsOutOfSync(ev.currentTime));
-
+      if (!this.player.isPlaying()) {
+        this.player.play(ev.mediaUrl);
+        return;
+      }
       this.player.seek(ev.currentTime);
     }
   }
@@ -148,6 +145,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
       console.log(
         `
         Client time:\t${clientTime}
+        Client URL:\t${this.mediaUrl}
         maxTimeBehind :\t${maxTimeBehind}
         maxTimeAhead :\t${maxTimeAhead}
         Leader time:\t${originTime}

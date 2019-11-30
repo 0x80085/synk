@@ -3,9 +3,7 @@ import {
   ComponentFactoryResolver,
   ComponentRef,
   Directive,
-  Input,
   OnInit,
-  Type,
   ViewChild,
   ViewContainerRef,
   Output
@@ -59,6 +57,14 @@ export class MediaComponent implements OnInit {
 
   getCurrentTime() {
     return this.ref.instance.getCurrentTime();
+  }
+
+  getCurrentUrl(): string {
+    return this.ref.instance.getCurrentUrl();
+  }
+
+  isPlaying() {
+    return this.ref.instance.getCurrentUrl();
   }
 
   private loadComponent() {

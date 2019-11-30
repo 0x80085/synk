@@ -27,12 +27,15 @@
     <app-chat-room [name]="name"></app-chat-room>
   </div>
   <div nz-col nzSpan="18" class="column">
-    <app-media
-      #player
-      (mediaEndedEvent)="onVideoEnded()"
-    ></app-media>
+    <app-media #player (mediaEndedEvent)="onVideoEnded()"></app-media>
   </div>
-
+  <button
+    nz-button
+    [nzType]="'primary'"
+    (click)="player.play('https://www.youtube.com/watch?v=_1rF38MjpHE')"
+  >
+    Play
+  </button>
 </ng-template>
 
 <ng-template #errorConnecting>

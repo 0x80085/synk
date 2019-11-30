@@ -67,21 +67,22 @@ export class Room {
   exit(socket: socketio.Socket) {
     const user = this.getUserFromSocket(socket);
 
-    if (user.isLeader) {
-      const newLeader = this.users[0] || null;
-      this.setLeader(newLeader);
-    }
-
-    this.users = this.users.filter(it => it.userName === user.userName);
-    const userLeft: OutgoingGroupMessage = {
-      roomName: this.name,
-      content: {
-        userName: "info",
-        text: `${user.userName} left`
+    if (user) {
+      if (user.isLeader) {
+        const newLeader = this.users[0] || null;
+        this.setLeader(newLeader);
       }
-    };
 
-    socket.to(this.name).emit("group message", userLeft);
+      this.users = this.users.filter(it => it.userName === user.userName);
+      const userLeft: OutgoingGroupMessage = {
+        roomName: this.name,
+        content: {
+          userName: "info",
+          text: `${user.userName} left`
+        }
+      };
+      socket.to(this.name).emit("group message", userLeft);
+    }
     socket.leave(this.name);
   }
 

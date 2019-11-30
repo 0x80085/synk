@@ -24,22 +24,21 @@ const mockList: PlaylistItem[] = [
     addedByUsername: "lain",
     currentTime: null,
     isPermenant: false,
-    mediaUrl: "https://www.youtube.com/watch?v=8B-Xn3Jfpls"
+    mediaUrl: "https://www.youtube.com/watch?v=p2LMwxo0MVk"
   },
 
   {
     addedByUsername: "lain",
     currentTime: null,
     isPermenant: false,
-    mediaUrl: "https://www.youtube.com/watch?v=H8ZKCNCSHtU"
+    mediaUrl: "https://www.youtube.com/watch?v=_1rF38MjpHE"
   },
   {
     addedByUsername: "lain",
     currentTime: null,
     isPermenant: false,
-    mediaUrl: "https://www.youtube.com/watch?v=p2ahxlTlwIQ"
-  },
-
+    mediaUrl: "https://www.youtube.com/watch?v=qUDEyONQaCA"
+  }
 ];
 
 export class Playlist {
@@ -117,32 +116,35 @@ export class Playlist {
   };
 
   update = (ev: MediaEvent) => {
-    const selectedItem = this.list.find(it => it.mediaUrl === ev.mediaUrl);
+    let selectedItem = this.list.find(it => it.mediaUrl === ev.mediaUrl);
 
     if (!selectedItem) {
       // delete/throw when add media is implemnted
-      this.add({
+      let selectedItem = {
         addedByUsername: "lain",
         currentTime: ev.currentTime,
         isPermenant: false,
         mediaUrl: ev.mediaUrl
-      });
-
-      this.current = this.list.find(it => it.mediaUrl === ev.mediaUrl);
-      this.current.currentTime = ev.currentTime;
+      };
+      this.add(selectedItem);
     }
+    this.current = selectedItem;
   };
 
   publish = (callback: (arg: MediaContent) => void) => {
+    if (!this.current) {
+      console.log('no vid selected ');
+      return;
+    }
     const update = {
       list: this.list,
       nowPlaying: this.current
     };
-
     const ev: MediaContent = {
       currentTime: update.nowPlaying.currentTime,
       mediaUrl: update.nowPlaying.mediaUrl
     };
+    console.log("publish = (", ev);
 
     callback(ev);
   };
