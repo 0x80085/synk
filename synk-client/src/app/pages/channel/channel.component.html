@@ -29,13 +29,30 @@
   <div nz-col nzSpan="18" class="column">
     <app-media #player (mediaEndedEvent)="onVideoEnded()"></app-media>
   </div>
-  <button
-    nz-button
-    [nzType]="'primary'"
-    (click)="player.play('https://www.youtube.com/watch?v=_1rF38MjpHE')"
-  >
-    Play
-  </button>
+  <div nz-col nzSpan="18" nzOffset="6" class="playlist">
+    <nz-list
+      nzBordered
+      nzSize="small"
+      [nzDataSource]="playlist"
+      [nzRenderItem]="item"
+      [nzNoResult]="'No items'"
+    >
+      <ng-template #item let-item>
+        <li
+          nz-list-item
+          class="playlist-item"
+          [nzContent]="item"
+          [nzActions]="[opAction]"
+          nzNoFlex
+        ></li>
+        <ng-template #opAction>
+          <a (click)="player.play(item)">
+            Play
+          </a>
+        </ng-template>
+      </ng-template>
+    </nz-list>
+  </div>
 </ng-template>
 
 <ng-template #errorConnecting>
