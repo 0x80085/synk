@@ -16,42 +16,46 @@
   ></nz-alert>
 </div>
 <div
-  nz-row
-  [nzGutter]="{ xs: 8, sm: 16, md: 24, lg: 32, xl: 32, xxl: 32 }"
-  nzJustify="space-between"
   *ngIf="!(errorEvent$ | async); then channelStage; else errorConnecting"
 ></div>
 
 <ng-template #channelStage>
-  <div nz-col nzSpan="6" class="column gutter-row">
-    <app-chat-room [name]="name"></app-chat-room>
-  </div>
-  <div nz-col nzSpan="18" class="column gutter-row">
-    <app-media #player (mediaEndedEvent)="onVideoEnded()"></app-media>
-  </div>
-  <div nz-col nzSpan="18" nzOffset="6" class="playlist">
-    <nz-list
-      nzBordered
-      nzSize="small"
-      [nzDataSource]="playlist"
-      [nzRenderItem]="item"
-      [nzNoResult]="'No items'"
-    >
-      <ng-template #item let-item>
-        <li
-          nz-list-item
-          class="playlist-item"
-          [nzContent]="item"
-          [nzActions]="[opAction]"
-          nzNoFlex
-        ></li>
-        <ng-template #opAction>
-          <a (click)="player.play(item)">
-            Play
-          </a>
+  <div
+    nz-row
+    [nzGutter]="{ xs: 8, sm: 16, md: 24, lg: 32, xl: 32, xxl: 32 }"
+    nzJustify="space-between"
+    class="row"
+  >
+    <div nz-col nzSpan="6" class="column gutter-row">
+      <app-chat-room [name]="name"></app-chat-room>
+    </div>
+    <div nz-col nzSpan="18" class="column gutter-row">
+      <app-media #player (mediaEndedEvent)="onVideoEnded()"></app-media>
+    </div>
+    <div nz-col nzSpan="18" nzOffset="6" class="playlist">
+      <nz-list
+        nzBordered
+        nzSize="small"
+        [nzDataSource]="playlist"
+        [nzRenderItem]="item"
+        [nzNoResult]="'No items'"
+      >
+        <ng-template #item let-item>
+          <li
+            nz-list-item
+            class="playlist-item"
+            [nzContent]="item"
+            [nzActions]="[opAction]"
+            nzNoFlex
+          ></li>
+          <ng-template #opAction>
+            <a (click)="player.play(item)">
+              Play
+            </a>
+          </ng-template>
         </ng-template>
-      </ng-template>
-    </nz-list>
+      </nz-list>
+    </div>
   </div>
 </ng-template>
 
