@@ -68,12 +68,14 @@ export class Room {
     const user = this.getUserFromSocket(socket);
 
     if (user) {
-      if (user.isLeader) {
+      this.users = this.users.filter(it => it.userName !== user.userName);
+
+      if (user.userName === this.leader.userName) {
         const newLeader = this.users[0] || null;
         this.setLeader(newLeader);
+        this.sendUserRoomConfig(newleadersocket);
       }
 
-      this.users = this.users.filter(it => it.userName === user.userName);
       const userLeft: OutgoingGroupMessage = {
         roomName: this.name,
         content: {
@@ -81,7 +83,7 @@ export class Room {
           text: `${user.userName} left`
         }
       };
-      socket.to(this.name).emit("group message", userLeft);
+      this.io.to(this.name).emit("group message", userLeft);
     }
     socket.leave(this.name);
   }

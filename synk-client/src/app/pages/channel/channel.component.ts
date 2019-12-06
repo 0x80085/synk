@@ -166,5 +166,6 @@ export class ChannelComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.mediaUpdateTimer$.unsubscribe();
     this.mediaSyncEvent$.unsubscribe();
+    this.chatService.exit(this.name);
   }
 }
