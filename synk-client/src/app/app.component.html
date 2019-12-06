@@ -8,16 +8,20 @@
     [nzTrigger]="null"
   >
     <div class="sidebar-logo">
-      <a routerLink="/welcome">
-        <i nz-icon nzType="meh" nzTheme="fill"></i>
-        <h1>SYNKd.TV</h1>
-      </a>
+      <span>
+        <i
+          nz-icon
+          nzType="meh"
+          style="cursor: pointer;"
+          (click)="isCollapsed = !isCollapsed"
+          nzTheme="fill"
+        ></i>
+        <h1 style="cursor: pointer;" (click)="isCollapsed = !isCollapsed">
+          SYNKd.TV
+        </h1>
+      </span>
     </div>
-    <ul
-      nz-menu
-      nzMode="inline"
-      [nzInlineCollapsed]="isCollapsed"
-    >
+    <ul nz-menu nzMode="inline" [nzInlineCollapsed]="isCollapsed">
       <li nz-submenu nzOpen nzTitle="Explore" nzIcon="compass">
         <ul>
           <li nz-menu-item nzMatchRouter>
@@ -26,11 +30,7 @@
         </ul>
       </li>
     </ul>
-    <ul
-      nz-menu
-      nzMode="inline"
-      [nzInlineCollapsed]="isCollapsed"
-    >
+    <ul nz-menu nzMode="inline" [nzInlineCollapsed]="isCollapsed">
       <li nz-submenu nzOpen nzTitle="Account" nzIcon="smile">
         <ul>
           <li nz-menu-item nzMatchRouter>
@@ -48,15 +48,15 @@
   </nz-sider>
   <nz-layout>
     <nz-header>
-      <div class="app-header">
+      <!-- <div class="app-header">
         <span class="header-trigger" (click)="isCollapsed = !isCollapsed">
           <i
             class="trigger"
             nz-icon
-            [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"
+            nzType="menu"
           ></i>
         </span>
-      </div>
+      </div> -->
     </nz-header>
     <nz-content>
       <router-outlet></router-outlet>
