@@ -7,6 +7,7 @@ import {
   Validators
 } from '@angular/forms';
 import { Router } from '@angular/router';
+import { NzNotificationService } from 'ng-zorro-antd';
 
 @Component({
   selector: 'app-create-room-form',
@@ -22,7 +23,8 @@ export class CreateRoomFormComponent implements OnInit {
   constructor(
     private service: OverviewService,
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private notification: NzNotificationService
   ) {}
 
   ngOnInit() {
@@ -35,13 +37,27 @@ export class CreateRoomFormComponent implements OnInit {
   onSubmit() {
     console.log('test');
 
+    if (this.form.invalid) {
+      this.form.markAsTouched();
+      return;
+    }
+
     const results: ChannelDraft = {
       name: this.form.controls.name.value,
       description: this.form.controls.description.value
     };
     console.log(results);
-    this.service.createChannel(results).subscribe(() => {
-      this.router.navigate(['/channel', results.name]);
-    });
+    this.service.createChannel(results).subscribe(
+      () => {
+        this.router.navigate(['/channel', results.name]);
+      },
+      err => {
+        this.notification.create(
+          'error',
+          `Couldn't create room`,
+          `Something went wrong when trying to create a new room.\n Try again later.`
+        );
+      }
+    );
   }
 }
