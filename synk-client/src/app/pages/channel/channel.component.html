@@ -1,21 +1,6 @@
 <p>Channel: {{ name }}</p>
 
 <div
-  nz-row
-  nzSpan="24"
-  nzJustify="space-between"
-  [hidden]="!errorEvent$ | async"
->
-  <nz-alert
-    nz-col
-    *ngFor="let item of errorEvent$ | async"
-    nzSpan="6"
-    nzType="error"
-    [nzShowIcon]="true"
-    [nzMessage]="item.text"
-  ></nz-alert>
-</div>
-<div
   *ngIf="!(errorEvent$ | async); then channelStage; else errorConnecting"
 ></div>
 
@@ -23,8 +8,6 @@
   <div
     nz-row
     [nzGutter]="{ xs: 8, sm: 16, md: 24, lg: 32, xl: 32, xxl: 32 }"
-    nzJustify="space-between"
-    class="row"
   >
     <div nz-col nzSpan="6" class="column gutter-row">
       <app-chat-room [name]="name"></app-chat-room>
@@ -59,10 +42,18 @@
   </div>
 </ng-template>
 
+<ng-template #disconnectedImg>
+  <i
+    nz-icon
+    style="font-size: 5rem; color: rgb(204, 254, 253);"
+    nzType="frown"
+  ></i>
+</ng-template>
 <ng-template #errorConnecting>
   <div nz-col nzSpan="24" class="column">
     <nz-empty
-      nzNotFoundContent="Can't connect to channel. Did you log in?"
+      [nzNotFoundImage]="disconnectedImg"
+      nzNotFoundContent="Can't connect to channel. Try logging in?"
     ></nz-empty>
   </div>
 </ng-template>

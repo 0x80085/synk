@@ -73,7 +73,7 @@ export class Room {
       if (user.userName === this.leader.userName) {
         const newLeader = this.users[0] || null;
         this.setLeader(newLeader);
-        this.sendUserRoomConfig(newleadersocket);
+        // this.sendUserRoomConfig(newleadersocket);
       }
 
       const userLeft: OutgoingGroupMessage = {
