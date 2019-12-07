@@ -1,4 +1,4 @@
-import { MediaEvent } from "./message";
+import { MediaEvent } from './message';
 
 export class MediaContent {
   mediaUrl: string;
@@ -21,23 +21,23 @@ export class PlaylistItem extends MediaContent {
 
 const mockList: PlaylistItem[] = [
   {
-    addedByUsername: "lain",
+    addedByUsername: 'lain',
     currentTime: null,
     isPermenant: false,
-    mediaUrl: "https://www.youtube.com/watch?v=p2LMwxo0MVk"
+    mediaUrl: 'https://www.youtube.com/watch?v=p2LMwxo0MVk'
   },
 
   {
-    addedByUsername: "lain",
+    addedByUsername: 'lain',
     currentTime: null,
     isPermenant: false,
-    mediaUrl: "https://www.youtube.com/watch?v=_1rF38MjpHE"
+    mediaUrl: 'https://www.youtube.com/watch?v=_1rF38MjpHE'
   },
   {
-    addedByUsername: "lain",
+    addedByUsername: 'lain',
     currentTime: null,
     isPermenant: false,
-    mediaUrl: "https://www.youtube.com/watch?v=qUDEyONQaCA"
+    mediaUrl: 'https://www.youtube.com/watch?v=qUDEyONQaCA'
   }
 ];
 
@@ -75,8 +75,8 @@ export class Playlist {
     let listCount = this.list.length;
 
     while (listCount) {
-      let newIndex = Math.floor(Math.random() * listCount--);
-      let lastItem = this.list[listCount];
+      const newIndex = Math.floor(Math.random() * listCount--);
+      const lastItem = this.list[listCount];
 
       this.list[listCount] = this.list[newIndex];
       this.list[newIndex] = lastItem;
@@ -94,7 +94,7 @@ export class Playlist {
       toPosition += lastPosition;
     }
     if (toPosition >= lastPosition) {
-      var k = toPosition - lastPosition;
+      let k = toPosition - lastPosition;
       while (k-- + 1) {
         this.list.push(undefined);
       }
@@ -113,15 +113,15 @@ export class Playlist {
     this.update(ev);
 
     this.publish(afterUpdateCallback);
-  };
+  }
 
   update = (ev: MediaEvent) => {
-    let selectedItem = this.list.find(it => it.mediaUrl === ev.mediaUrl);
+    const selectedItem = this.list.find(it => it.mediaUrl === ev.mediaUrl);
 
     if (!selectedItem) {
       // delete/throw when add media is implemnted
-      let selectedItem = {
-        addedByUsername: "lain",
+      const selectedItem = {
+        addedByUsername: 'lain',
         currentTime: ev.currentTime,
         isPermenant: false,
         mediaUrl: ev.mediaUrl
@@ -129,7 +129,7 @@ export class Playlist {
       this.add(selectedItem);
     }
     this.current = selectedItem;
-  };
+  }
 
   publish = (callback: (arg: MediaContent) => void) => {
     if (!this.current) {
@@ -144,10 +144,10 @@ export class Playlist {
       currentTime: update.nowPlaying.currentTime,
       mediaUrl: update.nowPlaying.mediaUrl
     };
-    console.log("publish = (", ev);
+    console.log('publish = (', ev);
 
     callback(ev);
-  };
+  }
 
   private getIndexOfCurrentPlaying() {
     return this.list.findIndex(it => it.mediaUrl === this.current.mediaUrl);

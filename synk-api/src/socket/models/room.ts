@@ -1,12 +1,12 @@
-import * as socketio from "socket.io";
+import * as socketio from 'socket.io';
 
-import { RoomUser, RoomUserConfig, Roles } from "./user";
+import { RoomUser, RoomUserConfig, Roles } from './user';
 import {
   OutgoingGroupMessage,
   IncomingGroupMessage,
   MediaEvent
-} from "./message";
-import { Playlist } from "./playlist";
+} from './message';
+import { Playlist } from './playlist';
 
 export class Room {
   name: string;
@@ -23,15 +23,15 @@ export class Room {
 
   constructor(
     name: string,
-    originSocket: socketio.Socket,
-    _io: socketio.Server
+    sio: socketio.Server,
+    originSocket?: socketio.Socket
   ) {
-    this.io = _io;
+    this.io = sio;
     this.name = name;
 
-    this.creator = originSocket ? originSocket.request.user.username : "Lain";
+    this.creator = originSocket ? originSocket.request.user.username : 'Lain';
 
-    const defaultPlaylist = new Playlist("default");
+    const defaultPlaylist = new Playlist('default');
     this.currentPlayList = defaultPlaylist;
     this.playlists.push(defaultPlaylist);
 
@@ -54,14 +54,12 @@ export class Room {
     const userJoined: OutgoingGroupMessage = {
       roomName: this.name,
       content: {
-        userName: "info",
+        userName: 'info',
         text: `${newuser.userName} joined`
       }
     };
 
-    this.sendUserRoomConfig(socket);
-
-    this.io.to(this.name).emit("group message", userJoined);
+    this.io.to(this.name).emit('group message', userJoined);
   }
 
   exit(socket: socketio.Socket) {
@@ -73,23 +71,24 @@ export class Room {
       if (user.userName === this.leader.userName) {
         const newLeader = this.users[0] || null;
         this.setLeader(newLeader);
-        // this.sendUserRoomConfig(newleadersocket);
       }
 
       const userLeft: OutgoingGroupMessage = {
         roomName: this.name,
         content: {
-          userName: "info",
+          userName: 'info',
           text: `${user.userName} left`
         }
       };
-      this.io.to(this.name).emit("group message", userLeft);
+      this.io.to(this.name).emit('group message', userLeft);
     }
     socket.leave(this.name);
   }
 
   setLeader(user: RoomUser) {
     this.leader = user;
+    const socketOfLeader = this.getSocketById(this.leader.id);
+    this.sendUserRoomConfig(socketOfLeader);
   }
 
   sendMessageToRoom(socket: socketio.Socket, msg: IncomingGroupMessage) {
@@ -100,11 +99,11 @@ export class Room {
         userName: socket.request.user.username
       }
     };
-    this.io.to(this.name).emit("group message", message);
+    this.io.to(this.name).emit('group message', message);
   }
 
   emitMediaEventToUsers(socket: socketio.Socket, data: MediaEvent) {
-    socket.to(this.name).emit("media event", data);
+    socket.to(this.name).emit('media event', data);
   }
 
   private createUserFromSocket(socket: socketio.Socket): RoomUser {
@@ -141,10 +140,15 @@ export class Room {
 
     console.log(userConfig);
 
-    socket.emit("user config", userConfig);
+    socket.emit('user config', userConfig);
   }
 
   private assignRoleToUser(socket: socketio.Socket) {}
 
   private assignPermissionToUser(socket: socketio.Socket) {}
+
+  private getSocketById(id: string) {
+    const ns = this.io.of(this.name);
+    return ns.connected[id];
+  }
 }

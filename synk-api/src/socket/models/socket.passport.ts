@@ -1,4 +1,4 @@
-import * as socketio from "socket.io";
+import * as socketio from 'socket.io';
 
 interface PassportUser {
   username: string;

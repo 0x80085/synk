@@ -1,4 +1,4 @@
-import configure from "./startup";
+import configure from './startup';
 
 async function RUN() {
   const { wsHttp } = await configure();

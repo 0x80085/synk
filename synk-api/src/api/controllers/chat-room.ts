@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction, RequestHandler } from "express";
+import { Request, Response, NextFunction, RequestHandler } from 'express';
 
-import { RoomService } from "../../socket/services/room-service";
-import { Room } from "../../socket/models/room";
+import { RoomService } from '../../socket/services/room-service';
+import { Room } from '../../socket/models/room';
 
 export interface RoomDto {
   roomName: string;
@@ -34,16 +34,16 @@ export const createRoom = (
   res: Response,
   roomService: RoomService
 ) => {
-  console.log("##### ROOM CREATION TRY");
+  console.log('##### ROOM CREATION TRY');
 
   try {
     roomService.createRoom(req.body);
 
-    res.status(200).json("OK");
+    res.status(200).json('OK');
   } catch (error) {
     console.log(error);
 
-    res.status(500).send("ERROR - Room not created");
+    res.status(500).send('ERROR - Room not created');
   }
 };
 
