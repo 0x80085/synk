@@ -1,9 +1,8 @@
 :host {
-  display: flex;
-}
-
-.app-layout {
+  display: block;
   height: 100vh;
+  widows: 100%;
+  max-width: 100vw;
 }
 
 .menu-sidebar {
