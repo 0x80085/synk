@@ -24,7 +24,7 @@
     <ul nz-menu nzMode="inline" [nzInlineCollapsed]="isCollapsed">
       <li nz-submenu nzOpen nzTitle="Explore" nzIcon="compass">
         <ul>
-          <li nz-menu-item nzMatchRouter>
+          <li nz-menu-item class="item" nzMatchRouter>
             <a routerLink="/welcome">All Channels</a>
           </li>
         </ul>
@@ -33,13 +33,13 @@
     <ul nz-menu nzMode="inline" [nzInlineCollapsed]="isCollapsed">
       <li nz-submenu nzOpen nzTitle="Account" nzIcon="smile">
         <ul>
-          <li nz-menu-item nzMatchRouter>
+          <li nz-menu-item class="item" nzMatchRouter>
             <a routerLink="/account/login">Login</a>
           </li>
-          <li nz-menu-item nzMatchRouter>
+          <li nz-menu-item class="item" nzMatchRouter>
             <a routerLink="/account/me">(You)</a>
           </li>
-          <li nz-menu-item nzMatchRouter>
+          <li nz-menu-item class="item" nzMatchRouter>
             <a routerLink="/account/new">Register</a>
           </li>
         </ul>

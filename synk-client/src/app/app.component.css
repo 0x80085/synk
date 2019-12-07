@@ -55,6 +55,10 @@ nz-header {
   padding: 0;
 }
 
+.item:hover{
+  background-color: rgb(255, 105, 78);
+}
+
 nz-content {
   margin: 24px;
 }
