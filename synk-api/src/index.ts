@@ -1,10 +1,12 @@
+// tslint:disable:no-console
+
 import configure from './startup';
 
 async function RUN() {
   const { wsHttp } = await configure();
 
   // Go
-  wsHttp.listen(3000, function() {
+  wsHttp.listen(3000, () => {
     console.info(`###########################`);
     console.info(`\t SERVER LAUNCHED`);
     console.info(`###########################`);

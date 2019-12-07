@@ -8,7 +8,9 @@ import { Connection } from 'typeorm';
 
 import { User } from '../domain/entity/User';
 
-import { Strategy as LocalStrategy } from 'passport-local';
+import { Strategy as LocalStrategy, IVerifyOptions } from 'passport-local';
+
+type PassportDoneFn = (error: any, user?: any, options?: IVerifyOptions) => void;
 
 export default async function setupAuthMiddleware(
   server: Express,
@@ -19,11 +21,11 @@ export default async function setupAuthMiddleware(
 
   passport.use(
     'local',
-    new LocalStrategy(async function(
+    new LocalStrategy(async (
       username: string,
       password: string,
-      done: Function
-    ) {
+      done: PassportDoneFn
+    ) => {
       const user = await userRepo.findOne({ username });
 
       if (!user) {
@@ -46,7 +48,7 @@ export default async function setupAuthMiddleware(
     })
   );
 
-  passport.serializeUser((user: User, done: Function) => {
+  passport.serializeUser((user: User, done: PassportDoneFn) => {
     console.log('serializeUser', user);
 
     done(null, { id: user.id, username: user.username });
@@ -71,7 +73,7 @@ export default async function setupAuthMiddleware(
 export function ensureAuthenticated(
   req: Request,
   res: Response,
-  next: Function,
+  next: (err?: any) => void,
   socket?: socketio.Socket
 ) {
   const isAuthenticated = socket

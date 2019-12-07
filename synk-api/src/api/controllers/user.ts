@@ -37,17 +37,17 @@ export const postLogin: RequestHandler = (
       if (!user) {
         return res.status(404).send('No user with those creds found');
       }
-      req.logIn(user, err => {
-        if (err) {
-          console.log(err);
-          return next(err);
+      req.logIn(user, error => {
+        if (error) {
+          console.log(error);
+          return next(error);
         }
-        req.login(user, error => {
-          if (!error) {
+        req.login(user, errer => {
+          if (!errer) {
             return res.status(200).send(['ok', 'user logged in']);
           }
-          console.log(error);
-          return next(err);
+          console.log(errer);
+          return next(errer);
         });
         // next(user);
       });
@@ -88,7 +88,7 @@ export const postSignup: RequestHandler = async (
 
   const connection = getConnection();
 
-  let qry: FindConditions<User> = {
+  const qry: FindConditions<User> = {
     username: req.body.username
   };
   const users = await connection.manager.find(User, { where: qry });

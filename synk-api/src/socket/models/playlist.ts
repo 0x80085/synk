@@ -116,11 +116,11 @@ export class Playlist {
   }
 
   update = (ev: MediaEvent) => {
-    const selectedItem = this.list.find(it => it.mediaUrl === ev.mediaUrl);
+    let selectedItem = this.list.find(it => it.mediaUrl === ev.mediaUrl);
 
     if (!selectedItem) {
       // delete/throw when add media is implemnted
-      const selectedItem = {
+      selectedItem = {
         addedByUsername: 'lain',
         currentTime: ev.currentTime,
         isPermenant: false,
