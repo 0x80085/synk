@@ -1,13 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { OverviewService, ChannelDraft } from '../overview.service';
-import {
-  FormGroup,
-  FormControl,
-  FormBuilder,
-  Validators
-} from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NzNotificationService } from 'ng-zorro-antd';
+import { throwIfEmpty } from 'rxjs/operators';
 
 @Component({
   selector: 'app-create-room-form',
@@ -15,10 +11,7 @@ import { NzNotificationService } from 'ng-zorro-antd';
   styleUrls: ['./create-room-form.component.scss']
 })
 export class CreateRoomFormComponent implements OnInit {
-  form: FormGroup = new FormGroup({
-    name: new FormControl(''),
-    description: new FormControl('')
-  });
+  form: FormGroup;
 
   constructor(
     private service: OverviewService,
@@ -29,16 +22,26 @@ export class CreateRoomFormComponent implements OnInit {
 
   ngOnInit() {
     this.form = this.fb.group({
-      name: [null, [Validators.required]],
-      description: [null, [Validators.required]]
+      name: [
+        null,
+        [
+          Validators.required,
+          Validators.maxLength(15),
+          Validators.minLength(3),
+          Validators.pattern(/^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/)
+        ]
+      ],
+      description: [
+        null,
+        [Validators.required, Validators.maxLength(20), Validators.minLength(5)]
+      ],
+      remember: [true]
     });
   }
 
   onSubmit() {
     console.log('test');
-
     if (this.form.invalid) {
-      this.form.markAsTouched();
       return;
     }
 
