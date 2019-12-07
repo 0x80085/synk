@@ -13,7 +13,6 @@ export class LoginComponent implements OnInit {
 
   isLoginSuccess = false;
 
-
   constructor(
     private fb: FormBuilder,
     private service: AuthService,

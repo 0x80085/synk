@@ -1,5 +1,8 @@
 <div nz-row>
-  <div nz-col nzSpan="8">
+  <div nz-col nzOffset="8" nzSpan="8">
+    <h1>Welcome back!</h1>
+  </div>
+  <div nz-col nzOffset="8" nzSpan="8">
     <nz-card nzTitle="Login" *ngIf="!isLoginSuccess">
       <form
         nz-form
@@ -12,7 +15,7 @@
             <ng-template #prefixTemplateUser
               ><i nz-icon style="color: rgb(204, 254, 253);" nzType="user"></i
             ></ng-template>
-            <nz-input-group [nzPrefix]="prefixTemplateUser" nz>
+            <nz-input-group [nzPrefix]="prefixTemplateUser" >
               <input
                 type="text"
                 nz-input
