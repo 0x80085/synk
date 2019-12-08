@@ -34,16 +34,26 @@ export class RoomService {
 
   private setupCommandHandlers(socket: SocketPassport) {
     socket.on(Commands.JOIN_ROOM, (roomName: string) => {
-      this.joinRoom(socket, roomName);
+      try {
+        console.log('socket.on(Commands.JOIN_ROOM');
+
+        this.joinRoom(socket, roomName);
+      } catch (error) {
+        console.log(error);
+      }
     });
 
     socket.on(Commands.EXIT_ROOM, (roomName: string) => {
-      this.exitRoom(socket, roomName);
+      try {
+
+        this.exitRoom(socket, roomName);
+      } catch (error) {
+        console.log(error);
+      }
     });
 
     socket.on(Commands.GROUP_MESSAGE, (data: IncomingGroupMessage) =>
-      this.onGroupMessage(data, socket)
-    );
+      this.onGroupMessage(data, socket));
 
     socket.on(Commands.MEDIA_EVENT, (data: MediaEvent) =>
       this.onMediaEvent(data, socket)
@@ -125,8 +135,10 @@ export class RoomService {
   }
 
   private disconnect = (socket: SocketPassport) => {
-    console.log('disconnect');
-    console.log(socket.rooms);
+    if (socket.request && socket.request.user) {
+      // Can be done better? idk
+      this.publicRooms.forEach(room => room.exit(socket));
+    }
   }
 
   private exitRoom(socket: socketio.Socket, roomName: string) {

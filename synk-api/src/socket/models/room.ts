@@ -39,17 +39,19 @@ export class Room {
   }
 
   join(socket: socketio.Socket) {
-    socket.join(this.name);
-
-    const newuser = this.createUserFromSocket(socket);
+    console.log('JOING ', this.name);
+    const newuser = this.createRoomUser(socket);
 
     console.log(newuser);
+    socket.join(this.name);
 
     if (this.users.length === 0) {
+      console.log('### NEW LEAZDER', newuser);
       this.setLeader(newuser);
     }
 
     this.users.push(newuser);
+    this.sendUserRoomConfig(socket);
 
     const userJoined: OutgoingGroupMessage = {
       roomName: this.name,
@@ -64,13 +66,16 @@ export class Room {
 
   exit(socket: socketio.Socket) {
     const user = this.getUserFromSocket(socket);
+    console.log('## EXIT SOCEUSER', user);
 
     if (user) {
       this.users = this.users.filter(it => it.userName !== user.userName);
 
-      if (user.userName === this.leader.userName) {
+      if (this.leader && user.userName === this.leader.userName) {
         const newLeader = this.users[0] || null;
-        this.setLeader(newLeader);
+        if (newLeader) {
+          this.setLeader(newLeader);
+        }
       }
 
       const userLeft: OutgoingGroupMessage = {
@@ -87,8 +92,6 @@ export class Room {
 
   setLeader(user: RoomUser) {
     this.leader = user;
-    const socketOfLeader = this.getSocketById(this.leader.id);
-    this.sendUserRoomConfig(socketOfLeader);
   }
 
   sendMessageToRoom(socket: socketio.Socket, msg: IncomingGroupMessage) {
@@ -106,7 +109,7 @@ export class Room {
     socket.to(this.name).emit('media event', data);
   }
 
-  private createUserFromSocket(socket: socketio.Socket): RoomUser {
+  private createRoomUser(socket: socketio.Socket): RoomUser {
     const isLeader =
       this.leader && this.leader.userName === socket.request.user.username;
 
@@ -143,12 +146,8 @@ export class Room {
     socket.emit('user config', userConfig);
   }
 
-  private assignRoleToUser(socket: socketio.Socket) {}
+  private assignRoleToUser(socket: socketio.Socket) { }
 
-  private assignPermissionToUser(socket: socketio.Socket) {}
+  private assignPermissionToUser(socket: socketio.Socket) { }
 
-  private getSocketById(id: string) {
-    const ns = this.io.of(this.name);
-    return ns.connected[id];
-  }
 }

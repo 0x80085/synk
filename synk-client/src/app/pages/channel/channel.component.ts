@@ -17,7 +17,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   @ViewChild('player', { static: false }) player: MediaComponent;
 
   name: string;
-  mediaUrl: string = '';
+  mediaUrl = '';
   isLeader = false;
 
   mediaUpdateTimer$: Subscription;
@@ -111,7 +111,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
     if (!this.shouldSyncPlayer(ev)) {
       return;
     }
-    if (this.mediaUrl !== ev.mediaUrl) {
+    if (this.player.getCurrentUrl() !== ev.mediaUrl) {
       console.log('url out of sync;');
       console.log(`wanted: ${ev.mediaUrl}, got ${this.mediaUrl}. Syncing..`);
 

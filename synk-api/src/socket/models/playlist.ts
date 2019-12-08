@@ -116,6 +116,17 @@ export class Playlist {
   }
 
   update = (ev: MediaEvent) => {
+    const hasInvalidUrl =
+      // delete/throw when add media is implemnted
+      !ev.mediaUrl
+      || ev.mediaUrl === ''
+      || YouTubeGetID(ev.mediaUrl) === null
+      || YouTubeGetID(ev.mediaUrl) === '';
+
+    if (hasInvalidUrl) {
+      return;
+    }
+
     let selectedItem = this.list.find(it => it.mediaUrl === ev.mediaUrl);
 
     if (!selectedItem) {
@@ -156,4 +167,18 @@ export class Playlist {
   private getIndexByUrl(mediaUrl: string) {
     return this.list.findIndex(it => it.mediaUrl === mediaUrl);
   }
+}
+
+function YouTubeGetID(url: any) {
+  let ID = '';
+  url = url
+    .replace(/(>|<)/gi, '')
+    .split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
+  if (url[2] !== undefined) {
+    ID = url[2].split(/[^0-9a-z_\-]/i);
+    ID = ID[0];
+  } else {
+    ID = url;
+  }
+  return ID;
 }
