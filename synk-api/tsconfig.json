@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "ES6",
     "target": "es6",
     "noImplicitAny": true,
+    "esModuleInterop": true,
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "dist",
@@ -10,8 +11,16 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "paths": {
-      "*": ["node_modules/", "src/types/*"]
+      "*": [
+        "node_modules/",
+        "src/types/*"
+      ]
     }
   },
-  "include": ["src/**/*"]
+  "include": [
+    "src/**/*"
+  ],
+  "lib": [
+    "es2015", "es6"
+  ]
 }
