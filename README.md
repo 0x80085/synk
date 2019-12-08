@@ -26,25 +26,38 @@ Getting the YT namespace error? Execute `npm i @types/youtube`.
 
 ## Todo 
 
-- Docker support
 - Config script for DB
 - More docs
 - DB model
-    - Users
-    - Channels
     - Bans
     - Mods
     - ...
 - DB Migration scripts
 - Moderation 
 - Custom emoji support
-- General styling
 - Deploy steps/script
 - Channel customization support
 - Rate limiting
 - Bans
 - Load Balancing/Testing
 - Refactor Middleware Sockets to make it more readable
-- Add Scrape.Tv Channel and scraoe vids periodically
+- Add Scrape.Tv Channel
 - Playlist control
 - exitGroup when user disconnects
+
+
+## Under construction at time of writing 
+
+- fix all leader media issues
+- General styling
+- connect Channels table to rooms socketio concept
+- fix the chat scrolldown when new msg
+- Docker support
+- introduce and model (some also in db) more concepts like playlist, roles, skips, room management/media management
+    - Channel
+    - User
+    - Session (from Passportjs)
+- concoct strategy for scraping videos
+- ratelimiting and security
+- db migration scripts
+- make ready for deployment
