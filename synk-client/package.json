@@ -7,7 +7,9 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "docker:run": "docker build --rm -f \"Dockerfile\" -t synk-client:latest \".\"",
+    "docker:build": "docker-compose up --build"
   },
   "private": true,
   "dependencies": {
