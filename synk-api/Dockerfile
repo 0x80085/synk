@@ -1,6 +1,12 @@
-# Build/package the API src
+# Builds/packages the API
 
 FROM node:lts-alpine
+
+# Install pkgs to build npm deps
+RUN apk add --no-cache --virtual .gyp \
+    python \
+    make \
+    g++
 
 # Create folder on container
 WORKDIR /synk-api
@@ -17,5 +23,13 @@ RUN npm install
 # Copy src
 COPY ./src ./src
 
+RUN ls
+
+RUN cd src && ls
+
+# Run dev start
+RUN npm start
+
+
 # Compile code (will put res in /dist)
-RUN tsc
+# RUN tsc then copy then run etc. if I get it fixed to compile
