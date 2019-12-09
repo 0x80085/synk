@@ -44,10 +44,6 @@ Getting the YT namespace error? Execute `npm i @types/youtube`.
 
 - Config script for DB
 - More docs
-- DB model
-    - Bans
-    - Mods
-    - ...
 - DB Migration scripts
 - Moderation 
 - Custom emoji support
@@ -74,7 +70,7 @@ Getting the YT namespace error? Execute `npm i @types/youtube`.
 - login error feedback
 - register err feedback
 - loggedin-state show to user + handle session expires better
-- add user profile page + confog settings
+- add user profile page + config settings
 - General styling
 - connect Channels table to rooms socketio concept
 - fix the chat scrolldown when new msg
@@ -82,9 +78,10 @@ Getting the YT namespace error? Execute `npm i @types/youtube`.
 - introduce and model (some also in db) more concepts like playlist, roles, skips, room management/media management
     - Channel
     - User
-    - Session (from Passportjs)
+    - Session (from Passportjs
+    - ...?
 - channel config settings
 - concoct strategy for scraping videos
 - ratelimiting and security
 - db migration scripts
-- make ready for deployment
+- prepare deployment
