@@ -67,6 +67,7 @@ Getting the YT namespace error? Execute `npm i @types/youtube`.
 - fix all leader media issues
 - youtube watch= ghost url in playlist
 - user isnt removed from roomuserlist on exit/disconnect
+- send config to all room users when leader (or other role)  changes
 
 ...next up
 

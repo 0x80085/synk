@@ -5,7 +5,7 @@ import { IVerifyOptions } from 'passport-local';
 import { check, sanitize, validationResult } from 'express-validator';
 
 import { User } from '../../domain/entity/User';
-import uuid = require('uuid');
+import * as uuid from 'uuid';
 import { createConnection, FindConditions, getConnection } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
