@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es2015",
+    "module": "commonjs",
+    "moduleResolution": "node",
     "noImplicitAny": true,
     "sourceMap": true,
     "outDir": "dist",
@@ -11,12 +13,17 @@
         "node_modules/",
         "src/types/*"
       ]
-    }
+    },
+    "baseUrl": "."
   },
   "include": [
     "src/**/*"
   ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
   "lib": [
-    "es6"
+    "esnext"
   ]
 }
