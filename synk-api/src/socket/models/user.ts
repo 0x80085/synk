@@ -14,9 +14,10 @@ export interface RoomUser {
   id: string;
   userName: string;
   role: Roles;
-  isLeader: boolean;
   permissionLevel: PermissionLevels;
 }
+
+export type RoomUserDto = RoomUser & { isLeader: boolean }
 
 export interface RoomUserConfig {
   playlist: MediaContent[];
@@ -24,4 +25,5 @@ export interface RoomUserConfig {
   permissionLevel: PermissionLevels;
   isLeader: boolean;
   isAdmin: boolean;
+  members: RoomUserDto[];
 }

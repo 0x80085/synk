@@ -1,6 +1,6 @@
 import * as socketio from 'socket.io';
 
-import { RoomUser, RoomUserConfig, Roles } from './user';
+import { RoomUser, RoomUserConfig, Roles, RoomUserDto } from './user';
 import {
   OutgoingGroupMessage,
   IncomingGroupMessage,
@@ -110,13 +110,9 @@ export class Room {
   }
 
   private createRoomUser(socket: socketio.Socket): RoomUser {
-    const isLeader =
-      this.leader && this.leader.userName === socket.request.user.username;
-
     return {
       id: socket.id,
       permissionLevel: 1,
-      isLeader,
       userName: socket.request.user.username,
       role: Roles.Regular
     };
@@ -130,20 +126,30 @@ export class Room {
   }
 
   private sendUserRoomConfig(socket: socketio.Socket) {
-    const isLeader =
-      this.leader && this.leader.userName === socket.request.user.username;
+    const userConfig = this.getConfigForSocket(socket);
+    socket.emit('user config', userConfig);
+  }
 
-    const userConfig: RoomUserConfig = {
+  private getConfigForSocket(socket: socketio.Socket) {
+    const user = this.getUserFromSocket(socket);
+    const userLs: RoomUserDto[] = this.users.map(u => {
+      return {
+        ...u,
+        isLeader: this.isLeader(u)
+      };
+    });
+
+    return {
       playlist: this.currentPlayList.list,
-      isLeader,
+      isLeader: this.isLeader(user),
       isAdmin: false,
       permissionLevel: 1,
-      role: Roles.Regular
+      role: Roles.Regular,
+      members: userLs
     };
-
-    console.log(userConfig);
-
-    socket.emit('user config', userConfig);
+  }
+  private isLeader(user: RoomUser): boolean {
+    return this.leader && this.leader.userName === user.userName;
   }
 
   private assignRoleToUser(socket: socketio.Socket) { }

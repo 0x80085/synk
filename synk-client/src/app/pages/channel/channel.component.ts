@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-import { tap } from 'rxjs/operators';
+import { tap, map } from 'rxjs/operators';
 import { timer, Subscription, Observable } from 'rxjs';
 
 import { MediaComponent } from './media/media.component';
 import { ChatService } from './chat.service';
-import { MediaEvent, Message, RoomUserConfig } from './models/room.models';
+import { MediaEvent, Message, RoomUserConfig, RoomUser } from './models/room.models';
 
 @Component({
   selector: 'app-channel',
@@ -23,6 +23,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   mediaUpdateTimer$: Subscription;
   mediaSyncEvent$: Subscription;
   errorEvent$: Observable<Message[]>;
+  members$: Observable<RoomUser[]>;
   roomUserConfig$: Subscription;
 
   playlist: string[] = [];
@@ -30,7 +31,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private chatService: ChatService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.name = this.route.snapshot.paramMap.get('name');
@@ -72,6 +73,13 @@ export class ChannelComponent implements OnInit, OnDestroy {
   }
 
   receiveRoomConfig() {
+    this.members$ = this.chatService.roomUserConfig$.pipe(
+      map((ev: RoomUserConfig) => {
+        console.log(ev);
+        return ev.members;
+      })
+    );
+
     this.roomUserConfig$ = this.chatService.roomUserConfig$.subscribe(ev => {
       console.log(ev);
 
