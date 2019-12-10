@@ -1,6 +1,6 @@
 import { MediaEvent } from './message';
 
-export class MediaContent {
+export class ItemContent {
   mediaUrl: string;
   currentTime: number | null = null;
 
@@ -10,7 +10,7 @@ export class MediaContent {
   }
 }
 
-export class PlaylistItem extends MediaContent {
+export class PlaylistItem extends ItemContent {
   isPermenant = false;
   addedByUsername: string;
 
@@ -51,10 +51,11 @@ export class Playlist {
   }
 
   add(media: PlaylistItem) {
-    this.list.push(media);
+    const alreadyAdded = this.list.filter(i => i.mediaUrl === media.mediaUrl).length > 0;
+    if (!alreadyAdded) { this.list.push(media); }
   }
 
-  next(media: MediaContent, isPermenant: boolean, addedBy: string) {
+  next(media: ItemContent, isPermenant: boolean, addedBy: string) {
     const item = new PlaylistItem(media.mediaUrl, addedBy);
     item.isPermenant = isPermenant;
 
@@ -116,33 +117,17 @@ export class Playlist {
   }
 
   update = (ev: MediaEvent) => {
-    const hasInvalidUrl =
-      // delete/throw when add media is implemnted
-      !ev.mediaUrl
-      || ev.mediaUrl === ''
-      || YouTubeGetID(ev.mediaUrl) === null
-      || YouTubeGetID(ev.mediaUrl) === '';
 
-    if (hasInvalidUrl) {
+    const selectedItem = this.list.find(it => it.mediaUrl === ev.mediaUrl);
+
+    if (!selectedItem) {
       return;
     }
 
-    let selectedItem = this.list.find(it => it.mediaUrl === ev.mediaUrl);
-
-    if (!selectedItem) {
-      // delete/throw when add media is implemnted
-      selectedItem = {
-        addedByUsername: 'lain',
-        currentTime: ev.currentTime,
-        isPermenant: false,
-        mediaUrl: ev.mediaUrl
-      };
-      this.add(selectedItem);
-    }
     this.current = selectedItem;
   }
 
-  publish = (callback: (arg: MediaContent) => void) => {
+  publish = (callback: (arg: ItemContent) => void) => {
     if (!this.current) {
       console.log('no vid selected ');
       return;
@@ -151,7 +136,7 @@ export class Playlist {
       list: this.list,
       nowPlaying: this.current
     };
-    const ev: MediaContent = {
+    const ev: ItemContent = {
       currentTime: update.nowPlaying.currentTime,
       mediaUrl: update.nowPlaying.mediaUrl
     };

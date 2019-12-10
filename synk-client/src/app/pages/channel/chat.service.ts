@@ -9,7 +9,8 @@ import {
   Message,
   RoomMessage,
   MediaEvent,
-  RoomUserConfig
+  RoomUserConfig,
+  RoomUserDto
 } from './models/room.models';
 
 @Injectable({
@@ -34,8 +35,24 @@ export class ChatService {
   });
 
   roomUserConfig$: Observable<RoomUserConfig> = new Observable(observer => {
-    this.socket.on('user config', (data: RoomUserConfig) => {
+    this.socket.on('user config', (data: PlaylistItem[]) => {
       console.log('config event received', data);
+
+      observer.next(data);
+    });
+  });
+
+  roomUserList$: Observable<RoomUserDto[]> = new Observable(observer => {
+    this.socket.on('userlist update', (data: RoomUserDto[]) => {
+      console.log('userlist update event received', data);
+
+      observer.next(data);
+    });
+  });
+
+  roomPlaylist$: Observable<MediaEvent[]> = new Observable(observer => {
+    this.socket.on('playlist update', (data: MediaEvent[]) => {
+      console.log('playlist update  event received', data);
 
       observer.next(data);
     });
@@ -84,6 +101,10 @@ export class ChatService {
       roomName
     };
     this.socket.emit('media event', ev);
+  }
+
+  addToPlaylist(ev: MediaEvent) {
+    this.socket.emit('add media', ev);
   }
 
   enterRoom(name: string) {

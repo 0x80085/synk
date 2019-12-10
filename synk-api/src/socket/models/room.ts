@@ -23,10 +23,10 @@ export class Room {
 
   constructor(
     name: string,
-    sio: socketio.Server,
+    sIO: socketio.Server,
     originSocket?: socketio.Socket
   ) {
-    this.io = sio;
+    this.io = sIO;
     this.name = name;
 
     this.creator = originSocket ? originSocket.request.user.username : 'Lain';
@@ -40,28 +40,13 @@ export class Room {
 
   join(socket: socketio.Socket) {
     console.log('JOING ', this.name);
-    const newuser = this.createRoomUser(socket);
 
-    console.log(newuser);
-    socket.join(this.name);
+    this.addSocketToRoom(socket);
 
-    if (this.users.length === 0) {
-      console.log('### NEW LEAZDER', newuser);
-      this.setLeader(newuser);
-    }
+    this.sendRoomConfigToUser(socket);
+    this.sendPlaylistToUser(socket);
 
-    this.users.push(newuser);
-    this.sendUserRoomConfig(socket);
-
-    const userJoined: OutgoingGroupMessage = {
-      roomName: this.name,
-      content: {
-        userName: 'info',
-        text: `${newuser.userName} joined`
-      }
-    };
-
-    this.io.to(this.name).emit('group message', userJoined);
+    this.emitUserListToRoom();
   }
 
   exit(socket: socketio.Socket) {
@@ -90,10 +75,6 @@ export class Room {
     socket.leave(this.name);
   }
 
-  setLeader(user: RoomUser) {
-    this.leader = user;
-  }
-
   sendMessageToRoom(socket: socketio.Socket, msg: IncomingGroupMessage) {
     const message: OutgoingGroupMessage = {
       roomName: this.name,
@@ -105,8 +86,29 @@ export class Room {
     this.io.to(this.name).emit('group message', message);
   }
 
+  emitPlaylistToRoom() {
+    console.log('emitUserListToRoom', this.currentPlayList.list);
+    this.io.to(this.name).emit('playlist update', this.currentPlayList.list);
+  }
+
   emitMediaEventToUsers(socket: socketio.Socket, data: MediaEvent) {
     socket.to(this.name).emit('media event', data);
+  }
+
+  emitUserListToRoom() {
+    const userLs: RoomUserDto[] = this.users.map(u => {
+      return {
+        ...u,
+        isLeader: this.isLeader(u)
+      };
+    });
+    console.log('emitUserListToRoom', userLs);
+
+    this.io.to(this.name).emit('userlist update', userLs);
+  }
+
+  private setLeader(user: RoomUser) {
+    this.leader = user;
   }
 
   private createRoomUser(socket: socketio.Socket): RoomUser {
@@ -125,29 +127,57 @@ export class Room {
     return user;
   }
 
-  private sendUserRoomConfig(socket: socketio.Socket) {
+  private sendPlaylistToUser(socket: socketio.Socket) {
+    socket.emit('user config', this.currentPlayList.list);
+  }
+
+  private sendRoomConfigToUser(socket: socketio.Socket) {
     const userConfig = this.getConfigForSocket(socket);
     socket.emit('user config', userConfig);
   }
 
-  private getConfigForSocket(socket: socketio.Socket) {
+  private getConfigForSocket(socket: socketio.Socket): RoomUserConfig {
     const user = this.getUserFromSocket(socket);
-    const userLs: RoomUserDto[] = this.users.map(u => {
-      return {
-        ...u,
-        isLeader: this.isLeader(u)
-      };
-    });
 
     return {
-      playlist: this.currentPlayList.list,
       isLeader: this.isLeader(user),
       isAdmin: false,
       permissionLevel: 1,
-      role: Roles.Regular,
-      members: userLs
+      role: Roles.Regular
     };
   }
+
+  private addSocketToRoom(socket: socketio.Socket) {
+    try {
+      const nu = this.getUserFromSocket(socket);
+      const alreadyAdded = this.users.filter(u => u.userName === nu.userName).length > 0;
+      if (alreadyAdded) {
+        return;
+      }
+      const newuser = this.createRoomUser(socket);
+      if (this.users.length === 0) {
+        console.log('### NEW LEAZDER', newuser);
+        this.setLeader(newuser);
+      }
+      this.users.push(newuser);
+
+      const userJoined: OutgoingGroupMessage = {
+        roomName: this.name,
+        content: {
+          userName: 'info',
+          text: `${newuser.userName} joined`
+        }
+      };
+
+      this.io.to(this.name).emit('group message', userJoined);
+
+    } catch (error) {
+      console.log('ERROR SOCKET ILLEAGL STATE');
+      socket.emit('authentication error');
+      return;
+    }
+  }
+
   private isLeader(user: RoomUser): boolean {
     return this.leader && this.leader.userName === user.userName;
   }

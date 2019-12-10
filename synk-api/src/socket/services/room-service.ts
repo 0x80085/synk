@@ -2,7 +2,7 @@ import * as socketio from 'socket.io';
 
 import { Room } from '../models/room';
 import { IncomingGroupMessage, MediaEvent } from '../models/message';
-import { MediaContent } from '../models/playlist';
+import { ItemContent } from '../models/playlist';
 import { SocketPassport } from '../models/socket.passport';
 
 export enum Commands {
@@ -89,7 +89,7 @@ export class RoomService {
   private onMediaEvent = (data: MediaEvent, socket: SocketPassport) => {
     console.log('media event received', data.currentTime);
 
-    const afterPlaylistUpdate = (state: MediaContent) => {
+    const afterPlaylistUpdate = (state: ItemContent) => {
       const update: MediaEvent = {
         ...state,
         roomName: data.roomName,
@@ -117,8 +117,7 @@ export class RoomService {
       isPermenant: false,
       addedByUsername: socket.request.user.username
     });
-
-    // this.io.to(data.roomName).emit("playlist update", update);
+    room.emitPlaylistToRoom();
   }
 
   private onGroupMessage = (

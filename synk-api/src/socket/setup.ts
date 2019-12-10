@@ -28,6 +28,8 @@ export function setupSockets(
 
   // Set up the Socket.IO server
   io.use((socket: SocketPassport, next) => {
+    console.log('###########');
+
     console.log('user trying to connect ', socket.id);
     console.log('user authed? ', socket.client.request.isAuthenticated());
     next();
@@ -41,6 +43,13 @@ export function setupSockets(
         fail: onAuthorizeFail // *optional* callback on fail/error
       })
     )
+    .use((socket: SocketPassport, next) => {
+      console.log('ppassed passportSocketIo.authorize ', socket.id);
+      console.log('user authed? ', socket.client.request.isAuthenticated());
+
+      console.log('###########');
+      next();
+    })
     .use(roomService.registerCommands)
     .on('connection', () => console.log('connected!'));
 

@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-import { tap, map } from 'rxjs/operators';
+import { tap, map, mapTo } from 'rxjs/operators';
 import { timer, Subscription, Observable } from 'rxjs';
 
 import { MediaComponent } from './media/media.component';
 import { ChatService } from './chat.service';
-import { MediaEvent, Message, RoomUserConfig, RoomUser } from './models/room.models';
+import { MediaEvent, Message, RoomUserConfig, RoomUser, RoomUserDto } from './models/room.models';
 
 @Component({
   selector: 'app-channel',
@@ -25,6 +25,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   errorEvent$: Observable<Message[]>;
   members$: Observable<RoomUser[]>;
   roomUserConfig$: Subscription;
+  playlist$: Observable<MediaEvent[]>;
 
   playlist: string[] = [];
 
@@ -40,6 +41,8 @@ export class ChannelComponent implements OnInit, OnDestroy {
     this.sendPeriodicUpdate();
     this.quitOnError();
     this.receiveRoomConfig();
+    this.receivePlaylistUpdate();
+    this.receiveMemberlistUpdate();
   }
 
   onVideoEnded() {
@@ -73,13 +76,6 @@ export class ChannelComponent implements OnInit, OnDestroy {
   }
 
   receiveRoomConfig() {
-    this.members$ = this.chatService.roomUserConfig$.pipe(
-      map((ev: RoomUserConfig) => {
-        console.log(ev);
-        return ev.members;
-      })
-    );
-
     this.roomUserConfig$ = this.chatService.roomUserConfig$.subscribe(ev => {
       console.log(ev);
 
@@ -90,6 +86,14 @@ export class ChannelComponent implements OnInit, OnDestroy {
       this.mediaUrl = this.playlist[0];
       this.player.play(this.mediaUrl);
     });
+  }
+
+  receivePlaylistUpdate() {
+    this.playlist$ = this.chatService.roomPlaylist$;
+  }
+
+  receiveMemberlistUpdate() {
+    this.members$ = this.chatService.roomUserList$;
   }
 
   quitOnError() {

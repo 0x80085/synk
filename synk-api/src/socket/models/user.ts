@@ -1,4 +1,4 @@
-import { MediaContent } from './playlist';
+import { ItemContent } from './playlist';
 
 export type PermissionLevels = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
@@ -17,13 +17,11 @@ export interface RoomUser {
   permissionLevel: PermissionLevels;
 }
 
-export type RoomUserDto = RoomUser & { isLeader: boolean }
+export type RoomUserDto = RoomUser & { isLeader: boolean };
 
 export interface RoomUserConfig {
-  playlist: MediaContent[];
   role: Roles;
   permissionLevel: PermissionLevels;
   isLeader: boolean;
   isAdmin: boolean;
-  members: RoomUserDto[];
 }
