@@ -29,7 +29,7 @@ export class Room {
     this.io = sIO;
     this.name = name;
 
-    this.creator = originSocket ? originSocket.request.user.username : 'Lain';
+    this.creator = originSocket ? this.getUsername(originSocket) : 'Lain';
 
     const defaultPlaylist = new Playlist('default');
     this.currentPlayList = defaultPlaylist;
@@ -80,14 +80,14 @@ export class Room {
       roomName: this.name,
       content: {
         text: msg.content.text,
-        userName: socket.request.user.username
+        userName: this.getUsername(socket)
       }
     };
     this.io.to(this.name).emit('group message', message);
   }
 
   emitPlaylistToRoom() {
-    console.log('emitUserListToRoom', this.currentPlayList.list);
+    console.log('emitPLayListToRoom', this.currentPlayList.list);
     this.io.to(this.name).emit('playlist update', this.currentPlayList.list);
   }
 
@@ -115,20 +115,20 @@ export class Room {
     return {
       id: socket.id,
       permissionLevel: 1,
-      userName: socket.request.user.username,
+      userName: this.getUsername(socket),
       role: Roles.Regular
     };
   }
 
   private getUserFromSocket(socket: socketio.Socket): RoomUser | null {
     const user = this.users.find(
-      u => u.userName === socket.request.user.username
+      u => u.userName === this.getUsername(socket)
     );
     return user;
   }
 
   private sendPlaylistToUser(socket: socketio.Socket) {
-    socket.emit('user config', this.currentPlayList.list);
+    socket.emit('playlist update', this.currentPlayList.list);
   }
 
   private sendRoomConfigToUser(socket: socketio.Socket) {
@@ -149,8 +149,8 @@ export class Room {
 
   private addSocketToRoom(socket: socketio.Socket) {
     try {
-      const nu = this.getUserFromSocket(socket);
-      const alreadyAdded = this.users.filter(u => u.userName === nu.userName).length > 0;
+      const uname = this.getUsername(socket);
+      const alreadyAdded = this.users.filter(u => u.userName === uname).length > 0;
       if (alreadyAdded) {
         return;
       }
@@ -159,6 +159,8 @@ export class Room {
         console.log('### NEW LEAZDER', newuser);
         this.setLeader(newuser);
       }
+
+      socket.join(this.name);
       this.users.push(newuser);
 
       const userJoined: OutgoingGroupMessage = {
@@ -178,7 +180,11 @@ export class Room {
     }
   }
 
-  private isLeader(user: RoomUser): boolean {
+  private getUsername(socket: socketio.Socket): string {
+    return socket.request.user.username;
+  }
+
+  private isLeader(user: RoomUser) {
     return this.leader && this.leader.userName === user.userName;
   }
 

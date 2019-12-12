@@ -23,7 +23,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   mediaUpdateTimer$: Subscription;
   mediaSyncEvent$: Subscription;
   errorEvent$: Observable<Message[]>;
-  members$: Observable<RoomUser[]>;
+  members$: Observable<RoomUserDto[]>;
   roomUserConfig$: Subscription;
   playlist$: Observable<MediaEvent[]>;
 
@@ -80,20 +80,30 @@ export class ChannelComponent implements OnInit, OnDestroy {
       console.log(ev);
 
       this.isLeader = ev.isLeader;
-      this.playlist = ev.playlist.map(i => {
-        return i.mediaUrl;
-      });
+
       this.mediaUrl = this.playlist[0];
       this.player.play(this.mediaUrl);
     });
   }
 
   receivePlaylistUpdate() {
-    this.playlist$ = this.chatService.roomPlaylist$;
+    this.playlist$ = this.chatService.roomPlaylist$.pipe(
+      tap(ev => {
+        console.log('playlist update', ev);
+
+        this.playlist = ev.map(i => {
+          return i.mediaUrl;
+        });
+      })
+    );
   }
 
   receiveMemberlistUpdate() {
-    this.members$ = this.chatService.roomUserList$;
+    this.members$ = this.chatService.roomUserList$.pipe(
+      tap(ev => {
+        console.log('roomUserList update', ev);
+      })
+    );
   }
 
   quitOnError() {

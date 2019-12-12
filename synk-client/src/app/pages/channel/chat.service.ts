@@ -35,7 +35,7 @@ export class ChatService {
   });
 
   roomUserConfig$: Observable<RoomUserConfig> = new Observable(observer => {
-    this.socket.on('user config', (data: PlaylistItem[]) => {
+    this.socket.on('user config', (data: RoomUserConfig) => {
       console.log('config event received', data);
 
       observer.next(data);
