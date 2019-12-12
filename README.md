@@ -61,22 +61,19 @@ Getting the YT namespace error? Execute `npm i @types/youtube`.
 
 ## Under construction at time of writing 
 
-- fix all leader media issues
-- youtube watch= ghost url in playlist
-- user isnt removed from roomuserlist on exit/disconnect
-- send config to all room users when leader (or other role)  changes
-
-...next up
-
 - login error feedback
 - register err feedback
 - loggedin-state show to user + handle session expires better
 - add user profile page + config settings
-- General styling
-- connect Channels table to rooms socketio concept
 - fix the chat scrolldown when new msg
+- connect Channels table to rooms socketio concept
 - Docker support
-- introduce and model (some also in db) more concepts like playlist, roles, skips, room management/media management
+- db migration scripts
+
+...next up
+
+- General styling
+- Introduce and model (some also in db) more concepts like playlist, roles, skips, room management/media management
     - Channel
     - User
     - Session (from Passportjs
@@ -84,5 +81,4 @@ Getting the YT namespace error? Execute `npm i @types/youtube`.
 - channel config settings
 - concoct strategy for scraping videos
 - ratelimiting and security
-- db migration scripts
 - prepare deployment
