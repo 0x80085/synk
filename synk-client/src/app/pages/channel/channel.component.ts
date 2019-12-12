@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy, HostListener } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { tap, map, mapTo } from 'rxjs/operators';
@@ -14,6 +14,7 @@ import { MediaEvent, Message, RoomUserConfig, RoomUser, RoomUserDto } from './mo
   styleUrls: ['./channel.component.scss']
 })
 export class ChannelComponent implements OnInit, OnDestroy {
+
   @ViewChild('player', { static: false }) player: MediaComponent;
 
   name: string;
@@ -33,6 +34,11 @@ export class ChannelComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private chatService: ChatService
   ) { }
+
+  @HostListener('window:beforeunload', ['$event'])
+  exitRoomOnPageDestroy(event) {
+    this.chatService.exit(this.name);
+  }
 
   ngOnInit() {
     this.name = this.route.snapshot.paramMap.get('name');
