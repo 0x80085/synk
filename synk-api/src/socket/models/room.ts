@@ -71,6 +71,7 @@ export class Room {
         }
       };
       this.io.to(this.name).emit('group message', userLeft);
+      this.emitUserListToRoom();
     }
     socket.leave(this.name);
   }
