@@ -56,6 +56,7 @@ Getting the YT namespace error? Execute `npm i @types/youtube`.
 - Add Scrape.Tv Channel
 - Playlist control
 - exitGroup when user disconnects
+- 404 pages server and client
 
 
 ## Under construction at time of writing 
