@@ -12,8 +12,6 @@
     </div>
     <div nz-col nzSpan="6" class="mt-1">
 
-
-
       <nz-list nzBordered nzSize="small" [nzDataSource]="members$ | async" [nzRenderItem]="member"
         [nzNoResult]="'No items'">
         <ng-template #member let-member>
@@ -32,13 +30,12 @@
       </nz-list>
     </div>
     <div nz-col nzSpan="18" class="mt-1">
-      <nz-list nzBordered nzSize="small" [nzDataSource]="playlist$ | async" [nzRenderItem]="item"
-        [nzNoResult]="'No items'">
+      <nz-list nzBordered nzSize="small" [nzDataSource]="playlist$ | async" [nzRenderItem]="item" [nzNoResult]="'No items'">
         <ng-template #item let-item>
-          <li nz-list-item nzBordered class="playlist-item" [nzContent]="item" [nzActions]="[opAction]" nzNoFlex></li>
+          <li nz-list-item nzBordered class="playlist-item" [nzContent]="item.mediaUrl" [nzActions]="[opAction]" nzNoFlex></li>
           <ng-template #opAction>
             <nz-button-group>
-              <button nz-button nzSize="small" nzType="link" (click)="player.play(item)" title="start video"><i nz-icon
+              <button nz-button nzSize="small" nzType="link" (click)="player.play(item.mediaUrl)" title="start video"><i nz-icon
                   nzType="caret-right"></i></button>
               <button nz-button nzSize="small" nzType="link" title="set next in line"><i nz-icon
                   nzType="double-right"></i></button>
@@ -47,13 +44,15 @@
         </ng-template>
       </nz-list>
     </div>
+  </div>
+</ng-template>
 
-    <ng-template #disconnectedImg>
-      <i nz-icon style="font-size: 5rem; color: rgb(204, 254, 253);" nzType="frown"></i>
-    </ng-template>
-    <ng-template #errorConnecting>
-      <div nz-col nzSpan="24" class="column">
-        <nz-empty [nzNotFoundImage]="disconnectedImg" nzNotFoundContent="Can't connect to channel. Try logging in?">
-        </nz-empty>
-      </div>
-    </ng-template>
+<ng-template #disconnectedImg>
+  <i nz-icon style="font-size: 5rem; color: rgb(204, 254, 253);" nzType="frown"></i>
+</ng-template>
+<ng-template #errorConnecting>
+  <div nz-col nzSpan="24" class="column">
+    <nz-empty [nzNotFoundImage]="disconnectedImg" nzNotFoundContent="Can't connect to channel. Try logging in?">
+    </nz-empty>
+  </div>
+</ng-template>
