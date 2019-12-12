@@ -25,7 +25,7 @@ export const errorDictionary: PlayerFeedbackMessage = {
   [YT.PlayerError.InvalidParam]: {
     type: 'error',
     title: 'Input invalid',
-    body: 'Something wet wrong requesting the video'
+    body: 'Something went wrong requesting the video'
   },
   [YT.PlayerError.VideoNotFound]: {
     type: 'error',
