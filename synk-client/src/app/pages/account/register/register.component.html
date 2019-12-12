@@ -1,5 +1,8 @@
-<div nz-row>
-  <div nz-col nzSpan="8">
+<div nz-row nzAlign="middle">
+  <div nz-col nzOffset="8" nzSpan="8">
+    <h1>Create your account</h1>
+  </div>
+  <div nz-col nzOffset="8" nzSpan="8">
     <nz-card nzTitle="Create account" *ngIf="!registerSuccess">
       <form
         nz-form
@@ -9,7 +12,10 @@
       >
         <nz-form-item>
           <nz-form-control nzErrorTip="Please input your username!">
-            <nz-input-group nzPrefixIcon="user">
+            <ng-template #prefixTemplateUser
+              ><i nz-icon style="color: rgb(204, 254, 253);" nzType="user"></i
+            ></ng-template>
+            <nz-input-group [nzPrefix]="prefixTemplateUser">
               <input
                 type="text"
                 nz-input
@@ -21,7 +27,10 @@
         </nz-form-item>
         <nz-form-item>
           <nz-form-control nzErrorTip="Please input your Password!">
-            <nz-input-group nzPrefixIcon="lock">
+            <ng-template #prefixTemplateLock
+              ><i nz-icon style="color: rgb(204, 254, 253);" nzType="lock"></i
+            ></ng-template>
+            <nz-input-group [nzPrefix]="prefixTemplateLock">
               <input
                 type="password"
                 nz-input

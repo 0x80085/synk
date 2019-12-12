@@ -1,6 +1,8 @@
-export class MediaContent {
+import { MediaEvent } from './message';
+
+export class ItemContent {
   mediaUrl: string;
-  currentTime: number | null;
+  currentTime: number | null = null;
 
   constructor(mediaUrl: string, currentTime: number) {
     this.currentTime = currentTime;
@@ -8,35 +10,160 @@ export class MediaContent {
   }
 }
 
-export class PlaylistItem extends MediaContent {
-  isPermenant: boolean;
+export class PlaylistItem extends ItemContent {
+  isPermenant = false;
   addedByUsername: string;
 
-  constructor(mediaUrl: string, currentTime: number) {
-    super(mediaUrl, currentTime);
+  constructor(mediaUrl: string, addedByUsername: string) {
+    super(mediaUrl, null);
   }
 }
 
+const mockList: PlaylistItem[] = [
+  {
+    addedByUsername: 'lain',
+    currentTime: null,
+    isPermenant: false,
+    mediaUrl: 'https://www.youtube.com/watch?v=p2LMwxo0MVk'
+  },
+
+  {
+    addedByUsername: 'lain',
+    currentTime: null,
+    isPermenant: false,
+    mediaUrl: 'https://www.youtube.com/watch?v=_1rF38MjpHE'
+  },
+  {
+    addedByUsername: 'lain',
+    currentTime: null,
+    isPermenant: false,
+    mediaUrl: 'https://www.youtube.com/watch?v=qUDEyONQaCA'
+  }
+];
+
 export class Playlist {
   name: string;
-  list: PlaylistItem[] = [];
-  current: PlaylistItem | null = null;
+  list: PlaylistItem[] = mockList;
+  current: PlaylistItem | null = mockList[0];
 
   constructor(name: string) {
     this.name = name;
   }
 
-  add(media: MediaContent, isPermenant: boolean, addedBy: string) {}
+  add(media: PlaylistItem) {
+    const alreadyAdded = this.list.filter(i => i.mediaUrl === media.mediaUrl).length > 0;
+    if (!alreadyAdded) { this.list.push(media); }
+  }
 
-  remove(mediaUrl: string) {}
+  next(media: ItemContent, isPermenant: boolean, addedBy: string) {
+    const item = new PlaylistItem(media.mediaUrl, addedBy);
+    item.isPermenant = isPermenant;
 
-  next() {}
+    this.list.push(item);
+    this.bump(media.mediaUrl, 2);
+  }
 
-  skip() {}
+  remove(mediaUrl: string) {
+    this.list = this.list.filter(it => it.mediaUrl !== mediaUrl);
+  }
 
-  shuffle() {}
+  skip() {
+    const nextIndex = this.getIndexOfCurrentPlaying() + 1;
+    this.current = this.list[nextIndex] || this.list[nextIndex - 1];
+  }
 
-  bump(mediaUrl: string, toPosition: number) {}
+  shuffle() {
+    let listCount = this.list.length;
 
-  clear() {}
+    while (listCount) {
+      const newIndex = Math.floor(Math.random() * listCount--);
+      const lastItem = this.list[listCount];
+
+      this.list[listCount] = this.list[newIndex];
+      this.list[newIndex] = lastItem;
+    }
+  }
+
+  bump(mediaUrl: string, toPosition: number) {
+    const lastPosition = this.list.length;
+    let fromPosition = this.getIndexByUrl(mediaUrl);
+
+    while (fromPosition < 0) {
+      fromPosition += lastPosition;
+    }
+    while (toPosition < 0) {
+      toPosition += lastPosition;
+    }
+    if (toPosition >= lastPosition) {
+      let k = toPosition - lastPosition;
+      while (k-- + 1) {
+        this.list.push(undefined);
+      }
+    }
+    this.list.splice(toPosition, 0, this.list.splice(fromPosition, 1)[0]);
+  }
+
+  clear() {
+    this.list = [];
+  }
+
+  handleListUpdate = (
+    ev: MediaEvent,
+    afterUpdateCallback: (arg: MediaEvent) => void
+  ) => {
+    this.update(ev);
+
+    this.publish(afterUpdateCallback);
+  }
+
+  update = (ev: MediaEvent) => {
+
+    const selectedItem = this.list.find(it => it.mediaUrl === ev.mediaUrl);
+
+    if (!selectedItem) {
+      return;
+    }
+
+    this.current = selectedItem;
+  }
+
+  publish = (callback: (arg: ItemContent) => void) => {
+    if (!this.current) {
+      console.log('no vid selected ');
+      return;
+    }
+    const update = {
+      list: this.list,
+      nowPlaying: this.current
+    };
+    const ev: ItemContent = {
+      currentTime: update.nowPlaying.currentTime,
+      mediaUrl: update.nowPlaying.mediaUrl
+    };
+    console.log('publish = (', ev);
+
+    callback(ev);
+  }
+
+  private getIndexOfCurrentPlaying() {
+    return this.list.findIndex(it => it.mediaUrl === this.current.mediaUrl);
+  }
+
+  private getIndexByUrl(mediaUrl: string) {
+    return this.list.findIndex(it => it.mediaUrl === mediaUrl);
+  }
+}
+
+function YouTubeGetID(url: any) {
+  let ID = '';
+  url = url
+    .replace(/(>|<)/gi, '')
+    .split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
+  if (url[2] !== undefined) {
+    ID = url[2].split(/[^0-9a-z_\-]/i);
+    ID = ID[0];
+  } else {
+    ID = url;
+  }
+  return ID;
 }

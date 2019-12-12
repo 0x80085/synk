@@ -1,14 +1,16 @@
-import * as passport from "passport";
-import * as bcrypt from "bcrypt";
-import * as socketio from "socket.io";
-import * as session from "express-session";
+import * as passport from 'passport';
+import * as bcrypt from 'bcrypt';
+import * as socketio from 'socket.io';
+import * as session from 'express-session';
 
-import { Express, Response, Request } from "express";
-import { Connection } from "typeorm";
+import { Express, Response, Request } from 'express';
+import { Connection } from 'typeorm';
 
-import { User } from "../domain/entity/User";
+import { User } from '../domain/entity/User';
 
-import { Strategy as LocalStrategy } from "passport-local";
+import { Strategy as LocalStrategy, IVerifyOptions } from 'passport-local';
+
+type PassportDoneFn = (error: any, user?: any, options?: IVerifyOptions) => void;
 
 export default async function setupAuthMiddleware(
   server: Express,
@@ -18,16 +20,16 @@ export default async function setupAuthMiddleware(
   const userRepo = connection.getRepository(User);
 
   passport.use(
-    "local",
-    new LocalStrategy(async function(
+    'local',
+    new LocalStrategy(async (
       username: string,
       password: string,
-      done: Function
-    ) {
+      done: PassportDoneFn
+    ) => {
       const user = await userRepo.findOne({ username });
 
       if (!user) {
-        done(null, false, { message: "Could not find that user" });
+        done(null, false, { message: 'Could not find that user' });
       } else {
         const passwordIsCorrect = await bcrypt.compare(
           password,
@@ -38,7 +40,7 @@ export default async function setupAuthMiddleware(
           setTimeout(() => done(null, user), Math.floor(Math.random() * 20));
         } else {
           setTimeout(
-            () => done(null, false, { message: "Incorrect password" }),
+            () => done(null, false, { message: 'Incorrect password' }),
             Math.floor(Math.random() * 20)
           );
         }
@@ -46,8 +48,8 @@ export default async function setupAuthMiddleware(
     })
   );
 
-  passport.serializeUser((user: User, done: Function) => {
-    console.log("serializeUser", user);
+  passport.serializeUser((user: User, done: PassportDoneFn) => {
+    console.log('serializeUser', user);
 
     done(null, { id: user.id, username: user.username });
   });
@@ -58,7 +60,7 @@ export default async function setupAuthMiddleware(
       if (user) {
         done(null, { id: user.id, username: user.username });
       } else {
-        done("404", null);
+        done('404', null);
       }
     }
   );
@@ -71,27 +73,27 @@ export default async function setupAuthMiddleware(
 export function ensureAuthenticated(
   req: Request,
   res: Response,
-  next: Function,
+  next: (err?: any) => void,
   socket?: socketio.Socket
 ) {
   const isAuthenticated = socket
     ? socket.client.request.isAuthenticated()
     : req.isAuthenticated();
-  console.log("autthing ! by:: ", socket ? "socket " : "req");
+  console.log('autthing ! by:: ', socket ? 'socket ' : 'req');
 
   if (!isAuthenticated) {
     if (socket) {
       console.log(socket.client.request.session);
 
-      console.log("socket::", "not authorized");
-      return next(new Error("authentication error"));
+      console.log('socket::', 'not authorized');
+      return next(new Error('authentication error'));
     } else {
-      console.log("http::", "not authorized");
+      console.log('http::', 'not authorized');
       return res.sendStatus(403);
     }
   }
 
-  console.log("authenticatd ! by:: ", socket ? "socket " : "req");
+  console.log('authenticatd ! by:: ', socket ? 'socket ' : 'req');
 
   return next();
 }

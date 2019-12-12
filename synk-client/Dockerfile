@@ -1,7 +1,8 @@
-# Stage 1
 # Build the WebApp
 
-FROM node:13 as build-ngx
+FROM node:13 AS build-ngx
+
+# Stage 1
 
 # Create build folder on container
 WORKDIR /synk-client
@@ -27,7 +28,7 @@ RUN npm run build
 # Stage 2
 # Copy build results to server and configure Nginx
 
-FROM nginx as serve-ngx
+FROM nginx AS serve-ngx
 
 # Copy app to Nginx server
 COPY --from=build-ngx /synk-client/dist/synk-client /usr/share/nginx/html

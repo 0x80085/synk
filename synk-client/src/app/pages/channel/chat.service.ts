@@ -5,7 +5,13 @@ import * as io from 'socket.io-client';
 import { Observable, fromEvent, timer } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
-import { Message, RoomMessage, MediaEvent, RoomUserConfig } from './models/room.models';
+import {
+  Message,
+  RoomMessage,
+  MediaEvent,
+  RoomUserConfig,
+  RoomUserDto
+} from './models/room.models';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +37,22 @@ export class ChatService {
   roomUserConfig$: Observable<RoomUserConfig> = new Observable(observer => {
     this.socket.on('user config', (data: RoomUserConfig) => {
       console.log('config event received', data);
+
+      observer.next(data);
+    });
+  });
+
+  roomUserList$: Observable<RoomUserDto[]> = new Observable(observer => {
+    this.socket.on('userlist update', (data: RoomUserDto[]) => {
+      console.log('userlist update event received', data);
+
+      observer.next(data);
+    });
+  });
+
+  roomPlaylist$: Observable<MediaEvent[]> = new Observable(observer => {
+    this.socket.on('playlist update', (data: MediaEvent[]) => {
+      console.log('playlist update  event received', data);
 
       observer.next(data);
     });
@@ -79,6 +101,10 @@ export class ChatService {
       roomName
     };
     this.socket.emit('media event', ev);
+  }
+
+  addToPlaylist(ev: MediaEvent) {
+    this.socket.emit('add media', ev);
   }
 
   enterRoom(name: string) {

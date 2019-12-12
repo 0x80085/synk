@@ -3,45 +3,42 @@
     class="menu-sidebar"
     nzCollapsible
     nzWidth="256px"
-    nzBreakpoint="md"
     [(nzCollapsed)]="isCollapsed"
     [nzTrigger]="null"
   >
     <div class="sidebar-logo">
-      <a routerLink="/welcome">
-        <i nz-icon nzType="meh" nzTheme="fill"></i>
-        <h1>SYNKd.TV</h1>
-      </a>
+      <span>
+        <i
+          nz-icon
+          nzType="meh"
+          style="cursor: pointer;"
+          (click)="isCollapsed = !isCollapsed"
+          nzTheme="fill"
+        ></i>
+        <h1 style="cursor: pointer;" (click)="isCollapsed = !isCollapsed">
+          SYNKd.TV
+        </h1>
+      </span>
     </div>
-    <ul
-      nz-menu
-      nzTheme="dark"
-      nzMode="inline"
-      [nzInlineCollapsed]="isCollapsed"
-    >
+    <ul nz-menu nzMode="inline" [nzInlineCollapsed]="isCollapsed">
       <li nz-submenu nzOpen nzTitle="Explore" nzIcon="compass">
         <ul>
-          <li nz-menu-item nzMatchRouter>
+          <li nz-menu-item class="item" nzMatchRouter>
             <a routerLink="/welcome">All Channels</a>
           </li>
         </ul>
       </li>
     </ul>
-    <ul
-      nz-menu
-      nzTheme="dark"
-      nzMode="inline"
-      [nzInlineCollapsed]="isCollapsed"
-    >
+    <ul nz-menu nzMode="inline" [nzInlineCollapsed]="isCollapsed">
       <li nz-submenu nzOpen nzTitle="Account" nzIcon="smile">
         <ul>
-          <li nz-menu-item nzMatchRouter>
+          <li nz-menu-item class="item" nzMatchRouter>
             <a routerLink="/account/login">Login</a>
           </li>
-          <li nz-menu-item nzMatchRouter>
+          <li nz-menu-item class="item" nzMatchRouter>
             <a routerLink="/account/me">(You)</a>
           </li>
-          <li nz-menu-item nzMatchRouter>
+          <li nz-menu-item class="item" nzMatchRouter>
             <a routerLink="/account/new">Register</a>
           </li>
         </ul>
@@ -49,21 +46,8 @@
     </ul>
   </nz-sider>
   <nz-layout>
-    <nz-header>
-      <div class="app-header">
-        <span class="header-trigger" (click)="isCollapsed = !isCollapsed">
-          <i
-            class="trigger"
-            nz-icon
-            [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"
-          ></i>
-        </span>
-      </div>
-    </nz-header>
     <nz-content>
-      <div class="inner-content">
-        <router-outlet></router-outlet>
-      </div>
+      <router-outlet></router-outlet>
     </nz-content>
   </nz-layout>
 </nz-layout>

@@ -1,5 +1,8 @@
 <div nz-row>
-  <div nz-col nzSpan="8">
+  <div nz-col nzOffset="8" nzSpan="8">
+    <h1>Welcome back!</h1>
+  </div>
+  <div nz-col nzOffset="8" nzSpan="8">
     <nz-card nzTitle="Login" *ngIf="!isLoginSuccess">
       <form
         nz-form
@@ -9,7 +12,10 @@
       >
         <nz-form-item>
           <nz-form-control nzErrorTip="Please input your username!">
-            <nz-input-group nzPrefixIcon="user">
+            <ng-template #prefixTemplateUser
+              ><i nz-icon style="color: rgb(204, 254, 253);" nzType="user"></i
+            ></ng-template>
+            <nz-input-group [nzPrefix]="prefixTemplateUser" >
               <input
                 type="text"
                 nz-input
@@ -21,7 +27,10 @@
         </nz-form-item>
         <nz-form-item>
           <nz-form-control nzErrorTip="Please input your Password!">
-            <nz-input-group nzPrefixIcon="lock">
+            <ng-template #prefixTemplateLock
+              ><i nz-icon style="color: rgb(204, 254, 253);" nzType="lock"></i
+            ></ng-template>
+            <nz-input-group [nzPrefix]="prefixTemplateLock">
               <input
                 type="password"
                 nz-input
@@ -36,24 +45,26 @@
             <label nz-checkbox formControlName="remember">
               <span>Remember me</span>
             </label>
-            <a class="login-form-forgot" class="login-form-forgot"
-              >Forgot password</a
-            >
             <button nz-button class="login-form-button" [nzType]="'primary'">
               Log in
             </button>
-            Or
-            <a
-              [routerLink]="['/account/new']"
-              routerLinkActive="router-link-active"
-              >register now!</a
-            >
+            <div style="text-align:center;">
+              <a
+                [routerLink]="['/account/new']"
+                routerLinkActive="router-link-active"
+                >Or register now!</a
+              >
+            </div>
           </nz-form-control>
         </nz-form-item>
       </form>
     </nz-card>
     <nz-card *ngIf="isLoginSuccess">
-      <nz-alert [nzShowIcon]="true" nzType="success" [nzMessage]="'User logged in!'"></nz-alert>
+      <nz-alert
+        [nzShowIcon]="true"
+        nzType="success"
+        [nzMessage]="'User logged in!'"
+      ></nz-alert>
     </nz-card>
   </div>
 </div>

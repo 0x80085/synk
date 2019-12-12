@@ -1,5 +1,8 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { NzNotificationService } from 'ng-zorro-antd';
+
 import { BaseMediaComponent } from '../base-media.component';
+import { errorDictionary } from './player-errors.model';
 
 @Component({
   selector: 'app-youtube',
@@ -7,13 +10,15 @@ import { BaseMediaComponent } from '../base-media.component';
   styleUrls: ['./youtube.component.scss']
 })
 export class YoutubeComponent implements BaseMediaComponent, OnInit {
-  @Input() url: string;
+  @Output() videoEnded = new EventEmitter();
 
   isReady = false;
-
   player: YT.Player;
 
-  constructor() {}
+  isPlaying = () =>
+    this.player && this.player.getPlayerState() === YT.PlayerState.PLAYING;
+
+  constructor(private notification: NzNotificationService) {}
 
   ngOnInit() {
     if (!(window as any).YT) {
@@ -33,8 +38,33 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
     }
   }
 
-  play(): void {
+  start(url?: string): void {
+    if (url) {
+      // debugger;
+      this.player.loadVideoById(YouTubeGetID(url), 0, 'large');
+      return;
+    }
     this.player.playVideo();
+  }
+
+  play(url: string): void {
+    console.log('## try to start playing:', url);
+
+    if (!this.isReady) {
+      // then we wait till player isReady
+      const isContinue = false;
+      setTimeout(async () => {
+        while (!isContinue) {
+          await sleep(1000);
+        }
+        this.player.loadVideoById(YouTubeGetID(url), 0);
+      }, 5);
+      return;
+    }
+
+    if (url) {
+      this.player.loadVideoById(YouTubeGetID(url), 0);
+    }
   }
 
   pause(): void {
@@ -51,15 +81,27 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
     return this.player.getCurrentTime();
   }
 
-  onPlayerReady(event) {
-    this.player = event.target;
-    this.play();
-    this.isReady = true;
+  getCurrentUrl(): string {
+    return this.player.getVideoUrl();
   }
 
-  onPlayerStateChange(event) {
+  onPlayerReady = event => {
+    this.player = event.target;
+    // this.play();
+    this.isReady = true;
+  };
+
+  onPlayerStateChange = event => {
     console.log(event);
-  }
+    if (event.data === 0) {
+      this.videoEnded.emit();
+    }
+  };
+
+  onPlayerError = event => {
+    console.log(event);
+    this.showPlayerErrorToast(event);
+  };
 
   stopVideo() {
     this.player.stopVideo();
@@ -69,13 +111,21 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
     this.player = new YT.Player('player', {
       height: '100%',
       width: '100%',
-      videoId: YouTubeGetID(this.url),
+      videoId: '',
       events: {
         onReady: ev => this.onPlayerReady(ev),
-        onError: ev => console.log(ev),
+        onError: ev => this.onPlayerError(ev),
         onStateChange: ev => this.onPlayerStateChange(ev)
       }
     });
+  }
+
+  private showPlayerErrorToast(event: any) {
+    this.notification.create(
+      errorDictionary[event.data].type,
+      errorDictionary[event.data].title,
+      errorDictionary[event.data].body
+    );
   }
 }
 
@@ -91,4 +141,13 @@ function YouTubeGetID(url) {
     ID = url;
   }
   return ID;
+}
+
+function sleep(timer) {
+  return new Promise(resolve => {
+    timer = timer || 2000;
+    setTimeout(() => {
+      resolve();
+    }, timer);
+  });
 }

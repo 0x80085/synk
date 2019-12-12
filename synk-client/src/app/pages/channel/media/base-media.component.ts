@@ -1,8 +1,12 @@
+import { Output, EventEmitter } from '@angular/core';
+
 export interface BaseMediaComponent {
-  url: string;
+  videoEnded: EventEmitter<unknown>;
+  isPlaying(): boolean;
   start?(url: string): void;
-  play(): void;
+  play(url?: string): void;
   pause(): void;
   seek(to: number): void;
   getCurrentTime(): number;
+  getCurrentUrl(): string;
 }

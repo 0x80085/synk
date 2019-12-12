@@ -1,10 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
-import { Channel } from "./Channel";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Channel } from './Channel';
 
 @Entity()
 export class User {
 
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
@@ -14,6 +14,6 @@ export class User {
   username: string;
 
   @OneToMany(type => Channel, channel => channel.owner)
-  channels: Channel[]
+  channels: Channel[];
 
 }

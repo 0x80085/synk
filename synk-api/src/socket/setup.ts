@@ -1,10 +1,11 @@
-import * as http from "http";
-import * as socketio from "socket.io";
-import * as passportSocketIo from "passport.socketio";
+import * as http from 'http';
+import * as socketio from 'socket.io';
+import * as passportSocketIo from 'passport.socketio';
+import * as cookieParser from 'cookie-parser';
 
-import { RoomService } from "./services/room-service";
-import cookieParser = require("cookie-parser");
-import { TypeormStore } from "typeorm-store";
+import { RoomService } from './services/room-service';
+import { TypeormStore } from 'typeorm-store';
+import { SocketPassport } from './models/socket.passport';
 
 export interface MiddlewareConfig {
   genid: () => string;
@@ -26,44 +27,31 @@ export function setupSockets(
   const roomService = new RoomService(io);
 
   // Set up the Socket.IO server
-  io.use((socket, next) => {
-    console.log("user trying to connect ", socket.id);
-    console.log("user authed? ", socket.client.request.isAuthenticated());
+  io.use((socket: SocketPassport, next) => {
+    console.log('###########');
+
+    console.log('user trying to connect ', socket.id);
+    console.log('user authed? ', socket.client.request.isAuthenticated());
     next();
   })
     .use(
       passportSocketIo.authorize({
-        key: "connect.sid", //make sure is the same as in your session settings in app.js
-        secret: sessionMiddleware.secret, //make sure is the same as in your session settings in app.js
-        store: sessionMiddleware.store, //you need to use the same sessionStore you defined in the app.use(session({... in app.js
+        key: 'connect.sid', // make sure is the same as in your session settings in app.js
+        secret: sessionMiddleware.secret, // make sure is the same as in your session settings in app.js
+        store: sessionMiddleware.store, // you need to use the same sessionStore you defined in the app.use(session({... in app.js
         success: onAuthorizeSuccess, // *optional* callback on success
         fail: onAuthorizeFail // *optional* callback on fail/error
       })
     )
-    .use((socket, next) => {
-      // try {
-      //   // DEBUG
-      //   // console.log("@@@@@@@");
-      //   // console.log(socket.client.request.cookie);
-      //   // console.log(socket.handshake.headers.cookie);
-      //   // console.log(socket.request.user);
-      //   // console.log("@@@@@@@");
-      // } catch (error) {
-      //   console.log(error);
-      // }
+    .use((socket: SocketPassport, next) => {
+      console.log('ppassed passportSocketIo.authorize ', socket.id);
+      console.log('user authed? ', socket.client.request.isAuthenticated());
 
-      if (socket.client.request.isAuthenticated()) {
-        console.log("user authed", socket.id);
-        roomService.setupListeners(socket);
-        return next();
-      }
-      // Not allowed
-      console.log("socket:: Not allowed");
-      next(new Error("unauthorized"));
+      console.log('###########');
+      next();
     })
-    .on("connection", () => {
-      console.log("connected!");
-    });
+    .use(roomService.registerCommands)
+    .on('connection', () => console.log('connected!'));
 
   return { roomService };
 }
@@ -72,7 +60,7 @@ function onAuthorizeSuccess(
   socket: socketio.Socket,
   next: (err?: any) => void
 ) {
-  console.log("successful connection to socket.io");
+  console.log('successful connection to socket.io');
   next();
 }
 
@@ -82,6 +70,6 @@ function onAuthorizeFail(
   error: string,
   next: (err?: any) => void
 ) {
-  console.log("failed connection to socket.io:", message);
+  console.log('failed connection to socket.io:', message);
   next(new Error(message));
 }
