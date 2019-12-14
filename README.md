@@ -15,11 +15,27 @@ Run `npm i` in all folders that contain a package.json
 - Angular cli
 - Typescript
 
-## Running 
+## Running
+
+### Run from command line
 
 Run `npm start` in the top level folder to start the Server and Client.
 
 Getting the YT namespace error? Execute `npm i @types/youtube`.
+
+### Run with Docker
+
+**No need to have postgres installed when using Docker, the compose file will spin up a PostGres DB  container**
+
+Install docker and also docker-compose.
+
+Then, in this directory, run:
+
+`docker-compose -f "docker-compose.yml" up -d --build`
+
+Or use the shortcut definied n package.json:
+
+ `npm run docker:run`
 
 ## Powered by
 

@@ -11,7 +11,8 @@
   },
   "scripts": {
     "start": "npx concurrently \"cd synk-client && ng s --live-reload\" \"cd synk-api && npm start\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docker:run": "docker-compose -f \"docker-compose.yml\" up -d --build"
   },
   "author": "0x80085",
   "license": "MIT"
