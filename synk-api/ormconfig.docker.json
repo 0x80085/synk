@@ -1,6 +1,6 @@
 {
    "type": "postgres",
-   "host": "localhost",
+   "host": "synk-db",
    "port": 5432,
    "username": "synk-db-user",
    "password": "synk-db-user-pass",

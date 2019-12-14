@@ -14,7 +14,7 @@ WORKDIR /synk-api
 # Copy build config files to container
 COPY package*.json ./
 COPY .env ./
-COPY ormconfig.json ./
+COPY ormconfig.docker.json ./ormconfig.json
 COPY tsconfig.json ./
 
 # Install deps

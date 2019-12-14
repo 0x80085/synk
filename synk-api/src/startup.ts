@@ -35,7 +35,7 @@ export default async function configure() {
 
   app.set('port', port);
 
-  app.use(cors({ credentials: corsUseCredentials, origin: corsOrigin }));
+  app.use(cors({ credentials: corsUseCredentials, origin: [corsOrigin, 'http://localhost'] }));
 
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
