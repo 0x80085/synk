@@ -8,9 +8,10 @@
 		},
 		{
 			"path": "synk-client"
+		},
+		{
+			"path": "synk-db"
 		}
 	],
-	"settings": {
-		
-	}
+	"settings": {}
 }

@@ -1,0 +1,14 @@
+version: "3.7"
+# Taken from  https://github.com/docker-library/postgres/issues/196#issuecomment-310209118
+services:
+  db:
+    build: 
+      context: .
+      dockerfile: db_test.Dockerfile
+    image: postgres
+    # environment:
+    #   POSTGRES_USER: synk-db-user
+    #   POSTGRES_PASSWORD: synk-db-pass
+    #   POSTGRES_DB: synk
+    ports: 
+      - "8000:5432"
