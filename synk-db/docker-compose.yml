@@ -1,12 +1,10 @@
 version: "3.7"
-
+# Taken from  https://github.com/docker-library/postgres/issues/196#issuecomment-310209118
 services:
   synk-db:
-    build:
+    build: 
       context: .
-      dockerfile: db.Dockerfile
-    volumes:
-      - ./var/pg/:/var/lib/postgresql
-      - ./var/db-log/:/var/log/postgresql
-    ports:
-      - 5432:8000
+      dockerfile: Dockerfile
+    image: postgres
+    ports: 
+      - "8000:5432"
