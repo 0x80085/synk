@@ -6,5 +6,3 @@ services:
       context: .
       dockerfile: Dockerfile
     image: postgres
-    ports: 
-      - "8000:5432"
