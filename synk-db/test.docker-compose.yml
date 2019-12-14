@@ -1,7 +1,7 @@
 version: "3.7"
 # Taken from  https://github.com/docker-library/postgres/issues/196#issuecomment-310209118
 services:
-  db:
+  synk-db:
     build: 
       context: .
       dockerfile: db_test.Dockerfile
