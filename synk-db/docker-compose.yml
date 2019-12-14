@@ -1,0 +1,12 @@
+version: "3.7"
+
+services:
+  db:
+    build:
+      context: .
+      dockerfile: db.Dockerfile
+    volumes:
+      - ./var/pgdata/data:/var/lib/postgresql
+      - ./var/pgdata/log:/var/log/postgresql
+    ports:
+      - 5432:5432
