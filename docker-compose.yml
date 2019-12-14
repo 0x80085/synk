@@ -1,6 +1,7 @@
 version: "3.7"
 
 services:
+
   synk-db:
     build: 
       context: ./synk-db
@@ -8,6 +9,7 @@ services:
     image: postgres
     networks:
       - local
+
   synk-api:
     build: 
         context: ./synk-api
@@ -21,6 +23,7 @@ services:
     restart: always
     networks:
       - local
+
   synk-client:
     build: 
         context: ./synk-client
@@ -29,6 +32,7 @@ services:
       - 8080:8080
       - 80:80
       - 443:443
+
   pgadmin:
     image: dpage/pgadmin4
     restart: always
@@ -41,6 +45,7 @@ services:
       PGADMIN_DEFAULT_PASSWORD: root
     networks:
       - local
+
 
 networks:
   local:
