@@ -1,0 +1,8 @@
+version: "3.7"
+# Taken from  https://github.com/docker-library/postgres/issues/196#issuecomment-310209118
+services:
+  synk-db:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: postgres
