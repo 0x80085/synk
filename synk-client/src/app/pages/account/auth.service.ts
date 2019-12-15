@@ -11,8 +11,8 @@ interface LoginInfo {
 }
 
 export interface User {
-  username: string;
-  createDate: Date;
+  userName: string;
+  id: string;
 }
 
 @Injectable({
@@ -20,7 +20,8 @@ export interface User {
 })
 export class AuthService {
 
-  constructor(private http: HttpClient,
+  constructor(
+    private http: HttpClient,
     private chatServ: ChatService,
     private state: AppStateService
   ) { }
@@ -50,14 +51,27 @@ export class AuthService {
       );
   }
 
+  logout() {
+    return this.http
+      .get(`${environment.api}/logout`, {
+        withCredentials: true
+      })
+      .pipe(
+        tap(() => {
+          this.state.loggedInSubject.next(true);
+          this.chatServ.reconnect();
+        })
+      );
+  }
+
   getUser() {
-    return this.http.get<User>(`${environment.api}/users/me`, {
+    return this.http.get<User>(`${environment.api}/account`, {
       withCredentials: true
     })
       .pipe(
         tap((ev) => {
+          console.log(ev);
           this.state.userSubject.next(ev);
-          this.chatServ.reconnect();
         })
       );
   }
