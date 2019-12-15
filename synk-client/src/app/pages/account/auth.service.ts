@@ -45,7 +45,7 @@ export class AuthService {
       })
       .pipe(
         tap(() => {
-          this.state.loggedInSubject.next(true);
+          this.state.isLoggedInSubject.next(true);
           this.chatServ.reconnect();
         })
       );
@@ -58,7 +58,7 @@ export class AuthService {
       })
       .pipe(
         tap(() => {
-          this.state.loggedInSubject.next(true);
+          this.state.isLoggedInSubject.next(true);
           this.chatServ.reconnect();
         })
       );

@@ -39,7 +39,7 @@ export class ChatService {
     this.socket.on('user config', (data: RoomUserConfig) => {
       console.log('config event received', data);
 
-      this.state.loggedInSubject.next(true);
+      this.state.isLoggedInSubject.next(true);
       this.state.isSocketConnectedSub.next(true);
 
       observer.next(data);
@@ -68,7 +68,7 @@ export class ChatService {
       this.messageQueue = [{ text: 'Error connecting', userName: '>:)' }];
       observer.next(this.messageQueue);
 
-      this.state.loggedInSubject.next(false);
+      this.state.isLoggedInSubject.next(false);
       this.state.isSocketConnectedSub.next(false);
 
       this.socket.close();
@@ -81,7 +81,7 @@ export class ChatService {
       this.messageQueue = [{ text: 'Error connecting', userName: '>:)' }];
       observer.next(this.messageQueue);
 
-      this.state.loggedInSubject.next(false);
+      this.state.isLoggedInSubject.next(false);
       this.state.isSocketConnectedSub.next(false);
 
       this.socket.close();
@@ -99,7 +99,7 @@ export class ChatService {
   connectionSuccessEvent$: Observable<Message[]> = new Observable(observer => {
     this.socket.on('connect', (data: any) => {
       console.log('connect OK event received', data);
-      this.state.loggedInSubject.next(true);
+      this.state.isLoggedInSubject.next(true);
       this.state.isSocketConnectedSub.next(true);
     });
   });

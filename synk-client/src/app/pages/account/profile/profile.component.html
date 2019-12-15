@@ -1,17 +1,8 @@
 <nz-card nzTitle="Profile info">
 
-  <div *ngIf="(me | async); then profile; else loading"></div>
-  <button nz-button nzType="primary" (click)="onLogout()">Logout</button>
-</nz-card>
-
-<ng-template #profile>
-  <div *ngIf="me | async">
-    <nz-avatar [nzText]="(me | async) ? (me | async).userName : 'missingno#'" nzSize="large"
-      style="vertical-align: middle;">
-    </nz-avatar>
+  <h5 *ngIf="(me$ | async)">{{ (me$ | async).userName }}</h5>
+  <button *ngIf="(me$ | async)" nz-button nzType="primary" (click)="onLogout()">Logout</button>
+  <div *ngIf="!(me$ | async)">
+    Please login
   </div>
-</ng-template>
-
-<ng-template #loading>
-  <i nz-icon nzType="loading"></i>
-</ng-template>
+</nz-card>
