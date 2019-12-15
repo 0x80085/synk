@@ -2,6 +2,8 @@
 
 FROM node:13 AS build-ngx
 
+ENV SYNK_API_URL=http://localhost:3000
+
 # Stage 1
 
 # Create build folder on container
@@ -17,6 +19,9 @@ COPY ./custom-nginx.conf ./
 
 # Copy src to build-stage container
 COPY ./src ./src
+
+# Replace __SYNK_API_URL__ in env.prod to $SYNK_API_URL
+RUN sed -i "s|__SYNK_API_URL__|${SYNK_API_URL}|g" ./src/environments/environment.prod.ts
 
 # Install dependencies
 RUN npm install

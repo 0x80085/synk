@@ -28,6 +28,8 @@ services:
     build: 
         context: ./synk-client
         dockerfile: ./Dockerfile
+    environment: 
+      SYNK_API_URL: "${SYNK_API_URL:-http://localhost:3000}"
     ports:
       - 8080:8080
       - 80:80
