@@ -4,39 +4,22 @@
   </div>
   <div nz-col nzOffset="8" nzSpan="8">
     <nz-card nzTitle="Create account" *ngIf="!registerSuccess">
-      <form
-        nz-form
-        [formGroup]="form"
-        class="login-form"
-        (ngSubmit)="submitForm()"
-      >
+      <form nz-form [formGroup]="form" class="login-form" (ngSubmit)="submitForm()">
         <nz-form-item>
           <nz-form-control nzErrorTip="Please input your username!">
-            <ng-template #prefixTemplateUser
-              ><i nz-icon style="color: rgb(204, 254, 253);" nzType="user"></i
-            ></ng-template>
+            <ng-template #prefixTemplateUser><i nz-icon style="color: rgb(204, 254, 253);" nzType="user"></i>
+            </ng-template>
             <nz-input-group [nzPrefix]="prefixTemplateUser">
-              <input
-                type="text"
-                nz-input
-                formControlName="userName"
-                placeholder="Username"
-              />
+              <input type="text" nz-input formControlName="userName" placeholder="Username" />
             </nz-input-group>
           </nz-form-control>
         </nz-form-item>
         <nz-form-item>
           <nz-form-control nzErrorTip="Please input your Password!">
-            <ng-template #prefixTemplateLock
-              ><i nz-icon style="color: rgb(204, 254, 253);" nzType="lock"></i
-            ></ng-template>
+            <ng-template #prefixTemplateLock><i nz-icon style="color: rgb(204, 254, 253);" nzType="lock"></i>
+            </ng-template>
             <nz-input-group [nzPrefix]="prefixTemplateLock">
-              <input
-                type="password"
-                nz-input
-                formControlName="password"
-                placeholder="Password"
-              />
+              <input type="password" nz-input formControlName="password" placeholder="Password" />
             </nz-input-group>
           </nz-form-control>
         </nz-form-item>
@@ -47,12 +30,25 @@
         </nz-form-item>
       </form>
     </nz-card>
-    <nz-card *ngIf="registerSuccess">
-      <nz-alert
-        [nzShowIcon]="true"
-        nzType="success"
-        [nzMessage]="'User registered, try loggin in!'"
-      ></nz-alert>
+    <nz-card *ngIf="registerSuccess" nzTitle="Account created" [nzCover]="coverTemplate" [nzExtra]="extraTemplate"
+      [nzActions]="[successActions]">
+      <nz-card-meta nzTitle="Ahoy matey! welcome aboard!"
+        nzDescription="You're almost there. Log in to access the channels">
+      </nz-card-meta>
     </nz-card>
+    <ng-template #coverTemplate>
+      <div style="width:100%;height:0;padding-bottom:100%;position:relative;"><iframe
+          src="https://giphy.com/embed/huItqkCWqjYhe1qCfu" width="100%" height="100%" style="position:absolute"
+          frameBorder="0" class="giphy-embed" allowFullScreen></iframe></div>
+    </ng-template>
+    <ng-template #extraTemplate>
+      <i nz-icon style="color: rgb(204, 254, 253);" nzType="notification"></i>
+    </ng-template>
+    <ng-template #successActions>
+      <button nz-button nzType="primary" [routerLink]="['/login']">
+        Go to login
+        <i nz-icon style="color: rgb(204, 254, 253);" nzType="right"></i>
+      </button>
+    </ng-template>
   </div>
 </div>
