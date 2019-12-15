@@ -2,7 +2,28 @@
 
 <div nz-row>
   <div nz-col nzSpan="24">
+    <nz-carousel nzEffect="scrollx" nzAutoPlay>
+      <div nz-carousel-content style="display: flex;">
+        <nz-avatar nzSize="large" nzSrc="assets/flask.svg"
+          class="avatar"></nz-avatar>
+        <h3 style="margin-top: 2rem;">Synk is under active development</h3>
+      </div>
+      <div nz-carousel-content style="display: flex;">
+        <nz-avatar nzSize="large" nzIcon="github"
+          class="avatar"></nz-avatar>
+        <h3 style="margin-top: 2rem;">Check out the GitHub repo if you want to contribute</h3>
+      </div>
+      <div nz-carousel-content style="display: flex;">
+        <nz-avatar nzSize="large" nzIcon="bug"
+          class="avatar"></nz-avatar>
+        <h3 style="margin-top: 2rem;">Feel free to report any bugs you see crawling around!</h3>
+      </div>
+    </nz-carousel>
+  </div>
+</div>
+<nz-divider nzText="Public channels"></nz-divider>
+<div nz-row>
+  <div nz-col nzSpan="24">
     <app-overview></app-overview>
   </div>
 </div>
-
