@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { ChatService } from '../channel/chat.service';
 import { tap, mapTo } from 'rxjs/operators';
+import { AppStateService } from 'src/app/app-state.service';
 
 interface LoginInfo {
   username: string;
@@ -13,9 +14,10 @@ interface LoginInfo {
   providedIn: 'root'
 })
 export class AuthService {
-  isLoggedIn = false;
 
-  constructor(private http: HttpClient, private chatServ: ChatService) {}
+  constructor(private http: HttpClient,
+              private chatServ: ChatService,
+              private state: AppStateService) { }
 
   createAccount(userCreds: LoginInfo) {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
@@ -36,7 +38,7 @@ export class AuthService {
       })
       .pipe(
         tap(() => {
-          this.isLoggedIn = true;
+          this.state.loggedInSubject.next(true);
           this.chatServ.reconnect();
         })
       );

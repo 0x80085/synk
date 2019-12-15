@@ -14,6 +14,7 @@ import { AppComponent } from './app.component';
 import { WelcomeModule } from './pages/welcome/welcome.module';
 import { ChannelModule } from './pages/channel/channel.module';
 import { AccountModule } from './pages/account/account.module';
+import { AppStateService } from './app-state.service';
 
 registerLocaleData(en);
 
@@ -32,7 +33,10 @@ registerLocaleData(en);
     ChannelModule,
     AccountModule
   ],
-  providers: [{ provide: NZ_I18N, useValue: en_US }],
+  providers: [
+    { provide: NZ_I18N, useValue: en_US },
+    AppStateService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

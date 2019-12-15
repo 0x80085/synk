@@ -12,6 +12,7 @@ import {
   RoomUserConfig,
   RoomUserDto
 } from './models/room.models';
+import { AppStateService } from 'src/app/app-state.service';
 
 @Injectable({
   providedIn: 'root'
@@ -38,6 +39,9 @@ export class ChatService {
     this.socket.on('user config', (data: RoomUserConfig) => {
       console.log('config event received', data);
 
+      this.state.loggedInSubject.next(true);
+      this.state.isSocketConnectedSub.next(true);
+
       observer.next(data);
     });
   });
@@ -63,13 +67,46 @@ export class ChatService {
       console.log('error event received', data);
       this.messageQueue = [{ text: 'Error connecting', userName: '>:)' }];
       observer.next(this.messageQueue);
+
+      this.state.loggedInSubject.next(false);
+      this.state.isSocketConnectedSub.next(false);
+
       this.socket.close();
+    });
+  });
+
+  connectionErrorEvent$: Observable<Message[]> = new Observable(observer => {
+    this.socket.on('connect_error', (data: any) => {
+      console.log('connect error', data);
+      this.messageQueue = [{ text: 'Error connecting', userName: '>:)' }];
+      observer.next(this.messageQueue);
+
+      this.state.loggedInSubject.next(false);
+      this.state.isSocketConnectedSub.next(false);
+
+      this.socket.close();
+    });
+  });
+
+  connectionTimeOutEvent$: Observable<Message[]> = new Observable(observer => {
+    this.socket.on('connect_timeout', (data: any) => {
+      console.log('connect_timeout error', data);
+      this.state.isSocketConnectedSub.next(false);
+      this.socket.close();
+    });
+  });
+
+  connectionSuccessEvent$: Observable<Message[]> = new Observable(observer => {
+    this.socket.on('connect', (data: any) => {
+      console.log('connect OK event received', data);
+      this.state.loggedInSubject.next(true);
+      this.state.isSocketConnectedSub.next(true);
     });
   });
 
   private socket: SocketIOClient.Socket;
 
-  constructor() {
+  constructor(private state: AppStateService) {
     this.init();
   }
 
