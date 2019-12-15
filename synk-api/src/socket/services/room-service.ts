@@ -87,7 +87,7 @@ export class RoomService {
   }
 
   private onMediaEvent = (data: MediaEvent, socket: SocketPassport) => {
-    console.log('media event received', data.currentTime);
+    console.log('media event received', data);
 
     const afterPlaylistUpdate = (state: ItemContent) => {
       const update: MediaEvent = {
