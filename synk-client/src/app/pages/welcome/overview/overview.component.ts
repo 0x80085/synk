@@ -6,7 +6,7 @@ import { tap } from 'rxjs/operators';
 @Component({
   selector: 'app-overview',
   templateUrl: './overview.component.html',
-  styleUrls: ['overview.component.css']
+  styleUrls: ['overview.component.scss']
 })
 export class OverviewComponent {
 

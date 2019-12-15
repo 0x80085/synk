@@ -1,0 +1,22 @@
+<nz-list [nzBordered]="(playlist$  | async)" nzSize="small" [nzLoading]="!(playlist$ | async)"
+  [nzDataSource]="playlist$ | async" [nzRenderItem]="item" [nzNoResult]="'No items'">
+  <ng-template #item let-item>
+    <li nz-list-item class="playlist-item" [nzContent]="item.mediaUrl" [nzActions]="[opAction]" nzNoFlex></li>
+    <ng-template #opAction>
+      <nz-button-group>
+        <button nz-button nzSize="small" nzType="link" (click)="playMedia.emit(item)" title="start video"><i nz-icon
+            nzType="caret-right"></i></button>
+        <button nz-button nzSize="small" nzType="link" disabled title="set next in line (not yet implemented)"><i
+            nz-icon nzType="double-right"></i></button>
+      </nz-button-group>
+    </ng-template>
+  </ng-template>
+</nz-list>
+
+<nz-input-group [hidden]="!showAddMediaInput" nzSearch nzSize="large" [nzAddOnAfter]="suffixButton" style="margin-top: 1rem;">
+  <input type="text" nz-input placeholder="Enter url to add video" [(ngModel)]="newMedia" />
+</nz-input-group>
+
+<ng-template #suffixButton>
+  <button nz-button nzType="primary" nzSize="large" nzSearch (click)="onAddMedia()">Add</button>
+</ng-template>

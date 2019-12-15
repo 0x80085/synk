@@ -129,7 +129,7 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
   }
 }
 
-function YouTubeGetID(url) {
+export function YouTubeGetID(url) {
   let ID = '';
   url = url
     .replace(/(>|<)/gi, '')
