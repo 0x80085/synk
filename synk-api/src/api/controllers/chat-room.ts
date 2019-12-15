@@ -51,7 +51,7 @@ function toDto(rooms: Room[]): RoomDto[] {
   return rooms.map(room => {
     return {
       roomName: room.name,
-      description: `${room.name}'s description here`
+      description: room.description
     };
   });
 }
