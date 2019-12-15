@@ -10,14 +10,20 @@ interface LoginInfo {
   password: string;
 }
 
+export interface User {
+  username: string;
+  createDate: Date;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
   constructor(private http: HttpClient,
-              private chatServ: ChatService,
-              private state: AppStateService) { }
+    private chatServ: ChatService,
+    private state: AppStateService
+  ) { }
 
   createAccount(userCreds: LoginInfo) {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
@@ -43,4 +49,17 @@ export class AuthService {
         })
       );
   }
+
+  getUser() {
+    return this.http.get<User>(`${environment.api}/users/me`, {
+      withCredentials: true
+    })
+      .pipe(
+        tap((ev) => {
+          this.state.userSubject.next(ev);
+          this.chatServ.reconnect();
+        })
+      );
+  }
+
 }
