@@ -1,26 +1,17 @@
 <nz-card nzTitle="Profile info">
-  <div nz-card-grid>
-    Hello
-  </div>
-  <div nz-card-grid>
-    this
-  </div>
-  <div nz-card-grid>
-    is
-  </div>
-  <div nz-card-grid>
-    you
-    <pre>
-      {{ (me | async) || 'Not yet loaded' }}
-    </pre>
-  </div>
-  <div nz-card-grid>
-    from
-  </div>
-  <div nz-card-grid>
-    the
-  </div>
-  <div nz-card-grid>
-    past
-  </div>
+
+  <div *ngIf="(me | async); then profile; else loading"></div>
+  <button nz-button nzType="primary" (click)="onLogout()">Logout</button>
 </nz-card>
+
+<ng-template #profile>
+  <div *ngIf="me | async">
+    <nz-avatar [nzText]="(me | async) ? (me | async).userName : 'missingno#'" nzSize="large"
+      style="vertical-align: middle;">
+    </nz-avatar>
+  </div>
+</ng-template>
+
+<ng-template #loading>
+  <i nz-icon nzType="loading"></i>
+</ng-template>

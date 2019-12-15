@@ -1,13 +1,15 @@
 import * as passport from 'passport';
+import * as uuid from 'uuid';
+import * as bcrypt from 'bcrypt';
 
 import { Request, Response, NextFunction, RequestHandler } from 'express';
-import { IVerifyOptions } from 'passport-local';
 import { check, sanitize, validationResult } from 'express-validator';
+import { IVerifyOptions } from 'passport-local';
+import { FindConditions, getConnection } from 'typeorm';
 
 import { User } from '../../domain/entity/User';
-import * as uuid from 'uuid';
-import { createConnection, FindConditions, getConnection } from 'typeorm';
-import * as bcrypt from 'bcrypt';
+
+export type PassportRequest = Request & { user: { username: string } };
 
 /**
  * POST /login
@@ -62,7 +64,7 @@ export const postLogin: RequestHandler = (
 export const getLogout = (req: Request, res: Response) => {
   req.logOut();
   req.logout();
-  res.status(200).send('user logged out');
+  res.status(200).json(['ok','user logged out']);
 };
 
 /**
@@ -116,10 +118,25 @@ export const postSignup: RequestHandler = async (
  * GET /account
  * Profile page.
  */
-export const getAccount = (req: Request, res: Response) => {
-  res.render('account/profile', {
-    title: 'Account Management'
-  });
+
+export const getAccount = async (req: PassportRequest, res: Response) => {
+  const connection = getConnection();
+
+  const qry: FindConditions<User> = {
+    username: req.user.username
+  };
+  const user = await connection.manager.findOne(User, { where: qry });
+
+  if (!user) {
+    return res.status(404).send(['nok', 'not found']);
+  }
+  const userDto = {
+    userName: user.username,
+    channels: user.channels,
+    id: user.id
+  };
+
+  res.status(200).send(userDto);
 };
 
 /**
