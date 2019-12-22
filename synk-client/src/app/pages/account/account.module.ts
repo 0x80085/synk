@@ -6,10 +6,12 @@ import { ProfileComponent } from './profile/profile.component';
 import { NgZorroAntdModule } from 'ng-zorro-antd';
 import { AccountRoutingModule } from './account-routing.module';
 import { RegisterComponent } from './register/register.component';
+import { PlaceholdPipe } from './profile/placehold.pipe';
+import { UsernamePipe } from './profile/username.pipe';
 
 
 @NgModule({
-  declarations: [LoginComponent, ProfileComponent, RegisterComponent],
+  declarations: [LoginComponent, ProfileComponent, RegisterComponent, PlaceholdPipe, UsernamePipe],
   imports: [
     CommonModule,
     FormsModule,

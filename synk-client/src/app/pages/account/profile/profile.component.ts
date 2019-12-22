@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
 import { AuthService, User } from '../auth.service';
-import { tap, map, withLatestFrom, filter } from 'rxjs/operators';
 import { merge, Observable } from 'rxjs';
 import { AppStateService } from 'src/app/app-state.service';
 import { Router } from '@angular/router';
@@ -20,16 +19,12 @@ export class ProfileComponent implements OnInit {
     private state: AppStateService,
     private notification: NzNotificationService,
     private router: Router) {
-    this.state.me$.subscribe((us) => {
-      console.log('#### USER STET', us);
-
-    })
   }
 
-  me$: Observable<User> = new Observable();
+  me$: Observable<User> = this.auth.getUser();
 
   ngOnInit() {
-    this.me$ = this.auth.getUser();
+    // this.me$ = this.auth.getUser();
   }
 
   onLogout() {
