@@ -24,6 +24,7 @@ export class RoomService {
     this.io = sio;
 
     const defaultRoom = new Room('SNKD', this.io, null);
+    defaultRoom.description = 'Default room';
     this.publicRooms.push(defaultRoom);
   }
 
