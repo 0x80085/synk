@@ -43,8 +43,8 @@ const mockList: PlaylistItem[] = [
 
 export class Playlist {
   name: string;
-  list: PlaylistItem[] = mockList;
-  current: PlaylistItem | null = mockList[0];
+  list: PlaylistItem[] = [...mockList];
+  current: PlaylistItem | null = this.list[0];
 
   constructor(name: string) {
     this.name = name;
