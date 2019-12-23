@@ -1,49 +1,9 @@
 import { MediaEvent } from './message';
-
-export class ItemContent {
-  mediaUrl: string;
-  currentTime: number | null = null;
-
-  constructor(mediaUrl: string, currentTime: number) {
-    this.currentTime = currentTime;
-    this.mediaUrl = mediaUrl;
-  }
-}
-
-export class PlaylistItem extends ItemContent {
-  isPermenant = false;
-  addedByUsername: string;
-
-  constructor(mediaUrl: string, addedByUsername: string) {
-    super(mediaUrl, null);
-  }
-}
-
-const mockList: PlaylistItem[] = [
-  {
-    addedByUsername: 'lain',
-    currentTime: null,
-    isPermenant: false,
-    mediaUrl: 'https://www.youtube.com/watch?v=p2LMwxo0MVk'
-  },
-
-  {
-    addedByUsername: 'lain',
-    currentTime: null,
-    isPermenant: false,
-    mediaUrl: 'https://www.youtube.com/watch?v=_1rF38MjpHE'
-  },
-  {
-    addedByUsername: 'lain',
-    currentTime: null,
-    isPermenant: false,
-    mediaUrl: 'https://www.youtube.com/watch?v=qUDEyONQaCA'
-  }
-];
+import { PlaylistItem, mockList, ItemContent } from './playlist-item';
 
 export class Playlist {
   name: string;
-  list: PlaylistItem[] = [...mockList];
+  list: PlaylistItem[] = cloneOf(mockList);
   current: PlaylistItem | null = this.list[0];
 
   constructor(name: string) {
@@ -53,7 +13,6 @@ export class Playlist {
   add(media: PlaylistItem) {
     const id = YouTubeGetID(media.mediaUrl);
     if (!id || id === '') {
-      console.log('bad id');
       return;
     }
     const alreadyAdded = this.list.filter(i => i.mediaUrl === media.mediaUrl).length > 0;
@@ -124,9 +83,8 @@ export class Playlist {
     this.current = selectedItem;
   }
 
-  publish = (callback: (arg: ItemContent) => void) => {
+  publish = (calledWithNewCurrentVideoState: (arg: ItemContent) => void) => {
     if (!this.current) {
-      console.log('no vid selected ');
       return;
     }
     const update = {
@@ -137,9 +95,8 @@ export class Playlist {
       currentTime: update.nowPlaying.currentTime,
       mediaUrl: update.nowPlaying.mediaUrl
     };
-    console.log('publish = (', ev);
 
-    callback(ev);
+    calledWithNewCurrentVideoState(ev);
   }
 
   private getIndexOfCurrentPlaying() {
@@ -177,4 +134,8 @@ function shuffleList(list: any[]) {
   }
 
   return list;
+}
+
+function cloneOf(obj: any) {
+  return JSON.parse(JSON.stringify(obj));
 }
