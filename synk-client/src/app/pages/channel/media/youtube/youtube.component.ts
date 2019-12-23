@@ -18,7 +18,7 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
   isPlaying = () =>
     this.player && this.player.getPlayerState() === YT.PlayerState.PLAYING
 
-  constructor(private notification: NzNotificationService) {}
+  constructor(private notification: NzNotificationService) { }
 
   ngOnInit() {
     if (!(window as any).YT) {
@@ -136,6 +136,11 @@ export function YouTubeGetID(url) {
     ID = url;
   }
   return ID;
+}
+
+export function isValidYTid(url: string) {
+  const regx = /http(?:s?):\/\/(?:www\.)?youtu(?:be\.com\/watch\?v=|\.be\/)([\w\-\_]*)(&(amp;)?‌​[\w\?‌​=]*)?/;
+  return regx.test(url);
 }
 
 function sleep(timer) {

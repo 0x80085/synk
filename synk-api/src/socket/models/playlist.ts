@@ -109,6 +109,13 @@ export class Playlist {
 }
 
 function YouTubeGetID(url: string) {
+  const regx = /http(?:s?):\/\/(?:www\.)?youtu(?:be\.com\/watch\?v=|\.be\/)([\w\-\_]*)(&(amp;)?‌​[\w\?‌​=]*)?/;
+  const isValid = regx.test(url);
+
+  if (!isValid) {
+    return;
+  }
+
   let ID;
   const ytID = url
     .replace(/(>|<)/gi, '')
