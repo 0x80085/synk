@@ -67,13 +67,7 @@ export class AuthService {
   getUser() {
     return this.http.get<User>(`${environment.api}/account`, {
       withCredentials: true
-    })
-      .pipe(
-        tap((ev) => {
-          console.log(ev);
-          this.state.userSubject.next(ev);
-        })
-      );
+    });
   }
 
 }

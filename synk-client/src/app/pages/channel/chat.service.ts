@@ -37,8 +37,6 @@ export class ChatService {
 
   roomUserConfig$: Observable<RoomUserConfig> = new Observable(observer => {
     this.socket.on('user config', (data: RoomUserConfig) => {
-      console.log('config event received', data);
-
       this.state.isLoggedInSubject.next(true);
       this.state.isSocketConnectedSub.next(true);
 
@@ -48,23 +46,18 @@ export class ChatService {
 
   roomUserList$: Observable<RoomUserDto[]> = new Observable(observer => {
     this.socket.on('userlist update', (data: RoomUserDto[]) => {
-      console.log('userlist update event received', data);
-
       observer.next(data);
     });
   });
 
   roomPlaylist$: Observable<MediaEvent[]> = new Observable(observer => {
     this.socket.on('playlist update', (data: MediaEvent[]) => {
-      console.log('playlist update  event received', data);
-
       observer.next(data);
     });
   });
 
   permissionErrorEvent$: Observable<Message[]> = new Observable(observer => {
     this.socket.on('error', (data: any) => {
-      console.log('error event received', data);
       this.messageQueue = [{ text: 'Error connecting', userName: '>:)' }];
       observer.next(this.messageQueue);
 
@@ -90,7 +83,6 @@ export class ChatService {
 
   connectionTimeOutEvent$: Observable<Message[]> = new Observable(observer => {
     this.socket.on('connect_timeout', (data: any) => {
-      console.log('connect_timeout error', data);
       this.state.isSocketConnectedSub.next(false);
       this.socket.close();
     });
@@ -98,7 +90,6 @@ export class ChatService {
 
   connectionSuccessEvent$: Observable<Message[]> = new Observable(observer => {
     this.socket.on('connect', (data: any) => {
-      console.log('connect OK event received', data);
       this.state.isLoggedInSubject.next(true);
       this.state.isSocketConnectedSub.next(true);
     });

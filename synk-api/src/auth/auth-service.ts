@@ -49,7 +49,6 @@ export default async function setupAuthMiddleware(
   );
 
   passport.serializeUser((user: User, done: PassportDoneFn) => {
-    console.log('serializeUser', user);
 
     done(null, { id: user.id, username: user.username });
   });
@@ -79,21 +78,16 @@ export function ensureAuthenticated(
   const isAuthenticated = socket
     ? socket.client.request.isAuthenticated()
     : req.isAuthenticated();
-  console.log('autthing ! by:: ', socket ? 'socket ' : 'req');
 
   if (!isAuthenticated) {
     if (socket) {
       console.log(socket.client.request.session);
 
-      console.log('socket::', 'not authorized');
       return next(new Error('authentication error'));
     } else {
-      console.log('http::', 'not authorized');
       return res.sendStatus(403);
     }
   }
-
-  console.log('authenticatd ! by:: ', socket ? 'socket ' : 'req');
 
   return next();
 }

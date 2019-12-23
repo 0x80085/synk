@@ -7,6 +7,7 @@ import { timer, Subscription, Observable } from 'rxjs';
 import { MediaComponent } from './media/media.component';
 import { ChatService } from './chat.service';
 import { MediaEvent, Message, RoomUserConfig, RoomUser, RoomUserDto } from './models/room.models';
+import { NzNotificationService } from 'ng-zorro-antd';
 
 @Component({
   selector: 'app-channel',
@@ -32,11 +33,12 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
-    private chatService: ChatService
+    private chatService: ChatService,
+    private notification: NzNotificationService
   ) { }
 
   @HostListener('window:beforeunload', ['$event'])
-  exitRoomOnPageDestroy(event) {
+  exitRoomOnPageDestroy() {
     this.chatService.exit(this.name);
   }
 
@@ -52,14 +54,10 @@ export class ChannelComponent implements OnInit, OnDestroy {
   }
 
   onVideoEnded() {
-    console.log('onVideoEnded');
-    console.log(this.playlist);
-
     const i = this.playlist.findIndex(it => it === this.mediaUrl);
     const next = this.playlist[i] + 1 || this.playlist[0];
     this.mediaUrl = next;
 
-    console.log('next::', next);
     this.player.play(this.mediaUrl);
   }
 
@@ -67,7 +65,6 @@ export class ChannelComponent implements OnInit, OnDestroy {
     const timer$ = timer(1000, 2000);
     this.mediaUpdateTimer$ = timer$.subscribe(val => {
       if (this.isLeader && this.player) {
-        console.log('sending update');
         this.sendMediaUpdate();
       }
     });
@@ -83,7 +80,6 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   receiveRoomConfig() {
     this.roomUserConfig$ = this.chatService.roomUserConfig$.subscribe(ev => {
-      console.log(ev);
 
       this.isLeader = ev.isLeader;
 
@@ -95,8 +91,6 @@ export class ChannelComponent implements OnInit, OnDestroy {
   receivePlaylistUpdate() {
     this.playlist$ = this.chatService.roomPlaylist$.pipe(
       tap(ev => {
-        console.log('playlist update', ev);
-
         this.playlist = ev.map(i => {
           return i.mediaUrl;
         });
@@ -116,6 +110,8 @@ export class ChannelComponent implements OnInit, OnDestroy {
     this.errorEvent$ = this.chatService.permissionErrorEvent$.pipe(
       tap(x => {
         console.log(x);
+
+        this.notification.error('Hmm.. Something went wrong here', 'Maybe try logging in again?');
 
         this.mediaUpdateTimer$.unsubscribe();
         this.mediaSyncEvent$.unsubscribe();
@@ -140,9 +136,6 @@ export class ChannelComponent implements OnInit, OnDestroy {
       return;
     }
     if (this.player.getCurrentUrl() !== ev.mediaUrl) {
-      console.log('url out of sync;');
-      console.log(`wanted: ${ev.mediaUrl}, got ${this.mediaUrl}. Syncing..`);
-
       this.mediaUrl = ev.mediaUrl;
       this.player.play(this.mediaUrl);
     }

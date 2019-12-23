@@ -64,7 +64,7 @@ export const postLogin: RequestHandler = (
 export const getLogout = (req: Request, res: Response) => {
   req.logOut();
   req.logout();
-  res.status(200).json(['ok','user logged out']);
+  res.status(200).json(['ok', 'user logged out']);
 };
 
 /**
@@ -99,8 +99,6 @@ export const postSignup: RequestHandler = async (
     return res.status(400).send(['error', 'user already exists']);
   }
 
-  console.log('Inserting a new user into the database...');
-
   const hash = await bcrypt.hash(req.body.password, 10);
 
   const newRecord = new User();
@@ -109,7 +107,6 @@ export const postSignup: RequestHandler = async (
   newRecord.passwordHash = hash;
 
   await connection.manager.save(newRecord);
-  console.log('Saved a new user with id: ' + newRecord.id);
 
   return res.status(200).send(['ok', 'user added. try logging in']);
 };

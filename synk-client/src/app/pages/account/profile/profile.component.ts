@@ -29,7 +29,6 @@ export class ProfileComponent implements OnInit {
 
   onLogout() {
     this.auth.logout().subscribe(e => {
-      console.log(e);
       this.notification.success('Logout', 'User logged out');
       this.router.navigate(['/account', 'login']);
     });

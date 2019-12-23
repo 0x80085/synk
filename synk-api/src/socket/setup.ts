@@ -28,10 +28,6 @@ export function setupSockets(
 
   // Set up the Socket.IO server
   io.use((socket: SocketPassport, next) => {
-    console.log('###########');
-
-    console.log('user trying to connect ', socket.id);
-    console.log('user authed? ', socket.client.request.isAuthenticated());
     next();
   })
     .use(
@@ -44,14 +40,10 @@ export function setupSockets(
       })
     )
     .use((socket: SocketPassport, next) => {
-      console.log('ppassed passportSocketIo.authorize ', socket.id);
-      console.log('user authed? ', socket.client.request.isAuthenticated());
-
-      console.log('###########');
       next();
     })
     .use(roomService.registerCommands)
-    .on('connection', () => console.log('connected!'));
+    .on('connection', (socket) => console.log(`${socket.request.user.username} connected to socket server`));
 
   return { roomService };
 }
@@ -60,7 +52,6 @@ function onAuthorizeSuccess(
   socket: socketio.Socket,
   next: (err?: any) => void
 ) {
-  console.log('successful connection to socket.io');
   next();
 }
 

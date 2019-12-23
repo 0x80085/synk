@@ -50,8 +50,6 @@ export class MediaComponent implements OnInit {
   }
 
   seek(to: number): void {
-    console.log('basmedia seek');
-
     this.ref.instance.seek(to);
   }
 

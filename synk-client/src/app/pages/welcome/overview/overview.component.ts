@@ -10,10 +10,7 @@ import { tap } from 'rxjs/operators';
 })
 export class OverviewComponent {
 
-  data$: Observable<OverviewlistItem[]> = this.overviewService.getChannels()
-    .pipe(
-      tap(de => console.log(de))
-    );
+  data$: Observable<OverviewlistItem[]> = this.overviewService.getChannels();
 
   constructor(private overviewService: OverviewService) { }
 }

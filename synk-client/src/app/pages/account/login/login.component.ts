@@ -48,17 +48,14 @@ export class LoginComponent implements OnInit {
       password: this.form.controls.password.value
     };
 
-    console.log('submitted');
     this.auth.login(creds).subscribe(
       ob => {
-        console.log('logged in');
         this.isLoginSuccess = true;
         this.isLoginSuccess = true;
 
         this.auth.getUser().subscribe();
       },
       err => {
-        console.log(err);
         this.notification.create(
           'error',
           'Login failed',

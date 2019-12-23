@@ -40,7 +40,6 @@ export class CreateRoomFormComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log('test');
     if (this.form.invalid) {
       return;
     }
@@ -49,7 +48,6 @@ export class CreateRoomFormComponent implements OnInit {
       name: this.form.controls.name.value,
       description: this.form.controls.description.value
     };
-    console.log(results);
     this.service.createChannel(results).subscribe(
       () => {
         this.router.navigate(['/channel', results.name]);

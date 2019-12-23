@@ -34,7 +34,6 @@ export const createRoom = (
   res: Response,
   roomService: RoomService
 ) => {
-  console.log('##### ROOM CREATION TRY');
 
   try {
     roomService.createRoom(req.body);
