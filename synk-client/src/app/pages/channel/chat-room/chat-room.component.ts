@@ -1,6 +1,6 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild, ElementRef, AfterViewChecked, HostListener } from '@angular/core';
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, debounceTime } from 'rxjs/operators';
+import { distinctUntilChanged, debounceTime, tap } from 'rxjs/operators';
 import { ChatService } from '../chat.service';
 import { Message } from '../models/room.models';
 
@@ -9,7 +9,9 @@ import { Message } from '../models/room.models';
   templateUrl: './chat-room.component.html',
   styleUrls: ['./chat-room.component.scss']
 })
-export class ChatRoomComponent implements OnDestroy, OnInit {
+export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
+
+  @ViewChild('feed', { static: false, read: ElementRef }) private feed: ElementRef;
 
   @Input() name: string;
 
@@ -23,6 +25,10 @@ export class ChatRoomComponent implements OnDestroy, OnInit {
 
   constructor(private chatServ: ChatService) { }
 
+  @HostListener('scroll', ['$event']) onScroll($event: Event): void {
+    console.log($event.target);
+  }
+
   onSendMessageToGroup() {
     this.chatServ.sendMessageToRoom({ text: this.msgBoxValue.trim() }, this.name);
     this.msgBoxValue = '';
@@ -34,6 +40,21 @@ export class ChatRoomComponent implements OnDestroy, OnInit {
 
   ngOnDestroy() {
     this.chatServ.exit(this.name);
+  }
+
+  private scrollChatFeedDown() {
+    try {
+      const feed: HTMLDivElement = this.feed.nativeElement.children[1];
+      // console.log(feed);
+
+      feed.scrollTop = feed.scrollHeight;
+    } catch (error) {
+
+    }
+  }
+
+  ngAfterViewChecked() {
+    this.scrollChatFeedDown();
   }
 
 

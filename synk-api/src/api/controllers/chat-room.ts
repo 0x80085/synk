@@ -34,7 +34,6 @@ export const createRoom = (
   res: Response,
   roomService: RoomService
 ) => {
-  console.log('##### ROOM CREATION TRY');
 
   try {
     roomService.createRoom(req.body);
@@ -51,7 +50,7 @@ function toDto(rooms: Room[]): RoomDto[] {
   return rooms.map(room => {
     return {
       roomName: room.name,
-      description: `${room.name}'s description here`
+      description: room.description
     };
   });
 }

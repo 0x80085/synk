@@ -2,8 +2,8 @@ import * as socketio from 'socket.io';
 
 import { Room } from '../models/room';
 import { IncomingGroupMessage, MediaEvent } from '../models/message';
-import { ItemContent } from '../models/playlist';
 import { SocketPassport } from '../models/socket.passport';
+import { ItemContent } from '../models/playlist-item';
 
 export enum Commands {
   PM = 'private message',
@@ -24,6 +24,7 @@ export class RoomService {
     this.io = sio;
 
     const defaultRoom = new Room('SNKD', this.io, null);
+    defaultRoom.description = 'Default room';
     this.publicRooms.push(defaultRoom);
   }
 
@@ -35,7 +36,6 @@ export class RoomService {
   private setupCommandHandlers(socket: SocketPassport) {
     socket.on(Commands.JOIN_ROOM, (roomName: string) => {
       try {
-        console.log('socket.on(Commands.JOIN_ROOM');
 
         this.joinRoom(socket, roomName);
       } catch (error) {
@@ -87,7 +87,6 @@ export class RoomService {
   }
 
   private onMediaEvent = (data: MediaEvent, socket: SocketPassport) => {
-    console.log('media event received', data.currentTime);
 
     const afterPlaylistUpdate = (state: ItemContent) => {
       const update: MediaEvent = {
@@ -95,7 +94,6 @@ export class RoomService {
         roomName: data.roomName,
         currentTime: data.currentTime
       };
-      console.log('## UPDATE', update);
       this.io.to(data.roomName).emit('media event', update);
     };
 
@@ -109,8 +107,6 @@ export class RoomService {
   }
 
   private onAddMedia = (data: MediaEvent, socket: SocketPassport) => {
-    console.log('add media received', data.currentTime);
-
     const room = this.getRoomByName(data.roomName);
     room.currentPlayList.add({
       ...data,
@@ -152,7 +148,6 @@ export class RoomService {
 
   private addRoomToDirectory(room: Room) {
     if (this.getRoomByName(room.name)) {
-      console.log('##### ERR ROOM ALREADY EXiSTS');
       throw Error('Room already exists');
     }
     this.publicRooms.push(room);

@@ -15,9 +15,9 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private service: AuthService,
+    private auth: AuthService,
     private notification: NzNotificationService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -48,15 +48,14 @@ export class LoginComponent implements OnInit {
       password: this.form.controls.password.value
     };
 
-    console.log('submitted');
-    this.service.login(creds).subscribe(
+    this.auth.login(creds).subscribe(
       ob => {
-        console.log('logged in');
         this.isLoginSuccess = true;
         this.isLoginSuccess = true;
+
+        this.auth.getUser().subscribe();
       },
       err => {
-        console.log(err);
         this.notification.create(
           'error',
           'Login failed',
@@ -68,5 +67,4 @@ export class LoginComponent implements OnInit {
       }
     );
   }
-f
 }

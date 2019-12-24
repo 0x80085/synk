@@ -18,16 +18,21 @@ export function setupRoutes(
   app.get('/', (req: Request, res: Response) => {
     res.send('herro from chink town');
   });
-  app.get('/account', auth.ensureAuthenticated, userController.getAccount);
+  app.get('/account',
+    (req: Request, res: Response, next: NextFunction) =>
+      auth.ensureAuthenticated(req, res, next),
+    userController.getAccount);
 
   app.patch(
     '/account/update',
-    auth.ensureAuthenticated,
+    (req: Request, res: Response, next: NextFunction) =>
+      auth.ensureAuthenticated(req, res, next),
     userController.patchUpdateProfile
   );
   app.patch(
     '/account/password',
-    auth.ensureAuthenticated,
+    (req: Request, res: Response, next: NextFunction) =>
+      auth.ensureAuthenticated(req, res, next),
     userController.patchUpdatePassword
   );
 
@@ -37,7 +42,8 @@ export function setupRoutes(
 
   app.delete(
     '/account/delete',
-    auth.ensureAuthenticated,
+    (req: Request, res: Response, next: NextFunction) =>
+      auth.ensureAuthenticated(req, res, next),
     userController.deleteAccount
   );
 

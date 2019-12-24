@@ -1,56 +1,20 @@
 import { MediaEvent } from './message';
-
-export class ItemContent {
-  mediaUrl: string;
-  currentTime: number | null = null;
-
-  constructor(mediaUrl: string, currentTime: number) {
-    this.currentTime = currentTime;
-    this.mediaUrl = mediaUrl;
-  }
-}
-
-export class PlaylistItem extends ItemContent {
-  isPermenant = false;
-  addedByUsername: string;
-
-  constructor(mediaUrl: string, addedByUsername: string) {
-    super(mediaUrl, null);
-  }
-}
-
-const mockList: PlaylistItem[] = [
-  {
-    addedByUsername: 'lain',
-    currentTime: null,
-    isPermenant: false,
-    mediaUrl: 'https://www.youtube.com/watch?v=p2LMwxo0MVk'
-  },
-
-  {
-    addedByUsername: 'lain',
-    currentTime: null,
-    isPermenant: false,
-    mediaUrl: 'https://www.youtube.com/watch?v=_1rF38MjpHE'
-  },
-  {
-    addedByUsername: 'lain',
-    currentTime: null,
-    isPermenant: false,
-    mediaUrl: 'https://www.youtube.com/watch?v=qUDEyONQaCA'
-  }
-];
+import { PlaylistItem, mockList, ItemContent } from './playlist-item';
 
 export class Playlist {
   name: string;
-  list: PlaylistItem[] = mockList;
-  current: PlaylistItem | null = mockList[0];
+  list: PlaylistItem[] = cloneOf(mockList);
+  current: PlaylistItem | null = this.list[0];
 
   constructor(name: string) {
     this.name = name;
   }
 
   add(media: PlaylistItem) {
+    const id = YouTubeGetID(media.mediaUrl);
+    if (!id || id === '') {
+      return;
+    }
     const alreadyAdded = this.list.filter(i => i.mediaUrl === media.mediaUrl).length > 0;
     if (!alreadyAdded) { this.list.push(media); }
   }
@@ -73,15 +37,7 @@ export class Playlist {
   }
 
   shuffle() {
-    let listCount = this.list.length;
-
-    while (listCount) {
-      const newIndex = Math.floor(Math.random() * listCount--);
-      const lastItem = this.list[listCount];
-
-      this.list[listCount] = this.list[newIndex];
-      this.list[newIndex] = lastItem;
-    }
+    this.list = shuffleList(this.list);
   }
 
   bump(mediaUrl: string, toPosition: number) {
@@ -127,9 +83,8 @@ export class Playlist {
     this.current = selectedItem;
   }
 
-  publish = (callback: (arg: ItemContent) => void) => {
+  publish = (calledWithNewCurrentVideoState: (arg: ItemContent) => void) => {
     if (!this.current) {
-      console.log('no vid selected ');
       return;
     }
     const update = {
@@ -140,9 +95,8 @@ export class Playlist {
       currentTime: update.nowPlaying.currentTime,
       mediaUrl: update.nowPlaying.mediaUrl
     };
-    console.log('publish = (', ev);
 
-    callback(ev);
+    calledWithNewCurrentVideoState(ev);
   }
 
   private getIndexOfCurrentPlaying() {
@@ -154,16 +108,41 @@ export class Playlist {
   }
 }
 
-function YouTubeGetID(url: any) {
-  let ID = '';
-  url = url
+function YouTubeGetID(url: string) {
+  const regx = /http(?:s?):\/\/(?:www\.)?youtu(?:be\.com\/watch\?v=|\.be\/)([\w\-\_]*)(&(amp;)?‌​[\w\?‌​=]*)?/;
+  const isValid = regx.test(url);
+
+  if (!isValid) {
+    return;
+  }
+
+  let ID;
+  const ytID = url
     .replace(/(>|<)/gi, '')
     .split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
-  if (url[2] !== undefined) {
-    ID = url[2].split(/[^0-9a-z_\-]/i);
+  if (ytID[2] !== undefined) {
+    ID = ytID[2].split(/[^0-9a-z_\-]/i);
     ID = ID[0];
   } else {
-    ID = url;
+    ID = ytID;
   }
-  return ID;
+  return ID as string;
+}
+
+function shuffleList(list: any[]) {
+  let listCount = { ...list }.length;
+
+  while (listCount) {
+    const newIndex = Math.floor(Math.random() * listCount--);
+    const lastItem = list[listCount];
+
+    list[listCount] = list[newIndex];
+    list[newIndex] = lastItem;
+  }
+
+  return list;
+}
+
+function cloneOf(obj: any) {
+  return JSON.parse(JSON.stringify(obj));
 }

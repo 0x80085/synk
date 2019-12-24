@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { ChatService } from './chat.service';
 import { MediaComponent, MediaHostDirective } from './media/media.component';
 import { YoutubeComponent } from './media/youtube/youtube.component';
+import { PlaylistComponent } from './playlist/playlist.component';
 
 @NgModule({
   entryComponents: [
@@ -18,7 +19,8 @@ import { YoutubeComponent } from './media/youtube/youtube.component';
     ChatRoomComponent,
     MediaComponent,
     MediaHostDirective,
-    YoutubeComponent
+    YoutubeComponent,
+    PlaylistComponent
   ],
   imports: [
     CommonModule,

@@ -6,14 +6,11 @@ import { tap } from 'rxjs/operators';
 @Component({
   selector: 'app-overview',
   templateUrl: './overview.component.html',
-  styleUrls: ['overview.component.css']
+  styleUrls: ['overview.component.scss']
 })
 export class OverviewComponent {
 
-  data$: Observable<OverviewlistItem[]> = this.overviewService.getChannels()
-    .pipe(
-      tap(de => console.log(de))
-    );
+  data$: Observable<OverviewlistItem[]> = this.overviewService.getChannels();
 
   constructor(private overviewService: OverviewService) { }
 }

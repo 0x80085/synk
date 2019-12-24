@@ -34,13 +34,9 @@ export class Room {
     const defaultPlaylist = new Playlist('default');
     this.currentPlayList = defaultPlaylist;
     this.playlists.push(defaultPlaylist);
-
-    console.log(`Created room [${name}]`);
   }
 
   join(socket: socketio.Socket) {
-    console.log('JOING ', this.name);
-
     this.addSocketToRoom(socket);
 
     this.sendRoomConfigToUser(socket);
@@ -51,7 +47,6 @@ export class Room {
 
   exit(socket: socketio.Socket) {
     const user = this.getUserFromSocket(socket);
-    console.log('## EXIT SOCEUSER', user);
 
     if (user) {
       this.users = this.users.filter(it => it.userName !== user.userName);
@@ -88,7 +83,6 @@ export class Room {
   }
 
   emitPlaylistToRoom() {
-    console.log('emitPLayListToRoom', this.currentPlayList.list);
     this.io.to(this.name).emit('playlist update', this.currentPlayList.list);
   }
 
@@ -103,7 +97,6 @@ export class Room {
         isLeader: this.isLeader(u)
       };
     });
-    console.log('emitUserListToRoom', userLs);
 
     this.io.to(this.name).emit('userlist update', userLs);
   }
@@ -157,7 +150,6 @@ export class Room {
       }
       const newuser = this.createRoomUser(socket);
       if (this.users.length === 0) {
-        console.log('### NEW LEAZDER', newuser);
         this.setLeader(newuser);
       }
 
@@ -175,7 +167,6 @@ export class Room {
       this.io.to(this.name).emit('group message', userJoined);
 
     } catch (error) {
-      console.log('ERROR SOCKET ILLEAGL STATE');
       socket.emit('authentication error');
       return;
     }

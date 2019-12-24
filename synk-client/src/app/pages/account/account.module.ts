@@ -2,14 +2,16 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LoginComponent } from './login/login.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AccountComponent } from './account.component';
+import { ProfileComponent } from './profile/profile.component';
 import { NgZorroAntdModule } from 'ng-zorro-antd';
 import { AccountRoutingModule } from './account-routing.module';
 import { RegisterComponent } from './register/register.component';
+import { PlaceholdPipe } from './profile/placehold.pipe';
+import { UsernamePipe } from './profile/username.pipe';
 
 
 @NgModule({
-  declarations: [LoginComponent, AccountComponent, RegisterComponent],
+  declarations: [LoginComponent, ProfileComponent, RegisterComponent, PlaceholdPipe, UsernamePipe],
   imports: [
     CommonModule,
     FormsModule,

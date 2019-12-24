@@ -16,14 +16,12 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
   player: YT.Player;
 
   isPlaying = () =>
-    this.player && this.player.getPlayerState() === YT.PlayerState.PLAYING;
+    this.player && this.player.getPlayerState() === YT.PlayerState.PLAYING
 
-  constructor(private notification: NzNotificationService) {}
+  constructor(private notification: NzNotificationService) { }
 
   ngOnInit() {
     if (!(window as any).YT) {
-      console.log('Building player...');
-
       const tag = document.createElement('script');
       tag.src = 'http://www.youtube.com/iframe_api';
 
@@ -40,7 +38,6 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
 
   start(url?: string): void {
     if (url) {
-      // debugger;
       this.player.loadVideoById(YouTubeGetID(url), 0, 'large');
       return;
     }
@@ -48,7 +45,6 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
   }
 
   play(url: string): void {
-    console.log('## try to start playing:', url);
 
     if (!this.isReady) {
       // then we wait till player isReady
@@ -87,21 +83,20 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
 
   onPlayerReady = event => {
     this.player = event.target;
-    // this.play();
     this.isReady = true;
-  };
+  }
 
   onPlayerStateChange = event => {
     console.log(event);
     if (event.data === 0) {
       this.videoEnded.emit();
     }
-  };
+  }
 
   onPlayerError = event => {
     console.log(event);
     this.showPlayerErrorToast(event);
-  };
+  }
 
   stopVideo() {
     this.player.stopVideo();
@@ -129,7 +124,7 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
   }
 }
 
-function YouTubeGetID(url) {
+export function YouTubeGetID(url) {
   let ID = '';
   url = url
     .replace(/(>|<)/gi, '')
@@ -141,6 +136,11 @@ function YouTubeGetID(url) {
     ID = url;
   }
   return ID;
+}
+
+export function isValidYTid(url: string) {
+  const regx = /http(?:s?):\/\/(?:www\.)?youtu(?:be\.com\/watch\?v=|\.be\/)([\w\-\_]*)(&(amp;)?‌​[\w\?‌​=]*)?/;
+  return regx.test(url);
 }
 
 function sleep(timer) {

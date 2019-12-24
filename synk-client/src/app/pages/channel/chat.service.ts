@@ -12,6 +12,7 @@ import {
   RoomUserConfig,
   RoomUserDto
 } from './models/room.models';
+import { AppStateService } from 'src/app/app-state.service';
 
 @Injectable({
   providedIn: 'root'
@@ -36,7 +37,8 @@ export class ChatService {
 
   roomUserConfig$: Observable<RoomUserConfig> = new Observable(observer => {
     this.socket.on('user config', (data: RoomUserConfig) => {
-      console.log('config event received', data);
+      this.state.isLoggedInSubject.next(true);
+      this.state.isSocketConnectedSub.next(true);
 
       observer.next(data);
     });
@@ -44,32 +46,58 @@ export class ChatService {
 
   roomUserList$: Observable<RoomUserDto[]> = new Observable(observer => {
     this.socket.on('userlist update', (data: RoomUserDto[]) => {
-      console.log('userlist update event received', data);
-
       observer.next(data);
     });
   });
 
   roomPlaylist$: Observable<MediaEvent[]> = new Observable(observer => {
     this.socket.on('playlist update', (data: MediaEvent[]) => {
-      console.log('playlist update  event received', data);
-
       observer.next(data);
     });
   });
 
   permissionErrorEvent$: Observable<Message[]> = new Observable(observer => {
     this.socket.on('error', (data: any) => {
-      console.log('error event received', data);
       this.messageQueue = [{ text: 'Error connecting', userName: '>:)' }];
       observer.next(this.messageQueue);
+
+      this.state.isLoggedInSubject.next(false);
+      this.state.isSocketConnectedSub.next(false);
+
       this.socket.close();
+    });
+  });
+
+  connectionErrorEvent$: Observable<Message[]> = new Observable(observer => {
+    this.socket.on('connect_error', (data: any) => {
+      console.log('connect error', data);
+      this.messageQueue = [{ text: 'Error connecting', userName: '>:)' }];
+      observer.next(this.messageQueue);
+
+      this.state.isLoggedInSubject.next(false);
+      this.state.isSocketConnectedSub.next(false);
+
+      this.socket.close();
+    });
+  });
+
+  connectionTimeOutEvent$: Observable<Message[]> = new Observable(observer => {
+    this.socket.on('connect_timeout', (data: any) => {
+      this.state.isSocketConnectedSub.next(false);
+      this.socket.close();
+    });
+  });
+
+  connectionSuccessEvent$: Observable<Message[]> = new Observable(observer => {
+    this.socket.on('connect', (data: any) => {
+      this.state.isLoggedInSubject.next(true);
+      this.state.isSocketConnectedSub.next(true);
     });
   });
 
   private socket: SocketIOClient.Socket;
 
-  constructor() {
+  constructor(private state: AppStateService) {
     this.init();
   }
 

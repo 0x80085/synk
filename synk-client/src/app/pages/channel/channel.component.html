@@ -12,8 +12,8 @@
     </div>
     <div nz-col nzSpan="6" class="mt-1">
 
-      <nz-list nzBordered nzSize="small" [nzDataSource]="members$ | async" [nzRenderItem]="member"
-        [nzNoResult]="'No items'">
+      <nz-list [nzBordered]="(members$  | async)" nzSize="small" [nzLoading]="!(members$  | async)"
+        [nzDataSource]="members$ | async" [nzRenderItem]="member" [nzNoResult]="'No items'">
         <ng-template #member let-member>
           <nz-list-item>
             <nz-list-item-meta [nzTitle]="nzTitle" [nzAvatar]="member.isLeader ? leaderIcon : null"
@@ -30,19 +30,8 @@
       </nz-list>
     </div>
     <div nz-col nzSpan="18" class="mt-1">
-      <nz-list nzBordered nzSize="small" [nzDataSource]="playlist$ | async" [nzRenderItem]="item" [nzNoResult]="'No items'">
-        <ng-template #item let-item>
-          <li nz-list-item nzBordered class="playlist-item" [nzContent]="item.mediaUrl" [nzActions]="[opAction]" nzNoFlex></li>
-          <ng-template #opAction>
-            <nz-button-group>
-              <button nz-button nzSize="small" nzType="link" (click)="player.play(item.mediaUrl)" title="start video"><i nz-icon
-                  nzType="caret-right"></i></button>
-              <button nz-button nzSize="small" nzType="link" title="set next in line"><i nz-icon
-                  nzType="double-right"></i></button>
-            </nz-button-group>
-          </ng-template>
-        </ng-template>
-      </nz-list>
+      <app-playlist [playlist$]="playlist$" [roomName]="name" [showAddMediaInput]="isLeader" (playMedia)="player.play($event.mediaUrl)">
+      </app-playlist>
     </div>
   </div>
 </ng-template>

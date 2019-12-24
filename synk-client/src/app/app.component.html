@@ -1,20 +1,9 @@
 <nz-layout class="app-layout">
-  <nz-sider
-    class="menu-sidebar"
-    nzCollapsible
-    nzWidth="256px"
-    [(nzCollapsed)]="isCollapsed"
-    [nzTrigger]="null"
-  >
+  <nz-sider class="menu-sidebar" nzCollapsible nzWidth="256px" [(nzCollapsed)]="isCollapsed" [nzTrigger]="null">
     <div class="sidebar-logo">
       <span>
-        <i
-          nz-icon
-          nzType="meh"
-          style="cursor: pointer;"
-          (click)="isCollapsed = !isCollapsed"
-          nzTheme="fill"
-        ></i>
+        <i nz-icon [style.color]="(isConnected | async) ? '#00ff00' : ''" nzType="meh" style="cursor: pointer;"
+          (click)="isCollapsed = !isCollapsed" nzTheme="fill"></i>
         <h1 style="cursor: pointer;" (click)="isCollapsed = !isCollapsed">
           SYNKd.TV
         </h1>
@@ -32,13 +21,13 @@
     <ul nz-menu nzMode="inline" [nzInlineCollapsed]="isCollapsed">
       <li nz-submenu nzOpen nzTitle="Account" nzIcon="smile">
         <ul>
-          <li nz-menu-item class="item" nzMatchRouter>
+          <li nz-menu-item [hidden]="isLoggedIn | async" class="item" nzMatchRouter>
             <a routerLink="/account/login">Login</a>
           </li>
-          <li nz-menu-item class="item" nzMatchRouter>
+          <li nz-menu-item [hidden]="!(isLoggedIn | async)" class="item" nzMatchRouter>
             <a routerLink="/account/me">(You)</a>
           </li>
-          <li nz-menu-item class="item" nzMatchRouter>
+          <li nz-menu-item [hidden]="isLoggedIn | async" class="item" nzMatchRouter>
             <a routerLink="/account/new">Register</a>
           </li>
         </ul>

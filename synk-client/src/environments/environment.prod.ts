@@ -1,3 +1,4 @@
 export const environment = {
-  production: true
+  production: true,
+  api: '__SYNK_API_URL__'
 };
