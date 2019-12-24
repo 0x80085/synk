@@ -37,7 +37,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
     private notification: NzNotificationService
   ) { }
 
-  @HostListener('window:beforeunload', ['$event'])
+  @HostListener('window:beforeunload')
   exitRoomOnPageDestroy() {
     this.chatService.exit(this.name);
   }
