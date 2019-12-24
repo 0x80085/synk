@@ -6,7 +6,7 @@
     <nz-card nzTitle="Create account" *ngIf="!registerSuccess">
       <form nz-form [formGroup]="form" class="login-form" (ngSubmit)="submitForm()">
         <nz-form-item>
-          <nz-form-control nzErrorTip="Please input your username!">
+          <nz-form-control nzErrorTip="Please input a valid username">
             <ng-template #prefixTemplateUser><i nz-icon style="color: rgb(204, 254, 253);" nzType="user"></i>
             </ng-template>
             <nz-input-group [nzPrefix]="prefixTemplateUser">
@@ -15,7 +15,7 @@
           </nz-form-control>
         </nz-form-item>
         <nz-form-item>
-          <nz-form-control nzErrorTip="Please input your Password!">
+          <nz-form-control nzErrorTip="Please input a valid password">
             <ng-template #prefixTemplateLock><i nz-icon style="color: rgb(204, 254, 253);" nzType="lock"></i>
             </ng-template>
             <nz-input-group [nzPrefix]="prefixTemplateLock">

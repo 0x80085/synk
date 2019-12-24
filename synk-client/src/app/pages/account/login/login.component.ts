@@ -39,10 +39,12 @@ export class LoginComponent implements OnInit {
   }
 
   submitForm(): void {
-    // for (const i in this.validateForm.controls) {
-    //   this.validateForm.controls[i].markAsDirty();
-    //   this.validateForm.controls[i].updateValueAndValidity();
-    // }
+    this.touchform();
+
+    if (this.form.invalid) {
+      return;
+    }
+
     const creds = {
       username: this.form.controls.userName.value,
       password: this.form.controls.password.value
@@ -66,5 +68,12 @@ export class LoginComponent implements OnInit {
         this.isLoginSuccess = false;
       }
     );
+  }
+
+  private touchform() {
+    for (const i of Object.keys(this.form.controls)) {
+      this.form.controls[i].markAsDirty();
+      this.form.controls[i].updateValueAndValidity();
+    }
   }
 }

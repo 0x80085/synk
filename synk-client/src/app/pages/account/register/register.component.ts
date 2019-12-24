@@ -17,7 +17,7 @@ export class RegisterComponent implements OnInit {
     private fb: FormBuilder,
     private service: AuthService,
     private notification: NzNotificationService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -39,6 +39,12 @@ export class RegisterComponent implements OnInit {
   }
 
   submitForm(): void {
+    this.touchform();
+
+    if (this.form.invalid) {
+      return;
+    }
+
     const creds = {
       username: this.form.controls.userName.value,
       password: this.form.controls.password.value
@@ -58,5 +64,12 @@ export class RegisterComponent implements OnInit {
         );
       }
     );
+  }
+
+  private touchform() {
+    for (const i of Object.keys(this.form.controls)) {
+      this.form.controls[i].markAsDirty();
+      this.form.controls[i].updateValueAndValidity();
+    }
   }
 }

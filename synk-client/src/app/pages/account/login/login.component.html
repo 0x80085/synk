@@ -6,7 +6,7 @@
     <nz-card nzTitle="Login" *ngIf="!isLoginSuccess">
       <form nz-form [formGroup]="form" class="login-form" (ngSubmit)="submitForm()">
         <nz-form-item>
-          <nz-form-control nzErrorTip="Please input your username">
+          <nz-form-control nzErrorTip="Please input a valid name">
             <ng-template #prefixTemplateUser><i nz-icon style="color: rgb(204, 254, 253);" nzType="user"></i>
             </ng-template>
             <nz-input-group [nzPrefix]="prefixTemplateUser">
@@ -15,7 +15,7 @@
           </nz-form-control>
         </nz-form-item>
         <nz-form-item>
-          <nz-form-control nzErrorTip="Please input your password">
+          <nz-form-control nzErrorTip="Please input a valid password">
             <ng-template #prefixTemplateLock><i nz-icon style="color: rgb(204, 254, 253);" nzType="lock"></i>
             </ng-template>
             <nz-input-group [nzPrefix]="prefixTemplateLock">
@@ -26,7 +26,7 @@
         <nz-form-item>
           <nz-form-control>
             <label nz-checkbox formControlName="remember">
-              <span>Remember me</span>
+              <span nz-tooltip nzTitle="Haha this does nothing">Remember me</span>
             </label>
             <button nz-button class="login-form-button" [nzType]="'primary'">
               Log in
