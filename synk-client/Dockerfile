@@ -20,8 +20,9 @@ COPY ./custom-nginx.conf ./
 # Copy src to build-stage container
 COPY ./src ./src
 
-# Replace __SYNK_API_URL__ in env.prod to $SYNK_API_URL
+# Replace __SYNK_API_URL__ in both env files to be sure
 RUN sed -i "s|__SYNK_API_URL__|${SYNK_API_URL}|g" ./src/environments/environment.prod.ts
+RUN sed -i "s|__SYNK_API_URL__|${SYNK_API_URL}|g" ./src/environments/environment.ts
 
 # Install dependencies
 RUN npm install
