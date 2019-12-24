@@ -2,7 +2,7 @@
 
 > Watch youtube vids in sync and chat with friends
 
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/0x80085/synk/graphs/commit-activity) [![Website synkd.tv](https://img.shields.io/website-up-down-green-red/http/synkd.tv.svg)](https://synkd.tv/) [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com) [![Open Source Love svg2](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/) [![GitHub contributors](https://img.shields.io/github/contributors/0x80085/synk)](https://github.com/0x80085/synk/graphs/contributors/)[![Dockerized](https://img.shields.io/badge/Docker%3F-yes-blue.svg)](https://github.com/0x80085/synk/graphs/commit-activity) 
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/0x80085/synk/graphs/commit-activity) [![Website synkd.tv](https://img.shields.io/website-up-down-green-red/http/synkd.tv.svg)](https://synkd.tv/) [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com) [![Open Source Love svg2](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/) [![GitHub contributors](https://img.shields.io/github/contributors/0x80085/synk)](https://github.com/0x80085/synk/graphs/contributors/) [![Dockerized](https://img.shields.io/static/v1?label=&message=Dockerized&logo=docker&color=0db7ed)](https://github.com/0x80085/synk/graphs/commit-activity) 
 
 ## Install 
 
@@ -71,17 +71,13 @@ Or use the shortcut definied n package.json:
 - Refactor Middleware Sockets to make it more readable
 - Add Scrape.Tv Channel
 - Playlist control
-- exitGroup when user disconnects
 - 404 pages server and client
 
 
 ## Under construction at time of writing 
 
-- login error feedback
-- register err feedback
-- loggedin-state show to user + handle session expires better
-- add user profile page + config settings
-- fix the chat scrolldown when new msg
+- user update + config settings
+- user channels management
 - connect Channels table to rooms socketio concept
 - Docker support
 - db migration scripts
@@ -92,7 +88,6 @@ Or use the shortcut definied n package.json:
 - Introduce and model (some also in db) more concepts like playlist, roles, skips, room management/media management
     - Channel
     - User
-    - Session (from Passportjs
     - ...?
 - channel config settings
 - concoct strategy for scraping videos
