@@ -1,0 +1,80 @@
+//// -- In DBML Format  
+//// -- Use https://dbdiagram.io/ to visualize
+
+// Creating tables
+Table UserConfigs as UC {
+  id int [pk]
+  isLocked bit
+}
+
+Table Users as U {
+  id int [pk, increment] // auto-increment
+  name varchar
+  created_at timestamp
+  password varchar
+  isAdmin bit
+  userConfig int [ref: - UC.id]
+}
+
+Table Videos {
+  url varchar
+  playlistId int [ref: > P.id] 
+  addedBy int [ref: > U.id]
+  positionInList int
+}
+
+Table Playlists as P {
+  id int [pk]
+  createdBy int [ref: > U.id]
+  isLocked bit
+}
+
+Table ChannelPlaylists {
+  channelId int [ref: > C.id] 
+  playlistId int [ref: > P.id]
+}
+
+Table Channels as C {
+  id int [pk]
+  name varchar
+  description varchar
+  owner int [ref: > U.id]
+  isLocked bit
+  isPublic bit
+  password varchar
+}
+
+Table ChannelConfigs {
+  channelId int [ref: - C.id]
+  customValue JSON
+  MOTD varchar
+  bannerUrl varchar
+  coverUrl varchar
+}
+
+Table Roles as R {
+  id int [pk]
+  name varchar
+  level int
+}
+
+Table ChannelRoles {
+  channelId int [ref: > C.id]
+  userId int [ref: > U.id]
+  roleID int [ref: > R.id]
+}
+
+Table ChannelPermissions {
+  permissionId int [ref: > PM.id]
+  channelId int [ref: > C.id]
+  userId int [ref: > U.id]
+  roleID int [ref: > R.id]
+  requiredLevel int
+  isActive bit
+}
+
+Table Permssion as PM {
+  id int [pk]
+  name varchar
+  value varchar
+}
