@@ -1,6 +1,7 @@
 //// -- In DBML Format  
 //// -- Use https://dbdiagram.io/ to visualize
 
+
 // Creating tables
 Table UserConfigs {
   id int [pk]
@@ -16,6 +17,12 @@ Table Users as U {
   isAdmin bit [default: 0]
   lastSeen date
   avatarUrl varchar
+}
+
+Table Session {
+  id int [pk]
+  expiresAt int
+  data varchar
 }
 
 Table Videos {
