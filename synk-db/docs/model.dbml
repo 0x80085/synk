@@ -2,54 +2,65 @@
 //// -- Use https://dbdiagram.io/ to visualize
 
 // Creating tables
-Table UserConfigs as UC {
+Table UserConfigs {
   id int [pk]
-  isLocked bit
+  userId int [ref: - U.id, not null]
+  isLocked bit [default: 0]
 }
 
 Table Users as U {
-  id int [pk, increment] // auto-increment
+  id int [pk]
   name varchar
-  created_at timestamp
+  dateCreated timestamp
   password varchar
-  isAdmin bit
-  userConfig int [ref: - UC.id]
+  isAdmin bit [default: 0]
+  lastSeen date
+  avatarUrl varchar
 }
 
 Table Videos {
   url varchar
-  playlistId int [ref: > P.id] 
-  addedBy int [ref: > U.id]
+  playlistId int [ref: > P.id, not null] 
+  addedBy int [ref: > U.id, not null]
   positionInList int
+  dateAdded date
 }
 
 Table Playlists as P {
   id int [pk]
-  createdBy int [ref: > U.id]
-  isLocked bit
+  createdBy int [ref: > U.id, not null]
+  isLocked bit [default: 0]
 }
 
 Table ChannelPlaylists {
-  channelId int [ref: > C.id] 
-  playlistId int [ref: > P.id]
+  channelId int [ref: > C.id, not null] 
+  playlistId int [ref: > P.id, not null]
+  addedBy int [ref: > U.id, not null]
 }
 
 Table Channels as C {
   id int [pk]
   name varchar
   description varchar
-  owner int [ref: > U.id]
-  isLocked bit
-  isPublic bit
+  owner int [ref: > U.id, not null]
+  isLocked bit [default: 0]
+  isPublic bit [default: 1]
   password varchar
+  dateCreated date
 }
 
 Table ChannelConfigs {
-  channelId int [ref: - C.id]
+  id int [pk]
+  channelId int [ref: > C.id, not null]
+  name varchar
+  isActivated bit [default: 1]
+  logFileUrl varchar
   customValue JSON
   MOTD varchar
   bannerUrl varchar
   coverUrl varchar
+  logoUrl varchar
+  emojiListUrl varchar
 }
 
 Table Roles as R {
@@ -59,22 +70,31 @@ Table Roles as R {
 }
 
 Table ChannelRoles {
-  channelId int [ref: > C.id]
-  userId int [ref: > U.id]
-  roleID int [ref: > R.id]
+  channelId int [ref: > C.id, not null]
+  userId int [ref: > U.id, not null]
+  roleID int [ref: > R.id, not null]
 }
 
 Table ChannelPermissions {
-  permissionId int [ref: > PM.id]
-  channelId int [ref: > C.id]
+  permissionId int [ref: > PM.id, not null]
+  channelId int [ref: > C.id, not null]
   userId int [ref: > U.id]
   roleID int [ref: > R.id]
   requiredLevel int
-  isActive bit
+  isActive bit [default: 1]
 }
 
 Table Permssion as PM {
   id int [pk]
   name varchar
   value varchar
+}
+
+Table Bans {
+  id int [pk]
+  userId int [ref: > U.id]
+  channelId int [ref: > C.id]
+  IP varchar
+  isGlobal bit [default: 0]
+  reason varchar
 }
