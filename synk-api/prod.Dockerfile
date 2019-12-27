@@ -67,8 +67,10 @@ RUN rm -f /etc/nginx/conf.d/default.conf
 
 # # Remove build folder
 # RUN rm -f /synk-api/build
+# RUN ls
 
-RUN ls
-# Run w PM2
-# CMD ["node", "index.js"]
-RUN node index.js
+
+# TODO: Run w PM2
+
+CMD ["node", "index.js"]
+# RUN node index.js
