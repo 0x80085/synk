@@ -6,7 +6,7 @@ import { timer, Subscription, Observable } from 'rxjs';
 
 import { MediaComponent } from './media/media.component';
 import { ChatService } from './chat.service';
-import { MediaEvent, Message, RoomUserConfig, RoomUser, RoomUserDto } from './models/room.models';
+import { MediaEvent, Message, RoomUserDto } from './models/room.models';
 import { NzNotificationService } from 'ng-zorro-antd';
 
 @Component({
@@ -80,11 +80,8 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   receiveRoomConfig() {
     this.roomUserConfig$ = this.chatService.roomUserConfig$.subscribe(ev => {
-
       this.isLeader = ev.isLeader;
-
-      this.mediaUrl = this.playlist[0];
-      this.player.play(this.mediaUrl);
+      console.log(ev);
     });
   }
 
@@ -94,6 +91,8 @@ export class ChannelComponent implements OnInit, OnDestroy {
         this.playlist = ev.map(i => {
           return i.mediaUrl;
         });
+        this.mediaUrl = this.playlist[0];
+        this.player.play(this.mediaUrl);
       })
     );
   }
@@ -135,16 +134,23 @@ export class ChannelComponent implements OnInit, OnDestroy {
     if (!this.shouldSyncPlayer(ev)) {
       return;
     }
-    if (this.player.getCurrentUrl() !== ev.mediaUrl) {
-      this.mediaUrl = ev.mediaUrl;
-      this.player.play(this.mediaUrl);
-    }
-    if (this.clientCurrenttimeIsOutOfSync(ev.currentTime)) {
-      if (!this.player.isPlaying()) {
-        this.player.play(ev.mediaUrl);
-        return;
+
+    try {
+      console.log('syncing...');
+      if (this.player.getCurrentUrl() !== ev.mediaUrl) {
+        this.mediaUrl = ev.mediaUrl;
+        this.player.play(this.mediaUrl);
       }
-      this.player.seek(ev.currentTime);
+      if (this.clientCurrenttimeIsOutOfSync(ev.currentTime)) {
+        if (!this.player.isPlaying()) {
+          this.player.play(ev.mediaUrl);
+          return;
+        }
+        this.player.seek(ev.currentTime);
+      }
+    } catch (error) {
+      console.log('Error while syncing player - probably not ready yet');
+      console.log(error);
     }
   }
 
@@ -157,6 +163,9 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   private clientCurrenttimeIsOutOfSync(originTime: number) {
     try {
+      if (typeof originTime !== 'number') {
+        return false;
+      }
       const clientTime = this.player.getCurrentTime();
       const maxTimeBehind = originTime - 2;
       const maxTimeAhead = originTime + 2;
