@@ -26,14 +26,14 @@ export class CreateRoomFormComponent implements OnInit {
         null,
         [
           Validators.required,
-          Validators.maxLength(15),
+          Validators.maxLength(25),
           Validators.minLength(3),
           Validators.pattern(/^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/)
         ]
       ],
       description: [
         null,
-        [Validators.required, Validators.maxLength(20), Validators.minLength(5)]
+        [Validators.required, Validators.maxLength(250), Validators.minLength(5)]
       ],
       remember: [true]
     });
