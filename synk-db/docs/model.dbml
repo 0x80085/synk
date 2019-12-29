@@ -1,7 +1,6 @@
 //// -- In DBML Format  
 //// -- Use https://dbdiagram.io/ to visualize
 
-
 // Creating tables
 Table UserConfigs {
   id int [pk]
@@ -74,27 +73,20 @@ Table Roles as R {
   id int [pk]
   name varchar
   level int
-}
-
-Table ChannelRoles {
   channelId int [ref: > C.id, not null]
   userId int [ref: > U.id, not null]
-  roleID int [ref: > R.id, not null]
 }
 
-Table ChannelPermissions {
-  permissionId int [ref: > PM.id, not null]
-  channelId int [ref: > C.id, not null]
-  userId int [ref: > U.id]
-  roleID int [ref: > R.id]
-  requiredLevel int
-  isActive bit [default: 1]
-}
 
 Table Permssion as PM {
   id int [pk]
   name varchar
   value varchar
+  requiredLevel int
+  isActive bit [default: 1]
+  channelId int [ref: > C.id]
+  userId int [ref: > U.id, not null]
+  roleID int [ref: > R.id]
 }
 
 Table Bans {
@@ -105,3 +97,16 @@ Table Bans {
   isGlobal bit [default: 0]
   reason varchar
 }
+
+Table GlobalSettings {
+  logoUrl varchar
+  maxUsersInRoom int
+  maxRooms int
+  homepageAnnouncement varchar
+  isRegistrationLocked bit
+  isChannelCreationLocked bit
+  currentTheme varchar
+  allowedImageHostingProviders JSON
+  
+}
+
