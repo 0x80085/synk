@@ -4,7 +4,7 @@
     <nz-list-item [ngClass]="'item'" routerLink="/channel/{{ item.roomName }}" [nzContent]="nzContent">
       <ng-template #nzContent>
         <nz-card [nzTitle]="item.roomName" [nzHoverable]="true" [nzActions]="[members, nowPlaying]">
-          <p nz-button nzType="link" nzParagraph nzEllipsis>{{ item.description }}</p>
+          <p nzType="link" nzParagraph nzEllipsis nzEllipsisRows="3">{{ item.description }}</p>
         </nz-card>
       </ng-template>
     </nz-list-item>

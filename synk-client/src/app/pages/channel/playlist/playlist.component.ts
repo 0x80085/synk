@@ -1,10 +1,11 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Observable, merge, combineLatest, of } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
+import { map, withLatestFrom } from 'rxjs/operators';
+import { NzNotificationService } from 'ng-zorro-antd';
+
 import { MediaEvent } from '../models/room.models';
 import { ChatService } from '../chat.service';
 import { isValidYTid } from '../media/youtube/youtube.component';
-import { NzNotificationService, isTemplateRef } from 'ng-zorro-antd';
-import { map, switchMap, tap, withLatestFrom, startWith } from 'rxjs/operators';
 
 type ListItem = MediaEvent & { active: boolean };
 
@@ -25,6 +26,8 @@ export class PlaylistComponent implements OnInit {
   newMedia: string;
 
   virtualPlaylist$: Observable<ListItem[]>;
+
+  showControls = false;
 
   constructor(
     private chatService: ChatService,
@@ -61,8 +64,6 @@ export class PlaylistComponent implements OnInit {
           const active = it.mediaUrl === a;
           return { ...it, active };
         });
-        console.log(e);
-
         return e;
       })
     );
