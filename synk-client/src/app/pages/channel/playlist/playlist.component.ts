@@ -1,9 +1,12 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, merge, combineLatest, of } from 'rxjs';
 import { MediaEvent } from '../models/room.models';
 import { ChatService } from '../chat.service';
 import { isValidYTid } from '../media/youtube/youtube.component';
-import { NzNotificationService } from 'ng-zorro-antd';
+import { NzNotificationService, isTemplateRef } from 'ng-zorro-antd';
+import { map, switchMap, tap, withLatestFrom, startWith } from 'rxjs/operators';
+
+type ListItem = MediaEvent & { active: boolean };
 
 @Component({
   selector: 'app-playlist',
@@ -13,6 +16,7 @@ import { NzNotificationService } from 'ng-zorro-antd';
 export class PlaylistComponent implements OnInit {
 
   @Input() playlist$: Observable<MediaEvent[]>;
+  @Input() activeItem = '';
   @Input() roomName: string;
   @Input() showAddMediaInput = true;
 
@@ -20,12 +24,14 @@ export class PlaylistComponent implements OnInit {
 
   newMedia: string;
 
+  virtualPlaylist$: Observable<ListItem[]>;
 
   constructor(
     private chatService: ChatService,
     private notification: NzNotificationService) { }
 
   ngOnInit() {
+    this.createVirtualList();
   }
 
   onAddMedia() {
@@ -45,6 +51,22 @@ export class PlaylistComponent implements OnInit {
 
     this.chatService.addToPlaylist(enw);
     this.notification.success('Success', 'Media added to playlist');
+  }
+
+  private createVirtualList() {
+    this.virtualPlaylist$ = this.playlist$.pipe(
+      withLatestFrom(of(this.activeItem)),
+      map(([ls, a]) => {
+        const e: ListItem[] = ls.map(it => {
+          const active = it.mediaUrl === a;
+          return { ...it, active };
+        });
+        console.log(e);
+
+        return e;
+      })
+    );
+
   }
 
 }

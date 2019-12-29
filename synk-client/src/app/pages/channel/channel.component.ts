@@ -91,8 +91,6 @@ export class ChannelComponent implements OnInit, OnDestroy {
         this.playlist = ev.map(i => {
           return i.mediaUrl;
         });
-        this.mediaUrl = this.playlist[0];
-        this.player.play(this.mediaUrl);
       })
     );
   }
@@ -125,6 +123,8 @@ export class ChannelComponent implements OnInit, OnDestroy {
         this.player.getCurrentTime(),
         this.name
       );
+      this.mediaUrl = this.player.getCurrentUrl();
+
     } catch (error) {
       console.log('Player may not be loaded yet', error);
     }

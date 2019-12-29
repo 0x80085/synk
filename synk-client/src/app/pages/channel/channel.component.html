@@ -30,7 +30,7 @@
       </nz-list>
     </div>
     <div nz-col nzSpan="18" class="mt-1">
-      <app-playlist [playlist$]="playlist$" [roomName]="name" [showAddMediaInput]="isLeader" (playMedia)="player.play($event.mediaUrl)">
+      <app-playlist [playlist$]="playlist$" [activeItem]="mediaUrl" [roomName]="name" [showAddMediaInput]="isLeader" (playMedia)="player.play($event.mediaUrl)">
       </app-playlist>
     </div>
   </div>
