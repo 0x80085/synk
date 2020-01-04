@@ -81,6 +81,7 @@ Or use the shortcut definied n package.json:
 - connect Channels table to rooms socketio concept
 - Docker support
 - db migration scripts
+- bug where playlist is not well updated in client memory and onEndVideo starts first vid 
 
 ...next up
 
