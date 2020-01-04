@@ -55,7 +55,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   onVideoEnded() {
     const i = this.playlist.findIndex(it => it === this.mediaUrl);
-    const next = this.playlist[i] + 1 || this.playlist[0];
+    const next = this.playlist[i + 1] || this.playlist[0];
     this.mediaUrl = next;
 
     this.player.play(this.mediaUrl);
