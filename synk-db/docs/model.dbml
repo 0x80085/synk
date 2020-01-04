@@ -10,9 +10,9 @@ Table UserConfigs {
 
 Table Users as U {
   id int [pk]
-  name varchar
+  username varchar
   dateCreated timestamp
-  password varchar
+  passwordHash varchar
   isAdmin bit [default: 0]
   lastSeen date
   avatarUrl varchar
