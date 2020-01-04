@@ -1,27 +1,16 @@
 import * as http from 'http';
 import * as socketio from 'socket.io';
 import * as passportSocketIo from 'passport.socketio';
-import * as cookieParser from 'cookie-parser';
 
 import { RoomService } from './services/room-service';
-import { TypeormStore } from 'typeorm-store';
 import { SocketPassport } from './models/socket.passport';
+import { SessionOptions } from '../auth/auth-service';
+import { Store } from 'express-session';
 
-export interface MiddlewareConfig {
-  genid: () => string;
-  cookieParser: typeof cookieParser;
-  secret: string;
-  resave: boolean;
-  saveUninitialized: boolean;
-  store: TypeormStore;
-  cookie: {
-    maxAge: number;
-  };
-}
 
 export function setupSockets(
   wsHttp: http.Server,
-  sessionMiddleware: MiddlewareConfig
+  sessionMiddleware: SessionOptions
 ) {
   const io = socketio(wsHttp);
   const roomService = new RoomService(io);
@@ -33,8 +22,8 @@ export function setupSockets(
     .use(
       passportSocketIo.authorize({
         key: 'connect.sid', // make sure is the same as in your session settings in app.js
-        secret: sessionMiddleware.secret, // make sure is the same as in your session settings in app.js
-        store: sessionMiddleware.store, // you need to use the same sessionStore you defined in the app.use(session({... in app.js
+        secret: sessionMiddleware.secret as string, // make sure is the same as in your session settings in app.js
+        store: sessionMiddleware.store as Store, // you need to use the same sessionStore you defined in the app.use(session({... in app.js
         success: onAuthorizeSuccess, // *optional* callback on success
         fail: onAuthorizeFail // *optional* callback on fail/error
       })
