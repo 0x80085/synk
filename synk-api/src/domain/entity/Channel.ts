@@ -15,13 +15,13 @@ export class Channel {
   @Column()
   description: string;
 
-  @Column()
+  @Column({ default: false })
   isLocked: boolean;
 
-  @Column()
+  @Column({ default: false })
   isPublic: boolean;
 
-  @Column()
+  @Column({ default: null, nullable: true })
   password: string;
 
   @Column()

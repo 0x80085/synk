@@ -6,31 +6,31 @@ export class GlobalSettings {
   @PrimaryColumn()
   name: string;
 
-  @Column()
+  @Column({ default: null, nullable: true })
   logoUrl: string;
 
-  @Column()
+  @Column({ default: 108 })
   maxUsersInRoom: number;
 
-  @Column()
+  @Column({ default: 108 })
   maxRooms: number;
 
-  @Column()
+  @Column({ default: 5 })
   maxRoomsPerUser: number;
 
-  @Column()
+  @Column({ default: null, nullable: true })
   allowedMediaHostingProviders: string;
 
-  @Column()
+  @Column({ default: null, nullable: true })
   homepageAnnouncement: string;
 
-  @Column()
+  @Column({ default: false })
   isRegistrationLocked: boolean;
 
-  @Column()
+  @Column({ default: false })
   isChannelCreationLocked: boolean;
 
-  @Column()
+  @Column({ default: null, nullable: true })
   currentTheme: string;
 
 }

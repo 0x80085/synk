@@ -8,7 +8,7 @@ export class Playlist {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({default: false})
   isLocked: boolean;
 
   @ManyToOne(type => User, user => user.playlists)

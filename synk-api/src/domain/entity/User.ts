@@ -18,22 +18,31 @@ export class User {
   @Column()
   dateCreated: Date;
 
-  @Column()
+  @Column({ default: false })
   isAdmin: boolean;
 
-  @Column()
+  @Column({ default: null, nullable: true })
   lastSeen: Date;
 
-  @Column()
+  @Column({ default: null, nullable: true })
   avatarUrl: Date;
 
-  @OneToMany(type => Playlist, playlist => playlist.createdBy)
+  @OneToMany(type => Playlist, playlist => playlist.createdBy, { nullable: true })
   playlists: Playlist[];
 
-  @OneToMany(type => Video, video => video.addedBy)
+  @OneToMany(type => Video, video => video.addedBy, { nullable: true })
   videos: Video[];
 
-  @OneToMany(type => Channel, channel => channel.owner)
+  @OneToMany(type => Channel, channel => channel.owner, { nullable: true })
   channels: Channel[];
+
+  static create(username: string, passwordHash: string) {
+
+    const newRecord = new User();
+    newRecord.username = username;
+    newRecord.passwordHash = passwordHash;
+    newRecord.dateCreated = new Date();
+
+  }
 
 }
