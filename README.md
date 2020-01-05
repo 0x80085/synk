@@ -81,6 +81,7 @@ Or use the shortcut definied n package.json:
 - create better playlist component
 - fix scroll issue on chatbox
 - admin functions
+- make sessions more stable
 
 ...next up
 
