@@ -1,8 +1,7 @@
-import * as passport from 'passport';
-import * as uuid from 'uuid';
 import * as bcrypt from 'bcrypt';
+import * as passport from 'passport';
 
-import { Request, Response, NextFunction, RequestHandler } from 'express';
+import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { check, sanitize, validationResult } from 'express-validator';
 import { IVerifyOptions } from 'passport-local';
 import { FindConditions, getConnection } from 'typeorm';
@@ -100,11 +99,7 @@ export const postSignup: RequestHandler = async (
   }
 
   const hash = await bcrypt.hash(req.body.password, 10);
-
-  const newRecord = new User();
-  newRecord.id = uuid();
-  newRecord.username = req.body.username;
-  newRecord.passwordHash = hash;
+  const newRecord = User.create(req.body.username, hash);
 
   await connection.manager.save(newRecord);
 

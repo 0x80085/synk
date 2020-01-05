@@ -1,4 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+
 import { Channel } from './Channel';
 import { Playlist } from './Playlist';
 import { Video } from './Video';
@@ -37,12 +38,11 @@ export class User {
   channels: Channel[];
 
   static create(username: string, passwordHash: string) {
-
-    const newRecord = new User();
-    newRecord.username = username;
-    newRecord.passwordHash = passwordHash;
-    newRecord.dateCreated = new Date();
-
+    const u = new User();
+    u.username = username;
+    u.passwordHash = passwordHash;
+    u.dateCreated = new Date();
+    return u;
   }
 
 }
