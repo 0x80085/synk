@@ -6,9 +6,9 @@ import { User } from '../auth.service';
 })
 export class PlaceholdPipe implements PipeTransform {
 
-  transform(user: User): string | null {
+  transform(user: User): string {
 
-    return user ? `http://satyr.io/400x300/c0ffee?text=${user.userName}` : `http://satyr.io/105x60?text=uh+oh`;
+    return user ? `http://satyr.io/400x300/c0ffee?text=${user.userName}` : `http://satyr.io/105x60?text=...`;
   }
 
 }
