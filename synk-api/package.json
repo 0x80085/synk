@@ -7,8 +7,7 @@
     "start": "ts-node src/index.ts",
     "watch-ts": "tsc -w",
     "watch-node": "nodemon dist/index.js",
-    "db:migrate:gen": "ts-node ./node_modules/.bin/typeorm migration:generate",
-    "db:migrate:run": "ts-node ./node_modules/.bin/typeorm migration:run"
+    "db:migrate:run": "ts-node ./node_modules/typeorm/cli.js migration:run"
   },
   "author": "gonzhq",
   "license": "MIT",
