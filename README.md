@@ -78,18 +78,15 @@ Or use the shortcut definied n package.json:
 - user channels management
 - connect Channels table to rooms socketio concept
 - Docker support
-- db migration scripts
 - create better playlist component
 - fix scroll issue on chatbox
+- admin functions
 
 ...next up
 
 - General styling
-- Introduce and model (some also in db) more concepts like playlist, roles, skips, room management/media management
-  - Channel
-  - User
-    - ...?
-- channel config settings
+- https
+- Implemet DB model and the handlers for the entities
 - concoct strategy for scraping videos
 - ratelimiting and security
 - prepare deployment (azure arm templates)
