@@ -1,5 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+
 import { Channel } from './Channel';
+import { Playlist } from './Playlist';
+import { Video } from './Video';
 
 @Entity()
 export class User {
@@ -13,7 +16,33 @@ export class User {
   @Column()
   username: string;
 
-  @OneToMany(type => Channel, channel => channel.owner)
+  @Column()
+  dateCreated: Date;
+
+  @Column({ default: false })
+  isAdmin: boolean;
+
+  @Column({ default: null, nullable: true })
+  lastSeen: Date;
+
+  @Column({ default: null, nullable: true })
+  avatarUrl: Date;
+
+  @OneToMany(type => Playlist, playlist => playlist.createdBy, { nullable: true })
+  playlists: Playlist[];
+
+  @OneToMany(type => Video, video => video.addedBy, { nullable: true })
+  videos: Video[];
+
+  @OneToMany(type => Channel, channel => channel.owner, { nullable: true })
   channels: Channel[];
+
+  static create(username: string, passwordHash: string) {
+    const u = new User();
+    u.username = username;
+    u.passwordHash = passwordHash;
+    u.dateCreated = new Date();
+    return u;
+  }
 
 }

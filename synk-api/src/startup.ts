@@ -4,16 +4,18 @@ import * as express from 'express';
 import * as cors from 'cors';
 import * as uuid from 'uuid';
 import * as passport from 'passport';
+import * as bodyParser from 'body-parser';
+import * as morgan from 'morgan';
+import * as cookieParser from 'cookie-parser';
+import * as compression from 'compression';
 
 import 'reflect-metadata';
 import { createConnection } from 'typeorm';
+import { TypeormStore } from 'typeorm-store';
 
-import setupAuthMiddleware from './auth/auth-service';
+import setupAuthMiddleware, { SessionOptions } from './auth/auth-service';
 import { setupRoutes } from './api/routes';
 import { setupSockets } from './socket/setup';
-import * as bodyParser from 'body-parser';
-import * as cookieParser from 'cookie-parser';
-import { TypeormStore } from 'typeorm-store';
 import { Session } from './domain/entity/Session';
 
 export default async function configure() {
@@ -39,13 +41,19 @@ export default async function configure() {
 
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(compression());
+  app.disable('x-powered-by');
+  app.enable('trust proxy');
+
+  app.use(morgan('short'));
 
   const wsHttp = new http.Server(app);
 
   const sessionRepo = connection.getRepository(Session);
   const sessionStore = new TypeormStore({ repository: sessionRepo });
 
-  const sessionMiddlewareConfig = {
+  // TODO : Read https://www.npmjs.com/package/express-session thoroughly to set most appropriate config
+  const sessionMiddlewareConfig: SessionOptions = {
     genid: () => {
       return uuid(); // use UUIDs for session IDs
     },
@@ -53,6 +61,7 @@ export default async function configure() {
     secret: sessionSecret,
     resave,
     saveUninitialized,
+    rolling: true,
     store: sessionStore,
     cookie: {
       maxAge: cookieMaxAge

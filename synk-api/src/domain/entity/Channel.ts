@@ -1,9 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { User } from './User';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Room } from '../../socket/models/room';
+import { ChannelConfig } from './ChannelConfig';
+import { User } from './User';
 
 @Entity()
 export class Channel {
+
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -11,16 +13,28 @@ export class Channel {
   name: string;
 
   @Column()
-  dateCreated: Date;
+  description: string;
+
+  @Column({ default: false })
+  isLocked: boolean;
+
+  @Column({ default: false })
+  isPublic: boolean;
+
+  @Column({ default: null, nullable: true })
+  password: string;
 
   @Column()
-  visibility: string;
+  dateCreated: Date;
 
   @ManyToOne(type => User, user => user.channels)
   owner: User;
 
+  @OneToMany(type => ChannelConfig, config => config.channel)
+  configs: ChannelConfig[];
+
   /**
-   * Chat Room of the channel
+   * Chat Room of the channel (socketio)
    */
   room: Room;
 }

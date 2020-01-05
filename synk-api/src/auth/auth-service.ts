@@ -10,12 +10,14 @@ import { User } from '../domain/entity/User';
 
 import { Strategy as LocalStrategy, IVerifyOptions } from 'passport-local';
 
+export type SessionOptions = session.SessionOptions & { cookieParser: any };
+
 type PassportDoneFn = (error: any, user?: any, options?: IVerifyOptions) => void;
 
 export default async function setupAuthMiddleware(
   server: Express,
   connection: Connection,
-  sessionMw: session.SessionOptions
+  sessionMw: SessionOptions
 ) {
   const userRepo = connection.getRepository(User);
 

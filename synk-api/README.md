@@ -3,20 +3,25 @@
 Steps to run this project:
 
 1. Run `npm i` command
-2. Setup database settings inside `ormconfig.json` file and other confog in `.env`
+2. Setup database settings inside `ormconfig.json` file and other confg in `.env`
+    - The .env file overwrites the ormconfig.json for db settings
 3. Run `npm start` command
 
 If DB complains about UUID, run:
 
 `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`
 
-## DB Migrations
+>(shouldn't happen if you build db the from the synk-db/Dockerfile)
 
-Are still a problem - issue with TS to JS
+## Migrations with TypeORM
+
+Run `ts-node ./node_modules/typeorm/cli.js migration:generate -n <name of migration>` to generate a migration
+
+Run `ts-node ./node_modules/typeorm/cli.js migration:run` to migrate
 
 ## Minification/Compilation/Packaging
 
-Also under construction - tsc succeeds but it bails on a typeorm error when trying to run
+See the prod.Dockerfile for the commands to compile the source
 
 ## Tech
 
@@ -24,3 +29,5 @@ Also under construction - tsc succeeds but it bails on a typeorm error when tryi
 - PassportJS
 - TypeORM
 - SocketIO
+- Docker
+- NGINX

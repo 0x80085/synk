@@ -37,10 +37,6 @@ export class MediaComponent implements OnInit {
     this.loadComponent();
   }
 
-  start(url: string) {
-    this.ref.instance.start(url);
-  }
-
   play(url: string): void {
     this.ref.instance.play(url);
   }

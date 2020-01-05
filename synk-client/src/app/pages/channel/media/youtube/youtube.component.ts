@@ -15,6 +15,8 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
   isReady = false;
   player: YT.Player;
 
+  current: string;
+
   isPlaying = () =>
     this.player && this.player.getPlayerState() === YT.PlayerState.PLAYING
 
@@ -36,14 +38,6 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
     }
   }
 
-  start(url?: string): void {
-    if (url) {
-      this.player.loadVideoById(YouTubeGetID(url), 0, 'large');
-      return;
-    }
-    this.player.playVideo();
-  }
-
   play(url: string): void {
 
     if (!this.isReady) {
@@ -53,12 +47,14 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
         while (!isContinue) {
           await sleep(1000);
         }
+        this.current = url;
         this.player.loadVideoById(YouTubeGetID(url), 0);
       }, 5);
       return;
     }
 
     if (url) {
+      this.current = url;
       this.player.loadVideoById(YouTubeGetID(url), 0);
     }
   }
@@ -78,7 +74,8 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
   }
 
   getCurrentUrl(): string {
-    return this.player.getVideoUrl();
+    return this.current;
+    // return this.player.getVideoUrl();
   }
 
   onPlayerReady = event => {

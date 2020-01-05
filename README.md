@@ -4,7 +4,7 @@
 
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/0x80085/synk/graphs/commit-activity) [![Website synkd.tv](https://img.shields.io/website-up-down-green-red/http/synkd.tv.svg)](https://synkd.tv/) [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://tldrlegal.com/license/mit-license) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com) [![GitHub contributors](https://img.shields.io/github/contributors/0x80085/synk)](https://github.com/0x80085/synk/graphs/contributors/) [![Dockerized](https://img.shields.io/static/v1?label=&message=Dockerized&logo=docker&color=0db7ed)](https://www.docker.com/) [![Open Source Love svg2](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://www.gnu.org/philosophy/floss-and-foss.en.html)
 
-## Install 
+## Install
 
 Run `npm i` in all folders that contain a package.json
 
@@ -25,7 +25,7 @@ Getting the YT namespace error? Execute `npm i @types/youtube`.
 
 ### Run with Docker
 
-**No need to have postgres installed when using Docker, the compose file will spin up a PostGres DB  container**
+>No need to have postgres installed when using Docker, the compose file will spin up a PostGres DB  container
 
 Install docker and also docker-compose.
 
@@ -46,22 +46,21 @@ Or use the shortcut definied n package.json:
 
 ### Front end
 
-[![made-with-Angular](https://img.shields.io/badge/Angular-1f425f.svg)](https://angular.io/) 
+[![made-with-Angular](https://img.shields.io/badge/Angular-1f425f.svg)](https://angular.io/)
 [![made-with-Ant-Design](https://img.shields.io/badge/Ant%20Design-1f425f.svg)](https://ng.ant.design/)
 
 ### Back end
 
-[![made-with-TypeORM](https://img.shields.io/badge/TypeORM-1f425f.svg)](https://github.com/typeorm/typeorm) 
-[![made-with-ExpressJS](https://img.shields.io/badge/ExpressJS-1f425f.svg)](https://expressjs.com/) 
+[![made-with-TypeORM](https://img.shields.io/badge/TypeORM-1f425f.svg)](https://github.com/typeorm/typeorm)
+[![made-with-ExpressJS](https://img.shields.io/badge/ExpressJS-1f425f.svg)](https://expressjs.com/)
 [![made-with-Passport](https://img.shields.io/badge/Passport-1f425f.svg)](http://www.passportjs.org/)
 
-
-## Todo 
+## Todo
 
 - Config script for DB
 - More docs
 - DB Migration scripts
-- Moderation 
+- Moderation
 - Custom emoji support
 - Deploy steps/script
 - Channel customization support
@@ -73,23 +72,24 @@ Or use the shortcut definied n package.json:
 - Playlist control
 - 404 pages server and client
 
-
-## Under construction at time of writing 
+## Under construction at time of writing
 
 - user update + config settings
 - user channels management
 - connect Channels table to rooms socketio concept
 - Docker support
 - db migration scripts
+- create better playlist component
+- fix scroll issue on chatbox
 
 ...next up
 
 - General styling
 - Introduce and model (some also in db) more concepts like playlist, roles, skips, room management/media management
-    - Channel
-    - User
+  - Channel
+  - User
     - ...?
 - channel config settings
 - concoct strategy for scraping videos
 - ratelimiting and security
-- prepare deployment
+- prepare deployment (azure arm templates)

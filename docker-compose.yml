@@ -13,7 +13,7 @@ services:
   synk-api:
     build: 
         context: ./synk-api
-        dockerfile: ./Dockerfile
+        dockerfile: ./prod.Dockerfile
     ports: 
       - 3000:3000
     links:

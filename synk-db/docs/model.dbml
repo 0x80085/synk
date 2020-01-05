@@ -1,0 +1,112 @@
+//// -- In DBML Format  
+//// -- Use https://dbdiagram.io/ to visualize
+
+// Creating tables
+Table UserConfigs {
+  id int [pk]
+  userId int [ref: - U.id, not null]
+  isLocked bit [default: 0]
+}
+
+Table Users as U {
+  id int [pk]
+  username varchar
+  dateCreated timestamp
+  passwordHash varchar
+  isAdmin bit [default: 0]
+  lastSeen date
+  avatarUrl varchar
+}
+
+Table Session {
+  id int [pk]
+  expiresAt int
+  data varchar
+}
+
+Table Videos {
+  url varchar
+  playlistId int [ref: > P.id, not null] 
+  addedBy int [ref: > U.id, not null]
+  positionInList int
+  dateAdded date
+}
+
+Table Playlists as P {
+  id int [pk]
+  createdBy int [ref: > U.id, not null]
+  isLocked bit [default: 0]
+}
+
+Table ChannelPlaylists {
+  channelId int [ref: > C.id, not null] 
+  playlistId int [ref: > P.id, not null]
+  addedBy int [ref: > U.id, not null]
+}
+
+Table Channels as C {
+  id int [pk]
+  name varchar
+  description varchar
+  owner int [ref: > U.id, not null]
+  isLocked bit [default: 0]
+  isPublic bit [default: 1]
+  password varchar
+  dateCreated date
+}
+
+Table ChannelConfigs {
+  id int [pk]
+  channelId int [ref: > C.id, not null]
+  name varchar
+  isActivated bit [default: 1]
+  logFileUrl varchar
+  customValue JSON
+  MOTD varchar
+  bannerUrl varchar
+  coverUrl varchar
+  logoUrl varchar
+  emojiListUrl varchar
+}
+
+Table Roles as R {
+  id int [pk]
+  name varchar
+  level int
+  channelId int [ref: > C.id, not null]
+  userId int [ref: > U.id, not null]
+}
+
+
+Table Permssion as PM {
+  id int [pk]
+  name varchar
+  value varchar
+  requiredLevel int
+  isActive bit [default: 1]
+  channelId int [ref: > C.id]
+  userId int [ref: > U.id, not null]
+  roleID int [ref: > R.id]
+}
+
+Table Bans {
+  id int [pk]
+  userId int [ref: > U.id]
+  channelId int [ref: > C.id]
+  IP varchar
+  isGlobal bit [default: 0]
+  reason varchar
+}
+
+Table GlobalSettings {
+  logoUrl varchar
+  maxUsersInRoom int
+  maxRooms int
+  homepageAnnouncement varchar
+  isRegistrationLocked bit
+  isChannelCreationLocked bit
+  currentTheme varchar
+  allowedImageHostingProviders JSON
+  
+}
+

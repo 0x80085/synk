@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction, RequestHandler } from 'express';
+import { Request, Response } from 'express';
 
-import { RoomService } from '../../socket/services/room-service';
 import { Room } from '../../socket/models/room';
+import { RoomService } from '../../socket/services/room-service';
 
 export interface RoomDto {
   roomName: string;

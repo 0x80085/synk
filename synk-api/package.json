@@ -7,20 +7,21 @@
     "start": "ts-node src/index.ts",
     "watch-ts": "tsc -w",
     "watch-node": "nodemon dist/index.js",
-    "db:migrate:gen": "ts-node ./node_modules/.bin/typeorm migration:generate",
-    "db:migrate:run": "ts-node ./node_modules/.bin/typeorm migration:run"
+    "db:migrate:run": "ts-node ./node_modules/typeorm/cli.js migration:run"
   },
   "author": "gonzhq",
   "license": "MIT",
   "dependencies": {
     "bcrypt": "^3.0.7",
     "body-parser": "^1.19.0",
+    "compression": "^1.7.4",
     "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-session": "^1.17.0",
     "express-validator": "^6.3.0",
+    "morgan": "^1.9.1",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "passport.socketio": "^3.7.0",
@@ -32,6 +33,8 @@
     "uuid": "^3.3.3"
   },
   "devDependencies": {
+    "@types/compression": "^1.0.1",
+    "@types/morgan": "^1.7.37",
     "@types/bcrypt": "^3.0.0",
     "@types/dotenv": "^8.2.0",
     "@types/express-validator": "^3.0.0",
