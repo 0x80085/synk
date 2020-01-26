@@ -75,6 +75,7 @@ export const postSignup: RequestHandler = async (
   res: Response,
   next: NextFunction
 ) => {
+
   check(req.body.username, 'username not valid').isLength({ min: 4 });
   check(
     req.body.password,
@@ -98,8 +99,11 @@ export const postSignup: RequestHandler = async (
     return res.status(400).send(['error', 'user already exists']);
   }
 
+  const firstUser = await connection.manager.find(User, { take: 1 });
+  const isAdmin = firstUser == null;
+
   const hash = await bcrypt.hash(req.body.password, 10);
-  const newRecord = User.create(req.body.username, hash);
+  const newRecord = User.create(req.body.username, hash, isAdmin);
 
   await connection.manager.save(newRecord);
 

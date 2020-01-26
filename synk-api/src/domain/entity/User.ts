@@ -37,11 +37,12 @@ export class User {
   @OneToMany(type => Channel, channel => channel.owner, { nullable: true })
   channels: Channel[];
 
-  static create(username: string, passwordHash: string) {
+  static create(username: string, passwordHash: string, isAdmin: boolean) {
     const u = new User();
     u.username = username;
     u.passwordHash = passwordHash;
     u.dateCreated = new Date();
+    u.isAdmin = isAdmin;
     return u;
   }
 
