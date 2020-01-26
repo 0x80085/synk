@@ -1,6 +1,7 @@
 import { NextFunction, RequestHandler, Response } from 'express';
 import { check, validationResult } from 'express-validator';
 import { FindConditions, getConnection } from 'typeorm';
+
 import { Playlist } from '../../domain/entity/Playlist';
 import { User } from '../../domain/entity/User';
 import { Video } from '../../domain/entity/Video';
@@ -34,7 +35,7 @@ export const getPlaylistById = async (req: PassportRequest, res: Response) => {
 
 /**
  * GET /user/playlists
- * Playlists of current user by name
+ * Returns playlists of current user
  */
 export const getPlaylistsOfUser = async (req: PassportRequest, res: Response) => {
   const connection = getConnection();
@@ -55,7 +56,7 @@ export const getPlaylistsOfUser = async (req: PassportRequest, res: Response) =>
 
 /**
  * `POST /create-playlist`
- * Creates a playlist
+ * Create a playlist
  */
 export const createRoom: RequestHandler = async (
   req: PassportRequest,
@@ -100,7 +101,7 @@ export const createRoom: RequestHandler = async (
 
 /**
  * DELETE /playlist?id=xx
- * Deletes a playlist by id.
+ * Delete a playlist w id.
  */
 export const deletePlaylist = async (req: PassportRequest, res: Response) => {
   try {
@@ -133,7 +134,7 @@ export const deletePlaylist = async (req: PassportRequest, res: Response) => {
 
 /**
  * PUT /playlist/:playlistId/video
- * Add video to playlist
+ * Add video to playlist (must be curernt user owned playlist)
  */
 export const AddVideoToList = async (req: PassportRequest, res: Response) => {
   try {
