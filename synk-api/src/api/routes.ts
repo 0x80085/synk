@@ -3,6 +3,7 @@ import { Request, Response } from 'express-serve-static-core';
 
 import * as userController from './controllers/user';
 import * as chatroomController from './controllers/chat-room';
+import * as playlistController from './controllers/playlist';
 import * as auth from '../auth/auth-service';
 import { RoomService } from '../socket/services/room-service';
 import { NextFunction } from 'connect';
@@ -62,4 +63,63 @@ export function setupRoutes(
     (req: Request, res: Response) =>
       chatroomController.createRoom(req, res, roomService)
   );
+
+  /**
+   * Playlist Routes
+   */
+
+  /**
+   * GET /playlist/:playlistId
+   * Gets a playlist by id.
+   */
+  app.get(
+    '/playlist/:playlistId',
+    (req: Request, res: Response, next: NextFunction) =>
+      auth.ensureAuthenticated(req, res, next),
+    playlistController.getPlaylistById
+  );
+
+
+  /**
+   * GET /user/playlists
+   * Returns playlists of current user
+   */
+  app.get(
+    '/user/playlists',
+    (req: Request, res: Response, next: NextFunction) =>
+      auth.ensureAuthenticated(req, res, next),
+    playlistController.getPlaylistsOfUser
+  );
+
+  /**
+   * `POST /playlist/:name`
+   * Create a playlist
+   */
+  app.post(
+    '/playlist/:name',
+    (req: Request, res: Response, next: NextFunction) =>
+      auth.ensureAuthenticated(req, res, next),
+    playlistController.createPlaylist
+  );
+  /**
+   * DELETE /playlist/:playlistId
+   * Delete a playlist w id.
+   */
+  app.delete(
+    '/playlist/:playlistId',
+    (req: Request, res: Response, next: NextFunction) =>
+      auth.ensureAuthenticated(req, res, next),
+    playlistController.deletePlaylist
+  );
+  /**
+   * PUT /playlist/:playlistId/video
+   * Add video to playlist (must be curernt user owned playlist)
+   */
+  app.put(
+    '/playlist/:playlistId',
+    (req: Request, res: Response, next: NextFunction) =>
+      auth.ensureAuthenticated(req, res, next),
+    playlistController.addVideoToList
+  );
+
 }

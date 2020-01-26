@@ -58,7 +58,7 @@ export const getPlaylistsOfUser = async (req: PassportRequest, res: Response) =>
  * `POST /create-playlist`
  * Create a playlist
  */
-export const createRoom: RequestHandler = async (
+export const createPlaylist: RequestHandler = async (
   req: PassportRequest,
   res: Response,
   next: NextFunction
@@ -136,7 +136,7 @@ export const deletePlaylist = async (req: PassportRequest, res: Response) => {
  * PUT /playlist/:playlistId/video
  * Add video to playlist (must be curernt user owned playlist)
  */
-export const AddVideoToList = async (req: PassportRequest, res: Response) => {
+export const addVideoToList = async (req: PassportRequest, res: Response) => {
   try {
     const connection = getConnection();
 
