@@ -3,7 +3,6 @@ import { Request, Response } from 'express-serve-static-core';
 import { NextFunction } from 'connect';
 
 import * as auth from '../auth/auth-service';
-import { RoomService } from '../socket/services/room-service';
 
 export interface RouteOptions {
   route: string;
@@ -23,6 +22,7 @@ export function setupRoute(
   if (opts.requireAuthentication) {
     defaultHandlers.push((req: Request, res: Response, next: NextFunction) =>
       auth.ensureAuthenticated(req, res, next));
+    // // (req: Request, res: Response, next: NextFunction, err: any)  => ErrorMiddleware
   }
 
   const routeProduct = [
@@ -34,35 +34,30 @@ export function setupRoute(
     case 'GET':
       app.get(opts.route,
         ...routeProduct,
-        // // (req: Request, res: Response, next: NextFunction, err: any)  => ErrorMiddleware
       );
 
       break;
     case 'POST':
       app.post(opts.route,
-        ...routeProduct,
-        // // (req: Request, res: Response, next: NextFunction, err: any)  => ErrorMiddleware
+        ...routeProduct
       );
 
       break;
     case 'PUT':
       app.put(opts.route,
-        ...routeProduct,
-        // // (req: Request, res: Response, next: NextFunction, err: any)  => ErrorMiddleware
+        ...routeProduct
       );
 
       break;
     case 'DELETE':
       app.delete(opts.route,
-        ...routeProduct,
-        // // (req: Request, res: Response, next: NextFunction, err: any)  => ErrorMiddleware
+        ...routeProduct
       );
 
       break;
     case 'PATCH':
       app.patch(opts.route,
-        ...routeProduct,
-        // // (req: Request, res: Response, next: NextFunction, err: any)  => ErrorMiddleware
+        ...routeProduct
       );
 
       break;
@@ -70,8 +65,7 @@ export function setupRoute(
 
     default:
       app.get(opts.route,
-        ...routeProduct,
-        // // (req: Request, res: Response, next: NextFunction, err: any)  => ErrorMiddleware
+        ...routeProduct
       );
       break;
   }
