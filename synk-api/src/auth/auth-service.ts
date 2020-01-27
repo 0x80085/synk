@@ -28,40 +28,55 @@ export default async function setupAuthMiddleware(
       password: string,
       done: PassportDoneFn
     ) => {
-      const user = await userRepo.findOne({ username });
+      try {
+        const user = await userRepo.findOne({ username });
 
-      if (!user) {
-        done(null, false, { message: 'Could not find that user' });
-      } else {
-        const passwordIsCorrect = await bcrypt.compare(
-          password,
-          user.passwordHash
-        );
-
-        if (passwordIsCorrect) {
-          setTimeout(() => done(null, user), Math.floor(Math.random() * 20));
+        if (!user) {
+          done(null, false, { message: 'Could not find that user' });
         } else {
-          setTimeout(
-            () => done(null, false, { message: 'Incorrect password' }),
-            Math.floor(Math.random() * 20)
+          const passwordIsCorrect = await bcrypt.compare(
+            password,
+            user.passwordHash
           );
+
+          if (passwordIsCorrect) {
+            setTimeout(() => done(null, user), Math.floor(Math.random() * 20));
+          } else {
+            setTimeout(
+              () => done(null, false, { message: 'Incorrect password' }),
+              Math.floor(Math.random() * 20)
+            );
+          }
         }
+      } catch (error) {
+        console.log('serializeUser error', error);
+        done({ message: 'Something went wrong' }, null);
       }
+
     })
   );
 
   passport.serializeUser((user: User, done: PassportDoneFn) => {
-
-    done(null, { id: user.id, username: user.username });
+    try {
+      done(null, { id: user.id, username: user.username });
+    } catch (error) {
+      console.log('use error', error);
+      done({ message: 'Something went wrong' }, null);
+    }
   });
 
   passport.deserializeUser(
     async ({ id }: { id: string; username: string }, done) => {
-      const user = await userRepo.findOne({ where: { id } });
-      if (user) {
-        done(null, { id: user.id, username: user.username });
-      } else {
-        done('404', null);
+      try {
+        const user = await userRepo.findOne({ where: { id } });
+        if (user) {
+          done(null, { id: user.id, username: user.username });
+        } else {
+          done('404', null);
+        }
+      } catch (error) {
+        console.log('deserializeUser error', error);
+        done({ message: 'Something went wrong' }, null);
       }
     }
   );
@@ -77,19 +92,29 @@ export function ensureAuthenticated(
   next: (err?: any) => void,
   socket?: socketio.Socket
 ) {
-  const isAuthenticated = socket
-    ? socket.client.request.isAuthenticated()
-    : req.isAuthenticated();
 
-  if (!isAuthenticated) {
-    if (socket) {
-      console.log(socket.client.request.session);
+  try {
+    const isAuthenticated = socket
+      ? socket.client.request.isAuthenticated()
+      : req.isAuthenticated();
 
-      return next(new Error('authentication error'));
-    } else {
-      return res.sendStatus(403);
+    if (!isAuthenticated) {
+      if (socket) {
+        console.log(socket.client.request.session);
+
+        return next(new Error('authentication error'));
+      } else {
+        return res.sendStatus(403);
+      }
     }
+
+    next();
+
+  } catch (error) {
+
+    console.log('ensureAuthenticated error', error);
+    return next(new Error('authentication error'));
+
   }
 
-  next();
 }
