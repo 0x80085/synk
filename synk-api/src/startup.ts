@@ -14,7 +14,7 @@ import { createConnection } from 'typeorm';
 import { TypeormStore } from 'typeorm-store';
 
 import setupAuthMiddleware, { SessionOptions } from './auth/auth-service';
-import { setupRoutes } from './api/routes';
+import { setupRouting } from './api/routes';
 import { setupSockets } from './socket/setup';
 import { Session } from './domain/entity/Session';
 
@@ -81,7 +81,7 @@ export default async function configure() {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  setupRoutes(app, roomService);
+  setupRouting(app, roomService, {});
 
   return { wsHttp };
 }

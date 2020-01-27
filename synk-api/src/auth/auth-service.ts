@@ -91,5 +91,5 @@ export function ensureAuthenticated(
     }
   }
 
-  return next();
+  next();
 }
