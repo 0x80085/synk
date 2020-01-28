@@ -45,7 +45,7 @@ export default async function setupAuthMiddleware(
               Math.floor(Math.random() * 20));
           } else {
             setTimeout(
-              () => done({ message: 'Not found' }, null),
+              () => done({ statusCode: 404, message: 'Not found' }, null),
               Math.floor(Math.random() * 20)
             );
           }

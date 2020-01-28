@@ -56,7 +56,7 @@ const ALL_ROUTES = (roomService: RoomService): RouteOptions[] => [
   {
     route: '/logout',
     handlers: [userController.getLogout],
-    requireAuthentication: true,
+    requireAuthentication: false,
     verb: 'GET'
   },
   {
