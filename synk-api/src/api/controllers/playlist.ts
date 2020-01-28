@@ -21,7 +21,7 @@ export const getPlaylistById = async (req: PassportRequest, res: Response) => {
   const ls = await connection.manager.findOne(Playlist, { where: qry });
 
   if (!ls) {
-    return res.status(404).send('Not found');
+    return res.status(404).json('Not found');
   }
 
   const lst = {
@@ -30,7 +30,7 @@ export const getPlaylistById = async (req: PassportRequest, res: Response) => {
     id: ls.id
   };
 
-  res.status(200).send(lst);
+  res.status(200).json(lst);
 };
 
 /**
@@ -46,12 +46,12 @@ export const getPlaylistsOfUser = async (req: PassportRequest, res: Response) =>
   const user = await connection.manager.findOne(User, { where: qry });
 
   if (!user) {
-    return res.status(404).send('Not found');
+    return res.status(404).json('Not found');
   }
 
   const playlists = user.playlists.map(ls => ({ name: ls.name, videos: ls.videos }));
 
-  res.status(200).send(playlists);
+  res.status(200).json(playlists);
 };
 
 /**
@@ -71,7 +71,7 @@ export const createPlaylist: RequestHandler = async (
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-      return res.status(400).send(['error signup', errors]);
+      return res.status(400).json(['error signup', errors]);
     }
 
     const connection = getConnection();
@@ -90,11 +90,11 @@ export const createPlaylist: RequestHandler = async (
     await connection.manager.save(user);
     // await connection.manager.save(ls); ?
 
-    res.status(200).send('OK');
+    res.status(200).json('OK');
   } catch (error) {
     console.log(error);
 
-    res.status(500).send('ERROR - playlist not created');
+    res.status(500).json('ERROR - playlist not created');
   }
 };
 
@@ -113,7 +113,7 @@ export const deletePlaylist = async (req: PassportRequest, res: Response) => {
     const ls = await connection.manager.findOne(Playlist, { where: qry });
 
     if (!ls) {
-      return res.status(404).send('Not found');
+      return res.status(404).json('Not found');
     }
 
     await connection.manager.delete(Playlist, { where: qry });
@@ -124,9 +124,9 @@ export const deletePlaylist = async (req: PassportRequest, res: Response) => {
       id: ls.id
     };
 
-    res.status(200).send(lst);
+    res.status(200).json(lst);
   } catch (error) {
-    res.status(500).send(`Error`);
+    res.status(500).json(`Error`);
   }
 };
 
@@ -149,7 +149,7 @@ export const addVideoToList = async (req: PassportRequest, res: Response) => {
     const ls = user.playlists.filter(p => p.id === req.params.playlistId)[0];
 
     if (!ls) {
-      return res.status(404).send('Not found');
+      return res.status(404).json('Not found');
     }
 
     const vid: Video = Video.create(req.body.url);
@@ -159,8 +159,8 @@ export const addVideoToList = async (req: PassportRequest, res: Response) => {
 
     await connection.manager.save(ls);
 
-    res.status(200).send('OK');
+    res.status(200).json('OK');
   } catch (error) {
-    res.status(500).send(`Error`);
+    res.status(500).json(`Error`);
   }
 };
