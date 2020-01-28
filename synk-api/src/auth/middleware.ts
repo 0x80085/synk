@@ -32,7 +32,7 @@ export default async function setupAuthMiddleware(
         const user = await userRepo.findOne({ username });
 
         if (!user) {
-          done(null, false, { message: 'Could not find that user' });
+          return done(null, false, { message: 'Could not find that user' });
         } else {
           const passwordIsCorrect = await bcrypt.compare(
             password,
@@ -40,17 +40,19 @@ export default async function setupAuthMiddleware(
           );
 
           if (passwordIsCorrect) {
-            setTimeout(() => done(null, user), Math.floor(Math.random() * 20));
+            setTimeout(() =>
+              done(null, user),
+              Math.floor(Math.random() * 20));
           } else {
             setTimeout(
-              () => done(null, false, { message: 'Incorrect password' }),
+              () => done({ message: 'Not found' }, null),
               Math.floor(Math.random() * 20)
             );
           }
         }
       } catch (error) {
-        console.log('serializeUser error', error);
-        done({ message: 'Something went wrong' }, null);
+        console.log('use error', error);
+        return done({ message: 'Something went wrong' }, null);
       }
 
     })
@@ -60,7 +62,7 @@ export default async function setupAuthMiddleware(
     try {
       done(null, { id: user.id, username: user.username });
     } catch (error) {
-      console.log('use error', error);
+      console.log('serializeUser error', error);
       done({ message: 'Something went wrong' }, null);
     }
   });
@@ -72,7 +74,7 @@ export default async function setupAuthMiddleware(
         if (user) {
           done(null, { id: user.id, username: user.username });
         } else {
-          done('404', null);
+          done({ message: 'Not found' }, null);
         }
       } catch (error) {
         console.log('deserializeUser error', error);

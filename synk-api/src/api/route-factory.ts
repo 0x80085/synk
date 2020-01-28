@@ -1,8 +1,7 @@
 import * as express from 'express';
-import { Request, Response } from 'express-serve-static-core';
-import { NextFunction } from 'connect';
+import { Request, Response, NextFunction } from 'express-serve-static-core';
 
-import * as auth from '../auth/auth-service';
+import * as auth from '../auth/middleware';
 
 export interface RouteOptions {
   route: string;
@@ -16,13 +15,11 @@ export function setupRoute(
   logger: any,
   opts: RouteOptions
 ) {
-
   const defaultHandlers = [];
 
   if (opts.requireAuthentication) {
     defaultHandlers.push((req: Request, res: Response, next: NextFunction) =>
       auth.ensureAuthenticated(req, res, next));
-    // // (req: Request, res: Response, next: NextFunction, err: any)  => ErrorMiddleware
   }
 
   const routeProduct = [
@@ -61,7 +58,6 @@ export function setupRoute(
       );
 
       break;
-
 
     default:
       app.get(opts.route,

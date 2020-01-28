@@ -6,9 +6,14 @@ import * as chatroomController from './controllers/chat-room';
 import * as playlistController from './controllers/playlist';
 import { RoomService } from '../socket/services/room-service';
 import { RouteOptions, setupRoute } from './route-factory';
+import { ErrorMeow } from './error-handler';
 
 const isAliveHandler = (req: Request, res: Response) => {
-  res.send('ฅ^•ﻌ•^ฅ');
+  res.json('ฅ^•ﻌ•^ฅ');
+};
+
+const testErrorMeowHandler = (req: Request, res: Response) => {
+  throw new ErrorMeow(500, 'GeneratedtestErrorMeowHandler');
 };
 
 const ALL_ROUTES = (roomService: RoomService): RouteOptions[] => [
@@ -106,6 +111,12 @@ const ALL_ROUTES = (roomService: RoomService): RouteOptions[] => [
     handlers: [playlistController.addVideoToList],
     requireAuthentication: true,
     verb: 'PUT'
+  },
+  {
+    route: '/error',
+    handlers: [testErrorMeowHandler],
+    requireAuthentication: false,
+    verb: 'GET'
   },
 ];
 
