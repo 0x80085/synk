@@ -23,4 +23,10 @@ export class Video {
   @ManyToMany(type => Playlist, playlist => playlist.videos)
   playlist: Playlist;
 
+  static create(url: any): Video {
+    const video = new Video();
+    video.url = url;
+    video.dateAdded = new Date();
+    return video;
+  }
 }

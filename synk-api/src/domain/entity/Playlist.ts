@@ -8,7 +8,10 @@ export class Playlist {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({default: false})
+  @Column()
+  name: string;
+
+  @Column({ default: false })
   isLocked: boolean;
 
   @ManyToOne(type => User, user => user.playlists)
@@ -16,5 +19,11 @@ export class Playlist {
 
   @ManyToMany(type => Video, video => video.playlist)
   videos: Video[];
+
+  static create(name: string) {
+    const ls = new Playlist();
+    ls.name = name;
+    return ls;
+  }
 
 }

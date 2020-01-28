@@ -3,7 +3,7 @@ import * as socketio from 'socket.io';
 import * as passportSocketIo from 'passport.socketio';
 
 import { RoomService } from './services/room-service';
-import { SessionOptions } from '../auth/auth-service';
+import { SessionOptions } from '../auth/middleware';
 import { Store } from 'express-session';
 
 export function setupSockets(

@@ -21,6 +21,7 @@ RUN()
     console.error(`\t SERVER CRASHED`);
     console.error(`\t><::> ###################><::> ########`);
     console.error(err);
+    process.exit(1);
   })
   .finally(() => {
     // send telegram when kill? npm install telegraf
