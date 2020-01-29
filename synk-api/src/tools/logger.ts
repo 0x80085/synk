@@ -4,13 +4,13 @@ import * as path from 'path';
 
 export class Logger {
 
-  writer: bunyan;
-
-  isDebugMode = false;
+  private writer: bunyan;
+  private isDebugMode = false;
 
   constructor(folderName: string, fileName: string, isDebugMode: boolean) {
     this.isDebugMode = isDebugMode;
     const pathToLog = this.createLogFile(folderName, fileName);
+
     this.start(pathToLog);
   }
 
@@ -53,6 +53,7 @@ export class Logger {
   private getAndCreateFilePath(folder: string, fileName: string) {
     const targetFolder = path.join(process.cwd(), folder);
     const targetFile = path.join(process.cwd(), folder, fileName);
+
     return { targetFile, targetFolder };
   }
 
