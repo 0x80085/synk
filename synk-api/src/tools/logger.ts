@@ -15,19 +15,31 @@ export class Logger {
   }
 
   info(msg: string) {
+    this.debugInfo('info', msg);
     this.writer.info(msg);
   }
 
   debug(msg: string) {
+    this.debugInfo('debug', msg);
     this.writer.debug(msg);
   }
 
   error(msg: string) {
+    this.debugInfo('error', msg);
     this.writer.error(msg);
   }
 
   fatal(msg: string) {
+    this.debugInfo('fatal', msg);
     this.writer.fatal(msg);
+  }
+
+  private now = () => new Date().toISOString();
+
+  private debugInfo(severity: string, entry: any) {
+    if (this.isDebugMode) {
+      console.log(`[${this.now()}]\t[${severity}]\t:: ${entry}`);
+    }
   }
 
   private initLogFile(folder: string, fileName: string) {
@@ -39,7 +51,7 @@ export class Logger {
       if (!fs.existsSync(targetFolder)) {
         fs.mkdirSync(targetFolder);
       }
-      fs.writeFileSync(targetFile, `[${now}] _INFO_ :: Logger Launched`);
+      fs.writeFileSync(targetFile, `[${now}] _INFO_ :: File created by Logger`);
     }
 
     return targetFile;
@@ -58,4 +70,5 @@ export class Logger {
       }]
     });
   }
+
 }
