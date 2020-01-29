@@ -6,6 +6,7 @@ import { Playlist } from '../../domain/entity/Playlist';
 import { User } from '../../domain/entity/User';
 import { Video } from '../../domain/entity/Video';
 import { PassportRequest } from './user';
+import { Logger } from '../../tools/logger';
 
 
 /**
@@ -58,10 +59,11 @@ export const getPlaylistsOfUser = async (req: PassportRequest, res: Response) =>
  * `POST /create-playlist`
  * Create a playlist
  */
-export const createPlaylist: RequestHandler = async (
+export const createPlaylist = async (
   req: PassportRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
+  logger: Logger
 ) => {
 
   try {
@@ -92,7 +94,7 @@ export const createPlaylist: RequestHandler = async (
 
     res.status(200).json('OK');
   } catch (error) {
-    console.log(error);
+    logger.info(error);
 
     res.status(500).json('ERROR - playlist not created');
   }

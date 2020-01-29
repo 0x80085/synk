@@ -2,6 +2,7 @@ import * as express from 'express';
 import { Request, Response, NextFunction } from 'express-serve-static-core';
 
 import * as auth from '../auth/middleware';
+import { Logger } from '../tools/logger';
 
 export interface RouteOptions {
   route: string;
@@ -12,14 +13,14 @@ export interface RouteOptions {
 
 export function setupRoute(
   app: express.Application,
-  logger: any,
+  logger: Logger,
   opts: RouteOptions
 ) {
   const defaultHandlers = [];
 
   if (opts.requireAuthentication) {
     defaultHandlers.push((req: Request, res: Response, next: NextFunction) =>
-      auth.ensureAuthenticated(req, res, next));
+      auth.ensureAuthenticated(req, res, next, logger));
   }
 
   const routeProduct = [

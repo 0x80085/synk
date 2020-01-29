@@ -5,37 +5,49 @@ import * as passportSocketIo from 'passport.socketio';
 import { RoomService } from './services/room-service';
 import { SessionOptions } from '../auth/middleware';
 import { Store } from 'express-session';
+import { Logger } from '../tools/logger';
 
 export function setupSockets(
   wsHttp: http.Server,
-  sessionMiddleware: SessionOptions
+  sessionMiddleware: SessionOptions,
+  logger: Logger
 ) {
   const io = socketio(wsHttp);
 
-  const roomService = new RoomService(io);
+  const roomService = new RoomService(io, logger);
 
   const socketPassportConfig = {
     key: 'connect.sid', // make sure is the same as in your session settings in app.js
     secret: sessionMiddleware.secret as string, // make sure is the same as in your session settings in app.js
     store: sessionMiddleware.store as Store, // you need to use the same sessionStore you defined in the app.use(session({... in app.js
-    success: onAuthorizeSuccess, // *optional* callback on success
-    fail: onAuthorizeFail // *optional* callback on fail/error
+    success: (socket: socketio.Socket, next: (err?: any) => void) => {
+      return onAuthorizeSuccess(socket, next, logger);
+    }, // *optional* callback on success
+    fail: (
+      data: socketio.Socket,
+      message: string,
+      error: string,
+      next: (err?: any) => void
+    ) => {
+      return onAuthorizeFail(data, message, error, next, logger);
+    },
   };
 
   // Set up the Socket.IO server
   io
     .use(passportSocketIo.authorize(socketPassportConfig))
     .use(roomService.registerCommands)
-    .on('connection', (socket) => console.log(`${socket.request.user.username} connected to socket server`));
+    .on('connection', (socket) => logger.info(`${socket.request.user.username} connected to socket server`));
 
   return { roomService };
 }
 
 function onAuthorizeSuccess(
   socket: socketio.Socket,
-  next: (err?: any) => void
+  next: (err?: any) => void,
+  logger: Logger
 ) {
-  console.log('success connection to socket.io:');
+  logger.info('success connection to socket.io:');
   next();
 }
 
@@ -43,8 +55,9 @@ function onAuthorizeFail(
   data: socketio.Socket,
   message: string,
   error: string,
-  next: (err?: any) => void
+  next: (err?: any) => void,
+  logger: Logger
 ) {
-  console.log('failed connection to socket.io:', message);
+  logger.info(`failed connection to socket.io: ${error}`);
   next(new Error(message));
 }

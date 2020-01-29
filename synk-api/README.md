@@ -31,3 +31,17 @@ See the prod.Dockerfile for the commands to compile the source
 - SocketIO
 - Docker
 - NGINX
+
+## Common dev issues
+
+bcrypt complains about binaries? Try:
+
+> `npm rebuild bcrypt --update-binary`
+
+nodegyp complains about... anything
+
+> Find and install the C build (like windows-build-tools or whatever you OS is)
+
+> Make sure to have Python 2.7 installed
+
+> Follow the instructions to build node-gyp from source step by step

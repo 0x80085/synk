@@ -4,6 +4,7 @@ import { Room } from '../models/room';
 import { IncomingGroupMessage, MediaEvent } from '../models/message';
 import { SocketPassport } from '../models/socket.passport';
 import { ItemContent } from '../models/playlist-item';
+import { Logger } from '../../tools/logger';
 
 export enum Commands {
   PM = 'private message',
@@ -19,9 +20,11 @@ export class RoomService {
   private io: socketio.Server;
 
   public publicRooms: Room[] = [];
+  private logger: Logger;
 
-  constructor(sio: socketio.Server) {
+  constructor(sio: socketio.Server, logger: Logger) {
     this.io = sio;
+    this.logger = logger;
 
     const defaultRoom = new Room('SNKD', this.io, null);
     defaultRoom.description = 'Default room';
@@ -39,7 +42,7 @@ export class RoomService {
 
         this.joinRoom(socket, roomName);
       } catch (error) {
-        console.log(error);
+        this.logger.info(error);
       }
     });
 
@@ -48,7 +51,7 @@ export class RoomService {
 
         this.exitRoom(socket, roomName);
       } catch (error) {
-        console.log(error);
+        this.logger.info(error);
       }
     });
 

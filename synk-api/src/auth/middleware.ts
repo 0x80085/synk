@@ -9,6 +9,7 @@ import { Connection } from 'typeorm';
 import { User } from '../domain/entity/User';
 
 import { Strategy as LocalStrategy, IVerifyOptions } from 'passport-local';
+import { Logger } from '../tools/logger';
 
 export type SessionOptions = session.SessionOptions & { cookieParser: any };
 
@@ -17,7 +18,8 @@ type PassportDoneFn = (error: any, user?: any, options?: IVerifyOptions) => void
 export default async function setupAuthMiddleware(
   server: Express,
   connection: Connection,
-  sessionMw: SessionOptions
+  sessionMw: SessionOptions,
+  logger: Logger
 ) {
   const userRepo = connection.getRepository(User);
 
@@ -51,7 +53,7 @@ export default async function setupAuthMiddleware(
           }
         }
       } catch (error) {
-        console.log('use error', error);
+        logger.info(`use error ${error}`);
         return done({ message: 'Something went wrong' }, null);
       }
 
@@ -62,7 +64,8 @@ export default async function setupAuthMiddleware(
     try {
       done(null, { id: user.id, username: user.username });
     } catch (error) {
-      console.log('serializeUser error', error);
+      logger.info(`serializeUser error: ${error}`);
+
       done({ message: 'Something went wrong' }, null);
     }
   });
@@ -77,7 +80,7 @@ export default async function setupAuthMiddleware(
           done({ message: 'Not found' }, null);
         }
       } catch (error) {
-        console.log('deserializeUser error', error);
+        logger.info(`deserializeUser error: ${error}`);
         done({ message: 'Something went wrong' }, null);
       }
     }
@@ -92,7 +95,8 @@ export function ensureAuthenticated(
   req: Request,
   res: Response,
   next: (err?: any) => void,
-  socket?: socketio.Socket
+  logger: Logger,
+  socket?: socketio.Socket,
 ) {
 
   try {
@@ -102,7 +106,7 @@ export function ensureAuthenticated(
 
     if (!isAuthenticated) {
       if (socket) {
-        console.log(socket.client.request.session);
+        logger.info(socket.client.request.session);
 
         return next(new Error('authentication error'));
       } else {
@@ -114,7 +118,7 @@ export function ensureAuthenticated(
 
   } catch (error) {
 
-    console.log('ensureAuthenticated error', error);
+    logger.info(`ensureAuthenticated error: ${error}`);
     return next(new Error('authentication error'));
 
   }

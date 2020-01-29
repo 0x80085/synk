@@ -8,6 +8,7 @@ import { RoomService } from '../socket/services/room-service';
 import { RouteOptions, setupRoute } from './route-factory';
 import { ErrorMeow } from './error-handler';
 import { Logger } from '../tools/logger';
+import { PassportRequest } from './controllers/user';
 
 const isAliveHandler = (req: Request, res: Response) => {
   res.json('ฅ^•ﻌ•^ฅ');
@@ -17,7 +18,7 @@ const testErrorMeowHandler = (req: Request, res: Response) => {
   throw new ErrorMeow(500, 'GeneratedtestErrorMeowHandler');
 };
 
-const ALL_ROUTES = (roomService: RoomService): RouteOptions[] => [
+const ALL_ROUTES = (roomService: RoomService, logger: Logger): RouteOptions[] => [
   {
     route: '/',
     handlers: [isAliveHandler],
@@ -44,7 +45,8 @@ const ALL_ROUTES = (roomService: RoomService): RouteOptions[] => [
   },
   {
     route: '/login',
-    handlers: [userController.postLogin],
+    handlers: [(req: Request, res: Response, next: express.NextFunction) =>
+      userController.postLogin(req, res, next, logger)],
     requireAuthentication: false,
     verb: 'POST'
   },
@@ -68,9 +70,8 @@ const ALL_ROUTES = (roomService: RoomService): RouteOptions[] => [
   },
   {
     route: '/create-room',
-    handlers: [
-      (req: Request, res: Response) =>
-        chatroomController.createRoom(req, res, roomService)
+    handlers: [(req: Request, res: Response, next: express.NextFunction) =>
+      chatroomController.createRoom(req, res, roomService, logger)
     ],
     requireAuthentication: true,
     verb: 'POST'
@@ -97,7 +98,8 @@ const ALL_ROUTES = (roomService: RoomService): RouteOptions[] => [
   },
   {
     route: '/playlist/:name',
-    handlers: [playlistController.createPlaylist],
+    handlers: [(req: PassportRequest, res: Response, next: express.NextFunction) =>
+      playlistController.createPlaylist(req, res, next, logger)],
     requireAuthentication: true,
     verb: 'POST'
   },
@@ -127,7 +129,7 @@ export const setupRouting = (
   logger: Logger
 ) => {
 
-  const routes = ALL_ROUTES(roomService);
+  const routes = ALL_ROUTES(roomService, logger);
 
   routes.forEach(routeOpts => {
     setupRoute(app, logger, routeOpts);

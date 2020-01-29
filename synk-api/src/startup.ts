@@ -75,10 +75,11 @@ export default async function configure(logger: Logger) {
   const { sessionMiddleware } = await setupAuthMiddleware(
     app,
     connection,
-    sessionMiddlewareConfig
+    sessionMiddlewareConfig,
+    logger
   );
 
-  const { roomService } = setupSockets(wsHttp, sessionMiddlewareConfig);
+  const { roomService } = setupSockets(wsHttp, sessionMiddlewareConfig, logger);
 
   app.use(sessionMiddleware);
 
@@ -88,7 +89,7 @@ export default async function configure(logger: Logger) {
   setupRouting(app, roomService, logger);
 
   app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-    errorMeow(err, res);
+    errorMeow(err, res, logger);
   });
 
   return { wsHttp };

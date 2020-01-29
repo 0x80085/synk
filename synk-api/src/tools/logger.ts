@@ -10,8 +10,7 @@ export class Logger {
 
   constructor(folderName: string, fileName: string, isDebugMode: boolean) {
     this.isDebugMode = isDebugMode;
-    const pathToLog = path.join(process.cwd(), folderName, fileName);
-    this.initLogFile(pathToLog);
+    const pathToLog = this.initLogFile(folderName, fileName);
     this.start(pathToLog);
   }
 
@@ -31,11 +30,19 @@ export class Logger {
     this.writer.fatal(msg);
   }
 
-  private initLogFile(pathTo: string) {
-    if (!fs.existsSync(pathTo)) {
+  private initLogFile(folder: string, fileName: string) {
+    const targetFolder = path.join(process.cwd(), folder);
+    const targetFile = path.join(process.cwd(), folder, fileName);
+
+    if (!fs.existsSync(targetFile)) {
       const now = new Date().toISOString();
-      fs.writeFileSync(pathTo, `[${now}] _INFO_ :: Logger Launched`);
+      if (!fs.existsSync(targetFolder)) {
+        fs.mkdirSync(targetFolder);
+      }
+      fs.writeFileSync(targetFile, `[${now}] _INFO_ :: Logger Launched`);
     }
+
+    return targetFile;
   }
 
   private start(pathTo: string) {

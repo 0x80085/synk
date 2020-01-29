@@ -2,7 +2,7 @@ import configure from './startup';
 import { Logger } from './tools/logger';
 
 const isProduction = process.env.NODE_ENV === 'production';
-const logger = new Logger('logs', 'synk-api', !isProduction);
+const logger = new Logger('logs', 'trace.log', !isProduction);
 
 async function RUN() {
 

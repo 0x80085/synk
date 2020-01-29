@@ -7,6 +7,7 @@ import { IVerifyOptions } from 'passport-local';
 import { FindConditions, getConnection } from 'typeorm';
 
 import { User } from '../../domain/entity/User';
+import { Logger } from '../../tools/logger';
 
 export type PassportRequest = Request & { user: { username: string } };
 
@@ -14,12 +15,12 @@ export type PassportRequest = Request & { user: { username: string } };
  * POST /login
  * Sign in using email and password.
  */
-export const postLogin: RequestHandler = (
+export const postLogin = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
+  logger: Logger
 ) => {
-  console.log('postlogin');
   check('username', 'name cannot be blank').isLength({ min: 4 });
   check('password', 'Password cannot be blank').isLength({ min: 4 });
 
@@ -28,7 +29,6 @@ export const postLogin: RequestHandler = (
   if (!errors.isEmpty()) {
     return next({ statusCode: 400, message: 'bad request' });
   }
-  console.log('authenticate..');
 
   passport.authenticate(
     'local',
@@ -38,14 +38,14 @@ export const postLogin: RequestHandler = (
       }
       req.logIn(user, error => {
         if (error) {
-          console.log(error);
+          logger.info(error);
           return next({ statusCode: 500, message: 'Error1, try again' });
         }
         req.login(user, errnr => {
           if (!errnr) {
             return res.status(200).json('OK');
           }
-          console.log(errnr);
+          logger.info(errnr);
           return next({ statusCode: 500, message: 'Error2, try again' });
         });
       });
@@ -67,7 +67,7 @@ export const getLogout = (req: Request, res: Response, next: NextFunction) => {
  * POST /signup
  * Create a new local account.
  */
-export const postSignup: RequestHandler = async (
+export const postSignup = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -80,10 +80,6 @@ export const postSignup: RequestHandler = async (
   ).isLength({ min: 4 });
 
   const errors = validationResult(req);
-
-  console.log(errors);
-  console.log(errors.isEmpty());
-
 
   if (!errors.isEmpty()) {
     return next({ statusCode: 400, message: 'bad request' });
