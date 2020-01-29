@@ -10,7 +10,7 @@ export class Logger {
 
   constructor(folderName: string, fileName: string, isDebugMode: boolean) {
     this.isDebugMode = isDebugMode;
-    const pathToLog = this.initLogFile(folderName, fileName);
+    const pathToLog = this.createLogFile(folderName, fileName);
     this.start(pathToLog);
   }
 
@@ -43,13 +43,17 @@ export class Logger {
     }
   }
 
-  private initLogFile(folder: string, fileName: string) {
-    const targetFolder = path.join(process.cwd(), folder);
-    const targetFile = path.join(process.cwd(), folder, fileName);
-
+  private createLogFile(folder: string, fileName: string) {
+    const { targetFile, targetFolder } = this.getAndCreateFilePath(folder, fileName);
     this.createLogfileIfNotExists(targetFile, targetFolder);
 
     return targetFile;
+  }
+
+  private getAndCreateFilePath(folder: string, fileName: string) {
+    const targetFolder = path.join(process.cwd(), folder);
+    const targetFile = path.join(process.cwd(), folder, fileName);
+    return { targetFile, targetFolder };
   }
 
   private createLogfileIfNotExists(targetFile: string, targetFolder: string) {
