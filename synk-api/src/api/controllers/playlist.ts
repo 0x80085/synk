@@ -8,7 +8,6 @@ import { Video } from '../../domain/entity/Video';
 import { PassportRequest } from './user';
 import { Logger } from '../../tools/logger';
 
-
 /**
  * GET /playlist/:playlistId
  * Gets a playlist by id.

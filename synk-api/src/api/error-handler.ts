@@ -21,6 +21,6 @@ export const errorMeow = (err: any, res: Response, logger: Logger) => {
   res.status(statusCode || 500).json({
     code: 'error',
     statusCode,
-    message
+    message: message || 'oh oh ... ฅ^*ﻌ*^ฅ'
   });
 };

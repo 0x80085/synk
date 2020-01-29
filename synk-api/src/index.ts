@@ -20,11 +20,17 @@ async function RUN() {
   });
 }
 
-RUN()
-  .catch(err => {
-    logger.error(`\t SERVER CRASHED`);
-    logger.error(err);
-  })
-  .finally(() => {
-    logger.fatal('Server has ended execution. See log for errors if any.');
-  });
+try {
+  RUN()
+    .catch(err => {
+      logger.error(`\t SERVER CRASHED`);
+      logger.error(err);
+    })
+    .finally(() => {
+      // logger.info('');
+    });
+
+} catch (error) {
+  logger.fatal(error);
+  logger.fatal('Server has ended execution. See above for errors if any.');
+}

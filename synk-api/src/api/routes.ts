@@ -4,11 +4,13 @@ import { Request, Response } from 'express-serve-static-core';
 import * as userController from './controllers/user';
 import * as chatroomController from './controllers/chat-room';
 import * as playlistController from './controllers/playlist';
+
 import { RoomService } from '../socket/services/room-service';
+import { PassportRequest } from './controllers/user';
 import { RouteOptions, setupRoute } from './route-factory';
+
 import { ErrorMeow } from './error-handler';
 import { Logger } from '../tools/logger';
-import { PassportRequest } from './controllers/user';
 
 const isAliveHandler = (req: Request, res: Response) => {
   res.json('ฅ^•ﻌ•^ฅ');
