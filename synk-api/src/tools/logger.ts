@@ -15,30 +15,31 @@ export class Logger {
   }
 
   info(entry: any) {
-    this.debugInfo('info', entry);
+    this.logToConsole('info', entry);
     this.writer.info(entry);
   }
 
   debug(entry: any) {
-    this.debugInfo('debug', entry);
+    this.logToConsole('debug', entry);
     this.writer.debug(entry);
   }
 
   error(entry: any) {
-    this.debugInfo('error', entry);
+    this.logToConsole('error', entry);
     this.writer.error(entry);
   }
 
   fatal(entry: any) {
-    this.debugInfo('fatal', entry);
+    this.logToConsole('fatal', entry);
     this.writer.fatal(entry);
   }
 
   private now = () => new Date().toISOString();
 
-  private debugInfo(severity: string, entry: any) {
+  private logToConsole(severity: string, entry: any) {
     if (this.isDebugMode) {
-      console.log(`「${this.now()}」\t「${severity}」\t:: ${entry}`);
+      const formattedMsg = `「${this.now()}」\t「${severity}」\t:: ${entry}`;
+      console.log(formattedMsg);
     }
   }
 
@@ -46,15 +47,20 @@ export class Logger {
     const targetFolder = path.join(process.cwd(), folder);
     const targetFile = path.join(process.cwd(), folder, fileName);
 
+    this.createLogfileIfNotExists(targetFile, targetFolder);
+
+    return targetFile;
+  }
+
+  private createLogfileIfNotExists(targetFile: string, targetFolder: string) {
     if (!fs.existsSync(targetFile)) {
       const now = new Date().toISOString();
       if (!fs.existsSync(targetFolder)) {
         fs.mkdirSync(targetFolder);
       }
-      fs.writeFileSync(targetFile, `「${now}」 _INFO_ :: File created by Logger`);
+      const msg = `「${now}」 _INFO_ :: File created by Logger`;
+      fs.writeFileSync(targetFile, msg);
     }
-
-    return targetFile;
   }
 
   private start(pathTo: string) {
