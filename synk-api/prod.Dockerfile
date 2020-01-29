@@ -34,8 +34,6 @@ COPY ./src ./src
 COPY ./nginx ./nginx
 
 RUN tsc
-RUN ls
-RUN cd dist
 
 ## Done Building
 
@@ -67,7 +65,6 @@ RUN rm -f /etc/nginx/conf.d/default.conf
 
 # # Remove build folder
 # RUN rm -f /synk-api/build
-# RUN ls
 
 
 # TODO: Run w PM2
