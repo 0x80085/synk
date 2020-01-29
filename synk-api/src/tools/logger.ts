@@ -14,24 +14,24 @@ export class Logger {
     this.start(pathToLog);
   }
 
-  info(msg: string) {
-    this.debugInfo('info', msg);
-    this.writer.info(msg);
+  info(entry: any) {
+    this.debugInfo('info', entry);
+    this.writer.info(entry);
   }
 
-  debug(msg: string) {
-    this.debugInfo('debug', msg);
-    this.writer.debug(msg);
+  debug(entry: any) {
+    this.debugInfo('debug', entry);
+    this.writer.debug(entry);
   }
 
-  error(msg: string) {
-    this.debugInfo('error', msg);
-    this.writer.error(msg);
+  error(entry: any) {
+    this.debugInfo('error', entry);
+    this.writer.error(entry);
   }
 
-  fatal(msg: string) {
-    this.debugInfo('fatal', msg);
-    this.writer.fatal(msg);
+  fatal(entry: any) {
+    this.debugInfo('fatal', entry);
+    this.writer.fatal(entry);
   }
 
   private now = () => new Date().toISOString();
