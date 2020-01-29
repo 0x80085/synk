@@ -19,9 +19,10 @@ import setupAuthMiddleware, { SessionOptions } from './auth/middleware';
 import { setupRouting } from './api/routes';
 import { setupSockets } from './socket/setup';
 import { Session } from './domain/entity/Session';
+import { Logger } from './tools/logger';
 import { errorMeow } from './api/error-handler';
 
-export default async function configure() {
+export default async function configure(logger: Logger) {
   dotenv.config();
 
   const port = +process.env.HOST_PORT;
@@ -74,20 +75,21 @@ export default async function configure() {
   const { sessionMiddleware } = await setupAuthMiddleware(
     app,
     connection,
-    sessionMiddlewareConfig
+    sessionMiddlewareConfig,
+    logger
   );
 
-  const { roomService } = setupSockets(wsHttp, sessionMiddlewareConfig);
+  const { roomService } = setupSockets(wsHttp, sessionMiddlewareConfig, logger);
 
   app.use(sessionMiddleware);
 
   app.use(passport.initialize());
   app.use(passport.session());
 
-  setupRouting(app, roomService, {});
+  setupRouting(app, roomService, logger);
 
   app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-    errorMeow(err, res);
+    errorMeow(err, res, logger);
   });
 
   return { wsHttp };

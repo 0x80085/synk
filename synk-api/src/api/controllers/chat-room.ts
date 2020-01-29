@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 
 import { Room } from '../../socket/models/room';
 import { RoomService } from '../../socket/services/room-service';
+import { Logger } from '../../tools/logger';
 
 export interface RoomDto {
   roomName: string;
@@ -32,7 +33,8 @@ export const getRooms = (
 export const createRoom = (
   req: Request,
   res: Response,
-  roomService: RoomService
+  roomService: RoomService,
+  logger: Logger
 ) => {
 
   try {
@@ -40,7 +42,7 @@ export const createRoom = (
 
     res.status(200).json('OK');
   } catch (error) {
-    console.log(error);
+    logger.info(error);
 
     res.status(500).json('ERROR - Room not created');
   }

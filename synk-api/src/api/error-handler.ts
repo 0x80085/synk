@@ -1,4 +1,5 @@
 import { Response } from 'express-serve-static-core';
+import { Logger } from '../tools/logger';
 
 export class ErrorMeow extends Error {
   statusCode: number;
@@ -9,17 +10,17 @@ export class ErrorMeow extends Error {
   }
 }
 
-export const errorMeow = (err: any, res: Response) => {
+export const errorMeow = (err: any, res: Response, logger: Logger) => {
   const { statusCode, message } = err;
 
   if (statusCode === 500 || !statusCode) {
     const msg = ` ฅ^•ﻌ•^ฅ < Error!! ${err ? err.statusCode : 'no status'} ${err ? err.message : 'no message'} `;
-    console.log(msg);
+    logger.info(msg);
   }
 
   res.status(statusCode || 500).json({
     code: 'error',
     statusCode,
-    message
+    message: message || 'oh oh ... ฅ^*ﻌ*^ฅ'
   });
 };
