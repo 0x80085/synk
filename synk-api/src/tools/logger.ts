@@ -38,7 +38,7 @@ export class Logger {
 
   private debugInfo(severity: string, entry: any) {
     if (this.isDebugMode) {
-      console.log(`[${this.now()}]\t[${severity}]\t:: ${entry}`);
+      console.log(`「${this.now()}」\t「${severity}」\t:: ${entry}`);
     }
   }
 
@@ -51,7 +51,7 @@ export class Logger {
       if (!fs.existsSync(targetFolder)) {
         fs.mkdirSync(targetFolder);
       }
-      fs.writeFileSync(targetFile, `[${now}] _INFO_ :: File created by Logger`);
+      fs.writeFileSync(targetFile, `「${now}」 _INFO_ :: File created by Logger`);
     }
 
     return targetFile;
