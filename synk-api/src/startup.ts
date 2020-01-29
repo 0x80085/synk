@@ -17,8 +17,9 @@ import setupAuthMiddleware, { SessionOptions } from './auth/auth-service';
 import { setupRoutes } from './api/routes';
 import { setupSockets } from './socket/setup';
 import { Session } from './domain/entity/Session';
+import { Logger } from './tools/logger';
 
-export default async function configure() {
+export default async function configure(logger: Logger) {
   dotenv.config();
 
   const port = +process.env.HOST_PORT;
