@@ -19,38 +19,35 @@ export const postLogin: RequestHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  check('username', 'Email is not valid').isEmail();
-  check('password', 'Password cannot be blank').isLength({ min: 1 });
+  console.log('postlogin');
+  check('username', 'name cannot be blank').isLength({ min: 4 });
+  check('password', 'Password cannot be blank').isLength({ min: 4 });
 
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    res.status(400).send(['login failed', errors]);
-    // next();
+    return next({ statusCode: 400, message: 'bad request' });
   }
+  console.log('authenticate..');
 
   passport.authenticate(
     'local',
     (err: Error, user: User, info: IVerifyOptions) => {
-      if (err) {
-        return res.status(500).send(['fatal err', err]);
-      }
       if (!user) {
-        return res.status(404).send('No user with those creds found');
+        return next({ statusCode: 404, message: 'no user with those creds found' });
       }
       req.logIn(user, error => {
         if (error) {
           console.log(error);
-          return next(error);
+          return next({ statusCode: 500, message: 'Error1, try again' });
         }
-        req.login(user, errer => {
-          if (!errer) {
-            return res.status(200).send(['ok', 'user logged in']);
+        req.login(user, errnr => {
+          if (!errnr) {
+            return res.status(200).json('OK');
           }
-          console.log(errer);
-          return next(errer);
+          console.log(errnr);
+          return next({ statusCode: 500, message: 'Error2, try again' });
         });
-        // next(user);
       });
     }
   )(req, res, next);
@@ -60,10 +57,10 @@ export const postLogin: RequestHandler = (
  * GET /logout
  * Log out.
  */
-export const getLogout = (req: Request, res: Response) => {
+export const getLogout = (req: Request, res: Response, next: NextFunction) => {
   req.logOut();
   req.logout();
-  res.status(200).json(['ok', 'user logged out']);
+  return res.status(200).json('OK');
 };
 
 /**
@@ -75,6 +72,7 @@ export const postSignup: RequestHandler = async (
   res: Response,
   next: NextFunction
 ) => {
+
   check(req.body.username, 'username not valid').isLength({ min: 4 });
   check(
     req.body.password,
@@ -83,27 +81,35 @@ export const postSignup: RequestHandler = async (
 
   const errors = validationResult(req);
 
+  console.log(errors);
+  console.log(errors.isEmpty());
+
+
   if (!errors.isEmpty()) {
-    return res.status(500).send(['error signup', errors]);
+    return next({ statusCode: 400, message: 'bad request' });
+  } else {
+    const connection = getConnection();
+
+    const qry: FindConditions<User> = {
+      username: req.body.username
+    };
+    const users = await connection.manager.find(User, { where: qry });
+
+    if (users.length > 0) {
+      return res.status(400).json(['error', 'user already exists']);
+    } else {
+
+      const userLs = await connection.manager.find(User, { take: 1 });
+      const isAdmin = userLs.length === 0;
+
+      const hash = await bcrypt.hash(req.body.password, 10);
+      const newRecord = User.create(req.body.username, hash, isAdmin);
+
+      await connection.manager.save(newRecord);
+
+      return res.status(200).json(['ok', 'user added. try logging in']);
+    }
   }
-
-  const connection = getConnection();
-
-  const qry: FindConditions<User> = {
-    username: req.body.username
-  };
-  const users = await connection.manager.find(User, { where: qry });
-
-  if (users.length > 0) {
-    return res.status(400).send(['error', 'user already exists']);
-  }
-
-  const hash = await bcrypt.hash(req.body.password, 10);
-  const newRecord = User.create(req.body.username, hash);
-
-  await connection.manager.save(newRecord);
-
-  return res.status(200).send(['ok', 'user added. try logging in']);
 };
 
 /**
@@ -111,7 +117,7 @@ export const postSignup: RequestHandler = async (
  * Profile page.
  */
 
-export const getAccount = async (req: PassportRequest, res: Response) => {
+export const getAccount = async (req: PassportRequest, res: Response, next: NextFunction) => {
   const connection = getConnection();
 
   const qry: FindConditions<User> = {
@@ -120,15 +126,18 @@ export const getAccount = async (req: PassportRequest, res: Response) => {
   const user = await connection.manager.findOne(User, { where: qry });
 
   if (!user) {
-    return res.status(404).send(['nok', 'not found']);
-  }
-  const userDto = {
-    userName: user.username,
-    channels: user.channels,
-    id: user.id
-  };
+    return next({ statusCode: 400, message: 'bad request' });
+  } else {
 
-  res.status(200).send(userDto);
+    const userDto = {
+      userName: user.username,
+      channels: user.channels,
+      id: user.id
+    };
+
+    return res.status(200).json(userDto);
+  }
+
 };
 
 /**
@@ -147,12 +156,12 @@ export const patchUpdateProfile = (
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(400).send(['error', errors]);
+    return res.status(400).json(['error', errors]);
   }
 
   const user = req.user as User;
   // User.findById(user.id, (err, user: UserDocument) => {
-  //     if (err) { return next(err); }
+  //     if (err) { return return next(err); }
   //     user.email = req.body.email || "";
   //     user.profile.name = req.body.name || "";
   //     user.profile.gender = req.body.gender || "";
@@ -164,7 +173,7 @@ export const patchUpdateProfile = (
   //                 req.flash("errors", { msg: "The email address you have entered is already associated with an account." });
   //                 return res.redirect("/account");
   //             }
-  //             return next(err);
+  //             return return next(err);
   //         }
   //         req.flash("success", { msg: "Profile information has been updated." });
   //         res.redirect("/account");
@@ -189,15 +198,15 @@ export const patchUpdatePassword = (
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(400).send(['error', errors]);
+    return res.status(400).json(['error', errors]);
   }
 
   // const user = req.user as UserDocument;
   // User.findById(user.id, (err, user: UserDocument) => {
-  //     if (err) { return next(err); }
+  //     if (err) { return return next(err); }
   //     user.password = req.body.password;
   //     user.save((err: WriteError) => {
-  //         if (err) { return next(err); }
+  //         if (err) { return return next(err); }
   //         req.flash("success", { msg: "Password has been changed." });
   //         res.redirect("/account");
   //     });
@@ -215,7 +224,7 @@ export const deleteAccount = (
 ) => {
   const user = req.user as User;
   // User.remove({ _id: user.id }, (err) => {
-  //     if (err) { return next(err); }
+  //     if (err) { return return next(err); }
   //     req.logout();
   //     req.flash("info", { msg: "Your account has been deleted." });
   //     res.redirect("/");

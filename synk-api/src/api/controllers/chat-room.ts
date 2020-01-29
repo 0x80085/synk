@@ -22,7 +22,7 @@ export const getRooms = (
   const rooms = roomService.publicRooms;
   const dtos = toDto(rooms);
 
-  res.send(dtos);
+  res.json(dtos);
 };
 
 /**
@@ -42,7 +42,7 @@ export const createRoom = (
   } catch (error) {
     console.log(error);
 
-    res.status(500).send('ERROR - Room not created');
+    res.status(500).json('ERROR - Room not created');
   }
 };
 

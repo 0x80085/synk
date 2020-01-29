@@ -9,15 +9,18 @@ import * as morgan from 'morgan';
 import * as cookieParser from 'cookie-parser';
 import * as compression from 'compression';
 
+import { Request, Response, NextFunction } from 'express-serve-static-core';
+
 import 'reflect-metadata';
 import { createConnection } from 'typeorm';
 import { TypeormStore } from 'typeorm-store';
 
-import setupAuthMiddleware, { SessionOptions } from './auth/auth-service';
-import { setupRoutes } from './api/routes';
+import setupAuthMiddleware, { SessionOptions } from './auth/middleware';
+import { setupRouting } from './api/routes';
 import { setupSockets } from './socket/setup';
 import { Session } from './domain/entity/Session';
 import { Logger } from './tools/logger';
+import { errorMeow } from './api/error-handler';
 
 export default async function configure(logger: Logger) {
   dotenv.config();
@@ -82,7 +85,11 @@ export default async function configure(logger: Logger) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  setupRoutes(app, roomService);
+  setupRouting(app, roomService, logger);
+
+  app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+    errorMeow(err, res);
+  });
 
   return { wsHttp };
 }
