@@ -13,3 +13,7 @@ export interface SocketPassport extends socketio.Socket {
     isAuthenticated(): boolean;
   };
 }
+
+export const getUsername = (socket: socketio.Socket): string => {
+  return socket.request.user.username;
+};

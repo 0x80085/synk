@@ -8,6 +8,7 @@ import {
 } from './message';
 import { Playlist } from './playlist';
 import { Logger } from '../../tools/logger';
+import { getUsername } from './socket.passport';
 
 export class Room {
   name: string;
@@ -33,7 +34,7 @@ export class Room {
     this.logger = logger;
     this.name = name;
 
-    this.creator = originSocket ? this.getUsername(originSocket) : 'Lain';
+    this.creator = originSocket ? getUsername(originSocket) : 'Lain';
 
     const defaultPlaylist = new Playlist('default');
     this.currentPlayList = defaultPlaylist;
@@ -70,7 +71,7 @@ export class Room {
   }
 
   broadcastMessageToMembers(socket: socketio.Socket, msg: IncomingGroupMessage) {
-    const name = this.getUsername(socket);
+    const name = getUsername(socket);
     const userIsInRoom = this.users.filter(u => u.userName === name).length > 0;
 
     if (userIsInRoom) {
@@ -112,14 +113,14 @@ export class Room {
     return {
       id: socket.id,
       permissionLevel: 1,
-      userName: this.getUsername(socket),
+      userName: getUsername(socket),
       role: Roles.Regular
     };
   }
 
   private getMemberFromSocket(socket: socketio.Socket): RoomMember | null {
     const user = this.users.find(
-      u => u.userName === this.getUsername(socket)
+      u => u.userName === getUsername(socket)
     );
     return user;
   }
@@ -146,7 +147,7 @@ export class Room {
 
   private addMemberFromSocket(socket: socketio.Socket) {
     try {
-      const uname = this.getUsername(socket);
+      const uname = getUsername(socket);
       const alreadyAdded = this.users.filter(u => u.userName === uname).length > 0;
       if (alreadyAdded) {
         return;
@@ -180,14 +181,6 @@ export class Room {
         text
       }
     };
-    this.io.to(this.name).emit('group message', groupMessage)
+    this.io.to(this.name).emit('group message', groupMessage);
   }
-
-  /**
-   * @info Move this func to auth folder somwhere
-   */
-  private getUsername(socket: socketio.Socket): string {
-    return socket.request.user.username;
-  }
-
 }
