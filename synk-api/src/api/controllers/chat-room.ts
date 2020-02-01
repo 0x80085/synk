@@ -42,7 +42,7 @@ export const createRoom = (
 
     res.status(200).json('OK');
   } catch (error) {
-    logger.info(error);
+    logger.error(error);
 
     res.status(500).json('ERROR - Room not created');
   }
