@@ -116,7 +116,7 @@ export class RoomService {
       isPermenant: false,
       addedByUsername: socket.request.user.username
     });
-    room.emitPlaylistToRoom();
+    room.broadcastPlaylistToMembers();
   }
 
   private onGroupMessage = (
@@ -129,12 +129,20 @@ export class RoomService {
       return Error('Room non-existant');
     }
 
-    room.sendMessageToRoom(socket, data);
+    room.broadcastMessageToMembers(socket, data);
   }
 
   private disconnect = (socket: SocketPassport) => {
     if (socket.request && socket.request.user) {
-      // Can be done better? idk
+      /**
+       * Can be done better::
+       * keep dictionary:
+       *    dictionary['user-guid'].rooms;
+       * Prints:
+       *    ['rrom1', 'room2', 'rooom2']
+       * Then disconnect only from those rooms:
+       *    dictionary['user-guid'].rooms.foreach(rom => rom.exit(user));
+       */
       this.publicRooms.forEach(room => room.exit(socket));
     }
   }

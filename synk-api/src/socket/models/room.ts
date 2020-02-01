@@ -1,6 +1,6 @@
 import * as socketio from 'socket.io';
 
-import { RoomUser, RoomUserConfig, Roles, RoomUserDto } from './user';
+import { RoomMember, RoomUserConfig, Roles, RoomMemberDto } from './user';
 import {
   OutgoingGroupMessage,
   IncomingGroupMessage,
@@ -14,8 +14,8 @@ export class Room {
   description: string;
   creator: string;
 
-  leader: RoomUser = null;
-  users: RoomUser[] = [];
+  leader: RoomMember = null;
+  users: RoomMember[] = [];
 
   playlists: Playlist[] = [];
   currentPlayList: Playlist | null = null;
@@ -41,16 +41,16 @@ export class Room {
   }
 
   join(socket: socketio.Socket) {
-    this.addSocketToRoom(socket);
+    this.addMemberFromSocket(socket);
 
     this.sendRoomConfigToUser(socket);
     this.sendPlaylistToUser(socket);
 
-    this.emitUserListToRoom();
+    this.broadcastUserListToMembers();
   }
 
   exit(socket: socketio.Socket) {
-    const user = this.getUserFromSocket(socket);
+    const user = this.getMemberFromSocket(socket);
 
     if (user) {
       this.users = this.users.filter(it => it.userName !== user.userName);
@@ -60,48 +60,36 @@ export class Room {
         if (newLeader) {
           this.logger.info(`New leader in room ${this.name} is ${newLeader}`);
           console.log(`New leader in room ${this.name} is ${newLeader}`);
-
           this.setLeader(newLeader);
-          const socketRef = this.io.of('/').connected[newLeader.id];
-          this.logger.info(`Leader socket :: ${socketRef || '( ´>_<`) Not found'}`);
-          this.sendRoomConfigToUser(socketRef);
         }
       }
-
-      const userLeft: OutgoingGroupMessage = {
-        roomName: this.name,
-        content: {
-          userName: 'info',
-          text: `${user.userName} left`
-        }
-      };
-      this.io.to(this.name).emit('group message', userLeft);
-      this.emitUserListToRoom();
+      this.sendMsgToMembers('info', `${user.userName} left`);
+      this.broadcastUserListToMembers();
     }
     socket.leave(this.name);
   }
 
-  sendMessageToRoom(socket: socketio.Socket, msg: IncomingGroupMessage) {
-    const message: OutgoingGroupMessage = {
-      roomName: this.name,
-      content: {
-        text: msg.content.text,
-        userName: this.getUsername(socket)
-      }
-    };
-    this.io.to(this.name).emit('group message', message);
+  broadcastMessageToMembers(socket: socketio.Socket, msg: IncomingGroupMessage) {
+    const name = this.getUsername(socket);
+    const userIsInRoom = this.users.filter(u => u.userName === name).length > 0;
+
+    if (userIsInRoom) {
+      this.sendMsgToMembers(name, msg.content.text);
+    } else {
+      this.logger.info(`User tried to send a message to a room where he does not have rights to`);
+    }
   }
 
-  emitPlaylistToRoom() {
+  broadcastPlaylistToMembers() {
     this.io.to(this.name).emit('playlist update', this.currentPlayList.list);
   }
 
-  emitMediaEventToUsers(socket: socketio.Socket, data: MediaEvent) {
+  broadcastMediaEventToMembers(socket: socketio.Socket, data: MediaEvent) {
     socket.to(this.name).emit('media event', data);
   }
 
-  emitUserListToRoom() {
-    const userLs: RoomUserDto[] = this.users.map(u => {
+  broadcastUserListToMembers() {
+    const userLs: RoomMemberDto[] = this.users.map(u => {
       return {
         ...u,
         isLeader: this.isLeader(u)
@@ -111,11 +99,16 @@ export class Room {
     this.io.to(this.name).emit('userlist update', userLs);
   }
 
-  private setLeader(user: RoomUser) {
+  private setLeader(user: RoomMember) {
     this.leader = user;
+
+    const socketRef = this.io.of('/').connected[this.leader.id];
+    this.logger.info(`Leader socket :: ${socketRef || '( ´>_<`) Not found'}`);
+
+    this.sendRoomConfigToUser(socketRef);
   }
 
-  private createRoomUser(socket: socketio.Socket): RoomUser {
+  private createMember(socket: socketio.Socket): RoomMember {
     return {
       id: socket.id,
       permissionLevel: 1,
@@ -124,7 +117,7 @@ export class Room {
     };
   }
 
-  private getUserFromSocket(socket: socketio.Socket): RoomUser | null {
+  private getMemberFromSocket(socket: socketio.Socket): RoomMember | null {
     const user = this.users.find(
       u => u.userName === this.getUsername(socket)
     );
@@ -141,7 +134,7 @@ export class Room {
   }
 
   private getConfigForSocket(socket: socketio.Socket): RoomUserConfig {
-    const user = this.getUserFromSocket(socket);
+    const user = this.getMemberFromSocket(socket);
 
     return {
       isLeader: this.isLeader(user),
@@ -151,14 +144,14 @@ export class Room {
     };
   }
 
-  private addSocketToRoom(socket: socketio.Socket) {
+  private addMemberFromSocket(socket: socketio.Socket) {
     try {
       const uname = this.getUsername(socket);
       const alreadyAdded = this.users.filter(u => u.userName === uname).length > 0;
       if (alreadyAdded) {
         return;
       }
-      const newuser = this.createRoomUser(socket);
+      const newuser = this.createMember(socket);
       if (this.users.length === 0) {
         this.setLeader(newuser);
       }
@@ -166,15 +159,7 @@ export class Room {
       socket.join(this.name);
       this.users.push(newuser);
 
-      const userJoined: OutgoingGroupMessage = {
-        roomName: this.name,
-        content: {
-          userName: 'info',
-          text: `${newuser.userName} joined`
-        }
-      };
-
-      this.io.to(this.name).emit('group message', userJoined);
+      this.sendMsgToMembers('info', `${newuser.userName} joined`);
 
     } catch (error) {
       socket.emit('authentication error');
@@ -182,16 +167,27 @@ export class Room {
     }
   }
 
-  private getUsername(socket: socketio.Socket): string {
-    return socket.request.user.username;
-  }
 
-  private isLeader(user: RoomUser) {
+  private isLeader(user: RoomMember) {
     return this.leader && this.leader.userName === user.userName;
   }
 
-  private assignRoleToUser(socket: socketio.Socket) { }
+  private sendMsgToMembers(userName: string, text: string) {
+    const groupMessage: OutgoingGroupMessage = {
+      roomName: this.name,
+      content: {
+        userName,
+        text
+      }
+    };
+    this.io.to(this.name).emit('group message', groupMessage)
+  }
 
-  private assignPermissionToUser(socket: socketio.Socket) { }
+  /**
+   * @info Move this func to auth folder somwhere
+   */
+  private getUsername(socket: socketio.Socket): string {
+    return socket.request.user.username;
+  }
 
 }

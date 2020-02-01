@@ -8,14 +8,14 @@ export enum Roles {
   Newbie = 'Newbie'
 }
 
-export interface RoomUser {
+export interface RoomMember {
   id: string;
   userName: string;
   role: Roles;
   permissionLevel: PermissionLevels;
 }
 
-export type RoomUserDto = RoomUser & { isLeader: boolean };
+export type RoomMemberDto = RoomMember & { isLeader: boolean };
 
 export interface RoomUserConfig {
   role: Roles;
