@@ -15,8 +15,8 @@ async function RUN() {
   logger.info('Launching server...');
 
   wsHttp.listen(3000, () => {
-    logger.info(`\t SERVER LAUNCHED`);
-    logger.info(`\t Started on port ${process.env.HOST_PORT}`);
+    logger.info(`🚀 \t SERVER LAUNCHED \t 🚀`);
+    logger.info(`🛰 \t Started on port ${process.env.HOST_PORT} \t 🛰`);
   });
 }
 
