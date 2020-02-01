@@ -92,7 +92,6 @@ export class Room {
 
   private setLeader(member: RoomMember) {
     this.leader = member;
-    this.logger.info(`Leader :: ${member.userName || '( ´>_<`) Not found'}`);
   }
 
   private checkIfLeader(member: RoomMember): boolean {

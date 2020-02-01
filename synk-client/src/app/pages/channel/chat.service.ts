@@ -29,8 +29,6 @@ export class ChatService {
 
   roomMediaEvent$: Observable<MediaEvent> = new Observable(observer => {
     this.socket.on('media event', (data: MediaEvent) => {
-      console.log('media event received', data.currentTime);
-
       observer.next(data);
     });
   });
