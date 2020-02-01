@@ -55,7 +55,9 @@ export class Room {
     const member = this.getMemberFromSocket(socket);
 
     if (member) {
-      this.setNewLeader(member, socket);
+      this.removeMemberFromList(member);
+
+      this.setNewLeaderIfNeeded(member);
 
       this.sendMsgToMembers('info', `${member.userName} left`);
 
@@ -66,7 +68,7 @@ export class Room {
   }
 
   broadcastMessageToAll(socket: socketio.Socket, msg: IncomingGroupMessage) {
-    this.sendMsgToMembers(name, msg.content.text);
+    this.sendMsgToMembers(getUsername(socket), msg.content.text);
   }
 
   broadcastPlaylistToAll() {
@@ -97,15 +99,17 @@ export class Room {
     return this.leader && this.leader.userName === member.userName;
   }
 
-  private setNewLeader(member: RoomMember, socket: socketio.Socket) {
-    this.removeMemberFromList(member);
+  private setNewLeaderIfNeeded(leavingMember: RoomMember) {
+    const isLeader = this.leader && leavingMember.userName === this.leader.userName;
 
-    if (this.leader && member.userName === this.leader.userName) {
+    if (isLeader) {
       const newLeader = this.members[0] || null;
+
       if (newLeader) {
-        this.logger.info(`New leader in room ${this.name} is ${newLeader}`);
         this.setLeader(newLeader);
-        this.sendRoomConfigToMember(socket);
+
+        const soc = this.getSocketOfMember(newLeader);
+        this.sendRoomConfigToMember(soc);
       }
     }
   }
