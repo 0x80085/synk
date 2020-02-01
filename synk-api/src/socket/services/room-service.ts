@@ -26,7 +26,7 @@ export class RoomService {
     this.io = sio;
     this.logger = logger;
 
-    const defaultRoom = new Room('SNKD', this.io, null);
+    const defaultRoom = new Room('SNKD', this.io, this.logger, null);
     defaultRoom.description = 'Default room';
     this.publicRooms.push(defaultRoom);
   }
@@ -70,7 +70,7 @@ export class RoomService {
   }
 
   createRoom(data: { name: string; description: string }) {
-    const newRoom = new Room(data.name, this.io, null);
+    const newRoom = new Room(data.name, this.io, this.logger, null);
     newRoom.description = data.description;
 
     this.addRoomToDirectory(newRoom);
@@ -80,7 +80,7 @@ export class RoomService {
     const room = this.getRoomByName(roomName);
 
     if (!room) {
-      const newRoom = new Room(roomName, this.io, socket);
+      const newRoom = new Room(roomName, this.io, this.logger, socket);
       this.addRoomToDirectory(newRoom);
       newRoom.join(socket);
       return;

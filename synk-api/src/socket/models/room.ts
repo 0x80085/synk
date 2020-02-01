@@ -7,6 +7,7 @@ import {
   MediaEvent
 } from './message';
 import { Playlist } from './playlist';
+import { Logger } from '../../tools/logger';
 
 export class Room {
   name: string;
@@ -20,13 +21,16 @@ export class Room {
   currentPlayList: Playlist | null = null;
 
   private io: socketio.Server;
+  logger: Logger;
 
   constructor(
     name: string,
     sIO: socketio.Server,
-    originSocket?: socketio.Socket
+    logger: Logger,
+    originSocket?: socketio.Socket,
   ) {
     this.io = sIO;
+    this.logger = logger;
     this.name = name;
 
     this.creator = originSocket ? this.getUsername(originSocket) : 'Lain';
@@ -54,7 +58,13 @@ export class Room {
       if (this.leader && user.userName === this.leader.userName) {
         const newLeader = this.users[0] || null;
         if (newLeader) {
+          this.logger.info(`New leader in room ${this.name} is ${newLeader}`);
+          console.log(`New leader in room ${this.name} is ${newLeader}`);
+
           this.setLeader(newLeader);
+          const socketRef = this.io.of('/').connected[newLeader.id];
+          this.logger.info(`Leader socket :: ${socketRef || '( ´>_<`) Not found'}`);
+          this.sendRoomConfigToUser(socketRef);
         }
       }
 

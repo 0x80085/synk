@@ -39,7 +39,12 @@ export class Logger {
   private logToConsole(severity: string, entry: any) {
     if (this.isDebugMode) {
       const formattedMsg = `「${this.now()}」\t「${severity}」\t:: ${entry}`;
+
       console.log(formattedMsg);
+
+      if (severity === 'fatal' || severity === 'error') {
+        console.log(entry);
+      }
     }
   }
 
