@@ -116,7 +116,7 @@ export class RoomService {
       isPermenant: false,
       addedByUsername: socket.request.user.username
     });
-    room.broadcastPlaylistToMembers();
+    room.broadcastPlaylistToAll();
   }
 
   private onGroupMessage = (
@@ -129,7 +129,7 @@ export class RoomService {
       return Error('Room non-existant');
     }
 
-    room.broadcastMessageToMembers(socket, data);
+    room.broadcastMessageToAll(socket, data);
   }
 
   private disconnect = (socket: SocketPassport) => {

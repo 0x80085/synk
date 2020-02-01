@@ -30,7 +30,7 @@ export class RoomMember {
 
 export type RoomMemberDto = RoomMember & { isLeader: boolean };
 
-export interface RoomUserConfig {
+export interface RoomMemberConfig {
   role: Roles;
   permissionLevel: PermissionLevels;
   isLeader: boolean;
