@@ -99,7 +99,7 @@ const ALL_ROUTES = (roomService: RoomService, logger: Logger): RouteOptions[] =>
     verb: 'GET'
   },
   {
-    route: '/playlist/:name',
+    route: '/playlist/create',
     handlers: [(req: PassportRequest, res: Response, next: express.NextFunction) =>
       playlistController.createPlaylist(req, res, next, logger)],
     requireAuthentication: true,
