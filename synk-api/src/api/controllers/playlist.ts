@@ -7,7 +7,8 @@ import { User } from '../../domain/entity/User';
 import { Video } from '../../domain/entity/Video';
 import { PassportRequest } from './user';
 import { Logger } from '../../tools/logger';
-import { addPlaylist, addVideoToPlaylist } from '../handlers/playlist';
+import * as playlistHandler from '../handlers/playlist';
+import { RoomService } from '../../socket/services/room-service';
 
 /**
  * GET /playlist/:playlistId
@@ -76,7 +77,7 @@ export const createPlaylist = async (
       return res.status(400).json(['error signup', errors]);
     }
 
-    await addPlaylist(req.user.username, req.body.playlistName);
+    await playlistHandler.addPlaylist(req.user.username, req.body.playlistName);
 
     // await connection.manager.save(ls); ?
 
@@ -120,15 +121,13 @@ export const deletePlaylist = async (req: PassportRequest, res: Response) => {
   }
 };
 
-
-
 /**
  * PUT /playlist/:playlistId/video
  * Add video to playlist (must be current user owned playlist)
  */
-export const addVideoToList = async (req: PassportRequest, res: Response) => {
+export const addVideoToList = async (req: PassportRequest, res: Response, roomService: RoomService) => {
   try {
-    addVideoToPlaylist(req.body.url, req.user.username, req.body.playlistId);
+    playlistHandler.addVideoToPlaylist(req.body.url, req.user.username, req.body.playlistId, req.body, roomService);
 
     res.status(200).json('OK');
   } catch (error) {

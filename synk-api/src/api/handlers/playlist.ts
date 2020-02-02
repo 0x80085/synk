@@ -3,6 +3,8 @@ import { getConnection } from 'typeorm';
 import { User } from '../../domain/entity/User';
 import { Playlist } from '../../domain/entity/Playlist';
 import { Video } from '../../domain/entity/Video';
+import { RoomService } from '../../socket/services/room-service';
+import { MediaEvent } from '../../socket/models/message';
 
 export async function addPlaylist(username: string, playlistName: string) {
   const connection = getConnection();
@@ -18,7 +20,7 @@ export async function addPlaylist(username: string, playlistName: string) {
   await connection.manager.save(user);
 }
 
-export async function addVideoToPlaylist(username: string, url: string, playlistId: string) {
+export async function addVideoToPlaylist(username: string, url: string, playlistId: string, media: MediaEvent, roomService: RoomService) {
   const connection = getConnection();
 
   const user = await connection.manager.findOneOrFail(User, {
@@ -35,6 +37,8 @@ export async function addVideoToPlaylist(username: string, url: string, playlist
 
   const vid: Video = Video.create(url);
   vid.addedBy = user;
+
+  roomService.addMediaToPlaylist(media);
 
   ls.videos.push(vid);
 

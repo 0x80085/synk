@@ -72,7 +72,7 @@ const ALL_ROUTES = (roomService: RoomService, logger: Logger): RouteOptions[] =>
   },
   {
     route: '/create-room',
-    handlers: [(req: Request, res: Response, next: express.NextFunction) =>
+    handlers: [(req: PassportRequest, res: Response, next: express.NextFunction) =>
       chatroomController.createRoom(req, res, roomService, logger)
     ],
     requireAuthentication: true,
@@ -81,7 +81,8 @@ const ALL_ROUTES = (roomService: RoomService, logger: Logger): RouteOptions[] =>
   {
     route: '/public-rooms',
     handlers: [
-      (req: Request, res: Response) => chatroomController.getRooms(req, res, roomService)
+      (req: Request, res: Response) =>
+        chatroomController.getRooms(req, res, roomService)
     ],
     requireAuthentication: false,
     verb: 'GET'
@@ -113,7 +114,8 @@ const ALL_ROUTES = (roomService: RoomService, logger: Logger): RouteOptions[] =>
   },
   {
     route: '/playlist/:playlistId',
-    handlers: [playlistController.addVideoToList],
+    handlers: [(req: PassportRequest, res: Response, next: express.NextFunction) =>
+      playlistController.addVideoToList(req, res, roomService)],
     requireAuthentication: true,
     verb: 'PUT'
   },

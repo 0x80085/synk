@@ -25,10 +25,6 @@ export class RoomService {
   constructor(sio: socketio.Server, logger: Logger) {
     this.io = sio;
     this.logger = logger;
-
-    const defaultRoom = new Room('SNKD', this.io, this.logger, null);
-    defaultRoom.description = 'Default room';
-    this.publicRooms.push(defaultRoom);
   }
 
   registerCommands = (socket: SocketPassport, next: (err?: any) => void) => {
@@ -59,11 +55,14 @@ export class RoomService {
       this.onGroupMessage(data, socket));
 
     socket.on(Commands.MEDIA_EVENT, (data: MediaEvent) =>
-      this.onMediaEvent(data, socket)
+      this.doIfRoomExists(
+        data.roomName,
+        (event: MediaEvent, soc: socketio.Socket) =>
+          this.onMediaEvent(event, soc)),
     );
 
     socket.on(Commands.ADD_MEDIA, (data: MediaEvent) =>
-      this.onAddMedia(data, socket)
+      this.onAddMedia(data)
     );
 
     socket.on(Commands.DISCONNECT, this.disconnect);
@@ -74,6 +73,10 @@ export class RoomService {
     newRoom.description = data.description;
 
     this.addRoomToDirectory(newRoom);
+  }
+
+  addMediaToPlaylist(data: MediaEvent) {
+    this.onAddMedia(data);
   }
 
   private joinRoom(socket: socketio.Socket, roomName: string) {
@@ -109,12 +112,11 @@ export class RoomService {
     }
   }
 
-  private onAddMedia = (data: MediaEvent, socket: SocketPassport) => {
+  private onAddMedia = (data: MediaEvent) => {
     const room = this.getRoomByName(data.roomName);
     room.currentPlayList.add({
       ...data,
-      isPermenant: false,
-      addedByUsername: socket.request.user.username
+      isPermenant: false
     });
     room.broadcastPlaylistToAll();
   }
@@ -158,13 +160,17 @@ export class RoomService {
   }
 
   private addRoomToDirectory(room: Room) {
-    if (this.getRoomByName(room.name)) {
-      throw Error('Room already exists');
-    }
     this.publicRooms.push(room);
   }
 
   private getRoomByName(roomName: string) {
     return this.publicRooms.find(r => r.name === roomName);
+  }
+
+  doIfRoomExists(roomName: string, thenDo: (...args: any[]) => void) {
+    if (this.getRoomByName(roomName)) {
+      return;
+    }
+    thenDo();
   }
 }
