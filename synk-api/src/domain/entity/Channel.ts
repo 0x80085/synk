@@ -33,8 +33,14 @@ export class Channel {
   @OneToMany(type => ChannelConfig, config => config.channel)
   configs: ChannelConfig[];
 
-  /**
-   * Chat Room of the channel (socketio)
-   */
-  room: Room;
+  static create(name: string, desc: string, owner: User): Channel {
+    const chan = new Channel();
+    chan.owner = owner;
+    chan.dateCreated = new Date();
+    chan.name = name;
+    chan.description = desc;
+    return chan;
+  }
+
+
 }
