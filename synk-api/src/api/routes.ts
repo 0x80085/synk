@@ -2,7 +2,7 @@ import * as express from 'express';
 import { Request, Response } from 'express-serve-static-core';
 
 import * as userController from './controllers/user';
-import * as chatroomController from './controllers/chat-room';
+import * as chatroomController from './controllers/room';
 import * as playlistController from './controllers/playlist';
 
 import { RoomService } from '../socket/services/room-service';
