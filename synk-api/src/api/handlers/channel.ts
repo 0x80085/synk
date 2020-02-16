@@ -3,7 +3,6 @@ import { getConnection } from 'typeorm';
 import { Channel } from '../../domain/entity/Channel';
 import { User } from '../../domain/entity/User';
 import { RoomService } from '../../socket/services/room-service';
-import { Room } from '../../socket/models/room';
 
 export async function addChannel(username: string, channelName: string, description: string) {
   const connection = getConnection();
@@ -21,45 +20,33 @@ export async function addChannel(username: string, channelName: string, descript
 export async function getPublicChannels(roomService: RoomService, amount = 50) {
   const connection = getConnection();
 
-  const channels = await connection.manager.find(Channel, {
+  const rawChannels = await connection.manager.find(Channel, {
     where: {
       isPublic: true
     },
     take: amount
   });
 
-  const rooms = roomService.publicRooms;
+  const rooms = roomService.publicRooms.map(summarize);
+  const channels = rawChannels.map(summarize);
 
-  const res = mergeRoomAndChannel(channels, rooms);
+  const res = mergeListsOn(channels, rooms, 'roomName');
 
   return res;
 }
 
-function mergeRoomAndChannel(channels: Channel[], rooms: Room[], key = 'name') {
-  const roomsDict = rooms.map(room => {
-    return {
-      [room.name]: {
-        name: room.name,
-        memberCount: room.members.length,
-        currentlyPlaying: room.currentPlayList.current
-      }
-    };
-  });
-  const channelsDict = channels.map(chan => {
-    return {
-      [chan.name]: {
-        name: chan.name,
-        description: chan.description
-      }
-    };
-  });
+function summarize(i: any) {
+  return {
+    roomName: i.name,
+    description: i.description || '...',
+    memberCount: i.members ? i.members.length : 0,
+    currentlyPlaying: i.currentPlayList ? i.currentPlayList.current : '...'
+  };
+}
 
-  const all = channelsDict.map(chan => {
-    return {
-      ...roomsDict[(chan[0] as any).name],
-      ...chan[0]
-    };
-  });
+function mergeListsOn(lsOne: any[], lsTwo: any[], hashKey: string) {
+  const table = new Set(lsOne.map(d => d[hashKey]));
+  const merged = [...lsOne, ...lsTwo.filter(d => !table.has(d[hashKey]))];
 
-
+  return merged;
 }

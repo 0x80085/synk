@@ -17,16 +17,12 @@ export interface RoomDto {
  * `GET /public-rooms`
  * Get all public chat rooms
  */
-export const getRooms = (
+export const getRooms = async (
   req: Request,
   res: Response,
   roomService: RoomService
 ) => {
-  channelHandler.getPublicChannels(roomService);
-
-  const rooms = roomService.publicRooms;
-  const dtos = toDto(rooms);
-
+  const dtos = await channelHandler.getPublicChannels(roomService);
   res.json(dtos);
 };
 

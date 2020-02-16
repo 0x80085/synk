@@ -39,6 +39,7 @@ export class Channel {
     chan.dateCreated = new Date();
     chan.name = name;
     chan.description = desc;
+    chan.isPublic = true;
     return chan;
   }
 
