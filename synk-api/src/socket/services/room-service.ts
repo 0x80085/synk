@@ -35,7 +35,6 @@ export class RoomService {
   private setupCommandHandlers(socket: SocketPassport) {
     socket.on(Commands.JOIN_ROOM, (roomName: string) => {
       try {
-
         this.joinRoom(socket, roomName);
       } catch (error) {
         this.logger.info(error);
@@ -44,7 +43,6 @@ export class RoomService {
 
     socket.on(Commands.EXIT_ROOM, (roomName: string) => {
       try {
-
         this.exitRoom(socket, roomName);
       } catch (error) {
         this.logger.info(error);
@@ -54,15 +52,34 @@ export class RoomService {
     socket.on(Commands.GROUP_MESSAGE, (data: IncomingGroupMessage) =>
       this.onGroupMessage(data, socket));
 
-    socket.on(Commands.MEDIA_EVENT, (data: MediaEvent) =>
-      this.doIfRoomExists(
-        data.roomName,
-        (event: MediaEvent, soc: socketio.Socket) =>
-          this.onMediaEvent(event, soc)),
+    socket.on(Commands.MEDIA_EVENT, (data: MediaEvent) => {
+      try {
+
+        if (!this.getRoomByName(data.roomName)) {
+          console.log('doIfRoomExists.. ROOM does not exist!');
+          return;
+        }
+        this.onMediaEvent(data, socket);
+
+      } catch (error) {
+        this.logger.info('onMediaEvent failed');
+        this.logger.info('broken data:');
+        this.logger.info(data);
+        this.logger.error(error);
+      }
+    }
     );
 
-    socket.on(Commands.ADD_MEDIA, (data: MediaEvent) =>
-      this.onAddMedia(data)
+    socket.on(Commands.ADD_MEDIA, (data: MediaEvent) => {
+      try {
+        this.onAddMedia(data);
+      } catch (error) {
+        this.logger.info('onAddMedia failed');
+        this.logger.info('broken data:');
+        this.logger.info(data);
+        this.logger.error(error);
+      }
+    }
     );
 
     socket.on(Commands.DISCONNECT, this.disconnect);
@@ -165,12 +182,5 @@ export class RoomService {
 
   private getRoomByName(roomName: string) {
     return this.publicRooms.find(r => r.name === roomName);
-  }
-
-  doIfRoomExists(roomName: string, thenDo: (...args: any[]) => void) {
-    if (this.getRoomByName(roomName)) {
-      return;
-    }
-    thenDo();
   }
 }
