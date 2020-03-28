@@ -40,7 +40,7 @@ bcrypt complains about binaries? Try:
 
 nodegyp complains about... anything
 
-> Find and install the C build (like windows-build-tools or whatever you OS is)
+> Find and install the C build (like windows-build-tools or whatever your OS is)
 
 > Make sure to have Python 2.7 installed
 
