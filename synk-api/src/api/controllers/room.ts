@@ -3,6 +3,8 @@ import { Request, Response } from 'express';
 import { Room } from '../../socket/models/room';
 import { RoomService } from '../../socket/services/room-service';
 import { Logger } from '../../tools/logger';
+import * as channelHandler from '../handlers/channel';
+import { PassportRequest } from './user';
 
 export interface RoomDto {
   roomName: string;
@@ -15,14 +17,12 @@ export interface RoomDto {
  * `GET /public-rooms`
  * Get all public chat rooms
  */
-export const getRooms = (
+export const getRooms = async (
   req: Request,
   res: Response,
   roomService: RoomService
 ) => {
-  const rooms = roomService.publicRooms;
-  const dtos = toDto(rooms);
-
+  const dtos = await channelHandler.getPublicChannels(roomService);
   res.json(dtos);
 };
 
@@ -31,13 +31,14 @@ export const getRooms = (
  * Creates a chat room
  */
 export const createRoom = (
-  req: Request,
+  req: PassportRequest,
   res: Response,
   roomService: RoomService,
   logger: Logger
 ) => {
 
   try {
+    channelHandler.addChannel(req.user.username, req.body.name, req.body.description);
     roomService.createRoom(req.body);
 
     res.status(200).json('OK');

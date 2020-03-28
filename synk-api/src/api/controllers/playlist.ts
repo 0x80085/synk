@@ -1,4 +1,4 @@
-import { NextFunction, RequestHandler, Response } from 'express';
+import { NextFunction, Response } from 'express';
 import { check, validationResult } from 'express-validator';
 import { FindConditions, getConnection } from 'typeorm';
 
@@ -7,6 +7,8 @@ import { User } from '../../domain/entity/User';
 import { Video } from '../../domain/entity/Video';
 import { PassportRequest } from './user';
 import { Logger } from '../../tools/logger';
+import * as playlistHandler from '../handlers/playlist';
+import { RoomService } from '../../socket/services/room-service';
 
 /**
  * GET /playlist/:playlistId
@@ -75,20 +77,8 @@ export const createPlaylist = async (
       return res.status(400).json(['error signup', errors]);
     }
 
-    const connection = getConnection();
+    await playlistHandler.addPlaylist(req.user.username, req.body.playlistName);
 
-    const user = await connection.manager.findOneOrFail(User, {
-      where: {
-        username: req.body.username
-      }
-    });
-
-    const ls = Playlist.create(req.body.playlistName);
-    user.playlists.push(ls);
-
-    ls.createdBy = user;
-
-    await connection.manager.save(user);
     // await connection.manager.save(ls); ?
 
     res.status(200).json('OK');
@@ -131,37 +121,18 @@ export const deletePlaylist = async (req: PassportRequest, res: Response) => {
   }
 };
 
-
-
 /**
  * PUT /playlist/:playlistId/video
- * Add video to playlist (must be curernt user owned playlist)
+ * Add video to playlist (must be current user owned playlist)
  */
-export const addVideoToList = async (req: PassportRequest, res: Response) => {
+export const addVideoToList = async (req: PassportRequest, res: Response, roomService: RoomService) => {
   try {
-    const connection = getConnection();
-
-    const user = await connection.manager.findOneOrFail(User, {
-      where: {
-        username: req.body.username
-      }
-    });
-
-    const ls = user.playlists.filter(p => p.id === req.params.playlistId)[0];
-
-    if (!ls) {
-      return res.status(404).json('Not found');
-    }
-
-    const vid: Video = Video.create(req.body.url);
-    vid.addedBy = user;
-
-    ls.videos.push(vid);
-
-    await connection.manager.save(ls);
+    playlistHandler.addVideoToPlaylist(req.body.url, req.user.username, req.body.playlistId, req.body, roomService);
 
     res.status(200).json('OK');
   } catch (error) {
-    res.status(500).json(`Error`);
+    res.status(404).json(error);
   }
 };
+
+

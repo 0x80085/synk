@@ -2,7 +2,7 @@ import * as express from 'express';
 import { Request, Response } from 'express-serve-static-core';
 
 import * as userController from './controllers/user';
-import * as chatroomController from './controllers/chat-room';
+import * as chatroomController from './controllers/room';
 import * as playlistController from './controllers/playlist';
 
 import { RoomService } from '../socket/services/room-service';
@@ -72,7 +72,7 @@ const ALL_ROUTES = (roomService: RoomService, logger: Logger): RouteOptions[] =>
   },
   {
     route: '/create-room',
-    handlers: [(req: Request, res: Response, next: express.NextFunction) =>
+    handlers: [(req: PassportRequest, res: Response, next: express.NextFunction) =>
       chatroomController.createRoom(req, res, roomService, logger)
     ],
     requireAuthentication: true,
@@ -81,7 +81,8 @@ const ALL_ROUTES = (roomService: RoomService, logger: Logger): RouteOptions[] =>
   {
     route: '/public-rooms',
     handlers: [
-      (req: Request, res: Response) => chatroomController.getRooms(req, res, roomService)
+      (req: Request, res: Response) =>
+        chatroomController.getRooms(req, res, roomService)
     ],
     requireAuthentication: false,
     verb: 'GET'
@@ -99,7 +100,7 @@ const ALL_ROUTES = (roomService: RoomService, logger: Logger): RouteOptions[] =>
     verb: 'GET'
   },
   {
-    route: '/playlist/:name',
+    route: '/playlist/create',
     handlers: [(req: PassportRequest, res: Response, next: express.NextFunction) =>
       playlistController.createPlaylist(req, res, next, logger)],
     requireAuthentication: true,
@@ -113,7 +114,8 @@ const ALL_ROUTES = (roomService: RoomService, logger: Logger): RouteOptions[] =>
   },
   {
     route: '/playlist/:playlistId',
-    handlers: [playlistController.addVideoToList],
+    handlers: [(req: PassportRequest, res: Response, next: express.NextFunction) =>
+      playlistController.addVideoToList(req, res, roomService)],
     requireAuthentication: true,
     verb: 'PUT'
   },

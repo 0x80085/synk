@@ -25,10 +25,6 @@ export class RoomService {
   constructor(sio: socketio.Server, logger: Logger) {
     this.io = sio;
     this.logger = logger;
-
-    const defaultRoom = new Room('SNKD', this.io, this.logger, null);
-    defaultRoom.description = 'Default room';
-    this.publicRooms.push(defaultRoom);
   }
 
   registerCommands = (socket: SocketPassport, next: (err?: any) => void) => {
@@ -39,7 +35,6 @@ export class RoomService {
   private setupCommandHandlers(socket: SocketPassport) {
     socket.on(Commands.JOIN_ROOM, (roomName: string) => {
       try {
-
         this.joinRoom(socket, roomName);
       } catch (error) {
         this.logger.info(error);
@@ -48,7 +43,6 @@ export class RoomService {
 
     socket.on(Commands.EXIT_ROOM, (roomName: string) => {
       try {
-
         this.exitRoom(socket, roomName);
       } catch (error) {
         this.logger.info(error);
@@ -58,12 +52,34 @@ export class RoomService {
     socket.on(Commands.GROUP_MESSAGE, (data: IncomingGroupMessage) =>
       this.onGroupMessage(data, socket));
 
-    socket.on(Commands.MEDIA_EVENT, (data: MediaEvent) =>
-      this.onMediaEvent(data, socket)
+    socket.on(Commands.MEDIA_EVENT, (data: MediaEvent) => {
+      try {
+
+        if (!this.getRoomByName(data.roomName)) {
+          console.log('doIfRoomExists.. ROOM does not exist!');
+          return;
+        }
+        this.onMediaEvent(data, socket);
+
+      } catch (error) {
+        this.logger.info('onMediaEvent failed');
+        this.logger.info('broken data:');
+        this.logger.info(data);
+        this.logger.error(error);
+      }
+    }
     );
 
-    socket.on(Commands.ADD_MEDIA, (data: MediaEvent) =>
-      this.onAddMedia(data, socket)
+    socket.on(Commands.ADD_MEDIA, (data: MediaEvent) => {
+      try {
+        this.onAddMedia(data);
+      } catch (error) {
+        this.logger.info('onAddMedia failed');
+        this.logger.info('broken data:');
+        this.logger.info(data);
+        this.logger.error(error);
+      }
+    }
     );
 
     socket.on(Commands.DISCONNECT, this.disconnect);
@@ -74,6 +90,10 @@ export class RoomService {
     newRoom.description = data.description;
 
     this.addRoomToDirectory(newRoom);
+  }
+
+  addMediaToPlaylist(data: MediaEvent) {
+    this.onAddMedia(data);
   }
 
   private joinRoom(socket: socketio.Socket, roomName: string) {
@@ -109,12 +129,11 @@ export class RoomService {
     }
   }
 
-  private onAddMedia = (data: MediaEvent, socket: SocketPassport) => {
+  private onAddMedia = (data: MediaEvent) => {
     const room = this.getRoomByName(data.roomName);
     room.currentPlayList.add({
       ...data,
-      isPermenant: false,
-      addedByUsername: socket.request.user.username
+      isPermenant: false
     });
     room.broadcastPlaylistToAll();
   }
@@ -158,9 +177,6 @@ export class RoomService {
   }
 
   private addRoomToDirectory(room: Room) {
-    if (this.getRoomByName(room.name)) {
-      throw Error('Room already exists');
-    }
     this.publicRooms.push(room);
   }
 

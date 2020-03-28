@@ -8,6 +8,8 @@ import { FindConditions, getConnection } from 'typeorm';
 
 import { User } from '../../domain/entity/User';
 import { Logger } from '../../tools/logger';
+import { Playlist } from '../../domain/entity/Playlist';
+import { Video } from '../../domain/entity/Video';
 
 export type PassportRequest = Request & { user: { username: string } };
 
@@ -100,6 +102,19 @@ export const postSignup = async (
 
       const hash = await bcrypt.hash(req.body.password, 10);
       const newRecord = User.create(req.body.username, hash, isAdmin);
+      const defaultPlaylist = new Playlist();
+      defaultPlaylist.name = 'default';
+      defaultPlaylist.createdBy = newRecord;
+
+      const defaultVideo = new Video();
+      defaultVideo.dateAdded = new Date();
+      defaultVideo.addedBy = newRecord;
+      defaultVideo.playlist = defaultPlaylist;
+      defaultVideo.positionInList = 1;
+      defaultVideo.url = 'https://www.youtube.com/watch?v=Ct2GP5v6MZM';
+
+      defaultPlaylist.videos = [defaultVideo];
+      newRecord.playlists = [defaultPlaylist];
 
       await connection.manager.save(newRecord);
 

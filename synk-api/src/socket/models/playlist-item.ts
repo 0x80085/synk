@@ -11,7 +11,7 @@ export class ItemContent {
 
 export class PlaylistItem extends ItemContent {
   isPermenant = false;
-  addedByUsername: string;
+  addedByUsername?: string;
 
   constructor(mediaUrl: string, addedByUsername: string) {
     super(mediaUrl, null);

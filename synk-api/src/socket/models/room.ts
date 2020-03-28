@@ -11,6 +11,7 @@ import { Logger } from '../../tools/logger';
 import { getUsername } from './socket.passport';
 
 export class Room {
+  id: string;
   name: string;
   description: string;
   creator: string;
