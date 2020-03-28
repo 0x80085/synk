@@ -48,12 +48,3 @@ export const createRoom = (
     res.status(500).json('ERROR - Room not created');
   }
 };
-
-function toDto(rooms: Room[]): RoomDto[] {
-  return rooms.map(room => {
-    return {
-      roomName: room.name,
-      description: room.description
-    };
-  });
-}
