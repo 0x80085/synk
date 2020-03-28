@@ -23,7 +23,7 @@ export function setupRoute(
       auth.ensureAuthenticated(req, res, next, logger));
   }
 
-  const routeProduct = [
+  const routeDefinition = [
     ...defaultHandlers,
     ...opts.handlers
   ].filter(i => Boolean(i));
@@ -31,38 +31,38 @@ export function setupRoute(
   switch (opts.verb) {
     case 'GET':
       app.get(opts.route,
-        ...routeProduct,
+        ...routeDefinition,
       );
 
       break;
     case 'POST':
       app.post(opts.route,
-        ...routeProduct
+        ...routeDefinition
       );
 
       break;
     case 'PUT':
       app.put(opts.route,
-        ...routeProduct
+        ...routeDefinition
       );
 
       break;
     case 'DELETE':
       app.delete(opts.route,
-        ...routeProduct
+        ...routeDefinition
       );
 
       break;
     case 'PATCH':
       app.patch(opts.route,
-        ...routeProduct
+        ...routeDefinition
       );
 
       break;
 
     default:
       app.get(opts.route,
-        ...routeProduct
+        ...routeDefinition
       );
       break;
   }
