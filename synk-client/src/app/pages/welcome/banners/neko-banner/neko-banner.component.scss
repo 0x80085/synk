@@ -1,0 +1,16 @@
+@import "../banner.scss";
+
+.wrap{
+  .left {
+    position: absolute;
+    bottom: 0px;
+    left: 5%;
+    height: 80%;
+  }
+  .right {
+    position: absolute;
+    right: -5%;
+    height: 110%;
+    top: -1%;
+  }
+}
