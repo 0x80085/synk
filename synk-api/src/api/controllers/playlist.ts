@@ -77,7 +77,7 @@ export const createPlaylist = async (
       return res.status(400).json(['error signup', errors]);
     }
 
-    await playlistHandler.addPlaylist(req.user.username, req.body.playlistName);
+    await playlistHandler.createPlaylist(req.user.username, req.body.playlistName);
 
     // await connection.manager.save(ls); ?
 

@@ -1,9 +1,8 @@
 import { Request, Response } from 'express';
 
-import { Room } from '../../socket/models/room';
 import { RoomService } from '../../socket/services/room-service';
 import { Logger } from '../../tools/logger';
-import * as channelHandler from '../handlers/channel';
+import * as channelHandler from '../handlers/channel/';
 import { PassportRequest } from './user';
 
 export interface RoomDto {
@@ -38,7 +37,7 @@ export const createRoom = (
 ) => {
 
   try {
-    channelHandler.addChannel(req.user.username, req.body.name, req.body.description);
+    channelHandler.createChannel(req.user.username, req.body.name, req.body.description);
     roomService.createRoom(req.body);
 
     res.status(200).json('OK');
