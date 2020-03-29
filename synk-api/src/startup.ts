@@ -1,4 +1,6 @@
-import * as http from 'http';
+import * as https from 'https';
+import * as http from 'https';
+import * as fs from 'graceful-fs';
 import * as dotenv from 'dotenv';
 import * as express from 'express';
 import * as cors from 'cors';
@@ -51,7 +53,9 @@ export default async function configure(logger: Logger) {
 
   app.use(morgan('short'));
 
-  const wsHttp = new http.Server(app);
+  const credentials = getSSLCert();
+
+  const wsHttps = https.createServer(credentials, app);
 
   const sessionRepo = connection.getRepository(Session);
   const sessionStore = new TypeormStore({ repository: sessionRepo });
@@ -79,7 +83,7 @@ export default async function configure(logger: Logger) {
     logger
   );
 
-  const { roomService } = setupSockets(wsHttp, sessionMiddlewareConfig, logger);
+  const { roomService } = setupSockets(wsHttps, sessionMiddlewareConfig, logger);
 
   app.use(sessionMiddleware);
 
@@ -92,5 +96,17 @@ export default async function configure(logger: Logger) {
     errorMeow(err, res, logger);
   });
 
-  return { wsHttp };
+  return { wsHttps };
+}
+
+function getSSLCert() {
+  try {
+    const privateKey = fs.readFileSync('sslcert/server.key', 'utf8');
+    const certificate = fs.readFileSync('sslcert/server.crt', 'utf8');
+    const credentials = { key: privateKey, cert: certificate };
+    return credentials;
+  } catch (e) {
+    console.log('no cert found, resuming');
+    return null;
+  }
 }
