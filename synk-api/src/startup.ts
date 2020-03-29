@@ -1,20 +1,17 @@
 import * as https from 'https';
-import * as http from 'https';
 import * as fs from 'graceful-fs';
 import * as dotenv from 'dotenv';
 import * as express from 'express';
 import * as cors from 'cors';
-import * as uuid from 'uuid';
 import * as passport from 'passport';
 import * as bodyParser from 'body-parser';
 import * as morgan from 'morgan';
-import * as cookieParser from 'cookie-parser';
 import * as compression from 'compression';
 
 import { Request, Response, NextFunction } from 'express-serve-static-core';
 
 import 'reflect-metadata';
-import { createConnection } from 'typeorm';
+import { createConnection, Connection } from 'typeorm';
 import { TypeormStore } from 'typeorm-store';
 
 import setupAuthMiddleware, { SessionOptions } from './auth/middleware';
@@ -23,6 +20,7 @@ import { setupSockets } from './socket/setup';
 import { Session } from './domain/entity/Session';
 import { Logger } from './tools/logger';
 import { errorMeow } from './api/error-handler';
+import { configureSessionMiddleware } from './auth/config';
 
 export default async function configure(logger: Logger) {
   dotenv.config();
@@ -31,11 +29,6 @@ export default async function configure(logger: Logger) {
 
   const corsUseCredentials = process.env.CORS_USE_CREDENTIAL === 'TRUE';
   const corsOrigin = process.env.CORS_ALLOWED_ORIGIN;
-
-  const sessionSecret = process.env.SESSION_SECRET;
-  const saveUninitialized = process.env.SESSION_SAVEUNINITIALIZED === 'TRUE';
-  const resave = process.env.SESSION_RESAVE === 'TRUE';
-  const cookieMaxAge = +process.env.SESSION_COOKIE_MAXAGE;
 
   const connection = await createConnection();
 
@@ -57,24 +50,7 @@ export default async function configure(logger: Logger) {
 
   const wsHttps = https.createServer(credentials, app);
 
-  const sessionRepo = connection.getRepository(Session);
-  const sessionStore = new TypeormStore({ repository: sessionRepo });
-
-  // TODO : Read https://www.npmjs.com/package/express-session thoroughly to set most appropriate config
-  const sessionMiddlewareConfig: SessionOptions = {
-    genid: () => {
-      return uuid(); // use UUIDs for session IDs
-    },
-    cookieParser,
-    secret: sessionSecret,
-    resave,
-    saveUninitialized,
-    rolling: true,
-    store: sessionStore,
-    cookie: {
-      maxAge: cookieMaxAge
-    }
-  };
+  const sessionMiddlewareConfig: SessionOptions = configureSessionMiddleware(connection);
 
   const { sessionMiddleware } = await setupAuthMiddleware(
     app,
@@ -101,11 +77,20 @@ export default async function configure(logger: Logger) {
 
 function getSSLCert() {
   try {
-    const privateKey = fs.readFileSync('sslcert/server.key', 'utf8');
-    const certificate = fs.readFileSync('sslcert/server.crt', 'utf8');
+    const pathToKey = process.env.SSL_KEY_PATH;
+    const pathToCert = process.env.SSL_CERT_PATH;
+
+    if (!pathToKey || !pathToCert) {
+      throw new Error('no path to SSL certificate found, will not be used');
+    }
+
+    const privateKey = fs.readFileSync(pathToKey, 'utf8');
+    const certificate = fs.readFileSync(pathToCert, 'utf8');
     const credentials = { key: privateKey, cert: certificate };
     return credentials;
+
   } catch (e) {
+    console.log(e);
     console.log('no cert found, resuming');
     return null;
   }
