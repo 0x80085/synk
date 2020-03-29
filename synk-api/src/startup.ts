@@ -11,13 +11,11 @@ import * as compression from 'compression';
 import { Request, Response, NextFunction } from 'express-serve-static-core';
 
 import 'reflect-metadata';
-import { createConnection, Connection } from 'typeorm';
-import { TypeormStore } from 'typeorm-store';
+import { createConnection } from 'typeorm';
 
 import setupAuthMiddleware, { SessionOptions } from './auth/middleware';
 import { setupRouting } from './api/routes';
 import { setupSockets } from './socket/setup';
-import { Session } from './domain/entity/Session';
 import { Logger } from './tools/logger';
 import { errorMeow } from './api/error-handler';
 import { configureSessionMiddleware } from './auth/config';
@@ -76,20 +74,29 @@ export default async function configure(logger: Logger) {
 }
 
 function getSSLCert() {
+
+  const pathToKey = process.env.SSL_KEY_PATH;
+  const pathToCert = process.env.SSL_CERT_PATH;
+  const pathToChain = process.env.SSL_CHAIN_PATH;
+
+  if (!pathToKey || !pathToCert || !pathToChain) {
+    throw new Error('WARN no path to SSL certificate found, SLL can not be used');
+  }
+
   try {
-    const pathToKey = process.env.SSL_KEY_PATH;
-    const pathToCert = process.env.SSL_CERT_PATH;
-
-    if (!pathToKey || !pathToCert) {
-      throw new Error('no path to SSL certificate found, will not be used');
-    }
-
     const privateKey = fs.readFileSync(pathToKey, 'utf8');
     const certificate = fs.readFileSync(pathToCert, 'utf8');
-    const credentials = { key: privateKey, cert: certificate };
-    return credentials;
+    const chain = fs.readFileSync(pathToChain, 'utf8');
+
+    return {
+      key: privateKey,
+      cert: certificate,
+      ca: [chain]
+    };
 
   } catch (e) {
+    console.log(`no file at ${pathToKey}`);
+    console.log(`no file at ${pathToCert}`);
     console.log(e);
     console.log('no cert found, resuming');
     return null;
