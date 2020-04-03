@@ -11,6 +11,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SushiBannerComponent } from './banners/sushi-banner/sushi-banner.component';
 import { PopcornBannerComponent } from './banners/popcorn-banner/popcorn-banner.component';
 import { NekoBannerComponent } from './banners/neko-banner/neko-banner.component';
+import { OverviewItemComponent } from './overview/overview-item/overview-item.component';
 
 @NgModule({
   imports: [
@@ -20,7 +21,15 @@ import { NekoBannerComponent } from './banners/neko-banner/neko-banner.component
     WelcomeRoutingModule,
     NgZorroAntdModule
   ],
-  declarations: [WelcomeComponent, OverviewComponent, CreateRoomFormComponent, SushiBannerComponent, PopcornBannerComponent, NekoBannerComponent],
+  declarations: [
+    WelcomeComponent,
+    OverviewComponent,
+    CreateRoomFormComponent,
+    SushiBannerComponent,
+    PopcornBannerComponent,
+    NekoBannerComponent,
+    OverviewItemComponent
+  ],
   exports: [WelcomeComponent]
 })
-export class WelcomeModule {}
+export class WelcomeModule { }
