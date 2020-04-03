@@ -5,8 +5,8 @@ import { environment } from 'src/environments/environment';
 export interface OverviewlistItem {
   roomName: string;
   description: string;
-  connectedUsers: number;
-  nowPlaying: string;
+  memberCount: number;
+  currentlyPlaying: string;
 }
 
 export interface ChannelDraft {
