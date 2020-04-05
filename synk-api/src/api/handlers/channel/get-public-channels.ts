@@ -37,23 +37,24 @@ function summarize(i: any): Summary {
   };
 }
 
-function mergeLists(allItems: Summary[], someItems: Summary[]) {
+function mergeLists(allItems: Summary[], someItems: Summary[] = []) {
   const someItemsDict = toDictionary(someItems);
   return allItems.map(it => {
-    const ls2i: Summary = someItemsDict[it.roomName];
+    const sndListEntry: Summary = someItemsDict[it.roomName];
     const summary: Summary = {
-      currentlyPlaying: ls2i ? ls2i.currentlyPlaying : 'N/A',
+      currentlyPlaying: sndListEntry ? sndListEntry.currentlyPlaying : 'N/A',
       description: it.description,
-      memberCount: ls2i ? ls2i.memberCount : 0,
+      memberCount: sndListEntry ? sndListEntry.memberCount : 0,
       roomName: it.roomName,
     };
     return summary;
   })
 }
 
-function toDictionary(arr: Summary[]): any {
+function toDictionary(arr: Summary[]) {
   const dict: any = {};
-  return arr.forEach(it => {
+  arr.forEach(it => {
     dict[it.roomName] = it;
   });
+  return dict;
 }
