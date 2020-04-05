@@ -8,7 +8,7 @@ import {
 } from './message';
 import { Playlist } from './playlist';
 import { Logger } from '../../tools/logger';
-import { getUsername } from './socket.passport';
+import { getUsername, SocketPassport } from './socket.passport';
 
 export class Room {
   id: string;
@@ -23,7 +23,7 @@ export class Room {
   currentPlayList: Playlist | null = null;
 
   private io: socketio.Server;
-  logger: Logger;
+  private logger: Logger;
 
   constructor(
     name: string,
@@ -49,6 +49,31 @@ export class Room {
 
     this.sendPlaylistToMember(socket);
 
+    this.broadcastMemberListToAll();
+  }
+
+  giveLeader(originSocket: SocketPassport, to: string) {
+    const initiator = this.getMemberFromSocket(originSocket);
+
+    if (!initiator) {
+      return;
+    }
+    if (initiator.userName !== this.leader.userName) {
+      return;
+    }
+
+    const candidate = this.getMemberByName(to);
+
+    if (!candidate) {
+      return;
+    }
+
+    const candidateSocket = this.getSocketOfMember(candidate);
+
+    this.sendRoomConfigToMember(originSocket);
+    this.sendRoomConfigToMember(candidateSocket);
+
+    this.setLeader(candidate);
     this.broadcastMemberListToAll();
   }
 
@@ -182,6 +207,13 @@ export class Room {
   private getMemberFromSocket(socket: socketio.Socket): RoomMember | null {
     const member = this.members.find(
       u => u.userName === getUsername(socket)
+    );
+    return member;
+  }
+
+  private getMemberByName(name: string): RoomMember | null {
+    const member = this.members.find(
+      u => u.userName === name
     );
     return member;
   }

@@ -46,14 +46,23 @@ export class PlaylistComponent implements OnInit {
       return;
     }
 
-    const enw: MediaEvent = {
+    this.chatService.addToPlaylist({
       mediaUrl: this.newMedia,
       roomName: this.roomName,
       currentTime: null
-    };
-
-    this.chatService.addToPlaylist(enw);
+    });
     this.notification.success('Success', 'Media added to playlist');
+  }
+
+  onRemoveMedia(mediaUrl: string) {
+    if (confirm(`Want to delete ${mediaUrl}?`)) {
+      this.chatService.removeFromPlaylist({
+        mediaUrl,
+        roomName: this.roomName,
+        currentTime: null
+      });
+      this.notification.success('Success', 'Media removed from playlist');
+    }
   }
 
   private createVirtualList() {

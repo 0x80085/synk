@@ -41,6 +41,8 @@
               title="start video"><i nz-icon nzType="caret-right"></i></button>
             <button nz-button nzSize="small" nzType="link" disabled title="set next in line (not yet implemented)"><i
                 nz-icon nzType="double-right"></i></button>
+            <button nz-button nzSize="small" nzType="link" (click)="onRemoveMedia(item.mediaUrl)" title="remove from list"><i
+                nz-icon nzType="cross"></i></button>
           </nz-button-group>
         </ng-template>
       </ng-template>

@@ -133,6 +133,10 @@ export class ChatService {
     this.socket.emit('add media', ev);
   }
 
+  removeFromPlaylist(ev: MediaEvent) {
+    this.socket.emit('remove media', ev);
+  }
+
   enterRoom(name: string) {
     this.socket.connect();
     this.socket.emit('join room', name);
