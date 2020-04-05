@@ -97,7 +97,7 @@ export class RoomService {
       try {
         this.onGiveLeader(data, socket);
       } catch (error) {
-        this.logger.info('onAddMedia failed');
+        this.logger.info('GIVE_LEADER failed');
         this.logger.info('broken data:');
         this.logger.info(data);
         this.logger.error(error);
@@ -122,7 +122,11 @@ export class RoomService {
     const room = this.getRoomByName(roomName);
 
     if (!room) {
-      return Error('Room non-existant');
+      // Todo - instead f creatun, check DB and throw if not in DB
+      const newRoom = new Room(roomName, this.io, this.logger, socket);
+      this.addRoomToDirectory(newRoom);
+      newRoom.join(socket);
+      return;
     }
 
     room.join(socket);

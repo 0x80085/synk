@@ -22,12 +22,13 @@ export class ChannelComponent implements OnInit, OnDestroy {
   mediaUrl = '';
   isLeader = false;
 
-  mediaUpdateTimer$: Subscription;
-  mediaSyncEvent$: Subscription;
   errorEvent$: Observable<Message[]>;
   members$: Observable<RoomUserDto[]>;
-  roomUserConfig$: Subscription;
   playlist$: Observable<MediaEvent[]>;
+
+  mediaUpdateTimerSubscription: Subscription;
+  mediaSyncEventSubscription: Subscription;
+  roomUserConfigSubscription: Subscription;
 
   playlist: string[] = [];
 
@@ -63,7 +64,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   sendPeriodicUpdate() {
     const timer$ = timer(1000, 2000);
-    this.mediaUpdateTimer$ = timer$.subscribe(val => {
+    this.mediaUpdateTimerSubscription = timer$.subscribe(val => {
       if (this.isLeader && this.player) {
         this.sendMediaUpdate();
       }
@@ -71,7 +72,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   }
 
   syncPlayerState() {
-    this.mediaSyncEvent$ = this.chatService.roomMediaEvent$.subscribe(ev => {
+    this.mediaSyncEventSubscription = this.chatService.roomMediaEvent$.subscribe(ev => {
       if (!this.isLeader) {
         this.syncPlayer(ev);
       }
@@ -79,7 +80,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   }
 
   receiveRoomConfig() {
-    this.roomUserConfig$ = this.chatService.roomUserConfig$.subscribe(ev => {
+    this.roomUserConfigSubscription = this.chatService.roomUserConfig$.subscribe(ev => {
       this.isLeader = ev.isLeader;
       console.log(ev);
     });
@@ -110,10 +111,14 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
         this.notification.error('Hmm.. Something went wrong here', 'Maybe try logging in again?');
 
-        this.mediaUpdateTimer$.unsubscribe();
-        this.mediaSyncEvent$.unsubscribe();
+        this.mediaUpdateTimerSubscription.unsubscribe();
+        this.mediaSyncEventSubscription.unsubscribe();
       })
     );
+  }
+
+  giveLeader(member: RoomUserDto) {
+    this.chatService.giveLeader(member, this.name);
   }
 
   private sendMediaUpdate() {
@@ -194,8 +199,8 @@ export class ChannelComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.mediaUpdateTimer$.unsubscribe();
-    this.mediaSyncEvent$.unsubscribe();
+    this.mediaUpdateTimerSubscription.unsubscribe();
+    this.mediaSyncEventSubscription.unsubscribe();
     this.chatService.exit(this.name);
   }
 }

@@ -15,7 +15,7 @@
       <nz-list [nzBordered]="(members$  | async)" nzSize="small" [nzLoading]="!(members$  | async)"
         [nzDataSource]="members$ | async" [nzRenderItem]="member" [nzNoResult]="'No items'">
         <ng-template #member let-member>
-          <nz-list-item [nzActions]="giveLeaderBtn">
+          <nz-list-item [nzActions]="[giveLeaderBtn]">
             <nz-list-item-meta [nzTitle]="nzTitle" [nzAvatar]="member.isLeader ? leaderIcon : null"
               [nzDescription]="member.userName">
               <ng-template #nzTitle>
@@ -24,10 +24,13 @@
             </nz-list-item-meta>
           </nz-list-item>
           <ng-template #leaderIcon>
-            <i nz-icon style="color: white; font-size: 1rem;" nzType="crown" nz-tooltip nzTitle="This user currently controls the playback"></i>
+            <i nz-icon style="color: white; font-size: 1rem;" nzType="crown" nz-tooltip
+              nzTitle="This user currently controls the playback"></i>
           </ng-template>
           <ng-template #giveLeaderBtn>
-            <button nz-button nzType="link" nzShape="circle"><i nz-icon nzType="api"  nz-tooltip nzTitle="Hand over playback control to user"></i></button>
+            <button nz-button nzType="link" nz-tooltip nzTitle="Hand over playback control to user" (nzClick)="giveLeader(member)">
+              <i nz-icon nzType="api"></i>
+            </button>
           </ng-template>
         </ng-template>
       </nz-list>

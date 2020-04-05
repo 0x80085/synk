@@ -142,6 +142,11 @@ export class ChatService {
     this.socket.emit('join room', name);
   }
 
+  giveLeader(member: RoomUserDto, name: string) {
+    const ev = { to: member.userName, roomName: name };
+    this.socket.emit('give leader', ev);
+  }
+
   exit(name: string) {
     this.socket.emit('exit room', name);
     this.socket.off('group message');
