@@ -69,3 +69,12 @@ follow steps for your domain
 When lost, consult docker files
 
 
+### Misc commands
+
+> cd /var/www/html/
+
+> cp -r  /home/not-synk-admin-at-all/source/client/* .
+
+> sudo sed -i -- 's,__SYNK_API_URL__,https://synked.westeurope.cloudapp.azure.com:3000,g' *js
+
+> sudo sed -i -- 's,http://www.youtube.com/iframe_api,https://www.youtube.com/iframe_api,g' *js
