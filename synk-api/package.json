@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "ts-node src/index.ts",
+    "build": "tsc",
     "watch-ts": "tsc -w",
     "watch-node": "nodemon dist/index.js",
     "db:migrate:run": "ts-node ./node_modules/typeorm/cli.js migration:run"
