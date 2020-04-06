@@ -67,10 +67,9 @@ export class PlaylistComponent implements OnInit {
 
   private createVirtualList() {
     this.virtualPlaylist$ = this.playlist$.pipe(
-      withLatestFrom(of(this.activeItem)),
-      map(([ls, a]) => {
+      map((ls) => {
         const e: ListItem[] = ls.map(it => {
-          const active = it.mediaUrl === a;
+          const active = it.mediaUrl === this.activeItem;
           return { ...it, active };
         });
         return e;
