@@ -67,7 +67,7 @@ export default async function configure(logger: Logger) {
   setupRouting(app, roomService, logger);
 
   app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-    errorMeow(err, res, logger);
+    errorMeow(err, res, logger, next);
   });
 
   return { wsHttps };
