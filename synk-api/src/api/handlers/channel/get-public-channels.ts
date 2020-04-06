@@ -2,12 +2,13 @@ import { getConnection } from 'typeorm';
 
 import { Channel } from '../../../domain/entity/Channel';
 import { RoomService } from '../../../socket/services/room-service';
+import { Room } from '../../../socket/models/room';
 
 interface Summary {
   roomName: string;
   description: string;
-  memberCount: number;
-  currentlyPlaying: string;
+  memberCount?: number;
+  currentlyPlaying?: string;
 }
 
 export async function getPublicChannels(roomService: RoomService, amount = 50) {
@@ -28,28 +29,38 @@ export async function getPublicChannels(roomService: RoomService, amount = 50) {
   return res;
 }
 
-function summarize(i: any): Summary {
-  return {
-    roomName: i.name,
-    description: i.description || '...',
-    memberCount: i.members ? i.members.length : 0,
-    currentlyPlaying: i.currentPlayList ? i.currentPlayList.current : '...'
-  };
-}
-
 function mergeLists(allItems: Summary[], someItems: Summary[] = []) {
   const someItemsDict = toDictionary(someItems);
   return allItems.map(it => {
-    const sndListEntry: Summary = someItemsDict[it.roomName];
+    const secondListEntry: Summary = someItemsDict[it.roomName];
     const summary: Summary = {
-      currentlyPlaying: sndListEntry ? sndListEntry.currentlyPlaying : 'N/A',
+      currentlyPlaying: secondListEntry ? secondListEntry.currentlyPlaying : 'N/A',
       description: it.description,
-      memberCount: sndListEntry ? sndListEntry.memberCount : 0,
+      memberCount: secondListEntry ? secondListEntry.memberCount : 0,
       roomName: it.roomName,
     };
     return summary;
-  })
+  });
 }
+
+function summarize(it: Room | Channel): Summary {
+  function isRoom(ting: Room | Channel): ting is Room {
+    return (ting as Room).members !== undefined;
+  }
+  return isRoom(it)
+    ? {
+      roomName: it.name,
+      description: it.description,
+      memberCount: it.members.length,
+      currentlyPlaying: getCurrentlyPlaying(it)
+    }
+    :
+    {
+      roomName: it.name,
+      description: it.description
+    };
+}
+
 
 function toDictionary(arr: Summary[]) {
   const dict: any = {};
@@ -57,4 +68,10 @@ function toDictionary(arr: Summary[]) {
     dict[it.roomName] = it;
   });
   return dict;
+}
+
+function getCurrentlyPlaying(room: Room) {
+  return room && room.currentPlayList && room.currentPlayList.current
+    ? room.currentPlayList.current.mediaUrl
+    : 'N/A';
 }
