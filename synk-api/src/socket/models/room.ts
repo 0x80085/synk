@@ -135,6 +135,8 @@ export class Room {
 
         const soc = this.getSocketOfMember(newLeader);
         this.sendRoomConfigToMember(soc);
+      } else {
+        this.setLeader(null);
       }
     }
   }
