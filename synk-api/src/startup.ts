@@ -7,6 +7,7 @@ import * as passport from 'passport';
 import * as bodyParser from 'body-parser';
 import * as morgan from 'morgan';
 import * as compression from 'compression';
+import * as helmet from 'helmet';
 
 import { Request, Response, NextFunction } from 'express-serve-static-core';
 
@@ -41,6 +42,8 @@ export default async function configure(logger: Logger) {
   app.use(compression());
   app.disable('x-powered-by');
   app.enable('trust proxy');
+
+  app.use(helmet());
 
   app.use(morgan('short'));
 

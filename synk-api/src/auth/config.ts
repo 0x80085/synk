@@ -10,6 +10,7 @@ export function configureSessionMiddleware(connection: Connection) {
   const sessionSecret = process.env.SESSION_SECRET;
   const saveUninitialized = process.env.SESSION_SAVEUNINITIALIZED === 'TRUE';
   const resave = process.env.SESSION_RESAVE === 'TRUE';
+  const secure = process.env.SESSION_HTTPS === 'TRUE';
   const cookieMaxAge = +process.env.SESSION_COOKIE_MAXAGE;
 
   const sessionRepo = connection.getRepository(Session);
@@ -26,7 +27,11 @@ export function configureSessionMiddleware(connection: Connection) {
     rolling: true,
     store: sessionStore,
     cookie: {
-      maxAge: cookieMaxAge
+      httpOnly: true,
+      secure,
+      domain: process.env.DOMAIN_NAME,
+      maxAge: cookieMaxAge,
+      sameSite: true
     }
   };
   return sessionMiddlewareConfig;
