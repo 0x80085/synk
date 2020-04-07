@@ -28,7 +28,7 @@
               nzTitle="This user currently controls the playback"></i>
           </ng-template>
           <ng-template #giveLeaderBtn>
-            <button nz-button nzType="link" nz-tooltip nzTitle="Hand over playback control to user" (nzClick)="giveLeader(member)">
+            <button nz-button nzType="link" nz-tooltip nzTitle="Hand over playback control to user" (click)="giveLeader(member)">
               <i nz-icon nzType="api"></i>
             </button>
           </ng-template>
@@ -36,7 +36,7 @@
       </nz-list>
     </div>
     <div nz-col nzSpan="18" class="mt-1">
-      <app-playlist [playlist$]="playlist$" [activeItem]="mediaUrl" [roomName]="name" [showAddMediaInput]="isLeader"
+      <app-playlist [playlist$]="playlist$" [activeItem]="activeItemSubject" [roomName]="name" [showAddMediaInput]="isLeader"
         (playMedia)="player.play($event.mediaUrl)">
       </app-playlist>
     </div>

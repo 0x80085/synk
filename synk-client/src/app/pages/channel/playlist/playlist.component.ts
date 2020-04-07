@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Observable, of, Subject } from 'rxjs';
+import { Observable, of, Subject, BehaviorSubject } from 'rxjs';
 import { map, withLatestFrom } from 'rxjs/operators';
 import { NzNotificationService } from 'ng-zorro-antd';
 
@@ -17,7 +17,7 @@ type ListItem = MediaEvent & { active: boolean };
 export class PlaylistComponent implements OnInit {
 
   @Input() playlist$: Observable<MediaEvent[]>;
-  @Input() activeItem = '';
+  @Input() activeItem: BehaviorSubject<string>;
   @Input() roomName: string;
   @Input() showAddMediaInput = true;
 
@@ -25,7 +25,16 @@ export class PlaylistComponent implements OnInit {
 
   newMedia: string;
 
-  virtualPlaylist$: Observable<ListItem[]>;
+  virtualPlaylist$ = this.playlist$.pipe(
+    withLatestFrom(this.activeItem),
+    map(([ls, activeItem]) => {
+      const e: ListItem[] = ls.map(it => {
+        const active = it.mediaUrl === activeItem;
+        return { ...it, active };
+      });
+      return e;
+    })
+  );
 
   showControls = false;
 
@@ -66,15 +75,7 @@ export class PlaylistComponent implements OnInit {
   }
 
   private createVirtualList() {
-    this.virtualPlaylist$ = this.playlist$.pipe(
-      map((ls) => {
-        const e: ListItem[] = ls.map(it => {
-          const active = it.mediaUrl === this.activeItem;
-          return { ...it, active };
-        });
-        return e;
-      })
-    );
+    this.virtualPlaylist$
 
   }
 

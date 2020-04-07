@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, OnDestroy, HostListener } from '@angular/
 import { ActivatedRoute } from '@angular/router';
 
 import { tap, map, mapTo } from 'rxjs/operators';
-import { timer, Subscription, Observable } from 'rxjs';
+import { timer, Subscription, Observable, BehaviorSubject } from 'rxjs';
 
 import { MediaComponent } from './media/media.component';
 import { ChatService } from './chat.service';
@@ -21,6 +21,8 @@ export class ChannelComponent implements OnInit, OnDestroy {
   name: string;
   mediaUrl = '';
   isLeader = false;
+
+  activeItemSubject: BehaviorSubject<string> = new BehaviorSubject(null);
 
   errorEvent$: Observable<Message[]>;
   members$: Observable<RoomUserDto[]>;
@@ -58,6 +60,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
     const i = this.playlist.findIndex(it => it === this.mediaUrl);
     const next = this.playlist[i + 1] || this.playlist[0];
     this.mediaUrl = next;
+    this.activeItemSubject.next(this.mediaUrl)
 
     this.player.play(this.mediaUrl);
   }
@@ -145,6 +148,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
       if (this.player.getCurrentUrl() !== ev.mediaUrl) {
         this.mediaUrl = ev.mediaUrl;
         this.player.play(this.mediaUrl);
+        this.activeItemSubject.next(this.mediaUrl)
       }
       if (this.clientCurrenttimeIsOutOfSync(ev.currentTime)) {
         if (!this.player.isPlaying()) {
