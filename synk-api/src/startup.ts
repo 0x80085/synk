@@ -82,11 +82,12 @@ function getSSLCert() {
   const pathToCert = process.env.SSL_CERT_PATH;
   const pathToChain = process.env.SSL_CHAIN_PATH;
 
-  if (!pathToKey || !pathToCert || !pathToChain) {
-    throw new Error('WARN no path to SSL certificate found, SLL can not be used');
-  }
-
   try {
+
+    if (!pathToKey || !pathToCert || !pathToChain) {
+      throw new Error('WARN no path to SSL certificate found, SLL can not be used');
+    }
+
     const privateKey = fs.readFileSync(pathToKey, 'utf8');
     const certificate = fs.readFileSync(pathToCert, 'utf8');
     const chain = fs.readFileSync(pathToChain, 'utf8');
