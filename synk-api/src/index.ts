@@ -8,13 +8,13 @@ async function RUN() {
 
   logger.info(`Configuring API for ${isProduction ? 'PRD' : 'DEV'} environment...`);
 
-  const { wsHttps } = await configure(logger);
+  const { server } = await configure(logger);
 
   logger.info('Configuring COMPLETED!');
 
   logger.info('Launching server...');
 
-  wsHttps.listen(3000, () => {
+  server.listen(3000, () => {
     logger.info(`🚀 \t SERVER LAUNCHED \t 🚀`);
     logger.info(`🛰 \t Started on port ${process.env.HOST_PORT} \t 🛰`);
   });

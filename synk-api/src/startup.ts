@@ -1,4 +1,5 @@
 import * as https from 'https';
+import * as http from 'http';
 import * as fs from 'graceful-fs';
 import * as dotenv from 'dotenv';
 import * as express from 'express';
@@ -49,7 +50,13 @@ export default async function configure(logger: Logger) {
 
   const credentials = getSSLCert();
 
-  const wsHttps = https.createServer(credentials, app);
+  let server;
+
+  if (credentials) {
+    server = https.createServer(credentials, app);
+  } else {
+    server = http.createServer(app);
+  }
 
   const sessionMiddlewareConfig: SessionOptions = configureSessionMiddleware(connection);
 
@@ -60,7 +67,7 @@ export default async function configure(logger: Logger) {
     logger
   );
 
-  const { roomService } = setupSockets(wsHttps, sessionMiddlewareConfig, logger);
+  const { roomService } = setupSockets(server, sessionMiddlewareConfig, logger);
 
   app.use(sessionMiddleware);
 
@@ -73,7 +80,7 @@ export default async function configure(logger: Logger) {
     errorMeow(err, res, logger, next);
   });
 
-  return { wsHttps };
+  return { server };
 }
 
 function getSSLCert() {
