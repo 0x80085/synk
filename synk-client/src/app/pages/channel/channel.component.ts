@@ -20,7 +20,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   name: string;
   mediaUrl = '';
-  isLeader = false;
+  loggedInUserIsLeader = false;
 
   activeItemSubject: BehaviorSubject<string> = new BehaviorSubject(null);
 
@@ -68,7 +68,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   sendPeriodicUpdate() {
     const timer$ = timer(1000, 2000);
     this.mediaUpdateTimerSubscription = timer$.subscribe(val => {
-      if (this.isLeader && this.player) {
+      if (this.loggedInUserIsLeader && this.player) {
         this.sendMediaUpdate();
       }
     });
@@ -76,7 +76,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   syncPlayerState() {
     this.mediaSyncEventSubscription = this.chatService.roomMediaEvent$.subscribe(ev => {
-      if (!this.isLeader) {
+      if (!this.loggedInUserIsLeader) {
         this.syncPlayer(ev);
       }
     });
@@ -84,7 +84,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   receiveRoomConfig() {
     this.roomUserConfigSubscription = this.chatService.roomUserConfig$.subscribe(ev => {
-      this.isLeader = ev.isLeader;
+      this.loggedInUserIsLeader = ev.isLeader;
       console.log(ev);
     });
   }

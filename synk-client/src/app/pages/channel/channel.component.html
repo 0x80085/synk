@@ -16,8 +16,7 @@
         [nzDataSource]="members$ | async" [nzRenderItem]="member" [nzNoResult]="'No items'">
         <ng-template #member let-member>
           <nz-list-item [nzActions]="[giveLeaderBtn]">
-            <nz-list-item-meta [nzTitle]="nzTitle" [nzAvatar]="member.isLeader ? leaderIcon : null"
-              [nzDescription]="member.userName">
+            <nz-list-item-meta [nzTitle]="nzTitle" [nzAvatar]="member.isLeader ? leaderIcon : null">
               <ng-template #nzTitle>
                 <span>{{ member.userName }}</span>
               </ng-template>
@@ -28,7 +27,8 @@
               nzTitle="This user currently controls the playback"></i>
           </ng-template>
           <ng-template #giveLeaderBtn>
-            <button nz-button nzType="link" nz-tooltip nzTitle="Hand over playback control to user" (click)="giveLeader(member)">
+            <button nz-button nzType="link" nz-tooltip nzTitle="Hand over playback control to user"
+              [hidden]="member.isLeader || !loggedInUserIsLeader" (click)="giveLeader(member)">
               <i nz-icon nzType="api"></i>
             </button>
           </ng-template>
@@ -36,8 +36,8 @@
       </nz-list>
     </div>
     <div nz-col nzSpan="18" class="mt-1">
-      <app-playlist [playlist$]="playlist$" [activeItem]="activeItemSubject" [roomName]="name" [showAddMediaInput]="isLeader"
-        (playMedia)="player.play($event.mediaUrl)">
+      <app-playlist [playlist$]="playlist$" [activeItem]="activeItemSubject | async"
+        [roomName]="name" [showAddMediaInput]="loggedInUserIsLeader" (playMedia)="player.play($event.mediaUrl)">
       </app-playlist>
     </div>
   </div>
