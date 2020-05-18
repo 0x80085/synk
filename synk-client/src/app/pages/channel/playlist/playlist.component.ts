@@ -6,6 +6,7 @@ import { NzNotificationService } from 'ng-zorro-antd';
 import { MediaEvent } from '../models/room.models';
 import { ChatService } from '../chat.service';
 import { isValidYTid } from '../media/youtube/youtube.component';
+import { MediaService } from '../media.service';
 
 type ListItem = MediaEvent & { active: boolean };
 
@@ -30,7 +31,7 @@ export class PlaylistComponent implements OnInit {
   showControls = false;
 
   constructor(
-    private chatService: ChatService,
+    private  mediaService: MediaService,
     private notification: NzNotificationService) { }
 
   ngOnInit() {
@@ -46,7 +47,7 @@ export class PlaylistComponent implements OnInit {
       return;
     }
 
-    this.chatService.addToPlaylist({
+    this.mediaService.addToPlaylist({
       mediaUrl: this.newMedia,
       roomName: this.roomName,
       currentTime: null
@@ -56,7 +57,7 @@ export class PlaylistComponent implements OnInit {
 
   onRemoveMedia(mediaUrl: string) {
     if (confirm(`Want to delete ${mediaUrl}?`)) {
-      this.chatService.removeFromPlaylist({
+      this.mediaService.removeFromPlaylist({
         mediaUrl,
         roomName: this.roomName,
         currentTime: null

@@ -1,18 +1,16 @@
-import { Injectable } from '@angular/core';
-
-import * as io from 'socket.io-client';
+import { Injectable, Inject, forwardRef } from '@angular/core';
 
 import { Observable, fromEvent, timer } from 'rxjs';
 
-import { environment } from 'src/environments/environment';
 import {
   Message,
   RoomMessage,
-  MediaEvent,
   RoomUserConfig,
-  RoomUserDto
+  RoomUserDto,
+  RoomCommands
 } from './models/room.models';
-import { AppStateService } from 'src/app/app-state.service';
+import { SocketService } from '../../socket.service';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -20,96 +18,58 @@ import { AppStateService } from 'src/app/app-state.service';
 export class ChatService {
   messageQueue: Message[] = [];
 
-  roomMessages$: Observable<Message[]> = new Observable(observer => {
-    this.socket.on('group message', (data: RoomMessage) => {
+  // roomMessages$: Observable<Message[]> = new Observable(observer => {
+  //   this.socketService.on('group message', (data: RoomMessage) => {
+  //     this.messageQueue = this.messageQueue.concat(data.content);
+  //     observer.next(this.messageQueue);
+  //   });
+  // });
+  // roomUserConfig$: Observable<RoomUserConfig> = new Observable(observer => {
+  //   this.socketService.on('user config', (data: RoomUserConfig) => {
+  //     this.state.isLoggedInSubject.next(true);
+  //     this.state.isSocketConnectedSub.next(true);
+  //     observer.next(data);
+  //   });
+  // });
+  // roomUserList$: Observable<RoomUserDto[]> = new Observable(observer => {
+  //   this.socket.on('userlist update', (data: RoomUserDto[]) => {
+  //     observer.next(data);
+  //   });
+  // });
+
+  roomMessages$ = this.socketService.listenForEventIfConnected(RoomCommands.GROUP_MESSAGE).pipe(
+    map((data: RoomMessage) => {
       this.messageQueue = this.messageQueue.concat(data.content);
-      observer.next(this.messageQueue);
-    });
-  });
+      return this.messageQueue;
+    })
+  );
 
-  roomMediaEvent$: Observable<MediaEvent> = new Observable(observer => {
-    this.socket.on('media event', (data: MediaEvent) => {
-      observer.next(data);
-    });
-  });
+  roomUserConfig$ = this.socketService.listenForEventIfConnected(RoomCommands.USER_CONFIG).pipe(
+    map((data: RoomUserConfig) => {
+      return data;
+    })
+  );
 
-  roomUserConfig$: Observable<RoomUserConfig> = new Observable(observer => {
-    this.socket.on('user config', (data: RoomUserConfig) => {
-      this.state.isLoggedInSubject.next(true);
-      this.state.isSocketConnectedSub.next(true);
+  roomUserList$ = this.socketService.listenForEventIfConnected(RoomCommands.USER_LIST_UPDATE).pipe(
+    map((data: RoomUserDto[]) => {
+      return data;
+    })
+  );
 
-      observer.next(data);
-    });
-  });
-
-  roomUserList$: Observable<RoomUserDto[]> = new Observable(observer => {
-    this.socket.on('userlist update', (data: RoomUserDto[]) => {
-      observer.next(data);
-    });
-  });
-
-  roomPlaylist$: Observable<MediaEvent[]> = new Observable(observer => {
-    this.socket.on('playlist update', (data: MediaEvent[]) => {
-      observer.next(data);
-    });
-  });
-
-  permissionErrorEvent$: Observable<Message[]> = new Observable(observer => {
-    this.socket.on('error', (data: any) => {
-      this.messageQueue = [{ text: 'Error connecting', userName: '>:)' }];
-      observer.next(this.messageQueue);
-
-      this.state.isLoggedInSubject.next(false);
-      this.state.isSocketConnectedSub.next(false);
-
-      this.socket.close();
-    });
-  });
-
-  connectionErrorEvent$: Observable<Message[]> = new Observable(observer => {
-    this.socket.on('connect_error', (data: any) => {
-      console.log('connect error', data);
-      this.messageQueue = [{ text: 'Error connecting', userName: '>:)' }];
-      observer.next(this.messageQueue);
-
-      this.state.isLoggedInSubject.next(false);
-      this.state.isSocketConnectedSub.next(false);
-
-      this.socket.close();
-    });
-  });
-
-  connectionTimeOutEvent$: Observable<Message[]> = new Observable(observer => {
-    this.socket.on('connect_timeout', (data: any) => {
-      this.state.isSocketConnectedSub.next(false);
-      this.socket.close();
-    });
-  });
-
-  connectionSuccessEvent$: Observable<Message[]> = new Observable(observer => {
-    this.socket.on('connect', (data: any) => {
-      this.state.isLoggedInSubject.next(true);
-      this.state.isSocketConnectedSub.next(true);
-    });
-  });
-
-  private socket: SocketIOClient.Socket;
-
-  constructor(private state: AppStateService) {
-    this.init();
-  }
-
-  init() {
-    this.socket = io(`${environment.api}`);
-  }
-
-  reconnect() {
-    this.socket.close();
-    this.socket.open();
-  }
+  constructor(@Inject(forwardRef(() => SocketService)) private socketService: SocketService) { }
 
   sendDM(msg: string) {
-    this.socket.emit('private message', msg);
+    this.socketService.sendEvent({ command: RoomCommands.PM, payload: msg });
+  }
+
+  cok(msg: string) {
+    this.socketService.emitIfConnected(sendMessage$)
+      .subscribe(([{ socket, data }, username]) => {
+        const [message, id] = data
+        clearUserInput()
+        addMessage(username, message) // Add own chat message to DOM
+        socket.emit('chat message', { id, message })
+      })
   }
 
   sendMessageToRoom(msg: Message, roomName: string) {
@@ -117,40 +77,24 @@ export class ChatService {
       roomName,
       content: msg
     };
-    this.socket.emit('group message', message);
-  }
-
-  sendMediaEvent(mediaUrl: string, currentTime: number, roomName: string) {
-    const ev: MediaEvent = {
-      currentTime,
-      mediaUrl,
-      roomName
-    };
-    this.socket.emit('media event', ev);
-  }
-
-  addToPlaylist(ev: MediaEvent) {
-    this.socket.emit('add media', ev);
-  }
-
-  removeFromPlaylist(ev: MediaEvent) {
-    this.socket.emit('remove media', ev);
+    this.socketService.sendEvent({ command: RoomCommands.GROUP_MESSAGE, payload: message });
   }
 
   enterRoom(name: string) {
-    this.socket.connect();
-    this.socket.emit('join room', name);
+    this.socketService.connect();
+    this.socketService.sendEvent({ command: RoomCommands.JOIN_ROOM, payload: name });
   }
 
   giveLeader(member: RoomUserDto, name: string) {
     const ev = { to: member.userName, roomName: name };
-    this.socket.emit('give leader', ev);
+    this.socketService.sendEvent({ command: RoomCommands.GIVE_LEADER, payload: ev });
   }
 
   exit(name: string) {
-    this.socket.emit('exit room', name);
-    this.socket.off('group message');
+    this.socketService.sendEvent({ command: RoomCommands.EXIT_ROOM, payload: name });
+    this.socketService.removeEventListener(RoomCommands.GROUP_MESSAGE);
     this.messageQueue = [];
+
   }
 
   // setupMessageQueueGCTimer() {

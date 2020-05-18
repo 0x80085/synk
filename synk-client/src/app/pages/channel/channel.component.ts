@@ -8,6 +8,8 @@ import { MediaComponent } from './media/media.component';
 import { ChatService } from './chat.service';
 import { MediaEvent, Message, RoomUserDto } from './models/room.models';
 import { NzNotificationService } from 'ng-zorro-antd';
+import { MediaService } from './media.service';
+import { SocketService } from 'src/app/socket.service';
 
 @Component({
   selector: 'app-channel',
@@ -24,7 +26,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   activeItemSubject: BehaviorSubject<string> = new BehaviorSubject(null);
 
-  errorEvent$: Observable<Message[]>;
+  errorEvent$: Observable<Message>;
   members$: Observable<RoomUserDto[]>;
   playlist$: Observable<MediaEvent[]>;
 
@@ -36,7 +38,9 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
+    private socketService: SocketService,
     private chatService: ChatService,
+    private mediaService: MediaService,
     private notification: NzNotificationService
   ) { }
 
@@ -47,7 +51,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.name = this.route.snapshot.paramMap.get('name');
-    this.chatService.reconnect();
+    this.socketService.reconnect();
     this.syncPlayerState();
     this.sendPeriodicUpdate();
     this.quitOnError();
@@ -75,7 +79,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   }
 
   syncPlayerState() {
-    this.mediaSyncEventSubscription = this.chatService.roomMediaEvent$.subscribe(ev => {
+    this.mediaSyncEventSubscription = this.mediaService.roomMediaEvent$.subscribe(ev => {
       if (!this.loggedInUserIsLeader) {
         this.syncPlayer(ev);
       }
@@ -90,7 +94,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   }
 
   receivePlaylistUpdate() {
-    this.playlist$ = this.chatService.roomPlaylist$.pipe(
+    this.playlist$ = this.mediaService.roomPlaylist$.pipe(
       tap(ev => {
         this.playlist = ev.map(i => {
           return i.mediaUrl;
@@ -108,7 +112,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   }
 
   quitOnError() {
-    this.errorEvent$ = this.chatService.permissionErrorEvent$.pipe(
+    this.errorEvent$ = this.socketService.permissionErrorEvent$.pipe(
       tap(x => {
         console.log(x);
 
@@ -126,7 +130,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   private sendMediaUpdate() {
     try {
-      this.chatService.sendMediaEvent(
+      this.mediaService.sendMediaEvent(
         this.player.getCurrentUrl(),
         this.player.getCurrentTime(),
         this.name

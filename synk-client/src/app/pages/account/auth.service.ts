@@ -4,6 +4,7 @@ import { environment } from 'src/environments/environment';
 import { ChatService } from '../channel/chat.service';
 import { tap, mapTo } from 'rxjs/operators';
 import { AppStateService } from 'src/app/app-state.service';
+import { SocketService } from 'src/app/socket.service';
 
 interface LoginInfo {
   username: string;
@@ -22,7 +23,7 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
-    private chatServ: ChatService,
+    private socketService: SocketService,
     private state: AppStateService
   ) { }
 
@@ -46,7 +47,7 @@ export class AuthService {
       .pipe(
         tap(() => {
           this.state.isLoggedInSubject.next(true);
-          this.chatServ.reconnect();
+          this.socketService.reconnect();
         })
       );
   }
@@ -59,7 +60,7 @@ export class AuthService {
       .pipe(
         tap(() => {
           this.state.isLoggedInSubject.next(true);
-          this.chatServ.reconnect();
+          this.socketService.reconnect();
         })
       );
   }
