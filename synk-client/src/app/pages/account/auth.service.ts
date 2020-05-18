@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { tap } from 'rxjs/operators';
+
 import { environment } from 'src/environments/environment';
-import { ChatService } from '../channel/chat.service';
-import { tap, mapTo } from 'rxjs/operators';
 import { AppStateService } from 'src/app/app-state.service';
 import { SocketService } from 'src/app/socket.service';
 
@@ -47,8 +47,8 @@ export class AuthService {
       .pipe(
         tap(() => {
           this.state.isLoggedInSubject.next(true);
-          this.socketService.reconnect();
-        })
+        }),
+        this.socketService.reconnect()
       );
   }
 
@@ -68,7 +68,13 @@ export class AuthService {
   getUser() {
     return this.http.get<User>(`${environment.api}/account`, {
       withCredentials: true
-    });
+    }).pipe(
+      tap(res => {
+        this.state.isLoggedInSubject.next(true);
+        this.state.userSubject.next(res);
+      })
+
+    );
   }
 
 }

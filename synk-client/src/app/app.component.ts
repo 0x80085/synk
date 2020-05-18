@@ -12,6 +12,7 @@ export class AppComponent {
 
   isLoggedIn = this.state.isLoggedIn$.pipe();
   isConnected = this.state.isSocketConnected$.pipe();
+  user = this.state.me$.pipe();
 
   constructor(private state: AppStateService) { }
 

@@ -20,7 +20,7 @@
       cols="30"
       minlength="10"
       maxlength="512"
-      (keyup.enter)="onSendMessageToGroup()"
+      (keyup.enter)="submitChatMessageSub.next()"
       nzAutosize
     ></textarea>
   </nz-card>
@@ -33,6 +33,6 @@
     nzType="edit"
     title="Send message"
     style="color: #fff;"
-    (click)="onSendMessageToGroup()"
+    (click)="submitChatMessageSub.next()"
   ></i>
 </ng-template>

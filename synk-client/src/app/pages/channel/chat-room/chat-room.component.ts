@@ -1,8 +1,8 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild, ElementRef, AfterViewChecked, HostListener } from '@angular/core';
-import { Observable } from 'rxjs';
-import { distinctUntilChanged, debounceTime, tap } from 'rxjs/operators';
+import { Observable, Subject, merge, of } from 'rxjs';
+import { distinctUntilChanged, debounceTime, tap, map, filter } from 'rxjs/operators';
 import { ChatService } from '../chat.service';
-import { Message } from '../models/room.models';
+import { Message, RoomMessage } from '../models/room.models';
 
 @Component({
   selector: 'app-chat-room',
@@ -15,6 +15,7 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
 
   @Input() name: string;
 
+  submitChatMessageSub = new Subject();
   msgBoxValue: string;
 
   messages$: Observable<Message[]> = this.chatServ.roomMessages$
@@ -23,23 +24,35 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
       distinctUntilChanged()
     );
 
+  submitMessage$: Observable<RoomMessage> = this.submitChatMessageSub.pipe(
+    map(() => ({
+      roomName: this.name,
+      content: {
+        text: this.msgBoxValue
+      }
+    })),
+    filter(msg => !!msg)
+  );
+
+  sendGroupMessage$ = this.chatServ.sendGroupMessage(this.submitMessage$);
+
   constructor(private chatServ: ChatService) { }
 
   @HostListener('scroll', ['$event']) onScroll($event: Event): void {
     console.log($event.target);
   }
 
-  onSendMessageToGroup() {
-    this.chatServ.sendMessageToRoom({ text: this.msgBoxValue.trim() }, this.name);
-    this.msgBoxValue = '';
-  }
+  // onSendMessageToGroup() {
+  //   this.chatServ.sendGroupMessage({ text: this.msgBoxValue.trim() }, this.name);
+  //   this.msgBoxValue = '';
+  // }
 
   ngOnInit() {
-    this.chatServ.enterRoom(this.name);
+    // this.chatServ.enterRoom(this.name);
   }
 
   ngOnDestroy() {
-    this.chatServ.exit(this.name);
+    this.chatServ.exit(of(this.name));
   }
 
   private scrollChatFeedDown() {

@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, fromEvent } from 'rxjs';
+import { Observable, of, fromEvent, merge } from 'rxjs';
 import * as io from 'socket.io-client';
 
 import { AppStateService } from 'src/app/app-state.service';
 import { environment } from 'src/environments/environment';
 import { Message } from './pages/channel/models/room.models';
 import { PossibleCommands } from './pages/channel/models/commands.enum';
-import { switchMap, map, tap } from 'rxjs/operators';
+import { switchMap, map, tap, share, withLatestFrom, catchError, mapTo } from 'rxjs/operators';
+import { NzNotificationService } from 'ng-zorro-antd';
 
 export interface RealTimeCommand {
   command: PossibleCommands;
@@ -18,15 +19,27 @@ export interface RealTimeCommand {
 })
 export class SocketService {
 
-  socket$ = of(io(`${environment.api}`));
+  socket$ = of(io(`${environment.api}`)).pipe(share());
+
 
   connectionSuccessEvent$ = this.socket$
     .pipe(
       switchMap(socket =>
         fromEvent(socket, 'connect')
           .pipe(
+            this.setAppState(true, true),
             map(() => socket),
-            tap(() => this.setAppState(true, true))
+          )
+      )
+    );
+
+  reconnectionSuccessEvent$ = this.socket$
+    .pipe(
+      switchMap(socket =>
+        fromEvent(socket, 'reconnect')
+          .pipe(
+            this.setAppState(true, true),
+            map(() => socket),
           )
       )
     );
@@ -36,10 +49,8 @@ export class SocketService {
       switchMap(socket =>
         fromEvent(socket, 'error')
           .pipe(
-            tap(() => {
-              this.setAppState(false, false);
-              this.socket.close();
-            }),
+            this.setAppState(false, false),
+            tap(() => socket.close()),
             map((data: Message) => data)
           )
       )
@@ -50,10 +61,8 @@ export class SocketService {
       switchMap(socket =>
         fromEvent(socket, 'error')
           .pipe(
-            tap(() => {
-              this.setAppState(false, false);
-              this.socket.close();
-            })
+            this.setAppState(false, false),
+            tap(() => socket.close()),
           )
       )
     );
@@ -63,10 +72,8 @@ export class SocketService {
       switchMap(socket =>
         fromEvent(socket, 'error')
           .pipe(
-            tap(() => {
-              this.setAppState(false);
-              this.socket.close();
-            })
+            this.setAppState(false),
+            tap(() => socket.close()),
           )
       )
     );
@@ -76,43 +83,57 @@ export class SocketService {
       switchMap(socket =>
         fromEvent(socket, 'error')
           .pipe(
-            tap(() => {
-              this.setAppState(false);
-            })
+            this.setAppState(false)
           )
       )
     );
 
-  constructor(private state: AppStateService) { }
+  connectionState$ = merge(
+    this.connectionSuccessEvent$.pipe(mapTo(true)),
+    this.reconnectionSuccessEvent$.pipe(mapTo(true)),
+    this.permissionErrorEvent$.pipe(mapTo(false)),
+    this.connectionErrorEvent$.pipe(mapTo(false)),
+    this.disconnectionEvent$.pipe(mapTo(false)),
+    this.connectionTimeOutEvent$.pipe(mapTo(false)),
+  ).pipe(
+    tap((iz) => this.state.isSocketConnectedSub.next(iz)),
+    share()
+  );
 
-  connect() {
-    this.socket.connect();
-  }
+  constructor(
+    private state: AppStateService,
+    private notification: NzNotificationService
+  ) { }
 
-  reconnect() {
-    this.socket.close();
-    this.socket.open();
-  }
-
-  removeEventListener(name: string) {
-    this.socket.off(name);
-  }
-
-  sendEvent(ev: RealTimeCommand) {
-    this.socket.emit(ev.command, ev.payload);
-  }
-
-  // emitIfConnected(observable$) {
-  //   return this.connectionSuccessEvent$
-  //     .pipe(
-  //       switchMap(socket =>
-  //         observable$
-  //           .pipe(
-  //             map(data => ({ socket, data }))
-  //           )
-  //       )
-  //     );
+  // connect() {
+  //   socket.connect();
   // }
+
+  // reconnect() {
+  //   socket.close();
+  //   socket.open();
+  // }
+
+  // removeEventListener(name: string) {
+  //   socket.off(name);
+  // }
+
+  // sendEvent(ev: RealTimeCommand) {
+  //   socket.emit(ev.command, ev.payload);
+  // }
+
+  emitIfConnected<T>(command$: Observable<T>) {
+    return this.connectionSuccessEvent$
+      .pipe(
+        switchMap(socket =>
+          command$
+            .pipe(
+              map(data => ({ socket, data }))
+            )
+        ),
+        this.catchSocketErr()
+      );
+  }
 
   listenForEventIfConnected(event: string) {
     return this.connectionSuccessEvent$
@@ -123,10 +144,39 @@ export class SocketService {
       );
   }
 
-  private setAppState(isConnected: boolean, isLoggedIn?: boolean) {
-    this.state.isSocketConnectedSub.next(isConnected);
-    if (isLoggedIn) {
-      this.state.isLoggedInSubject.next(isLoggedIn);
-    }
+  reconnect<T>(): (src: Observable<T>) => Observable<T> {
+    return (source: Observable<T>) =>
+      source.pipe(
+        withLatestFrom(this.socket$),
+        tap(([_, socket]) => {
+          socket.close();
+          socket.open();
+        }),
+        map(([_, s]) => _),
+        // this.catchSocketErr()
+      );
+  }
+
+  private setAppState<T>(isConnected: boolean, isLoggedIn?: boolean): (src: Observable<T>) => Observable<T> {
+    return (src: Observable<T>) =>
+      src.pipe(
+        tap(() => {
+          this.state.isSocketConnectedSub.next(isConnected);
+          if (isLoggedIn) {
+            this.state.isLoggedInSubject.next(isLoggedIn);
+          }
+        }),
+      );
+  }
+
+  private catchSocketErr<T>(): (src: Observable<T>) => Observable<T> {
+    return (src: Observable<T>) =>
+      src.pipe(
+        catchError((err) => {
+          console.log(err);
+          this.notification.error('Hmm.. Something went wrong here', 'Cant reach the RT server');
+          return of(err);
+        }),
+      )
   }
 }

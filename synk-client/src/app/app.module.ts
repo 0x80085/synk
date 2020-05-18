@@ -36,8 +36,8 @@ registerLocaleData(en);
   ],
   providers: [
     { provide: NZ_I18N, useValue: en_US },
+    SocketService,
     AppStateService,
-    SocketService
   ],
   bootstrap: [AppComponent]
 })

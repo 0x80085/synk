@@ -3,7 +3,8 @@
     <div class="sidebar-logo">
       <span>
         <i nz-icon [style.color]="(isConnected | async) ? '#00ff00' : ''" nzType="meh" style="cursor: pointer;"
-          (click)="isCollapsed = !isCollapsed" nzTheme="fill"></i>
+          (click)="isCollapsed = !isCollapsed" nzTheme="fill"
+          nz-tooltip [nzTitle]="(user | async).userName"></i>
         <h1 style="cursor: pointer;" (click)="isCollapsed = !isCollapsed">
           SYNKd.TV
         </h1>

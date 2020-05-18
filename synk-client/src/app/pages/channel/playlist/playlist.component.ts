@@ -31,7 +31,7 @@ export class PlaylistComponent implements OnInit {
   showControls = false;
 
   constructor(
-    private  mediaService: MediaService,
+    private mediaService: MediaService,
     private notification: NzNotificationService) { }
 
   ngOnInit() {
@@ -47,21 +47,21 @@ export class PlaylistComponent implements OnInit {
       return;
     }
 
-    this.mediaService.addToPlaylist({
+    this.mediaService.addToPlaylist(of({
       mediaUrl: this.newMedia,
       roomName: this.roomName,
       currentTime: null
-    });
+    }));
     this.notification.success('Success', 'Media added to playlist');
   }
 
   onRemoveMedia(mediaUrl: string) {
     if (confirm(`Want to delete ${mediaUrl}?`)) {
-      this.mediaService.removeFromPlaylist({
+      this.mediaService.removeFromPlaylist(of({
         mediaUrl,
         roomName: this.roomName,
         currentTime: null
-      });
+      }));
       this.notification.success('Success', 'Media removed from playlist');
     }
   }

@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, OnDestroy, HostListener } from '@angular/
 import { ActivatedRoute } from '@angular/router';
 
 import { tap, map, mapTo } from 'rxjs/operators';
-import { timer, Subscription, Observable, BehaviorSubject } from 'rxjs';
+import { timer, Subscription, Observable, BehaviorSubject, of } from 'rxjs';
 
 import { MediaComponent } from './media/media.component';
 import { ChatService } from './chat.service';
@@ -46,12 +46,12 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   @HostListener('window:beforeunload')
   exitRoomOnPageDestroy() {
-    this.chatService.exit(this.name);
+    this.chatService.exit(of(this.name));
   }
 
   ngOnInit() {
     this.name = this.route.snapshot.paramMap.get('name');
-    this.socketService.reconnect();
+    // this.socketService.reconnect();
     this.syncPlayerState();
     this.sendPeriodicUpdate();
     this.quitOnError();
@@ -125,18 +125,17 @@ export class ChannelComponent implements OnInit, OnDestroy {
   }
 
   giveLeader(member: RoomUserDto) {
-    this.chatService.giveLeader(member, this.name);
+    this.chatService.giveLeader(of({ member, roomName: this.name }));
   }
 
   private sendMediaUpdate() {
     try {
-      this.mediaService.sendMediaEvent(
-        this.player.getCurrentUrl(),
-        this.player.getCurrentTime(),
-        this.name
-      );
-      this.mediaUrl = this.player.getCurrentUrl();
-
+      const ev = {
+        mediaUrl: this.player.getCurrentUrl(),
+        currentTime: this.player.getCurrentTime(),
+        roomName: this.name
+      };
+      this.mediaService.sendMediaEvent(of(ev));
     } catch (error) {
       console.log('Player may not be loaded yet', error);
     }
@@ -209,6 +208,6 @@ export class ChannelComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.mediaUpdateTimerSubscription.unsubscribe();
     this.mediaSyncEventSubscription.unsubscribe();
-    this.chatService.exit(this.name);
+    this.chatService.exit(of(this.name));
   }
 }
