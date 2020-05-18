@@ -22,7 +22,7 @@ export class SocketService {
   socket$ = of(io(`${environment.api}`)).pipe(share());
 
 
-  connectionSuccessEvent$ = this.socket$
+  connectionSuccess$ = this.socket$
     .pipe(
       switchMap(socket =>
         fromEvent(socket, 'connect')
@@ -33,7 +33,18 @@ export class SocketService {
       )
     );
 
-  reconnectionSuccessEvent$ = this.socket$
+  reconnectionAttempt$ = this.socket$
+    .pipe(
+      switchMap(socket =>
+        fromEvent(socket, 'reconnect_attempt')
+          .pipe(
+            this.setAppState(true, true),
+            map(() => socket),
+          )
+      )
+    );
+
+  reconnectionSuccess$ = this.socket$
     .pipe(
       switchMap(socket =>
         fromEvent(socket, 'reconnect')
@@ -44,7 +55,7 @@ export class SocketService {
       )
     );
 
-  permissionErrorEvent$ = this.socket$
+  permissionError$ = this.socket$
     .pipe(
       switchMap(socket =>
         fromEvent(socket, 'error')
@@ -56,7 +67,7 @@ export class SocketService {
       )
     );
 
-  connectionErrorEvent$ = this.socket$
+  connectionError$ = this.socket$
     .pipe(
       switchMap(socket =>
         fromEvent(socket, 'error')
@@ -67,7 +78,18 @@ export class SocketService {
       )
     );
 
-  connectionTimeOutEvent$ = this.socket$
+  connectionFail$ = this.socket$
+    .pipe(
+      switchMap(socket =>
+        fromEvent(socket, 'reconnect_failed')
+          .pipe(
+            this.setAppState(false, false),
+            tap(() => socket.close()),
+          )
+      )
+    );
+
+  connectionTimeOut$ = this.socket$
     .pipe(
       switchMap(socket =>
         fromEvent(socket, 'error')
@@ -78,7 +100,7 @@ export class SocketService {
       )
     );
 
-  disconnectionEvent$ = this.socket$
+  disconnection$ = this.socket$
     .pipe(
       switchMap(socket =>
         fromEvent(socket, 'error')
@@ -88,15 +110,19 @@ export class SocketService {
       )
     );
 
-  connectionState$ = merge(
-    this.connectionSuccessEvent$.pipe(mapTo(true)),
-    this.reconnectionSuccessEvent$.pipe(mapTo(true)),
-    this.permissionErrorEvent$.pipe(mapTo(false)),
-    this.connectionErrorEvent$.pipe(mapTo(false)),
-    this.disconnectionEvent$.pipe(mapTo(false)),
-    this.connectionTimeOutEvent$.pipe(mapTo(false)),
+  isConnected$ = merge(
+    this.connectionSuccess$.pipe(mapTo(true)),
+    this.reconnectionSuccess$.pipe(mapTo(true)),
+    this.reconnectionAttempt$.pipe(mapTo(false)),
+    this.permissionError$.pipe(mapTo(false)),
+    this.connectionError$.pipe(mapTo(false)),
+    this.disconnection$.pipe(mapTo(false)),
+    this.connectionFail$.pipe(mapTo(false)),
+    this.connectionTimeOut$.pipe(mapTo(false)),
   ).pipe(
     tap((iz) => this.state.isSocketConnectedSub.next(iz)),
+    tap((iz) => console.log(iz)
+    ),
     share()
   );
 
@@ -123,7 +149,7 @@ export class SocketService {
   // }
 
   emitIfConnected<T>(command$: Observable<T>) {
-    return this.connectionSuccessEvent$
+    return this.connectionSuccess$
       .pipe(
         switchMap(socket =>
           command$
@@ -136,7 +162,7 @@ export class SocketService {
   }
 
   listenForEventIfConnected(event: string) {
-    return this.connectionSuccessEvent$
+    return this.connectionSuccess$
       .pipe(
         switchMap(socket =>
           fromEvent(socket, event)
@@ -152,8 +178,8 @@ export class SocketService {
           socket.close();
           socket.open();
         }),
-        map(([_, s]) => _),
-        // this.catchSocketErr()
+        map(([src]) => src),
+        this.catchSocketErr()
       );
   }
 

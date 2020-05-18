@@ -9,7 +9,7 @@ import { Message, RoomMessage } from '../models/room.models';
   templateUrl: './chat-room.component.html',
   styleUrls: ['./chat-room.component.scss']
 })
-export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
+export class ChatRoomComponent implements OnDestroy, AfterViewChecked {
 
   @ViewChild('feed', { static: false, read: ElementRef }) private feed: ElementRef;
 
@@ -20,6 +20,7 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
 
   messages$: Observable<Message[]> = this.chatServ.roomMessages$
     .pipe(
+      this.chatServ.enterRoom(this.name),
       debounceTime(10),
       distinctUntilChanged()
     );
@@ -46,10 +47,6 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
   //   this.chatServ.sendGroupMessage({ text: this.msgBoxValue.trim() }, this.name);
   //   this.msgBoxValue = '';
   // }
-
-  ngOnInit() {
-    // this.chatServ.enterRoom(this.name);
-  }
 
   ngOnDestroy() {
     this.chatServ.exit(of(this.name));

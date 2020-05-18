@@ -112,7 +112,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   }
 
   quitOnError() {
-    this.errorEvent$ = this.socketService.permissionErrorEvent$.pipe(
+    this.errorEvent$ = this.socketService.permissionError$.pipe(
       tap(x => {
         console.log(x);
 

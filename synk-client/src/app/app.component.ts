@@ -10,9 +10,9 @@ export class AppComponent {
 
   isCollapsed = true;
 
-  isLoggedIn = this.state.isLoggedIn$.pipe();
-  isConnected = this.state.isSocketConnected$.pipe();
-  user = this.state.me$.pipe();
+  isLoggedIn = this.state.isLoggedIn$;
+  isConnected = this.state.isSocketConnected$;
+  user = this.state.me$;
 
   constructor(private state: AppStateService) { }
 

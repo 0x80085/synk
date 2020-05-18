@@ -10,7 +10,7 @@ import {
   RoomCommands
 } from './models/room.models';
 import { SocketService } from '../../socket.service';
-import { map } from 'rxjs/operators';
+import { map, withLatestFrom, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -81,15 +81,29 @@ export class ChatService {
   //   this.socketService.sendEvent({ command: RoomCommands.GROUP_MESSAGE, payload: message });
   // }
 
-  enterRoom(obs: Observable<string>) {
-    return this.socketService.emitIfConnected(obs)
-      .subscribe(({ socket, data: roomName }) => {
-        socket.emit(RoomCommands.JOIN_ROOM, roomName);
-      });
+  enterRoom<T>(roomName: string): (src: Observable<T>) => Observable<T> {
+    return (source: Observable<T>) =>
+      source.pipe(
+        tap(() =>console.log('enterroom')),
+        withLatestFrom(this.socketService.socket$),
+        tap(([_, socket]) => {
+          console.log(`command :${RoomCommands.JOIN_ROOM} : roomName: ${roomName}`);
 
-    // this.socketService.connect();
-    // this.socketService.sendEvent({ command: RoomCommands.JOIN_ROOM, payload: name });
+          socket.emit(RoomCommands.JOIN_ROOM, roomName);
+        }),
+        map(([src]) => src),
+      );
   }
+
+  // enterRoom(obs: Observable<string>) {
+  //   return this.socketService.emitIfConnected(obs)
+  //     .subscribe(({ socket, data: roomName }) => {
+  //       socket.emit(RoomCommands.JOIN_ROOM, roomName);
+  //     });
+
+  //   // this.socketService.connect();
+  //   // this.socketService.sendEvent({ command: RoomCommands.JOIN_ROOM, payload: name });
+  // }
 
   giveLeader(obs: Observable<{ member: RoomUserDto, roomName: string }>) {
     return this.socketService.emitIfConnected(obs)
