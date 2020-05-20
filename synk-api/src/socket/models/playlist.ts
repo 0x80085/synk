@@ -4,7 +4,7 @@ import { PlaylistItem, mockList, ItemContent } from './playlist-item';
 export class Playlist {
   name: string;
   list: PlaylistItem[] = []; // cloneOf(mockList);
-  current: PlaylistItem | null = this.list[0];
+  current: PlaylistItem | null;
 
   constructor(name: string) {
     this.name = name;
