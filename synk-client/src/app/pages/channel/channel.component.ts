@@ -26,7 +26,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   activeItemSubject: BehaviorSubject<string> = new BehaviorSubject(null);
 
-  errorEvent$: Observable<Message>;
+  errorEvent$: Observable<any>;
   members$: Observable<RoomUserDto[]>;
   playlist$: Observable<MediaEvent[]>;
 
@@ -124,17 +124,16 @@ export class ChannelComponent implements OnInit, OnDestroy {
   }
 
   giveLeader(member: RoomUserDto) {
-    this.chatService.giveLeader(of({ member, roomName: this.name }));
+    this.chatService.giveLeader({ member, roomName: this.name });
   }
 
   private sendMediaUpdate() {
     try {
-      const ev = {
+      this.mediaService.sendMediaEvent({
         mediaUrl: this.player.getCurrentUrl(),
         currentTime: this.player.getCurrentTime(),
         roomName: this.name
-      };
-      this.mediaService.sendMediaEvent(of(ev));
+      });
     } catch (error) {
       console.log('Player may not be loaded yet', error);
     }

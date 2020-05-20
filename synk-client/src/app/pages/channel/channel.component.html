@@ -36,7 +36,7 @@
       </nz-list>
     </div>
     <div nz-col nzSpan="18" class="mt-1">
-      <app-playlist [playlist$]="playlist$" [activeItem]="activeItemSubject | async"
+      <app-playlist
         [roomName]="name" [showAddMediaInput]="loggedInUserIsLeader" (playMedia)="player.play($event.mediaUrl)">
       </app-playlist>
     </div>

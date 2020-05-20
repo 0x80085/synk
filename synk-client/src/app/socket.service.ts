@@ -19,109 +19,30 @@ export interface RealTimeCommand {
 })
 export class SocketService {
 
-  socket = io(`${environment.api}`);
+  socket = io(`${environment.api}`, { transports: ['websocket'], upgrade: false });
 
   private socket$ = of(this.socket).pipe(
-    tap((socket) => {
-      socket.open();
-    }),
     share()
   );
 
-  connectionSuccess$ = this.socket$
-    .pipe(
-      tap((iz) => console.log(iz)),
-      switchMap(socket =>
-        fromEvent(socket, 'connect')
-          .pipe(
-            tap((iz) => console.log(iz)),
-            mapTo(socket),
-          )
-      ),
-      catchError(e => {
-        console.log(e);
-        throw new Error(e);
-      }),
-      share()
-    );
+  connectionSuccess$ = this.listenForEvent('connect').pipe(mapTo({ event: 'connect', connected: true }));
+  reconnectionAttempt$ = this.listenForEvent('reconnect_attempt').pipe(mapTo({ event: 'reconnect_attempt', connected: false }));
+  reconnectionSuccess$ = this.listenForEvent('reconnect').pipe(mapTo({ event: 'reconnect', connected: true }));
+  permissionError$ = this.listenForEvent('authentication error').pipe(mapTo({ event: 'error', connected: false }));
+  connectionError$ = this.listenForEvent('error').pipe(mapTo({ event: 'error', connected: false }));
+  connectionFail$ = this.listenForEvent('reconnect_failed').pipe(mapTo({ event: 'reconnect_failed', connected: false }));
+  connectionTimeOut$ = this.listenForEvent('connect_timeout').pipe(mapTo({ event: 'connect_timeout', connected: false }));
+  disconnection$ = this.listenForEvent('disconnect').pipe(mapTo({ event: 'disconnect', connected: false }));
 
-  reconnectionAttempt$ = this.socket$
-    .pipe(
-      switchMap(socket =>
-        fromEvent(socket, 'reconnect_attempt')
-          .pipe(
-            tap((iz) => console.log(iz)),
-            map(() => socket),
-          )
-      )
-    );
-
-  reconnectionSuccess$ = this.socket$
-    .pipe(
-      switchMap(socket =>
-        fromEvent(socket, 'reconnect')
-          .pipe(
-            map(() => socket),
-          )
-      )
-    );
-
-  permissionError$ = this.socket$
-    .pipe(
-      switchMap(socket =>
-        fromEvent(socket, 'authentication error')
-          .pipe(
-            tap(() => socket.close()),
-            map((data: Message) => data)
-          )
-      )
-    );
-
-  connectionError$ = this.socket$
-    .pipe(
-      switchMap(socket =>
-        fromEvent(socket, 'error')
-          .pipe(
-            tap(() => socket.close()),
-          )
-      )
-    );
-
-  connectionFail$ = this.socket$
-    .pipe(
-      switchMap(socket =>
-        fromEvent(socket, 'reconnect_failed')
-          .pipe(
-            tap(() => socket.close()),
-          )
-      )
-    );
-
-  connectionTimeOut$ = this.socket$
-    .pipe(
-      switchMap(socket =>
-        fromEvent(socket, 'connect_timeout')
-          .pipe(
-            tap(() => socket.close()),
-          )
-      )
-    );
-
-  disconnection$ = this.socket$
-    .pipe(
-      switchMap(socket =>
-        fromEvent(socket, 'disconnect'))
-    );
-
-  isConnected$ = merge(
-    this.connectionSuccess$.pipe(mapTo(true)),
-    this.reconnectionSuccess$.pipe(mapTo(true)),
-    this.reconnectionAttempt$.pipe(mapTo(false)),
-    this.permissionError$.pipe(mapTo(false)),
-    this.connectionError$.pipe(mapTo(false)),
-    this.disconnection$.pipe(mapTo(false)),
-    this.connectionFail$.pipe(mapTo(false)),
-    this.connectionTimeOut$.pipe(mapTo(false)),
+  connectionState$ = merge(
+    this.connectionSuccess$,
+    this.reconnectionSuccess$,
+    this.reconnectionAttempt$,
+    this.permissionError$,
+    this.connectionError$,
+    this.disconnection$,
+    this.connectionFail$,
+    this.connectionTimeOut$,
   ).pipe(
     tap((iz) => console.log(iz)),
     tap((iz) => console.log('isConnected$: ', iz)),

@@ -51,32 +51,14 @@ export class ChatService {
     this.socketService.socket.emit(RoomCommands.GROUP_MESSAGE, message);
   }
 
-
   enterRoom(roomName: string) {
-    console.log('enterroom');
-
     this.socketService.socket.emit(RoomCommands.JOIN_ROOM, roomName);
   }
 
-  // enterRoom(obs: Observable<string>) {
-  //   return this.socketService.emitIfConnected(obs)
-  //     .subscribe(({ socket, data: roomName }) => {
-  //       socket.emit(RoomCommands.JOIN_ROOM, roomName);
-  //     });
-
-  //   // this.socketService.connect();
-  //   // this.socketService.sendEvent({ command: RoomCommands.JOIN_ROOM, payload: name });
-  // }
-
-  giveLeader(obs: Observable<{ member: RoomUserDto, roomName: string }>) {
-    return this.socketService.emit(obs)
-      .subscribe(({ socket, data: { member, roomName } }) => {
-        const ev = { to: member.userName, roomName };
-        socket.emit(RoomCommands.GIVE_LEADER, ev);
-      });
-
-    // this.socketService.sendEvent({ command: RoomCommands.GIVE_LEADER, payload: ev });
+  giveLeader({ member, roomName }: { member: RoomUserDto, roomName: string }) {
+    this.socketService.socket.emit(RoomCommands.GIVE_LEADER, { to: member.userName, roomName });
   }
+
   exit(name: string) {
     this.socketService.socket.emit(RoomCommands.EXIT_ROOM, name);
     this.socketService.socket.off(RoomCommands.GROUP_MESSAGE);

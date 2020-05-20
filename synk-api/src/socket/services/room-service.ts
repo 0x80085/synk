@@ -152,6 +152,7 @@ export class RoomService {
 
     if (isLeader) {
       room.currentPlayList.handleListUpdate(data, afterPlaylistUpdate);
+      room.broadcastPlaylistToAll();
     }
   }
 

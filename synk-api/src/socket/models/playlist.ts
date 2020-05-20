@@ -1,9 +1,9 @@
 import { MediaEvent } from './message';
-import { PlaylistItem, mockList, ItemContent } from './playlist-item';
+import { PlaylistItem, ItemContent } from './playlist-item';
 
 export class Playlist {
   name: string;
-  list: PlaylistItem[] = []; // cloneOf(mockList);
+  list: PlaylistItem[] = [];
   current: PlaylistItem | null;
 
   constructor(name: string) {
@@ -19,7 +19,7 @@ export class Playlist {
     if (!alreadyAdded) { this.list.push(media); }
   }
 
-  next(media: ItemContent, isPermenant: boolean, addedBy: string) {
+  queueUpSecondPosition(media: ItemContent, isPermenant: boolean, addedBy: string) {
     const item = new PlaylistItem(media.mediaUrl, addedBy);
     item.isPermenant = isPermenant;
 
@@ -67,13 +67,6 @@ export class Playlist {
     ev: MediaEvent,
     afterUpdateCallback: (arg: MediaEvent) => void
   ) => {
-    this.update(ev);
-
-    this.publish(afterUpdateCallback);
-  }
-
-  update = (ev: MediaEvent) => {
-
     const selectedItem = this.list.find(it => it.mediaUrl === ev.mediaUrl);
 
     if (!selectedItem) {
@@ -81,6 +74,10 @@ export class Playlist {
     }
 
     this.current = selectedItem;
+    this.list.forEach(it => it.active = false);
+    selectedItem.active = true;
+
+    this.publish(afterUpdateCallback);
   }
 
   publish = (calledWithNewCurrentVideoState: (arg: ItemContent) => void) => {

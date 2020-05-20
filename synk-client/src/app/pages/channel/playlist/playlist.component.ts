@@ -1,14 +1,11 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Observable, of, Subject } from 'rxjs';
-import { map, withLatestFrom } from 'rxjs/operators';
 import { NzNotificationService } from 'ng-zorro-antd';
 
 import { MediaEvent } from '../models/room.models';
 import { ChatService } from '../chat.service';
 import { isValidYTid } from '../media/youtube/youtube.component';
-import { MediaService } from '../media.service';
-
-type ListItem = MediaEvent & { active: boolean };
+import { MediaService, PlaylistItem } from '../media.service';
 
 @Component({
   selector: 'app-playlist',
@@ -17,8 +14,6 @@ type ListItem = MediaEvent & { active: boolean };
 })
 export class PlaylistComponent implements OnInit {
 
-  @Input() playlist$: Observable<MediaEvent[]>;
-  @Input() activeItem = '';
   @Input() roomName: string;
   @Input() showAddMediaInput = true;
 
@@ -26,7 +21,7 @@ export class PlaylistComponent implements OnInit {
 
   newMedia: string;
 
-  virtualPlaylist$: Observable<ListItem[]>;
+  virtualPlaylist$: Observable<PlaylistItem[]> = this.mediaService.roomPlaylist$;
 
   showControls = false;
 
@@ -35,7 +30,6 @@ export class PlaylistComponent implements OnInit {
     private notification: NzNotificationService) { }
 
   ngOnInit() {
-    this.createVirtualList();
   }
 
   onAddMedia() {
@@ -47,37 +41,23 @@ export class PlaylistComponent implements OnInit {
       return;
     }
 
-    this.mediaService.addToPlaylist(of({
+    this.mediaService.addToPlaylist({
       mediaUrl: this.newMedia,
       roomName: this.roomName,
       currentTime: null
-    }));
+    });
     this.notification.success('Success', 'Media added to playlist');
   }
 
   onRemoveMedia(mediaUrl: string) {
     if (confirm(`Want to delete ${mediaUrl}?`)) {
-      this.mediaService.removeFromPlaylist(of({
+      this.mediaService.removeFromPlaylist({
         mediaUrl,
         roomName: this.roomName,
         currentTime: null
-      }));
+      });
       this.notification.success('Success', 'Media removed from playlist');
     }
-  }
-
-  private createVirtualList() {
-    this.virtualPlaylist$ = this.playlist$.pipe(
-      withLatestFrom(of(this.activeItem)),
-      map(([ls, a]) => {
-        const e: ListItem[] = ls.map(it => {
-          const active = it.mediaUrl === a;
-          return { ...it, active };
-        });
-        return e;
-      })
-    );
-
   }
 
 }
