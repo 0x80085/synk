@@ -10,24 +10,16 @@ import { map } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class MediaService {
-  // roomPlaylist$: Observable<MediaEvent[]> = new Observable(observer => {
-  //   this.socketService.on('playlist update', (data: MediaEvent[]) => {
-  //     observer.next(data);
-  //   });
-  // });
-  // roomMediaEvent$: Observable<MediaEvent> = new Observable(observer => {
-  //   this.socketService.on('media event', (data: MediaEvent) => {
-  //     observer.next(data);
-  //   });
-  // });
 
-  roomPlaylist$ = this.socketService.listenForEventIfConnected(MediaCommands.PLAYLIST_UPDATE).pipe(
-    map((data: MediaEvent[]) => {
-      return data;
-    })
-  );
+  roomPlaylist$ = new Observable<MediaEvent[]>(observer => {
+    this.socketService.listenForEvent<MediaEvent[]>(MediaCommands.PLAYLIST_UPDATE).pipe(
+      map((data: MediaEvent[]) => {
+        return data;
+      })
+    );
+  });
 
-  roomMediaEvent$ = this.socketService.listenForEventIfConnected(MediaCommands.MEDIA_EVENT).pipe(
+  roomMediaEvent$ = this.socketService.listenForEvent(MediaCommands.MEDIA_EVENT).pipe(
     map((data: MediaEvent) => {
       return data;
     })
@@ -36,7 +28,7 @@ export class MediaService {
   constructor(private socketService: SocketService) { }
 
   sendMediaEvent(obs: Observable<{ mediaUrl: string, currentTime: number, roomName: string }>) {
-    return this.socketService.emitIfConnected(obs)
+    return this.socketService.emit(obs)
       .subscribe(({ socket, data: { mediaUrl, roomName, currentTime, } }) => {
         const ev: MediaEvent = {
           currentTime,
@@ -57,7 +49,7 @@ export class MediaService {
   // }
 
   addToPlaylist(obs: Observable<MediaEvent>) {
-    return this.socketService.emitIfConnected(obs)
+    return this.socketService.emit(obs)
       .subscribe(({ socket, data }) => {
         socket.emit(MediaCommands.ADD_MEDIA, data);
       });
@@ -68,7 +60,7 @@ export class MediaService {
   // }
 
   removeFromPlaylist(obs: Observable<MediaEvent>) {
-    return this.socketService.emitIfConnected(obs)
+    return this.socketService.emit(obs)
       .subscribe(({ socket, data }) => {
         socket.emit(MediaCommands.REMOVE_MEDIA, data);
       });

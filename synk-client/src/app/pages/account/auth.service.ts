@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { tap } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
 
 import { environment } from 'src/environments/environment';
 import { AppStateService } from 'src/app/app-state.service';
 import { SocketService } from 'src/app/socket.service';
+import { of } from 'rxjs';
 
 interface LoginInfo {
   username: string;
@@ -48,7 +49,11 @@ export class AuthService {
         tap(() => {
           this.state.isLoggedInSubject.next(true);
         }),
-        this.socketService.reconnect()
+        this.socketService.reconnect(),
+        // catchError(err => {
+        //   this.state.isLoggedInSubject.next(false);
+        //   return of(err);
+        // })
       );
   }
 
@@ -59,9 +64,9 @@ export class AuthService {
       })
       .pipe(
         tap(() => {
-          this.state.isLoggedInSubject.next(true);
-          this.socketService.reconnect();
-        })
+          this.state.isLoggedInSubject.next(false);
+        }),
+        this.socketService.close()
       );
   }
 
