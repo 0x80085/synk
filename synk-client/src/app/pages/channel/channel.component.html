@@ -37,7 +37,7 @@
     </div>
     <div nz-col nzSpan="18" class="mt-1">
       <app-playlist
-        [roomName]="name" [showAddMediaInput]="loggedInUserIsLeader" (playMedia)="player.play($event.mediaUrl)">
+        [roomName]="name" (playMedia)="player.play($event.mediaUrl)">
       </app-playlist>
     </div>
   </div>

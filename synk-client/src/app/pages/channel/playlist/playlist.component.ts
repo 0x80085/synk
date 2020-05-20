@@ -6,6 +6,7 @@ import { MediaEvent } from '../models/room.models';
 import { ChatService } from '../chat.service';
 import { isValidYTid } from '../media/youtube/youtube.component';
 import { MediaService, PlaylistItem } from '../media.service';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-playlist',
@@ -15,18 +16,20 @@ import { MediaService, PlaylistItem } from '../media.service';
 export class PlaylistComponent implements OnInit {
 
   @Input() roomName: string;
-  @Input() showAddMediaInput = true;
 
   @Output() playMedia = new EventEmitter<MediaEvent>();
 
   newMedia: string;
+  showControls: boolean;
 
   virtualPlaylist$: Observable<PlaylistItem[]> = this.mediaService.roomPlaylist$;
-
-  showControls = false;
+  isLeader$ = this.chatService.roomUserConfig$.pipe(
+    map(conf => conf.isLeader),
+  );
 
   constructor(
     private mediaService: MediaService,
+    private chatService: ChatService,
     private notification: NzNotificationService) { }
 
   ngOnInit() {

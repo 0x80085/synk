@@ -1,5 +1,5 @@
 <div nz-row>
-  <div nz-col nzSpan="24" style="min-height: 3rem;" [hidden]="!showAddMediaInput">
+  <div nz-col nzSpan="24" style="min-height: 3rem;" [hidden]="!(isLeader$ |async)">
     <button nz-button nzType="link" nzGhost (click)="showControls = !showControls">
       <i nz-icon nzType="menu"></i>
     </button>
@@ -22,7 +22,7 @@
       </button>
     </nz-button-group>
   </div>
-  <div nz-col nzSpan="24" [hidden]="!showAddMediaInput">
+  <div nz-col nzSpan="24" [hidden]="!(isLeader$ |async)">
     <nz-input-group [hidden]="!showControls" nzSearch nzSize="large" [nzAddOnAfter]="suffixButton"
       style="margin-bottom: 1rem;">
       <input type="text" nz-input placeholder="Enter url to add video" [(ngModel)]="newMedia" />
@@ -41,8 +41,8 @@
               title="start video"><i nz-icon nzType="caret-right"></i></button>
             <button nz-button nzSize="small" nzType="link" disabled title="set next in line (not yet implemented)"><i
                 nz-icon nzType="double-right"></i></button>
-            <button nz-button nzSize="small" nzType="link" (click)="onRemoveMedia(item.mediaUrl)" title="remove from list"><i
-                nz-icon nzType="delete"></i></button>
+            <button nz-button nzSize="small" nzType="link" (click)="onRemoveMedia(item.mediaUrl)"
+              title="remove from list"><i nz-icon nzType="delete"></i></button>
           </nz-button-group>
         </ng-template>
       </ng-template>

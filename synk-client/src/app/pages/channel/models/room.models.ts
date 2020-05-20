@@ -45,10 +45,8 @@ export interface RoomUser {
 export type RoomUserDto = RoomUser & { isLeader: boolean };
 
 export interface RoomUserConfig {
-  playlist: { currentTime: null; mediaUrl: string }[]; // TODO: remove and move to mediaService models
   role: Roles;
   permissionLevel: PermissionLevels;
   isLeader: boolean;
   isAdmin: boolean;
-  members: RoomUserDto[];
 }
