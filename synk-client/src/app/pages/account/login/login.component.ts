@@ -53,7 +53,6 @@ export class LoginComponent implements OnInit {
     this.auth.login(creds).subscribe(
       ob => {
         this.isLoginSuccess = true;
-        this.isLoginSuccess = true;
 
         this.auth.getUser().subscribe();
       },
