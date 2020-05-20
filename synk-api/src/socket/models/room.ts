@@ -70,10 +70,11 @@ export class Room {
 
     const candidateSocket = this.getSocketOfMember(candidate);
 
+    this.setLeader(candidate);
+
     this.sendRoomConfigToMember(originSocket);
     this.sendRoomConfigToMember(candidateSocket);
 
-    this.setLeader(candidate);
     this.broadcastMemberListToAll();
   }
 

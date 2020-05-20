@@ -4,6 +4,7 @@ import { User } from './pages/account/auth.service';
 import { share, tap, catchError, mapTo, map, startWith } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { SocketService } from './socket.service';
 
 @Injectable({
   providedIn: 'root'
@@ -24,6 +25,7 @@ export class AppStateService {
 
   isLoggedIn$ = merge(
     this.me$.pipe(map(me => !!me)),
+    this.socketService.isConnected$,
     this.isLoggedInSubject
   ).pipe(
     share(),
@@ -31,16 +33,6 @@ export class AppStateService {
 
   constructor(
     private http: HttpClient,
+    private socketService: SocketService,
   ) { }
-
-  getUser() {
-    return this.http.get<User>(`${environment.api}/account`, {
-      withCredentials: true
-    }).pipe(
-      tap(res => {
-        this.isLoggedInSubject.next(true);
-      })
-
-    );
-  }
 }
