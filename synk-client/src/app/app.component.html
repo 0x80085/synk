@@ -2,9 +2,7 @@
   <nz-sider class="menu-sidebar" nzCollapsible nzWidth="256px" [(nzCollapsed)]="isCollapsed" [nzTrigger]="null">
     <div class="sidebar-logo">
       <span>
-        <i nz-icon [style.color]="(isConnected | async) ? '#00ff00' : ''" nzType="meh" style="cursor: pointer;"
-          (click)="isCollapsed = !isCollapsed" nzTheme="fill"
-          nz-tooltip [nzTitle]="(user | async).userName"></i>
+        <ng-container *ngIf="(isLoggedIn | async); then userLoggedIn; else userNotLoggedIn"></ng-container>
         <h1 style="cursor: pointer;" (click)="isCollapsed = !isCollapsed">
           SYNKd.TV
         </h1>
@@ -20,7 +18,7 @@
       </li>
     </ul>
     <ul nz-menu nzMode="inline" [nzInlineCollapsed]="isCollapsed">
-      <li nz-submenu nzOpen nzTitle="Account" nzIcon="smile">
+      <li nz-submenu nzOpen nzTitle="Account" nzIcon="user">
         <ul>
           <li nz-menu-item [hidden]="isLoggedIn | async" class="item" nzMatchRouter>
             <a routerLink="/account/login">Login</a>
@@ -41,3 +39,27 @@
     </nz-content>
   </nz-layout>
 </nz-layout>
+
+<ng-template #logo>
+  <ng-container *ngIf="isLoggedIn | async; then userLoggedIn; else userNotLoggedIn">
+  </ng-container>
+</ng-template>
+
+<ng-template #userNotLoggedIn>
+  <i nz-icon nzType="meh" style="cursor: pointer;" (click)="isCollapsed = !isCollapsed" nzTheme="fill" nz-tooltip
+    nzTitle="Log in for the full experience!"></i>
+</ng-template>
+
+<ng-template #userLoggedIn>
+  <ng-container *ngIf="isConnected | async; then socketConnected; else socketDisonnected"></ng-container>
+</ng-template>
+
+<ng-template #socketDisonnected>
+  <i nz-icon nzType="smile" style="cursor: pointer;" (click)="isCollapsed = !isCollapsed" nzTheme="fill" nz-tooltip
+    [nzTitle]="(user | async)?.userName"></i>
+</ng-template>
+
+<ng-template #socketConnected>
+  <i nz-icon [style.color]=" '#00ff00'" nzType="smile" style="cursor: pointer;" (click)="isCollapsed = !isCollapsed"
+    nzTheme="fill" nz-tooltip [nzTitle]="(user | async)?.userName"></i>
+</ng-template>

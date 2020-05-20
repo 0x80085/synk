@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, fromEvent, merge } from 'rxjs';
+import { Observable, of, fromEvent, merge, iif, noop } from 'rxjs';
 import * as io from 'socket.io-client';
 
 import { AppStateService } from 'src/app/app-state.service';
 import { environment } from 'src/environments/environment';
 import { Message } from './pages/channel/models/room.models';
 import { PossibleCommands } from './pages/channel/models/commands.enum';
-import { switchMap, map, tap, share, withLatestFrom, catchError, mapTo } from 'rxjs/operators';
+import { switchMap, map, tap, share, withLatestFrom, catchError, mapTo, startWith, filter } from 'rxjs/operators';
 import { NzNotificationService } from 'ng-zorro-antd';
 
 export interface RealTimeCommand {
@@ -19,18 +19,30 @@ export interface RealTimeCommand {
 })
 export class SocketService {
 
-  socket$ = of(io(`${environment.api}`)).pipe(share());
+  socket = io(`${environment.api}`);
 
+  private socket$ = of(this.socket).pipe(
+    tap((socket) => {
+      socket.open();
+    }),
+    share()
+  );
 
   connectionSuccess$ = this.socket$
     .pipe(
+      tap((iz) => console.log(iz)),
       switchMap(socket =>
         fromEvent(socket, 'connect')
           .pipe(
-            this.setAppState(true, true),
-            map(() => socket),
+            tap((iz) => console.log(iz)),
+            mapTo(socket),
           )
-      )
+      ),
+      catchError(e => {
+        console.log(e);
+        throw new Error(e);
+      }),
+      share()
     );
 
   reconnectionAttempt$ = this.socket$
@@ -38,7 +50,7 @@ export class SocketService {
       switchMap(socket =>
         fromEvent(socket, 'reconnect_attempt')
           .pipe(
-            this.setAppState(true, true),
+            tap((iz) => console.log(iz)),
             map(() => socket),
           )
       )
@@ -49,7 +61,6 @@ export class SocketService {
       switchMap(socket =>
         fromEvent(socket, 'reconnect')
           .pipe(
-            this.setAppState(true, true),
             map(() => socket),
           )
       )
@@ -58,9 +69,8 @@ export class SocketService {
   permissionError$ = this.socket$
     .pipe(
       switchMap(socket =>
-        fromEvent(socket, 'error')
+        fromEvent(socket, 'authentication error')
           .pipe(
-            this.setAppState(false, false),
             tap(() => socket.close()),
             map((data: Message) => data)
           )
@@ -72,7 +82,6 @@ export class SocketService {
       switchMap(socket =>
         fromEvent(socket, 'error')
           .pipe(
-            this.setAppState(false, false),
             tap(() => socket.close()),
           )
       )
@@ -83,7 +92,6 @@ export class SocketService {
       switchMap(socket =>
         fromEvent(socket, 'reconnect_failed')
           .pipe(
-            this.setAppState(false, false),
             tap(() => socket.close()),
           )
       )
@@ -92,9 +100,8 @@ export class SocketService {
   connectionTimeOut$ = this.socket$
     .pipe(
       switchMap(socket =>
-        fromEvent(socket, 'error')
+        fromEvent(socket, 'connect_timeout')
           .pipe(
-            this.setAppState(false),
             tap(() => socket.close()),
           )
       )
@@ -103,11 +110,7 @@ export class SocketService {
   disconnection$ = this.socket$
     .pipe(
       switchMap(socket =>
-        fromEvent(socket, 'error')
-          .pipe(
-            this.setAppState(false)
-          )
-      )
+        fromEvent(socket, 'disconnect'))
     );
 
   isConnected$ = merge(
@@ -120,36 +123,15 @@ export class SocketService {
     this.connectionFail$.pipe(mapTo(false)),
     this.connectionTimeOut$.pipe(mapTo(false)),
   ).pipe(
-    tap((iz) => this.state.isSocketConnectedSub.next(iz)),
-    tap((iz) => console.log(iz)
-    ),
+    tap((iz) => console.log(iz)),
+    tap((iz) => console.log('isConnected$: ', iz)),
     share()
   );
 
-  constructor(
-    private state: AppStateService,
-    private notification: NzNotificationService
-  ) { }
+  constructor(private notification: NzNotificationService) { }
 
-  // connect() {
-  //   socket.connect();
-  // }
-
-  // reconnect() {
-  //   socket.close();
-  //   socket.open();
-  // }
-
-  // removeEventListener(name: string) {
-  //   socket.off(name);
-  // }
-
-  // sendEvent(ev: RealTimeCommand) {
-  //   socket.emit(ev.command, ev.payload);
-  // }
-
-  emitIfConnected<T>(command$: Observable<T>) {
-    return this.connectionSuccess$
+  emit(command$: Observable<any>) {
+    return this.socket$
       .pipe(
         switchMap(socket =>
           command$
@@ -161,13 +143,14 @@ export class SocketService {
       );
   }
 
-  listenForEventIfConnected(event: string) {
-    return this.connectionSuccess$
-      .pipe(
-        switchMap(socket =>
-          fromEvent(socket, event)
-        )
-      );
+  listenForEvent<T>(event: string): Observable<T> {
+    return this.socket$.pipe(
+      switchMap((socket) =>
+        fromEvent(socket, event)
+      ),
+      map(e => (e as T)),
+      tap((e) => console.log(e)),
+    );
   }
 
   reconnect<T>(): (src: Observable<T>) => Observable<T> {
@@ -183,15 +166,15 @@ export class SocketService {
       );
   }
 
-  private setAppState<T>(isConnected: boolean, isLoggedIn?: boolean): (src: Observable<T>) => Observable<T> {
-    return (src: Observable<T>) =>
-      src.pipe(
-        tap(() => {
-          this.state.isSocketConnectedSub.next(isConnected);
-          if (isLoggedIn) {
-            this.state.isLoggedInSubject.next(isLoggedIn);
-          }
+  close<T>(): (src: Observable<T>) => Observable<T> {
+    return (source: Observable<T>) =>
+      source.pipe(
+        withLatestFrom(this.socket$),
+        tap(([_, socket]) => {
+          socket.close();
         }),
+        map(([src]) => src),
+        this.catchSocketErr()
       );
   }
 
@@ -200,9 +183,10 @@ export class SocketService {
       src.pipe(
         catchError((err) => {
           console.log(err);
-          this.notification.error('Hmm.. Something went wrong here', 'Cant reach the RT server');
-          return of(err);
+          this.notification.error('Hmm.. Something went wrong here', 'Cannot reach the RT server');
+          throw new Error(err);
+          // return of(err);
         }),
-      )
+      );
   }
 }
