@@ -10,11 +10,8 @@ import { environment } from 'src/environments/environment';
 })
 export class AppStateService {
 
-  isLoggedInSubject: Subject<boolean> = new Subject();
-  isSocketConnectedSub: Subject<boolean> = new Subject();
+  isLoggedInSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
   userSubject: BehaviorSubject<User> = new BehaviorSubject({ id: 'missingno', userName: '-----' });
-
-  isSocketConnected$ = this.isSocketConnectedSub.pipe(share());
 
   me$ = this.http.get<User>(`${environment.api}/account`,
     {
@@ -34,10 +31,7 @@ export class AppStateService {
 
   constructor(
     private http: HttpClient,
-  ) {
-    this.isLoggedInSubject.next(false);
-    this.isSocketConnectedSub.next(false);
-  }
+  ) { }
 
   getUser() {
     return this.http.get<User>(`${environment.api}/account`, {
