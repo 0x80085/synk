@@ -46,12 +46,11 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   @HostListener('window:beforeunload')
   exitRoomOnPageDestroy() {
-    this.chatService.exit(of(this.name));
+    this.chatService.exit(this.name);
   }
 
   ngOnInit() {
     this.name = this.route.snapshot.paramMap.get('name');
-    // this.socketService.reconnect();
     this.syncPlayerState();
     this.sendPeriodicUpdate();
     this.quitOnError();
@@ -208,6 +207,6 @@ export class ChannelComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.mediaUpdateTimerSubscription.unsubscribe();
     this.mediaSyncEventSubscription.unsubscribe();
-    this.chatService.exit(of(this.name));
+    this.chatService.exit(this.name);
   }
 }
