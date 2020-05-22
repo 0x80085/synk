@@ -93,7 +93,7 @@ export class AuthService {
   }
 
   getChannels() {
-    return this.http.get<Channel>(`${environment.api}/account/channels`, {
+    return this.http.get<Channel[]>(`${environment.api}/account/channels`, {
       withCredentials: true
     });
   }

@@ -17,7 +17,7 @@ export class OwnedChannelsComponent {
     private notification: NzNotificationService) {
   }
 
-  channels$: Observable<Channel> = this.auth.getChannels()
+  channels$: Observable<Channel[]> = this.auth.getChannels()
     .pipe(tap(e => console.log(e)));
 
   deleteChannel(chan: Channel) {
