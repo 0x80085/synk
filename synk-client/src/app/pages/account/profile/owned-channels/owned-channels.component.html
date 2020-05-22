@@ -1,5 +1,14 @@
 <nz-card nzTitle="Owned Channels" [nzLoading]="!(channels$ | async)">
-  <nz-collapse>
+
+  <nz-empty *ngIf="(channels$ | async)?.length === 0" [nzNotFoundImage]="channelListEmpty"
+    nzNotFoundContent="It's empty in here...">
+  </nz-empty>
+
+  <ng-template #channelListEmpty>
+    <i nz-icon style="font-size: 4rem" nzType="small-dash"></i>
+  </ng-template>
+
+  <nz-collapse *ngIf="(channels$ | async)?.length > 0">
     <nz-collapse-panel *ngFor="let channel of channels$ | async" [nzHeader]="channel.name" [nzExtra]="actions"
       nzExpandedIcon="more">
       <nz-table [nzData]="[channel]" [nzShowPagination]="false">
