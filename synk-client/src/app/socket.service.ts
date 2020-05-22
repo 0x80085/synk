@@ -6,7 +6,7 @@ import { AppStateService } from 'src/app/app-state.service';
 import { environment } from 'src/environments/environment';
 import { Message } from './pages/channel/models/room.models';
 import { PossibleCommands } from './pages/channel/models/commands.enum';
-import { switchMap, map, tap, share, withLatestFrom, catchError, mapTo, startWith, filter } from 'rxjs/operators';
+import { switchMap, map, tap, share, withLatestFrom, catchError, mapTo, startWith, filter, shareReplay } from 'rxjs/operators';
 import { NzNotificationService } from 'ng-zorro-antd';
 
 export interface RealTimeCommand {
@@ -28,7 +28,7 @@ export class SocketService {
   connectionSuccess$ = this.listenForEvent('connect').pipe(mapTo({ event: 'connect', connected: true }));
   reconnectionAttempt$ = this.listenForEvent('reconnect_attempt').pipe(mapTo({ event: 'reconnect_attempt', connected: false }));
   reconnectionSuccess$ = this.listenForEvent('reconnect').pipe(mapTo({ event: 'reconnect', connected: true }));
-  permissionError$ = this.listenForEvent('authentication error').pipe(mapTo({ event: 'error', connected: false }));
+  permissionError$ = this.listenForEvent('authentication error').pipe(mapTo({ event: 'authentication error', connected: false }));
   connectionError$ = this.listenForEvent('error').pipe(mapTo({ event: 'error', connected: false }));
   connectionFail$ = this.listenForEvent('reconnect_failed').pipe(mapTo({ event: 'reconnect_failed', connected: false }));
   connectionTimeOut$ = this.listenForEvent('connect_timeout').pipe(mapTo({ event: 'connect_timeout', connected: false }));
@@ -51,7 +51,7 @@ export class SocketService {
   isConnected$ = this.connectionState$.pipe(
     map(({ connected }) => connected),
     tap((iz) => console.log('isConnected$: ', iz)),
-    share()
+    shareReplay(1)
   );
 
   constructor(private notification: NzNotificationService) { }

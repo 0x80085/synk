@@ -1,15 +1,14 @@
-import { Component, OnInit, ViewChild, OnDestroy, HostListener } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-
-import { tap, map, mapTo } from 'rxjs/operators';
-import { timer, Subscription, Observable, BehaviorSubject, of, merge } from 'rxjs';
-
-import { MediaComponent } from './media/media.component';
-import { ChatService } from './chat.service';
-import { MediaEvent, Message, RoomUserDto } from './models/room.models';
 import { NzNotificationService } from 'ng-zorro-antd';
-import { MediaService } from './media.service';
+import { BehaviorSubject, merge, Observable, Subscription, timer } from 'rxjs';
+import { mapTo, startWith, tap } from 'rxjs/operators';
+
 import { SocketService } from 'src/app/socket.service';
+import { ChatService } from './chat.service';
+import { MediaService } from './media.service';
+import { MediaComponent } from './media/media.component';
+import { MediaEvent, RoomUserDto } from './models/room.models';
 
 @Component({
   selector: 'app-channel',
@@ -26,8 +25,37 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   activeItemSubject: BehaviorSubject<string> = new BehaviorSubject(null);
 
-  errorEvent$: Observable<any>;
-  members$: Observable<RoomUserDto[]>;
+  errorEvent$: Observable<any> = merge(
+    this.socketService.connectionError$,
+    this.socketService.permissionError$
+  ).pipe(
+    tap(x => {
+      console.log(x);
+
+      this.notification.error('Hmm.. Something went wrong here', 'Maybe try logging in again?');
+
+      this.mediaUpdateTimerSubscription.unsubscribe();
+      this.mediaSyncEventSubscription.unsubscribe();
+    }));
+
+  isConnected$ = this.socketService.isConnected$.pipe(
+    tap((x) => console.log(x))
+  );
+
+  isLoading$ = this.isConnected$
+    .pipe(
+      mapTo(false)
+    )
+    .pipe(
+      startWith(true)
+    );
+
+  members$: Observable<RoomUserDto[]> = this.chatService.roomUserList$.pipe(
+    tap(ev => {
+      console.log('roomUserList update', ev);
+    })
+  );
+
   playlist$: Observable<MediaEvent[]>;
 
   mediaUpdateTimerSubscription: Subscription;
@@ -53,10 +81,8 @@ export class ChannelComponent implements OnInit, OnDestroy {
     this.name = this.route.snapshot.paramMap.get('name');
     this.syncPlayerState();
     this.sendPeriodicUpdate();
-    this.quitOnError();
     this.receiveRoomConfig();
     this.receivePlaylistUpdate();
-    this.receiveMemberlistUpdate();
   }
 
   onVideoEnded() {
@@ -102,29 +128,6 @@ export class ChannelComponent implements OnInit, OnDestroy {
     );
   }
 
-  receiveMemberlistUpdate() {
-    this.members$ = this.chatService.roomUserList$.pipe(
-      tap(ev => {
-        console.log('roomUserList update', ev);
-      })
-    );
-  }
-
-  quitOnError() {
-    this.errorEvent$ = merge(
-      this.socketService.connectionError$,
-      this.socketService.permissionError$
-    ).pipe(
-      tap(x => {
-        console.log(x);
-
-        this.notification.error('Hmm.. Something went wrong here', 'Maybe try logging in again?');
-
-        this.mediaUpdateTimerSubscription.unsubscribe();
-        this.mediaSyncEventSubscription.unsubscribe();
-      })
-    );
-  }
 
   giveLeader(member: RoomUserDto) {
     this.chatService.giveLeader({ member, roomName: this.name });
