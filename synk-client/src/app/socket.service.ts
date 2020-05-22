@@ -52,18 +52,6 @@ export class SocketService {
 
   constructor(private notification: NzNotificationService) { }
 
-  emit(command$: Observable<any>) {
-    return this.socket$.pipe(
-      switchMap(socket =>
-        command$
-          .pipe(
-            map(data => ({ socket, data }))
-          )
-      ),
-      this.catchSocketErr()
-    );
-  }
-
   emitCommand(): (src: Observable<RealTimeCommand>) => Observable<RealTimeCommand> {
     return (src: Observable<RealTimeCommand>) =>
       src.pipe(

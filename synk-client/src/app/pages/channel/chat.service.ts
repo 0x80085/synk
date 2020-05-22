@@ -25,33 +25,13 @@ export class ChatService {
     })
   );
 
-  roomUserConfig$ = this.socketService.listenForEvent(RoomCommands.USER_CONFIG).pipe(
-    map((data: RoomUserConfig) => {
-      return data;
-    })
-  );
+  roomUserConfig$ = this.socketService.listenForEvent<RoomUserConfig>(RoomCommands.USER_CONFIG);
 
-  roomUserList$ = this.socketService.listenForEvent(RoomCommands.USER_LIST_UPDATE).pipe(
-    map((data: RoomUserDto[]) => {
-      return data;
-    })
-  );
+  roomUserList$ = this.socketService.listenForEvent<RoomUserDto[]>(RoomCommands.USER_LIST_UPDATE);
 
   constructor(private socketService: SocketService) { }
 
-  // sendDM(msg: string) {
-  //   this.socketService.sendEvent({ command: RoomCommands.PM, payload: msg });
-  // }
-
-  sendMessageToRoom(msg: Message, roomName: string) {
-    const message: RoomMessage = {
-      roomName,
-      content: msg
-    };
-    this.socketService.socket.emit(RoomCommands.GROUP_MESSAGE, message);
-  }
-
-  sendMessageToRoom$(): (src: Observable<RoomMessage>) => Observable<RealTimeCommand> {
+  sendMessageToRoom(): (src: Observable<RoomMessage>) => Observable<RealTimeCommand> {
     return (src: Observable<RoomMessage>) =>
       src.pipe(
         map(({ content, roomName }) => ({

@@ -28,7 +28,7 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
       roomName: this.name,
       content: { text: text.trim() }
     })),
-    this.chatServ.sendMessageToRoom$(),
+    this.chatServ.sendMessageToRoom(),
   ).subscribe();
 
   messages$: Observable<Message[]> = this.chatServ.roomMessages$
