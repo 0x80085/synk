@@ -115,6 +115,17 @@ export class RoomService {
     this.addRoomToDirectory(newRoom);
   }
 
+  deleteRoom(name: string, creator: string) {
+    const room = this.getRoomByName(name);
+    if (!room) {
+      return;
+    }
+    if (room.creator !== creator) {
+      return;
+    }
+    this.removeRoomfromDirectory(room);
+  }
+
   addMediaToPlaylist(data: MediaEvent) {
     this.onAddMedia(data);
   }
@@ -219,6 +230,10 @@ export class RoomService {
 
   private addRoomToDirectory(room: Room) {
     this.publicRooms.push(room);
+  }
+
+  private removeRoomfromDirectory(room: Room) {
+    this.publicRooms = this.publicRooms.filter(r => r.name !== room.name);
   }
 
   private getRoomByName(roomName: string) {
