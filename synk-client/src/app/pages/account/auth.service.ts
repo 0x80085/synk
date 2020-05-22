@@ -48,8 +48,9 @@ export class AuthService {
       .pipe(
         tap(() => {
           this.state.isLoggedInSubject.next(true);
+          this.socketService.socket.close();
+          this.socketService.socket.open();
         }),
-        this.socketService.reconnect(),
         // catchError(err => {
         //   this.state.isLoggedInSubject.next(false);
         //   return of(err);
@@ -65,8 +66,8 @@ export class AuthService {
       .pipe(
         tap(() => {
           this.state.isLoggedInSubject.next(false);
+          this.socketService.socket.close();
         }),
-        this.socketService.close()
       );
   }
 

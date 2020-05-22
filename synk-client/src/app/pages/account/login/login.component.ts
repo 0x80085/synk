@@ -61,7 +61,7 @@ export class LoginComponent implements OnInit {
           'error',
           'Login failed',
           `
-          ${err.status === 404 ? 'user not found' : '??'}
+          ${err.status === 404 ? 'user not found' : `Hmm... That didn't work`}
         `
         );
         this.isLoginSuccess = false;
