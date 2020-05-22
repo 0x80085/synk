@@ -1,6 +1,4 @@
-<p>Channel: {{ name }}</p>
-
-<div *ngIf="!(errorEvent$ | async); then channelStage; else errorConnecting"></div>
+<div *ngIf="isConnected$ | async; then channelStage; else connectionState"></div>
 
 <ng-template #channelStage>
   <div nz-row [nzGutter]="{ xs: 8, sm: 16, md: 24, lg: 32, xl: 32, xxl: 32 }">
@@ -36,19 +34,44 @@
       </nz-list>
     </div>
     <div nz-col nzSpan="18" class="mt-1">
-      <app-playlist
-        [roomName]="name" (playMedia)="player.play($event.mediaUrl)">
+      <app-playlist [roomName]="name" (playMedia)="player.play($event.mediaUrl)">
       </app-playlist>
     </div>
   </div>
 </ng-template>
 
-<ng-template #disconnectedImg>
-  <i nz-icon style="font-size: 5rem; color: rgb(204, 254, 253);" nzType="frown"></i>
+<ng-template #connectionState>
+  <div *ngIf="isLoading$ | async; then busyConnecting; else errorConnecting"></div>
 </ng-template>
+
 <ng-template #errorConnecting>
   <div nz-col nzSpan="24" class="column">
-    <nz-empty [nzNotFoundImage]="disconnectedImg" nzNotFoundContent="Can't connect to channel. Try logging in?">
+    <nz-empty [nzNotFoundImage]="disconnectedImg" [nzNotFoundContent]="disconnectedText">
     </nz-empty>
   </div>
 </ng-template>
+
+<ng-template #busyConnecting>
+  <div nz-col nzSpan="24" class="column">
+    <nz-empty [nzNotFoundImage]="busyConnectingImg" [nzNotFoundContent]="busyConnectingText">
+    </nz-empty>
+  </div>
+</ng-template>
+
+<ng-template #disconnectedImg>
+  <i nz-icon style="font-size: 5rem; color: rgb(204, 254, 253);" nzTheme="fill" nzType="meh"></i>
+</ng-template>
+
+<ng-template #disconnectedText>
+  <h2>You don't have an account yet</h2>
+  <p>Please create one to be able to enter rooms</p>
+</ng-template>
+
+<ng-template #busyConnectingImg>
+  <i nz-icon style="font-size: 5rem; color: rgb(204, 254, 253);" nzType="sync" [nzSpin]="true"></i>
+</ng-template>
+
+<ng-template #busyConnectingText>
+  <h4>Connecting to server...</h4>
+</ng-template>
+
