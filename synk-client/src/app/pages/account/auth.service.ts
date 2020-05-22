@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { tap, catchError } from 'rxjs/operators';
+import { tap, catchError, shareReplay } from 'rxjs/operators';
 
 import { environment } from 'src/environments/environment';
 import { AppStateService } from 'src/app/app-state.service';
@@ -15,6 +15,15 @@ interface LoginInfo {
 export interface User {
   userName: string;
   id: string;
+}
+
+export interface Channel {
+  id: string;
+  name: string;
+  description: string;
+  isPublic: string;
+  dateCreated: string;
+  isLocked: boolean;
 }
 
 @Injectable({
@@ -78,9 +87,15 @@ export class AuthService {
       tap(res => {
         this.state.isLoggedInSubject.next(true);
         this.state.userSubject.next(res);
-      })
-
+      }),
+      shareReplay()
     );
+  }
+
+  getChannels() {
+    return this.http.get<Channel>(`${environment.api}/account/channels`, {
+      withCredentials: true
+    });
   }
 
 }

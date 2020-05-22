@@ -4,7 +4,6 @@ import { AuthService, User } from '../auth.service';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { NzNotificationService } from 'ng-zorro-antd';
-import { share } from 'rxjs/operators';
 
 @Component({
   selector: 'app-profile',
@@ -19,7 +18,7 @@ export class ProfileComponent {
     private router: Router) {
   }
 
-  me$: Observable<User> = this.auth.getUser().pipe(share());
+  me$: Observable<User> = this.auth.getUser();
 
   onLogout() {
     this.auth.logout().subscribe(e => {

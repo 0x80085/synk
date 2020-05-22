@@ -8,10 +8,11 @@ import { AccountRoutingModule } from './account-routing.module';
 import { RegisterComponent } from './register/register.component';
 import { PlaceholdPipe } from './profile/placehold.pipe';
 import { UsernamePipe } from './profile/username.pipe';
+import { OwnedChannelsComponent } from './profile/owned-channels/owned-channels.component';
 
 
 @NgModule({
-  declarations: [LoginComponent, ProfileComponent, RegisterComponent, PlaceholdPipe, UsernamePipe],
+  declarations: [LoginComponent, ProfileComponent, RegisterComponent, PlaceholdPipe, UsernamePipe, OwnedChannelsComponent],
   imports: [
     CommonModule,
     FormsModule,

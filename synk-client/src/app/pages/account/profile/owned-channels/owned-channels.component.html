@@ -1,0 +1,38 @@
+<nz-card nzTitle="Owned Channels" [nzLoading]="!(channels$ | async)">
+  <nz-collapse>
+    <nz-collapse-panel *ngFor="let channel of channels$ | async" [nzHeader]="channel.name" [nzExtra]="actions"
+      nzExpandedIcon="more">
+      <nz-table [nzData]="[channel]" [nzShowPagination]="false">
+        <tr>
+          <th>description</th>
+          <td>{{ channel.description }}</td>
+        </tr>
+        <tr>
+          <th>isPublic</th>
+          <td>{{ channel.isPublic }}</td>
+        </tr>
+        <tr>
+          <th>dateCreated</th>
+          <td>{{ channel.dateCreated | date }}</td>
+        </tr>
+        <tr>
+          <th>isLocked</th>
+          <td>{{ channel.isLocked }}</td>
+        </tr>
+      </nz-table>
+
+      <ng-template #actions>
+        <button nz-button nzGhost nzSize="small" nz-tooltip nzTitle="Go to channel"
+          [routerLink]="['/channel', channel.name]">
+          <i nz-icon style="color: #ff694e;" nzType="login"></i>
+        </button>
+
+        <button nz-button nzType="danger" nzSize="small" nzGhost nz-tooltip nzTitle="Delete this channel"
+          (click)="deleteChannel(channel.id)">
+          <i nz-icon nzTheme="fill" nzType="delete"></i>
+
+        </button>
+      </ng-template>
+    </nz-collapse-panel>
+  </nz-collapse>
+</nz-card>
