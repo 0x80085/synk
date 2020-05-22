@@ -48,5 +48,5 @@ export interface RoomUserConfig {
   role: Roles;
   permissionLevel: PermissionLevels;
   isLeader: boolean;
-  isAdmin: boolean;
+  isOwner: boolean;
 }

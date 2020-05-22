@@ -110,7 +110,8 @@ export class Room {
     const members: RoomMemberDto[] = this.members.map(u => {
       return {
         ...u,
-        isLeader: this.checkIfLeader(u)
+        isLeader: this.checkIfLeader(u),
+        isOwner: this.checkIfOwner(u)
       };
     });
 
@@ -123,6 +124,10 @@ export class Room {
 
   private checkIfLeader(member: RoomMember): boolean {
     return this.leader && this.leader.userName === member.userName;
+  }
+
+  private checkIfOwner(member: RoomMember) {
+    return this.creator && this.creator === member.userName;
   }
 
   private setNewLeaderIfNeeded(leavingMember: RoomMember) {
@@ -160,7 +165,7 @@ export class Room {
 
     return {
       isLeader: this.checkIfLeader(member),
-      isAdmin: false,
+      isOwner: this.checkIfOwner(member),
       permissionLevel: 1,
       role: Roles.Regular
     };

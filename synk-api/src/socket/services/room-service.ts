@@ -107,9 +107,10 @@ export class RoomService {
     socket.on(Commands.DISCONNECT, this.disconnect);
   }
 
-  createRoom(data: { name: string; description: string }) {
+  createRoom(data: { name: string; description: string }, creator: string) {
     const newRoom = new Room(data.name, this.io, this.logger, null);
     newRoom.description = data.description;
+    newRoom.creator = creator;
 
     this.addRoomToDirectory(newRoom);
   }

@@ -38,7 +38,7 @@ export const createRoom = (
 
   try {
     channelHandler.createChannel(req.user.username, req.body.name, req.body.description);
-    roomService.createRoom(req.body);
+    roomService.createRoom(req.body, req.user.username);
 
     res.status(200).json('OK');
   } catch (error) {
