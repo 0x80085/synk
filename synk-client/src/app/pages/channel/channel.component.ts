@@ -25,9 +25,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   activeItemSubject: BehaviorSubject<string> = new BehaviorSubject(null);
 
-  isConnected$ = this.socketService.isConnected$.pipe(
-    tap((x) => console.log(x))
-  );
+  isConnected$ = this.socketService.isConnected$;
 
   isLoading$ = this.isConnected$
     .pipe(

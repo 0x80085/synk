@@ -44,13 +44,11 @@ export class SocketService {
     this.connectionFail$,
     this.connectionTimeOut$,
   ).pipe(
-    tap((iz) => console.log(iz)),
     share()
   );
 
   isConnected$ = this.connectionState$.pipe(
     map(({ connected }) => connected),
-    tap((iz) => console.log('isConnected$: ', iz)),
     shareReplay(1)
   );
 
@@ -75,7 +73,6 @@ export class SocketService {
         fromEvent(socket, event)
       ),
       map(e => (e as T)),
-      tap((e) => console.log(e)),
     );
   }
 
