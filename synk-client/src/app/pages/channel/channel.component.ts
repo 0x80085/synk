@@ -25,19 +25,6 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   activeItemSubject: BehaviorSubject<string> = new BehaviorSubject(null);
 
-  errorEvent$: Observable<any> = merge(
-    this.socketService.connectionError$,
-    this.socketService.permissionError$
-  ).pipe(
-    tap(x => {
-      console.log(x);
-
-      this.notification.error('Hmm.. Something went wrong here', 'Maybe try logging in again?');
-
-      this.mediaUpdateTimerSubscription.unsubscribe();
-      this.mediaSyncEventSubscription.unsubscribe();
-    }));
-
   isConnected$ = this.socketService.isConnected$.pipe(
     tap((x) => console.log(x))
   );
@@ -56,11 +43,42 @@ export class ChannelComponent implements OnInit, OnDestroy {
     })
   );
 
-  playlist$: Observable<MediaEvent[]>;
+  playlist$: Observable<MediaEvent[]> = this.mediaService.roomPlaylist$.pipe(
+    tap(ev => {
+      this.playlist = ev.map(i => {
+        return i.mediaUrl;
+      });
+    }));
 
-  mediaUpdateTimerSubscription: Subscription;
-  mediaSyncEventSubscription: Subscription;
-  roomUserConfigSubscription: Subscription;
+  mediaUpdateTimerSubscription: Subscription = timer(1000, 2000).subscribe(val => {
+    if (this.loggedInUserIsLeader && this.player) {
+      this.sendMediaUpdate();
+    }
+  });
+
+  mediaSyncEventSubscription = this.mediaService.roomMediaEvent$.subscribe(ev => {
+    if (!this.loggedInUserIsLeader) {
+      this.syncPlayer(ev);
+    }
+  });
+
+  roomUserConfigSubscription = this.chatService.roomUserConfig$.subscribe(ev => {
+    this.loggedInUserIsLeader = ev.isLeader;
+    console.log(ev);
+  });
+
+  errorEventSubscription = merge(
+    this.socketService.connectionError$,
+    this.socketService.permissionError$
+  ).pipe(
+    tap(x => {
+      console.log(x);
+
+      this.notification.error('Hmm.. Something went wrong here', 'Maybe try logging in again?');
+
+      this.mediaUpdateTimerSubscription.unsubscribe();
+      this.mediaSyncEventSubscription.unsubscribe();
+    })).subscribe();
 
   playlist: string[] = [];
 
@@ -79,10 +97,6 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.name = this.route.snapshot.paramMap.get('name');
-    this.syncPlayerState();
-    this.sendPeriodicUpdate();
-    this.receiveRoomConfig();
-    this.receivePlaylistUpdate();
   }
 
   onVideoEnded() {
@@ -94,40 +108,6 @@ export class ChannelComponent implements OnInit, OnDestroy {
     this.player.play(this.mediaUrl);
   }
 
-  sendPeriodicUpdate() {
-    const timer$ = timer(1000, 2000);
-    this.mediaUpdateTimerSubscription = timer$.subscribe(val => {
-      if (this.loggedInUserIsLeader && this.player) {
-        this.sendMediaUpdate();
-      }
-    });
-  }
-
-  syncPlayerState() {
-    this.mediaSyncEventSubscription = this.mediaService.roomMediaEvent$.subscribe(ev => {
-      if (!this.loggedInUserIsLeader) {
-        this.syncPlayer(ev);
-      }
-    });
-  }
-
-  receiveRoomConfig() {
-    this.roomUserConfigSubscription = this.chatService.roomUserConfig$.subscribe(ev => {
-      this.loggedInUserIsLeader = ev.isLeader;
-      console.log(ev);
-    });
-  }
-
-  receivePlaylistUpdate() {
-    this.playlist$ = this.mediaService.roomPlaylist$.pipe(
-      tap(ev => {
-        this.playlist = ev.map(i => {
-          return i.mediaUrl;
-        });
-      })
-    );
-  }
-
 
   giveLeader(member: RoomUserDto) {
     this.chatService.giveLeader({ member, roomName: this.name });
@@ -135,6 +115,11 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   private sendMediaUpdate() {
     try {
+      const isPaused = !this.player.isPlaying();
+      if (isPaused) {
+        // Dont update when leader paused video.
+        return;
+      }
       this.mediaService.sendMediaEvent({
         mediaUrl: this.player.getCurrentUrl(),
         currentTime: this.player.getCurrentTime(),
@@ -157,7 +142,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
         this.player.play(this.mediaUrl);
         this.activeItemSubject.next(this.mediaUrl);
       }
-      if (this.clientCurrenttimeIsOutOfSync(ev.currentTime)) {
+      if (this.isCurrentTimeOutOfSync(ev.currentTime)) {
         if (!this.player.isPlaying()) {
           this.player.play(ev.mediaUrl);
           return;
@@ -173,11 +158,11 @@ export class ChannelComponent implements OnInit, OnDestroy {
   private shouldSyncPlayer(ev: MediaEvent) {
     return (
       this.mediaUrl !== ev.mediaUrl ||
-      this.clientCurrenttimeIsOutOfSync(ev.currentTime)
+      this.isCurrentTimeOutOfSync(ev.currentTime)
     );
   }
 
-  private clientCurrenttimeIsOutOfSync(originTime: number) {
+  private isCurrentTimeOutOfSync(originTime: number) {
     try {
       if (typeof originTime !== 'number') {
         return false;
@@ -212,6 +197,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.mediaUpdateTimerSubscription.unsubscribe();
     this.mediaSyncEventSubscription.unsubscribe();
+    this.errorEventSubscription.unsubscribe();
     this.chatService.exit(this.name);
   }
 }
