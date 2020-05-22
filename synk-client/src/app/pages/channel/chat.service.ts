@@ -9,7 +9,7 @@ import {
   RoomUserDto,
   RoomCommands
 } from './models/room.models';
-import { SocketService } from '../../socket.service';
+import { SocketService, RealTimeCommand } from '../../socket.service';
 import { map, withLatestFrom, tap } from 'rxjs/operators';
 
 @Injectable({
@@ -49,6 +49,17 @@ export class ChatService {
       content: msg
     };
     this.socketService.socket.emit(RoomCommands.GROUP_MESSAGE, message);
+  }
+
+  sendMessageToRoom$(): (src: Observable<RoomMessage>) => Observable<RealTimeCommand> {
+    return (src: Observable<RoomMessage>) =>
+      src.pipe(
+        map(({ content, roomName }) => ({
+          command: RoomCommands.GROUP_MESSAGE,
+          payload: { roomName, content }
+        })),
+        this.socketService.emitCommand(),
+      );
   }
 
   enterRoom(roomName: string) {

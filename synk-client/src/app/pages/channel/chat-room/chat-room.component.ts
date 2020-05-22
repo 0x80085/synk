@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild, ElementRef, AfterViewChecked, HostListener } from '@angular/core';
-import { Observable } from 'rxjs';
-import { distinctUntilChanged, debounceTime, tap } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
+import { distinctUntilChanged, debounceTime, tap, take, filter, map } from 'rxjs/operators';
 import { ChatService } from '../chat.service';
 import { Message } from '../models/room.models';
 
@@ -17,6 +17,20 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
 
   msgBoxValue: string;
 
+  submitPressedSubject: Subject<{ ev?: KeyboardEvent, text: string }> = new Subject();
+
+  sendMessageSub = this.submitPressedSubject.pipe(
+    filter(({ text }) => Boolean(text)),
+    filter(({ text }) => Boolean(text.trim())),
+    tap(() => this.msgBoxValue = ''),
+    map(({ text }) => text.trim()),
+    map((text) => ({
+      roomName: this.name,
+      content: { text: text.trim() }
+    })),
+    this.chatServ.sendMessageToRoom$(),
+  ).subscribe();
+
   messages$: Observable<Message[]> = this.chatServ.roomMessages$
     .pipe(
       debounceTime(10),
@@ -25,13 +39,21 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
 
   constructor(private chatServ: ChatService) { }
 
-  @HostListener('scroll', ['$event']) onScroll($event: Event): void {
+  @HostListener('scroll', ['$event'])
+  onScroll($event: Event): void {
     console.log($event.target);
   }
 
-  onSendMessageToGroup() {
-    this.chatServ.sendMessageToRoom({ text: this.msgBoxValue.trim() }, this.name);
-    this.msgBoxValue = '';
+  @HostListener('keydown.enter', ['$event'])
+  onEnter(evt: KeyboardEvent) {
+    evt.preventDefault();
+  }
+
+  private scrollChatFeedDown() {
+    try {
+      const feed: HTMLDivElement = this.feed.nativeElement.children[1];
+      feed.scrollTop = feed.scrollHeight;
+    } catch (error) { }
   }
 
   ngOnInit() {
@@ -39,23 +61,11 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
   }
 
   ngOnDestroy() {
+    this.sendMessageSub.unsubscribe();
     this.chatServ.exit(this.name);
-  }
-
-  private scrollChatFeedDown() {
-    try {
-      const feed: HTMLDivElement = this.feed.nativeElement.children[1];
-      // console.log(feed);
-
-      feed.scrollTop = feed.scrollHeight;
-    } catch (error) {
-
-    }
   }
 
   ngAfterViewChecked() {
     this.scrollChatFeedDown();
   }
-
-
 }

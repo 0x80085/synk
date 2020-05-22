@@ -1,12 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, fromEvent, merge, iif, noop } from 'rxjs';
+import { Observable, of, fromEvent, merge, throwError } from 'rxjs';
 import * as io from 'socket.io-client';
 
-import { AppStateService } from 'src/app/app-state.service';
 import { environment } from 'src/environments/environment';
-import { Message } from './pages/channel/models/room.models';
 import { PossibleCommands } from './pages/channel/models/commands.enum';
-import { switchMap, map, tap, share, withLatestFrom, catchError, mapTo, startWith, filter, shareReplay } from 'rxjs/operators';
+import { switchMap, map, tap, share, withLatestFrom, catchError, mapTo, shareReplay } from 'rxjs/operators';
 import { NzNotificationService } from 'ng-zorro-antd';
 
 export interface RealTimeCommand {
@@ -55,15 +53,25 @@ export class SocketService {
   constructor(private notification: NzNotificationService) { }
 
   emit(command$: Observable<any>) {
-    return this.socket$
-      .pipe(
-        switchMap(socket =>
-          command$
-            .pipe(
-              map(data => ({ socket, data }))
-            )
-        ),
-        this.catchSocketErr()
+    return this.socket$.pipe(
+      switchMap(socket =>
+        command$
+          .pipe(
+            map(data => ({ socket, data }))
+          )
+      ),
+      this.catchSocketErr()
+    );
+  }
+
+  emitCommand(): (src: Observable<RealTimeCommand>) => Observable<RealTimeCommand> {
+    return (src: Observable<RealTimeCommand>) =>
+      src.pipe(
+        withLatestFrom(this.socket$),
+        tap(([{ command, payload }, { }]) => console.log('emitCOmmannd', command, payload)),
+        tap(([{ command, payload }, socket]) => socket.emit(command, payload)),
+        map(([rtc, _]) => rtc),
+        this.catchSocketErr(),
       );
   }
 
@@ -77,28 +85,26 @@ export class SocketService {
   }
 
   reconnect<T>(): (src: Observable<T>) => Observable<T> {
-    return (source: Observable<T>) =>
-      source.pipe(
-        withLatestFrom(this.socket$),
-        tap(([_, socket]) => {
-          socket.close();
-          socket.open();
-        }),
-        map(([src]) => src),
-        this.catchSocketErr()
-      );
+    return (source: Observable<T>) => source.pipe(
+      withLatestFrom(this.socket$),
+      tap(([_, socket]) => {
+        socket.close();
+        socket.open();
+      }),
+      map(([src]) => src),
+      this.catchSocketErr()
+    );
   }
 
   close<T>(): (src: Observable<T>) => Observable<T> {
-    return (source: Observable<T>) =>
-      source.pipe(
-        withLatestFrom(this.socket$),
-        tap(([_, socket]) => {
-          socket.close();
-        }),
-        map(([src]) => src),
-        this.catchSocketErr()
-      );
+    return (source: Observable<T>) => source.pipe(
+      withLatestFrom(this.socket$),
+      tap(([_, socket]) => {
+        socket.close();
+      }),
+      map(([src]) => src),
+      this.catchSocketErr()
+    );
   }
 
   private catchSocketErr<T>(): (src: Observable<T>) => Observable<T> {
@@ -107,8 +113,7 @@ export class SocketService {
         catchError((err) => {
           console.log(err);
           this.notification.error('Hmm.. Something went wrong here', 'Cannot reach the RT server');
-          throw new Error(err);
-          // return of(err);
+          return of(err);
         }),
       );
   }
