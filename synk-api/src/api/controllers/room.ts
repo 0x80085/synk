@@ -65,7 +65,7 @@ export const createRoom = (
 };
 
 /**
- * `DELETE /delete-room`
+ * `DELETE /account/channels/name`
  * Creates a chat room
  */
 export const deleteRoom = (
@@ -76,8 +76,8 @@ export const deleteRoom = (
 ) => {
 
   try {
-    channelHandler.deleteChannel(req.user.username, req.body.name);
-    roomService.deleteRoom(req.body.name, req.user.username);
+    channelHandler.deleteChannel(req.user.username, req.params.name);
+    roomService.deleteRoom(req.params.name, req.user.username);
 
     res.status(200).json('OK');
   } catch (error) {

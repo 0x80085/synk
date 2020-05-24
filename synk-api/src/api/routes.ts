@@ -86,7 +86,7 @@ const ALL_ROUTES = (roomService: RoomService, logger: Logger): RouteOptions[] =>
     verb: 'POST'
   },
   {
-    route: '/delete-room',
+    route: '/account/channels/:name',
     handlers: [(req: PassportRequest, res: Response, next: express.NextFunction) =>
       chatroomController.deleteRoom(req, res, roomService, logger)
     ],

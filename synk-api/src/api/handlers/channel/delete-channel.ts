@@ -7,7 +7,7 @@ export async function deleteChannel(username: string, channelName: string) {
   const connection = getConnection();
 
   const user = await connection.manager.findOneOrFail(User, {
-    relations: ['Channel'],
+    relations: ['channels'],
     where: {
       username
     }

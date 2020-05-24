@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { NzNotificationService } from 'ng-zorro-antd';
-import { Observable } from 'rxjs';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
 
 import { AuthService, Channel } from '../../auth.service';
-import { tap } from 'rxjs/operators';
+import { tap, take, catchError, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-owned-channels',
@@ -17,11 +17,30 @@ export class OwnedChannelsComponent {
     private notification: NzNotificationService) {
   }
 
-  channels$: Observable<Channel[]> = this.auth.getChannels()
-    .pipe(tap(e => console.log(e)));
+  refreshSubject = new BehaviorSubject(null);
 
-  deleteChannel(chan: Channel) {
-    console.log(chan);
+  channels$: Observable<Channel[]> = this.refreshSubject.pipe(
+    switchMap(() => {
+      return this.auth.getChannels()
+        .pipe(tap(e => console.log(e))
+        );
+    })
+  );
+
+  deleteChannel(chan: Channel, ev: Event) {
+    if (confirm(`You really want to delete ${chan.name}?`)) {
+      this.auth.deleteChannel(chan.name)
+        .pipe(
+          tap(() => this.refreshSubject.next(null)),
+          take(1)
+          , catchError((err) => {
+            this.notification.error('Delete failed', 'try again later')
+            return err;
+          }))
+        .subscribe();
+      ev.preventDefault();
+      return false;
+    }
   }
 
   openSettings(chan: Channel) {

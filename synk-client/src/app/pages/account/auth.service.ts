@@ -98,4 +98,10 @@ export class AuthService {
     });
   }
 
+  deleteChannel(name: string) {
+    return this.http.delete<Channel[]>(
+      `${environment.api}/account/channels/${name}`,
+      { withCredentials: true });
+  }
+
 }
