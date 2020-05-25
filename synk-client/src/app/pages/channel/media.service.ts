@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { SocketService } from '../../socket.service';
 import { MediaEvent } from './models/room.models';
 import { MediaCommands } from './models/media.models';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 
 export type PlaylistItem = MediaEvent & { active: boolean };
 
@@ -13,17 +13,9 @@ export type PlaylistItem = MediaEvent & { active: boolean };
 })
 export class MediaService {
 
-  roomPlaylist$ = this.socketService.listenForEvent<PlaylistItem[]>(MediaCommands.PLAYLIST_UPDATE).pipe(
-    map((data: PlaylistItem[]) => {
-      return data;
-    })
-  );
+  roomPlaylist$ = this.socketService.listenForEvent<PlaylistItem[]>(MediaCommands.PLAYLIST_UPDATE);
 
-  roomMediaEvent$ = this.socketService.listenForEvent(MediaCommands.MEDIA_EVENT).pipe(
-    map((data: MediaEvent) => {
-      return data;
-    })
-  );
+  roomMediaEvent$ = this.socketService.listenForEvent<MediaEvent>(MediaCommands.MEDIA_EVENT);
 
   constructor(private socketService: SocketService) { }
 

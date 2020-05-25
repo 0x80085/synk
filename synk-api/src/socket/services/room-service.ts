@@ -173,11 +173,9 @@ export class RoomService {
     if (!room) {
       return Error('Room non-existant');
     }
-    room.currentPlayList.add({
-      ...data,
-      isPermenant: false
-    });
-    room.broadcastPlaylistToAll();
+    room.currentPlayList.add({ ...data },
+      () => room.broadcastPlaylistToAll()
+    );
   }
 
   private onRemoveMedia = (data: MediaEvent) => {

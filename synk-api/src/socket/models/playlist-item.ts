@@ -10,9 +10,17 @@ export class ItemContent {
 }
 
 export class PlaylistItem extends ItemContent {
-  isPermenant = false;
+  isPermanent = false;
   addedByUsername?: string;
   active ? = false;
+  title: any;
+  duration: number;
+  meta: {
+    thumbnail: any;
+    etag: any;
+    blocked: boolean;
+    allowed: boolean;
+  };
 
   constructor(mediaUrl: string, addedByUsername: string) {
     super(mediaUrl, null);
@@ -23,20 +31,20 @@ export class PlaylistItem extends ItemContent {
 //   {
 //     addedByUsername: 'lain',
 //     currentTime: null,
-//     isPermenant: false,
+//     isPermanent: false,
 //     mediaUrl: 'https://www.youtube.com/watch?v=p2LMwxo0MVk'
 //   },
 
 //   {
 //     addedByUsername: 'lain',
 //     currentTime: null,
-//     isPermenant: false,
+//     isPermanent: false,
 //     mediaUrl: 'https://www.youtube.com/watch?v=_1rF38MjpHE'
 //   },
 //   {
 //     addedByUsername: 'lain',
 //     currentTime: null,
-//     isPermenant: false,
+//     isPermanent: false,
 //     mediaUrl: 'https://www.youtube.com/watch?v=qUDEyONQaCA'
 //   }
 // ];

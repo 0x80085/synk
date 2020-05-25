@@ -1,5 +1,6 @@
 import { MediaEvent } from './message';
 import { PlaylistItem, ItemContent } from './playlist-item';
+import { lookup } from '../../api/handlers/info/lookup-yt-video-info';
 
 export class Playlist {
   name: string;
@@ -10,18 +11,34 @@ export class Playlist {
     this.name = name;
   }
 
-  add(media: PlaylistItem) {
+  async add(
+    media: MediaEvent,
+    next: () => void = () => { },
+    error: (err: any) => void = () => { }
+  ) {
     const id = YouTubeGetID(media.mediaUrl);
     if (!id || id === '') {
       return;
     }
     const alreadyAdded = this.list.filter(i => i.mediaUrl === media.mediaUrl).length > 0;
-    if (!alreadyAdded) { this.list.push(media); }
+    if (alreadyAdded) {
+      error('duplicate id');
+    }
+    try {
+      const ytMetadata = await lookup(id);
+      const playlistItem: PlaylistItem = { ...ytMetadata, ...media, isPermanent: false };
+      console.log(playlistItem);
+
+      this.list.push(playlistItem);
+      next();
+    } catch (e) {
+      error(e);
+    }
   }
 
-  queueUpSecondPosition(media: ItemContent, isPermenant: boolean, addedBy: string) {
+  queueUpSecondPosition(media: ItemContent, isPermanent: boolean, addedBy: string) {
     const item = new PlaylistItem(media.mediaUrl, addedBy);
-    item.isPermenant = isPermenant;
+    item.isPermanent = isPermanent;
 
     this.list.push(item);
     this.bump(media.mediaUrl, 2);

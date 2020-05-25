@@ -33,7 +33,7 @@
       [nzDataSource]="virtualPlaylist$| async" [nzRenderItem]="item" [nzNoResult]="'No items'">
       <ng-template #item let-item>
         <nz-list-item style="border-bottom: 1px solid rgb(25, 25, 25);" class="playlist-item" [class.active]="true"
-          nzSplit [nzContent]="item.mediaUrl" [nzActions]="[opAction]" nzNoFlex>
+          nzSplit [nzContent]="item.title" [nzActions]="[opAction]" nzNoFlex>
         </nz-list-item>
         <ng-template #opAction>
           <nz-button-group>
