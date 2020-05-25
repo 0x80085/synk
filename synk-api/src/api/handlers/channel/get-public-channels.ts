@@ -72,6 +72,6 @@ function toDictionary(arr: Summary[]) {
 
 function getCurrentlyPlaying(room: Room) {
   return room && room.currentPlayList && room.currentPlayList.current
-    ? room.currentPlayList.current.mediaUrl
+    ? room.currentPlayList.current.title
     : 'N/A';
 }

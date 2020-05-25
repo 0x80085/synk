@@ -7,6 +7,6 @@
 </ng-template>
 
 <ng-template #nowPlaying>
-  <p nzType="link" nz-paragraph nzEllipsis nzEllipsisRows="1" style="margin: 0 .5rem; margin-top: 5px;"><i nz-icon
-      nzType="caret-right"></i>{{ item.currentlyPlaying }}</p>
+  <p nz-tooltip [nzTitle]="item.currentlyPlaying" nzType="link" nz-paragraph nzEllipsis nzEllipsisRows="1" style="margin: 0 .5rem; margin-top: 5px;">
+    <i nz-icon nzType="caret-right"></i>{{ item.currentlyPlaying }}</p>
 </ng-template>
