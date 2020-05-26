@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { SocketService } from '../../socket.service';
 import { MediaEvent } from './models/room.models';
 import { MediaCommands } from './models/media.models';
-import { map, tap } from 'rxjs/operators';
+import { map, tap, shareReplay } from 'rxjs/operators';
 
 export type PlaylistItem = MediaEvent & { active: boolean };
 
@@ -13,7 +13,10 @@ export type PlaylistItem = MediaEvent & { active: boolean };
 })
 export class MediaService {
 
-  roomPlaylist$ = this.socketService.listenForEvent<PlaylistItem[]>(MediaCommands.PLAYLIST_UPDATE);
+  roomPlaylist$ = this.socketService.listenForEvent<PlaylistItem[]>(MediaCommands.PLAYLIST_UPDATE)
+    .pipe(
+      shareReplay(1)
+    );
 
   roomMediaEvent$ = this.socketService.listenForEvent<MediaEvent>(MediaCommands.MEDIA_EVENT);
 

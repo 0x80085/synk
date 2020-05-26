@@ -6,7 +6,7 @@
       <app-chat-room [name]="name"></app-chat-room>
     </div>
     <div nz-col nzSpan="18" class="column gutter-row">
-      <app-media #player (mediaEndedEvent)="onVideoEnded()"></app-media>
+      <app-media *ngIf="playlist$ | async" #player (mediaEndedEvent)="onVideoEnded()"></app-media>
     </div>
     <div nz-col nzSpan="6" class="mt-1">
 
