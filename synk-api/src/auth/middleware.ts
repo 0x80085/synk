@@ -25,39 +25,45 @@ export default async function setupAuthMiddleware(
 
   passport.use(
     'local',
-    new LocalStrategy(async (
-      username: string,
-      password: string,
-      done: PassportDoneFn
-    ) => {
-      try {
-        const user = await userRepo.findOne({ username });
+    new LocalStrategy(
+      {
+        passReqToCallback: true,
+        session: true
+      },
+      async (
+        req: Request,
+        username: string,
+        password: string,
+        done: PassportDoneFn
+      ) => {
+        try {
+          const user = await userRepo.findOne({ username });
 
-        if (!user) {
-          return done(null, false, { message: 'Could not find that user' });
-        } else {
-          const passwordIsCorrect = await bcrypt.compare(
-            password,
-            user.passwordHash
-          );
-
-          if (passwordIsCorrect) {
-            setTimeout(() =>
-              done(null, user),
-              Math.floor(Math.random() * 20));
+          if (!user) {
+            return done(null, false, { message: 'Could not find that user' });
           } else {
-            setTimeout(
-              () => done({ statusCode: 404, message: 'Not found' }, null),
-              Math.floor(Math.random() * 20)
+            const passwordIsCorrect = await bcrypt.compare(
+              password,
+              user.passwordHash
             );
-          }
-        }
-      } catch (error) {
-        logger.info(`use error ${error}`);
-        return done({ message: 'Something went wrong' }, null);
-      }
 
-    })
+            if (passwordIsCorrect) {
+              setTimeout(() =>
+                done(null, user),
+                Math.floor(Math.random() * 20));
+            } else {
+              setTimeout(
+                () => done({ statusCode: 404, message: 'Not found' }, null),
+                Math.floor(Math.random() * 20)
+              );
+            }
+          }
+        } catch (error) {
+          logger.info(`use error ${error}`);
+          return done({ message: 'Something went wrong' }, null);
+        }
+
+      })
   );
 
   passport.serializeUser((user: User, done: PassportDoneFn) => {
