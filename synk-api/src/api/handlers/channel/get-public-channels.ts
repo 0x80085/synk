@@ -4,7 +4,7 @@ import { Channel } from '../../../domain/entity/Channel';
 import { RoomService } from '../../../socket/services/room-service';
 import { Room } from '../../../socket/models/room';
 
-interface Summary {
+interface ChannelSummary {
   roomName: string;
   description: string;
   memberCount?: number;
@@ -29,11 +29,11 @@ export async function getPublicChannels(roomService: RoomService, amount = 50) {
   return res;
 }
 
-function mergeLists(allItems: Summary[], someItems: Summary[] = []) {
+function mergeLists(allItems: ChannelSummary[], someItems: ChannelSummary[] = []) {
   const someItemsDict = toDictionary(someItems);
   return allItems.map(it => {
-    const secondListEntry: Summary = someItemsDict[it.roomName];
-    const summary: Summary = {
+    const secondListEntry: ChannelSummary = someItemsDict[it.roomName];
+    const summary: ChannelSummary = {
       currentlyPlaying: secondListEntry ? secondListEntry.currentlyPlaying : 'N/A',
       description: it.description,
       memberCount: secondListEntry ? secondListEntry.memberCount : 0,
@@ -43,7 +43,7 @@ function mergeLists(allItems: Summary[], someItems: Summary[] = []) {
   });
 }
 
-function summarize(it: Room | Channel): Summary {
+function summarize(it: Room | Channel): ChannelSummary {
   function isRoom(ting: Room | Channel): ting is Room {
     return (ting as Room).members !== undefined;
   }
@@ -62,7 +62,7 @@ function summarize(it: Room | Channel): Summary {
 }
 
 
-function toDictionary(arr: Summary[]) {
+function toDictionary(arr: ChannelSummary[]) {
   const dict: any = {};
   arr.forEach(it => {
     dict[it.roomName] = it;
