@@ -1,12 +1,18 @@
 <nz-card [nzTitle]="item.roomName" [nzHoverable]="true" [nzActions]="[members, nowPlaying]">
-  <p nzType="link" nzParagraph nzEllipsis nzEllipsisRows="3">{{ item.description }}</p>
+  <div class="description">
+    <p nzType="link" nzParagraph nzEllipsis nzEllipsisRows="3">{{ item.description }}</p>
+  </div>
 </nz-card>
 
 <ng-template #members>
-  <button nz-button nzType="link"><i nz-icon nzType="team"></i> {{ item.memberCount }}</button>
+  <button nz-button nzType="link" nz-tooltip [nzTitle]="item.memberCount + ' user(s) in room'"
+    style="margin: 0 .5rem; margin-top: 5px;">
+    <i nz-icon nzType="team"></i>{{ item.memberCount }}
+  </button>
 </ng-template>
 
 <ng-template #nowPlaying>
-  <p nz-tooltip [nzTitle]="item.currentlyPlaying" nzType="link" nz-paragraph nzEllipsis nzEllipsisRows="1" style="margin: 0 .5rem; margin-top: 5px;">
+  <p nz-tooltip [nzTitle]="item.currentlyPlaying" nzType="link" nz-paragraph nzEllipsis nzEllipsisRows="1"
+    style="margin: 0 .5rem; margin-top: 5px;">
     <i nz-icon nzType="caret-right"></i>{{ item.currentlyPlaying }}</p>
 </ng-template>
