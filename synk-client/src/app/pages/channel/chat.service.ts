@@ -25,6 +25,8 @@ export class ChatService {
     })
   );
 
+  alreadyJoinedRoomError$ = this.socketService.listenForEvent('already joined');
+
   roomUserConfig$ = this.socketService.listenForEvent<RoomUserConfig>(RoomCommands.USER_CONFIG);
 
   roomUserList$ = this.socketService.listenForEvent<RoomUserDto[]>(RoomCommands.USER_LIST_UPDATE);

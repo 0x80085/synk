@@ -43,13 +43,15 @@ export class Room {
   }
 
   join(socket: socketio.Socket) {
-    this.addMemberFromSocket(socket);
+    this.addMemberFromSocket(socket,
+      () => {
+        this.sendRoomConfigToMember(socket);
+        this.sendPlaylistToMember(socket);
+        this.broadcastMemberListToAll();
+      },
+      (e) => socket.emit(e)
+    );
 
-    this.sendRoomConfigToMember(socket);
-
-    this.sendPlaylistToMember(socket);
-
-    this.broadcastMemberListToAll();
   }
 
   giveLeader(originSocket: SocketPassport, to: string) {
@@ -171,30 +173,30 @@ export class Room {
     };
   }
 
-  private addMemberFromSocket(socket: socketio.Socket) {
-    try {
-      const uname = getUsername(socket);
+  private addMemberFromSocket(
+    socket: socketio.Socket,
+    next: () => void = () => { },
+    error: (err: any) => void = () => { }
+  ) {
+    const uname = getUsername(socket);
 
-      const alreadyAdded = this.isUserIsMember(uname);
-      if (alreadyAdded) {
-        return;
-      }
-
-      const newMember = RoomMember.create(socket);
-
-      if (this.members.length === 0) {
-        this.setLeader(newMember);
-      }
-
-      socket.join(this.name);
-      this.members.push(newMember);
-
-      this.sendMsgToMembers('info', `${newMember.userName} joined`);
-
-    } catch (error) {
-      socket.emit('authentication error');
+    const alreadyAdded = this.isUserIsMember(uname);
+    if (alreadyAdded) {
+      error('already joined');
       return;
     }
+
+    const newMember = RoomMember.create(socket);
+
+    if (this.members.length === 0) {
+      this.setLeader(newMember);
+    }
+
+    socket.join(this.name);
+    this.members.push(newMember);
+
+    this.sendMsgToMembers('info', `${newMember.userName} joined`);
+    next();
   }
 
   private isUserIsMember(uname: string) {

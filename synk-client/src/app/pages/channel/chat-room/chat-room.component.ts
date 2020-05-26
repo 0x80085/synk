@@ -1,8 +1,9 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild, ElementRef, AfterViewChecked, HostListener } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { distinctUntilChanged, debounceTime, tap, take, filter, map } from 'rxjs/operators';
+import { distinctUntilChanged, debounceTime, tap, take, filter, map, mapTo } from 'rxjs/operators';
 import { ChatService } from '../chat.service';
 import { Message } from '../models/room.models';
+import { NzNotificationService } from 'ng-zorro-antd';
 
 @Component({
   selector: 'app-chat-room',
@@ -37,7 +38,16 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
       distinctUntilChanged()
     );
 
-  constructor(private chatServ: ChatService) { }
+  roomError$ = this.chatServ.alreadyJoinedRoomError$.pipe(
+    mapTo(true),
+    tap(() => {
+      this.notification.error('Illegal operation', `Can't join the same room more than once!`);
+    })
+  );
+
+  constructor(private chatServ: ChatService,
+    private notification: NzNotificationService
+  ) { }
 
   @HostListener('scroll', ['$event'])
   onScroll($event: Event): void {
