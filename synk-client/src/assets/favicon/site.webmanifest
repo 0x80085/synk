@@ -1,14 +1,19 @@
 {
-    "name": "synk",
-    "short_name": "synk",
+    "name": "",
+    "short_name": "",
     "icons": [
         {
-            "src": "android-chrome-96x96.png?v=pglO8JJrWP",
-            "sizes": "96x96",
+            "src": "/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/android-chrome-512x512.png",
+            "sizes": "512x512",
             "type": "image/png"
         }
     ],
-    "theme_color": "#ffffff",
-    "background_color": "#ffffff",
+    "theme_color": "#ff694e",
+    "background_color": "#ff694e",
     "display": "standalone"
 }
