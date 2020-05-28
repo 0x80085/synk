@@ -49,6 +49,7 @@ export class PlaylistComponent implements OnInit {
       roomName: this.roomName,
       currentTime: null
     });
+    this.newMedia = '';
     this.notification.success('Success', 'Media added to playlist');
   }
 
