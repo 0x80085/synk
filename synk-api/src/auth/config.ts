@@ -3,7 +3,7 @@ import { Connection } from 'typeorm';
 import { TypeormStore } from 'typeorm-store';
 import { Session } from '../domain/entity/Session';
 import { SessionOptions } from './middleware';
-import * as uuid from 'uuid';
+import { v4 as uuid } from 'uuid';
 import * as cookieParser from 'cookie-parser';
 
 export function configureSessionMiddleware(connection: Connection) {
