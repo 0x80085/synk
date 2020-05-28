@@ -36,14 +36,18 @@
           nzSplit [nzContent]="item.title" [nzActions]="[opAction]" nzNoFlex>
         </nz-list-item>
         <ng-template #opAction>
-          <nz-button-group>
-            <button nz-button [nzGhost]="!item.active" nzSize="small" nzType="link" (click)="playMedia.emit(item)"
-              title="start video"><i nz-icon nzType="caret-right"></i></button>
-            <button nz-button nzSize="small" nzType="link" disabled title="set next in line (not yet implemented)"><i
-                nz-icon nzType="double-right"></i></button>
-            <button nz-button nzSize="small" nzType="link" (click)="onRemoveMedia(item.mediaUrl)"
-              title="remove from list"><i nz-icon nzType="delete"></i></button>
-          </nz-button-group>
+          <button nz-button [nzGhost]="!item.active" nzSize="small" nzType="link" (click)="playMedia.emit(item)"
+            nz-tooltip nzTitle="start video">
+            <i nz-icon [nzType]="item.active ? 'play-circle':'caret-right'"></i>
+          </button>
+          <!-- <button nz-button nzSize="small" nzType="link" disabled nz-tooltip
+            nzTitle="set next in line (not yet implemented)">
+            <i nz-icon nzType="double-right"></i>
+          </button> -->
+          <button nz-button nzSize="small" nzDanger nzType="link" (click)="onRemoveMedia(item.mediaUrl)" nz-tooltip
+            nzTitle="Remove from list">
+            <i nz-icon nzType="delete"></i>
+          </button>
         </ng-template>
       </ng-template>
     </nz-list>
