@@ -15,7 +15,9 @@ export enum Commands {
   ADD_MEDIA = 'add media',
   REMOVE_MEDIA = 'remove media',
   GIVE_LEADER = 'give leader',
-  DISCONNECT = 'disconnect'
+  DISCONNECT = 'disconnect',
+  PLAY_NEXT_MEDIA = "play next media",
+  SHUFFLE_PLAYLIST = "shuffle playlist"
 }
 
 export class RoomService {
@@ -93,6 +95,26 @@ export class RoomService {
       }
     });
 
+    socket.on(Commands.PLAY_NEXT_MEDIA, (roomName: string) => {
+      try {
+        this.onPlayNextMedia(roomName);
+      } catch (error) {
+        this.logger.info('play next media failed');
+        this.logger.info(roomName);
+        this.logger.error(error);
+      }
+    });
+
+    socket.on(Commands.SHUFFLE_PLAYLIST, (roomName: string) => {
+      try {
+        this.onShufflePlaylist(roomName);
+      } catch (error) {
+        this.logger.info('SHUFFLE_PLAYLIST failed');
+        this.logger.info(roomName);
+        this.logger.error(error);
+      }
+    });
+
     socket.on(Commands.GIVE_LEADER, (data: { to: string, roomName: string }) => {
       try {
         this.onGiveLeader(data, socket);
@@ -105,6 +127,24 @@ export class RoomService {
     });
 
     socket.on(Commands.DISCONNECT, this.disconnect);
+  }
+
+  onPlayNextMedia(roomName: string) {
+    const room = this.getRoomByName(roomName);
+    if (!room) {
+      return;
+    }
+    room.currentPlayList.skip();
+    room.broadcastPlaylistToAll();
+  }
+
+  onShufflePlaylist(roomName: string) {
+    const room = this.getRoomByName(roomName);
+    if (!room) {
+      return;
+    }
+    room.currentPlayList.shuffle();
+    room.broadcastPlaylistToAll();
   }
 
   createRoom(data: { name: string; description: string }, creator: string) {

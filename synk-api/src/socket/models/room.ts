@@ -9,6 +9,7 @@ import {
 import { Playlist } from './playlist';
 import { Logger } from '../../tools/logger';
 import { getUsername, SocketPassport } from './socket.passport';
+import { RequiresAuthentication } from '../decorators/auth.decorator';
 
 export class Room {
   id: string;
@@ -42,6 +43,7 @@ export class Room {
     this.playlists.push(defaultPlaylist);
   }
 
+  @RequiresAuthentication
   join(socket: socketio.Socket) {
     this.addMemberFromSocket(socket,
       () => {
@@ -54,13 +56,12 @@ export class Room {
 
   }
 
+  @RequiresAuthentication
   giveLeader(originSocket: SocketPassport, to: string) {
     const initiator = this.getMemberFromSocket(originSocket);
 
-    if (!initiator) {
-      return;
-    }
-    if (initiator.userName !== this.leader.userName) {
+
+    if (initiator && initiator.userName !== this.leader.userName) {
       return;
     }
 
@@ -96,6 +97,7 @@ export class Room {
     socket.leave(this.name);
   }
 
+  @RequiresAuthentication
   broadcastMessageToAll(socket: socketio.Socket, msg: IncomingGroupMessage) {
     this.sendMsgToMembers(getUsername(socket), msg.content.text);
   }
@@ -104,6 +106,7 @@ export class Room {
     this.io.to(this.name).emit('playlist update', this.currentPlayList.list);
   }
 
+  @RequiresAuthentication
   broadcastMediaEventToAll(socket: socketio.Socket, data: MediaEvent) {
     socket.to(this.name).emit('media event', data);
   }
@@ -118,6 +121,28 @@ export class Room {
     });
 
     this.io.to(this.name).emit('userlist update', members);
+  }
+
+  @RequiresAuthentication
+  playNextMedia(socket: SocketPassport) {
+    const initiator = this.getMemberFromSocket(socket);
+
+    if (initiator && initiator.userName !== this.leader.userName) {
+      return;
+    }
+    this.currentPlayList.skip();
+    this.broadcastPlaylistToAll();
+  }
+
+  @RequiresAuthentication
+  shufflePlaylist(socket: SocketPassport) {
+    const initiator = this.getMemberFromSocket(socket);
+
+    if (initiator && initiator.userName !== this.leader.userName) {
+      return;
+    }
+    this.currentPlayList.shuffle();
+    this.broadcastPlaylistToAll();
   }
 
   private setLeader(member: RoomMember) {
@@ -233,3 +258,4 @@ export class Room {
     return socketRef;
   }
 }
+
