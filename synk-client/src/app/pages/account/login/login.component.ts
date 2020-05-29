@@ -12,6 +12,7 @@ export class LoginComponent implements OnInit {
   form: FormGroup;
 
   isLoginSuccess = false;
+  isSubmitting = false;
 
   constructor(
     private fb: FormBuilder,
@@ -40,6 +41,7 @@ export class LoginComponent implements OnInit {
 
   submitForm(): void {
     this.touchform();
+    this.isSubmitting = true;
 
     if (this.form.invalid) {
       return;
@@ -53,6 +55,7 @@ export class LoginComponent implements OnInit {
     this.auth.login(creds).subscribe(
       ob => {
         this.isLoginSuccess = true;
+        this.isSubmitting = false;
 
         this.auth.getUser().subscribe();
       },
@@ -64,6 +67,7 @@ export class LoginComponent implements OnInit {
           ${err.status === 404 ? 'user not found' : `Hmm... That didn't work`}
         `
         );
+        this.isSubmitting = false;
         this.isLoginSuccess = false;
       }
     );
