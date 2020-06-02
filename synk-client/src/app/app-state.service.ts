@@ -1,9 +1,10 @@
-import { Injectable } from '@angular/core';
-import { of, Subject, BehaviorSubject, merge } from 'rxjs';
-import { User } from './pages/account/auth.service';
-import { share, tap, catchError, mapTo, map, startWith } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
-import { environment } from 'src/environments/environment';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, merge, of } from 'rxjs';
+import { catchError, map, share, shareReplay, startWith } from 'rxjs/operators';
+
+import { environment } from '../environments/environment';
+import { User } from './pages/account/auth.service';
 import { SocketService } from './socket.service';
 
 @Injectable({
@@ -28,7 +29,7 @@ export class AppStateService {
     this.socketService.isConnected$,
     this.isLoggedInSubject
   ).pipe(
-    share(),
+    shareReplay(1),
   );
 
   constructor(
