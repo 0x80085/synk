@@ -3,7 +3,6 @@ import { OverviewService, ChannelDraft } from '../overview.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NzNotificationService } from 'ng-zorro-antd';
-import { throwIfEmpty } from 'rxjs/operators';
 
 @Component({
   selector: 'app-create-room-form',
@@ -18,7 +17,7 @@ export class CreateRoomFormComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private notification: NzNotificationService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -53,6 +52,14 @@ export class CreateRoomFormComponent implements OnInit {
         this.router.navigate(['/channel', results.name]);
       },
       err => {
+        if (err.status === 403) {
+          this.notification.create(
+            'error',
+            `Login to create a room`,
+            `Only known users may create a room.`
+          );
+          return;
+        }
         this.notification.create(
           'error',
           `Couldn't create room`,
