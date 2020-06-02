@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { shareReplay } from 'rxjs/operators';
 
 import { SocketService } from '../../socket.service';
 import { MediaEvent } from './models/room.models';
 import { MediaCommands } from './models/media.models';
-import { map, tap, shareReplay } from 'rxjs/operators';
 
 export type PlaylistItem = MediaEvent & { active: boolean };
 

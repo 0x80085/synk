@@ -8,6 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
+    "tslint-check": "tslint-config-prettier-check ./tslint.json",
     "docker:run": "docker build --rm -f \"Dockerfile\" -t synk-client:latest \".\"",
     "docker:build": "docker-compose up --build"
   },
@@ -47,6 +48,7 @@
     "karma-jasmine-html-reporter": "^1.4.0",
     "protractor": "~5.4.0",
     "tslint": "6.1.2",
+    "tslint-config-prettier": "^1.18.0",
     "typescript": "3.6.4"
   }
 }
