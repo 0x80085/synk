@@ -1,20 +1,17 @@
-import { SocketPassport } from "../models/socket.passport";
+import { SocketPassport } from '../models/socket.passport';
 
 export function RequiresAuthentication(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-  let originalMethod = descriptor.value;
+  const originalMethod = descriptor.value;
   descriptor.value = function (...args: [SocketPassport, ...any[]]) {
     try {
       const [socket] = args;
-      console.log("wrapped function: before invoking " + propertyKey);
-      console.log(args)
       throwIfNotLoggedIn(socket);
-      let result = originalMethod.apply(this, args);
-      console.log("wrapped function: after invoking " + propertyKey);
+      const result = originalMethod.apply(this, args);
 
     } catch (error) {
-      console.log("user not logged in");
+      console.log('user not logged in');
     }
-  }
+  };
 }
 
 export function throwIfNotLoggedIn(socket: SocketPassport) {
@@ -23,6 +20,6 @@ export function throwIfNotLoggedIn(socket: SocketPassport) {
     || !socket.request.user.logged_in
     || !socket.request.isAuthenticated()
   ) {
-    throw "authentication error";
+    throw new Error('authentication error');
   }
 }
