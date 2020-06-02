@@ -30,10 +30,15 @@ export class MediaService {
     this.socketService.socket.emit(MediaCommands.ADD_MEDIA, ev);
   }
 
+  playNext(roomName: string) {
+    this.socketService.socket.emit(MediaCommands.PLAY_NEXT_MEDIA, roomName);
+  }
+
+  shufflePlaylist(roomName: string) {
+    this.socketService.socket.emit(MediaCommands.SHUFFLE_PLAYLIST, roomName);
+  }
+
   removeFromPlaylist(ev: MediaEvent) {
     this.socketService.socket.emit(MediaCommands.REMOVE_MEDIA, ev);
   }
-  // removeFromPlaylist(ev: MediaEvent) {
-  //   this.socketService.sendEvent({ command: MediaCommands.REMOVE_MEDIA, payload: ev });
-  // }
 }

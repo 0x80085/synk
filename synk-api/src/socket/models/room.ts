@@ -60,7 +60,6 @@ export class Room {
   giveLeader(originSocket: SocketPassport, to: string) {
     const initiator = this.getMemberFromSocket(originSocket);
 
-
     if (initiator && initiator.userName !== this.leader.userName) {
       return;
     }

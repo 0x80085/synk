@@ -17,7 +17,7 @@ export class PlaylistComponent implements OnInit {
 
   @Input() roomName: string;
 
-  @Output() playMedia = new EventEmitter<MediaEvent>();
+  @Output() playMedia = new EventEmitter<MediaEvent>()
 
   newMedia: string;
   showControls: boolean;
@@ -64,4 +64,11 @@ export class PlaylistComponent implements OnInit {
     }
   }
 
+  onNext() {
+    this.mediaService.playNext(this.roomName);
+  }
+
+  onShuffle() {
+    this.mediaService.shufflePlaylist(this.roomName);
+  }
 }

@@ -1,22 +1,18 @@
 <div nz-row>
   <div nz-col nzSpan="24" style="min-height: 3rem;" [hidden]="!(isLeader$ |async)">
-    <button nz-button nzType="link" nzGhost (click)="showControls = !showControls">
+    <button nz-button nzType="link" (click)="showControls = !showControls">
       <i nz-icon nzType="menu"></i>
     </button>
     <nz-button-group style="margin-left: 0.875rem;" [hidden]="!showControls">
-      <button nzGhost nz-button nzType="default">
-        <i nz-icon nzType="backward" nzTheme="outline"></i>
-        Previous
-      </button>
-      <button nzGhost nz-button nzType="default">
-        <i nz-icon nzType="down-square" nzTheme="outline"></i>
+      <!-- <button nzGhost nz-button nzType="default">
+        <i nz-icon nzType="down-square" nzTheme="outline" (click)="onLoadPlaylist()"></i>
         Load Playlist
-      </button>
-      <button nzGhost nz-button nzType="default">
+      </button> -->
+      <button nz-button nzType="default" (click)="onShuffle()">
         <i nz-icon nzType="swap" nzTheme="outline"></i>
         Shuffle Playlist
       </button>
-      <button nzGhost nz-button nzType="default">
+      <button nz-button nzType="default" (click)="onNext()">
         <i nz-icon nzType="forward" nzTheme="outline"></i>
         Next
       </button>
@@ -36,7 +32,7 @@
           nzSplit [nzContent]="item.title" [nzActions]="[opAction]" nzNoFlex>
         </nz-list-item>
         <ng-template #opAction>
-          <button nz-button [nzGhost]="!item.active" nzSize="small" nzType="link" (click)="playMedia.emit(item)"
+          <button nz-button nzSize="small" nzType="link" (click)="playMedia.emit(item)"
             nz-tooltip nzTitle="start video">
             <i nz-icon [nzType]="item.active ? 'play-circle':'caret-right'"></i>
           </button>
