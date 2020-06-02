@@ -57,7 +57,7 @@
     "@types/socket.io": "^2.1.4",
     "@types/uuid": "^8.0.0",
     "ts-node": "8.10.1",
-    "eslint": "^7.1.0",
+    "tslint": "^6.1.2",
     "typescript": "^3.7.3"
   }
 }
