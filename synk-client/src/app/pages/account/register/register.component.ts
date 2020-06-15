@@ -41,7 +41,6 @@ export class RegisterComponent implements OnInit {
 
   submitForm(): void {
     this.touchform();
-    this.isSubmitting = true;
 
     if (this.form.invalid) {
       return;
@@ -51,6 +50,8 @@ export class RegisterComponent implements OnInit {
       username: this.form.controls.userName.value,
       password: this.form.controls.password.value
     };
+
+    this.isSubmitting = true;
 
     this.service.createAccount(creds).subscribe(
       () => {

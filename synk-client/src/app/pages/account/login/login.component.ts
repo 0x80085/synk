@@ -34,14 +34,12 @@ export class LoginComponent implements OnInit {
       password: [
         null,
         [Validators.required, Validators.maxLength(20), Validators.minLength(5)]
-      ],
-      remember: [true]
+      ]
     });
   }
 
   submitForm(): void {
     this.touchform();
-    this.isSubmitting = true;
 
     if (this.form.invalid) {
       return;
@@ -52,8 +50,10 @@ export class LoginComponent implements OnInit {
       password: this.form.controls.password.value
     };
 
+    this.isSubmitting = true;
+
     this.auth.login(creds).subscribe(
-      ob => {
+      () => {
         this.isLoginSuccess = true;
         this.isSubmitting = false;
 
