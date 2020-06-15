@@ -4,7 +4,7 @@ import { NzNotificationService } from 'ng-zorro-antd';
 import { BehaviorSubject, merge, Observable, Subscription, timer } from 'rxjs';
 import { mapTo, startWith, tap } from 'rxjs/operators';
 
-import { SocketService } from 'src/app/socket.service';
+import { SocketService } from '../../socket.service';
 import { ChatService } from './chat.service';
 import { MediaService } from './media.service';
 import { MediaComponent } from './media/media.component';
