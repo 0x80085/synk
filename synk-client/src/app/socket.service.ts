@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { Observable, of, fromEvent, merge, throwError } from 'rxjs';
 import * as io from 'socket.io-client';
 
-import { environment } from 'src/environments/environment';
-import { PossibleCommands } from './pages/channel/models/commands.enum';
+import { environment } from '../environments/environment';
 import { switchMap, map, tap, share, withLatestFrom, catchError, mapTo, shareReplay } from 'rxjs/operators';
 import { NzNotificationService } from 'ng-zorro-antd';
+import { PossibleCommands } from './pages/channel/models/commands.enum';
 
 export interface RealTimeCommand {
   command: PossibleCommands;

@@ -5,7 +5,7 @@ export function RequiresAuthentication(target: any, propertyKey: string, descrip
   descriptor.value = function (...args: [SocketPassport, ...any[]]) {
     try {
       const [socket] = args;
-      throwIfNotLoggedIn(socket);
+      disconnectIfNotLoggedIn(socket);
       const result = originalMethod.apply(this, args);
 
     } catch (error) {
@@ -14,12 +14,15 @@ export function RequiresAuthentication(target: any, propertyKey: string, descrip
   };
 }
 
-export function throwIfNotLoggedIn(socket: SocketPassport) {
+export function disconnectIfNotLoggedIn(socket: SocketPassport) {
   if (
     !socket.request.user
     || !socket.request.user.logged_in
     || !socket.request.isAuthenticated()
   ) {
+    console.log('disconnectIfNotLoggedIn', socket.request.user);
+    console.log('disconnectIfNotLoggedIn',socket.request.isAuthenticated());
+    socket.disconnect();
     throw new Error('authentication error');
   }
 }

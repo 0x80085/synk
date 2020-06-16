@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { tap, catchError, shareReplay } from 'rxjs/operators';
-
-import { environment } from 'src/environments/environment';
-import { AppStateService } from 'src/app/app-state.service';
-import { SocketService } from 'src/app/socket.service';
 import { of } from 'rxjs';
+
+import { environment } from '../../../environments/environment';
+import { AppStateService } from '../../app-state.service';
+import { SocketService } from '../../socket.service';
 
 interface LoginInfo {
   username: string;
@@ -30,6 +30,12 @@ export interface Channel {
   providedIn: 'root'
 })
 export class AuthService {
+
+  userOwnedChannels$ = this.http.get<Channel[]>(`${environment.api}/account/channels`, {
+    withCredentials: true
+  }).pipe(
+    shareReplay(1)
+  );
 
   constructor(
     private http: HttpClient,
@@ -90,12 +96,6 @@ export class AuthService {
       }),
       shareReplay()
     );
-  }
-
-  getChannels() {
-    return this.http.get<Channel[]>(`${environment.api}/account/channels`, {
-      withCredentials: true
-    });
   }
 
   deleteChannel(name: string) {

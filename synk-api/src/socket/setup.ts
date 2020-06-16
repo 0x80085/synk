@@ -87,5 +87,6 @@ function onAuthorizeFail(
   logger: Logger
 ) {
   logger.info(`failed connection to socket.io: ${error}`);
+  logger.info(`ERR MSG: ${message}`);
   next(new Error(message));
 }

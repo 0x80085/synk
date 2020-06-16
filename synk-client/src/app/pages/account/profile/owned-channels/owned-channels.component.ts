@@ -21,7 +21,7 @@ export class OwnedChannelsComponent {
 
   channels$: Observable<Channel[]> = this.refreshSubject.pipe(
     switchMap(() => {
-      return this.auth.getChannels()
+      return this.auth.userOwnedChannels$
         .pipe(tap(e => console.log(e))
         );
     })
@@ -34,7 +34,7 @@ export class OwnedChannelsComponent {
           tap(() => this.refreshSubject.next(null)),
           take(1)
           , catchError((err) => {
-            this.notification.error('Delete failed', 'try again later')
+            this.notification.error('Delete failed', 'try again later');
             return err;
           }))
         .subscribe();
