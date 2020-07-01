@@ -1,0 +1,20 @@
+<div class="stage">
+  <video controls
+         #videoElement>
+    <source [src]="videoSubject | async"
+            type="video/mp4">
+    <source [src]="videoSubject | async"
+            type="video/webm">
+    <p>Your browser doesn't support HTML5 video.</p>
+  </video>
+</div>
+<div class="stats">
+  <p>
+    <label>Ended:</label>
+    {{ ended$ | async  }}
+  </p>
+  <p>
+    <label>Error:</label>
+    {{ error$ | async  }}
+  </p>
+</div>
