@@ -43,7 +43,7 @@ export class Room {
     this.playlists.push(defaultPlaylist);
   }
 
-  @RequiresAuthentication
+  @RequiresAuthentication()
   join(socket: socketio.Socket) {
     this.addMemberFromSocket(socket,
       () => {
@@ -56,7 +56,7 @@ export class Room {
 
   }
 
-  @RequiresAuthentication
+  @RequiresAuthentication()
   giveLeader(originSocket: SocketPassport, to: string) {
     const initiator = this.getMemberFromSocket(originSocket);
 
@@ -96,7 +96,7 @@ export class Room {
     socket.leave(this.name);
   }
 
-  @RequiresAuthentication
+  @RequiresAuthentication()
   broadcastMessageToAll(socket: socketio.Socket, msg: IncomingGroupMessage) {
     this.sendMsgToMembers(getUsername(socket), msg.content.text);
   }
@@ -105,7 +105,7 @@ export class Room {
     this.io.to(this.name).emit('playlist update', this.currentPlayList.list);
   }
 
-  @RequiresAuthentication
+  @RequiresAuthentication()
   broadcastMediaEventToAll(socket: socketio.Socket, data: MediaEvent) {
     socket.to(this.name).emit('media event', data);
   }
@@ -122,7 +122,7 @@ export class Room {
     this.io.to(this.name).emit('userlist update', members);
   }
 
-  @RequiresAuthentication
+  @RequiresAuthentication()
   playNextMedia(socket: SocketPassport) {
     const initiator = this.getMemberFromSocket(socket);
 
@@ -133,7 +133,7 @@ export class Room {
     this.broadcastPlaylistToAll();
   }
 
-  @RequiresAuthentication
+  @RequiresAuthentication()
   shufflePlaylist(socket: SocketPassport) {
     const initiator = this.getMemberFromSocket(socket);
 
