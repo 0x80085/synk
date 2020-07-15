@@ -6,9 +6,11 @@ import { User } from '../auth.service';
 })
 export class PlaceholdPipe implements PipeTransform {
 
-  transform(user: User): string {
+  // till satyr.io fixes https problem
 
-    return user ? `http://satyr.io/400x300/c0ffee?text=${user.userName}` : `http://satyr.io/105x60?text=...`;
-  }
+  transform = (user: User): string =>
+    user
+      ? `https://via.placeholder.com/400x300/c0ffee?text=${user.userName}`
+      : `https://via.placeholder.com/400x300/c0ffee`
 
 }
