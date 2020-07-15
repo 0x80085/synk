@@ -75,7 +75,6 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
 
   getCurrentUrl(): string {
     return this.current;
-    // return this.player.getVideoUrl();
   }
 
   onPlayerReady = event => {
