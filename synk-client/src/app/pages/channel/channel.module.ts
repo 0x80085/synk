@@ -8,6 +8,7 @@ import { ChatService } from './chat.service';
 import { MediaComponent, MediaHostDirective } from './media/media.component';
 import { YoutubeComponent } from './media/youtube/youtube.component';
 import { PlaylistComponent } from './playlist/playlist.component';
+import { Html5Component } from './media/html5/html5.component';
 
 @NgModule({
   entryComponents: [
@@ -19,7 +20,8 @@ import { PlaylistComponent } from './playlist/playlist.component';
     MediaComponent,
     MediaHostDirective,
     YoutubeComponent,
-    PlaylistComponent
+    PlaylistComponent,
+    Html5Component
   ],
   imports: [
     CommonModule,
