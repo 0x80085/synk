@@ -25,7 +25,7 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
   ngOnInit() {
     if (!(window as any).YT) {
       const tag = document.createElement('script');
-      tag.src = 'http://www.youtube.com/iframe_api';
+      tag.src = 'https://www.youtube.com/iframe_api';
 
       const firstScriptTag = document.getElementsByTagName('script')[0];
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
@@ -75,7 +75,6 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
 
   getCurrentUrl(): string {
     return this.current;
-    // return this.player.getVideoUrl();
   }
 
   onPlayerReady = event => {

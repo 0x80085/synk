@@ -58,7 +58,7 @@ export class MediaComponent implements OnInit {
   }
 
   isPlaying() {
-    return this.ref.instance.getCurrentUrl();
+    return this.ref.instance.isPlaying();
   }
 
   private loadComponent() {

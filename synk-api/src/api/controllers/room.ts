@@ -26,6 +26,22 @@ export const getRooms = async (
 };
 
 /**
+ * `GET /account/channels`
+ * Get all channels owned by user
+ */
+export const getChannelsOwnedByUser = async (
+  req: PassportRequest,
+  res: Response,
+  roomService: RoomService
+) => {
+
+  const channels =
+    await channelHandler.getChannelsOwnedByUser(req.user.username);
+
+  res.json(channels);
+};
+
+/**
  * `POST /create-room`
  * Creates a chat room
  */
@@ -38,12 +54,35 @@ export const createRoom = (
 
   try {
     channelHandler.createChannel(req.user.username, req.body.name, req.body.description);
-    roomService.createRoom(req.body);
+    roomService.createRoom(req.body, req.user.username);
 
     res.status(200).json('OK');
   } catch (error) {
     logger.error(error);
 
     res.status(500).json('ERROR - Room not created');
+  }
+};
+
+/**
+ * `DELETE /account/channels/name`
+ * Creates a chat room
+ */
+export const deleteRoom = (
+  req: PassportRequest,
+  res: Response,
+  roomService: RoomService,
+  logger: Logger
+) => {
+
+  try {
+    channelHandler.deleteChannel(req.user.username, req.params.name);
+    roomService.deleteRoom(req.params.name, req.user.username);
+
+    res.status(200).json('OK');
+  } catch (error) {
+    logger.error(error);
+
+    res.status(500).json('ERROR - Room not deleted');
   }
 };

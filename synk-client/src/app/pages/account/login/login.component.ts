@@ -12,6 +12,7 @@ export class LoginComponent implements OnInit {
   form: FormGroup;
 
   isLoginSuccess = false;
+  isSubmitting = false;
 
   constructor(
     private fb: FormBuilder,
@@ -33,8 +34,7 @@ export class LoginComponent implements OnInit {
       password: [
         null,
         [Validators.required, Validators.maxLength(20), Validators.minLength(5)]
-      ],
-      remember: [true]
+      ]
     });
   }
 
@@ -50,10 +50,12 @@ export class LoginComponent implements OnInit {
       password: this.form.controls.password.value
     };
 
+    this.isSubmitting = true;
+
     this.auth.login(creds).subscribe(
-      ob => {
+      () => {
         this.isLoginSuccess = true;
-        this.isLoginSuccess = true;
+        this.isSubmitting = false;
 
         this.auth.getUser().subscribe();
       },
@@ -62,9 +64,10 @@ export class LoginComponent implements OnInit {
           'error',
           'Login failed',
           `
-          ${err.status === 404 ? 'user not found' : '??'}
+          ${err.status === 404 ? 'user not found' : `Hmm... That didn't work`}
         `
         );
+        this.isSubmitting = false;
         this.isLoginSuccess = false;
       }
     );

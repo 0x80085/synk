@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { OverviewlistItem, OverviewService } from '../overview.service';
-import { tap } from 'rxjs/operators';
+import { share } from 'rxjs/operators';
+import { AppStateService } from '../../../app-state.service';
 
 @Component({
   selector: 'app-overview',
@@ -10,7 +11,9 @@ import { tap } from 'rxjs/operators';
 })
 export class OverviewComponent {
 
-  data$: Observable<OverviewlistItem[]> = this.overviewService.getChannels();
+  data$: Observable<OverviewlistItem[]> = this.overviewService.getChannels().pipe(share());
 
-  constructor(private overviewService: OverviewService) { }
+  isLoggedIn$ = this.state.isLoggedIn$.pipe(share());
+
+  constructor(private overviewService: OverviewService, private state: AppStateService) { }
 }

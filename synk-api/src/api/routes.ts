@@ -34,6 +34,13 @@ const ALL_ROUTES = (roomService: RoomService, logger: Logger): RouteOptions[] =>
     verb: 'GET'
   },
   {
+    route: '/account/channels',
+    handlers: [(req: PassportRequest, res: Response) =>
+      chatroomController.getChannelsOwnedByUser(req, res, roomService)],
+    requireAuthentication: true,
+    verb: 'GET'
+  },
+  {
     route: '/account/update',
     handlers: [userController.patchUpdateProfile],
     requireAuthentication: true,
@@ -77,6 +84,14 @@ const ALL_ROUTES = (roomService: RoomService, logger: Logger): RouteOptions[] =>
     ],
     requireAuthentication: true,
     verb: 'POST'
+  },
+  {
+    route: '/account/channels/:name',
+    handlers: [(req: PassportRequest, res: Response, next: express.NextFunction) =>
+      chatroomController.deleteRoom(req, res, roomService, logger)
+    ],
+    requireAuthentication: true,
+    verb: 'DELETE'
   },
   {
     route: '/public-rooms',

@@ -1,17 +1,15 @@
 <nz-list [nzDataSource]="data$ | async" [nzRenderItem]="item"
-  [nzGrid]="{ gutter: 8, xs: 24, sm: 12, md: 8, lg: 8, xl: 8 }" [nzNoResult]="noResults">
+  [nzGrid]="{ gutter: 16, xs: 24, sm: 12, md: 6}" [nzNoResult]="noResults">
   <ng-template #item let-item>
     <nz-list-item [ngClass]="'item'" routerLink="/channel/{{ item.roomName }}" [nzContent]="nzContent">
       <ng-template #nzContent>
-        <nz-card [nzTitle]="item.roomName" [nzHoverable]="true" [nzActions]="[members, nowPlaying]">
-          <p nzType="link" nzParagraph nzEllipsis nzEllipsisRows="3">{{ item.description }}</p>
-        </nz-card>
+        <app-overview-item [item]="item" #nzContent></app-overview-item>
       </ng-template>
     </nz-list-item>
   </ng-template>
 </nz-list>
 
-<div nz-row>
+<div *ngIf="isLoggedIn$ | async" nz-row>
   <div nz-col nzSpan="8">
     <nz-card nzTitle="New channel">
       <app-create-room-form></app-create-room-form>
@@ -21,13 +19,4 @@
 
 <ng-template #noResults>
   <nz-empty></nz-empty>
-</ng-template>
-
-<ng-template #members>
-  <button nz-button nzType="link"><i nz-icon nzType="team"></i> 88</button>
-</ng-template>
-
-<ng-template #nowPlaying>
-  <p nzType="link" nz-paragraph nzEllipsis nzEllipsisRows="1" style="margin: 0 .5rem; margin-top: 5px;"><i nz-icon
-      nzType="caret-right"></i> ぐでたまアニメ　第157話　公式配信 Moaraz az Moaraz az Moaraz az Moaraz az Moaraz az </p>
 </ng-template>

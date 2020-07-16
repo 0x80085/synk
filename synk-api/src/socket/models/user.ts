@@ -28,11 +28,11 @@ export class RoomMember {
   }
 }
 
-export type RoomMemberDto = RoomMember & { isLeader: boolean };
+export type RoomMemberDto = RoomMember & RoomMemberConfig;
 
 export interface RoomMemberConfig {
   role: Roles;
   permissionLevel: PermissionLevels;
+  isOwner: boolean;
   isLeader: boolean;
-  isAdmin: boolean;
 }

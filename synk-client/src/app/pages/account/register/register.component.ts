@@ -9,9 +9,10 @@ import { NzNotificationService } from 'ng-zorro-antd';
   styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent implements OnInit {
-  registerSuccess = false;
-
   form: FormGroup;
+
+  registerSuccess = false;
+  isSubmitting = false;
 
   constructor(
     private fb: FormBuilder,
@@ -50,9 +51,12 @@ export class RegisterComponent implements OnInit {
       password: this.form.controls.password.value
     };
 
+    this.isSubmitting = true;
+
     this.service.createAccount(creds).subscribe(
       () => {
         this.registerSuccess = true;
+        this.isSubmitting = false;
       },
       err => {
         this.notification.create(
@@ -62,6 +66,8 @@ export class RegisterComponent implements OnInit {
           AAaaaaah
         `
         );
+        this.isSubmitting = false;
+        this.registerSuccess = false;
       }
     );
   }

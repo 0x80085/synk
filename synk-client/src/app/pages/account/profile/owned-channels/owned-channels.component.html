@@ -1,0 +1,43 @@
+<nz-card nzTitle="Owned Channels" [nzLoading]="!(channels$ | async)">
+
+  <nz-empty *ngIf="(channels$ | async)?.length === 0" [nzNotFoundImage]="channelListEmpty"
+    nzNotFoundContent="It's empty in here...">
+  </nz-empty>
+
+  <ng-template #channelListEmpty>
+    <i nz-icon style="font-size: 4rem" nzType="small-dash"></i>
+  </ng-template>
+
+  <nz-collapse *ngIf="(channels$ | async)?.length > 0">
+    <nz-collapse-panel *ngFor="let channel of channels$ | async" [nzHeader]="channel.name" [nzExtra]="actions">
+      <nz-table [nzData]="[channel]" [nzShowPagination]="false">
+        <tr>
+          <th>description</th>
+          <td>{{ channel.description }}</td>
+        </tr>
+        <tr>
+          <th>isPublic</th>
+          <td>{{ channel.isPublic }}</td>
+        </tr>
+        <tr>
+          <th>dateCreated</th>
+          <td>{{ channel.dateCreated | date }}</td>
+        </tr>
+        <tr>
+          <th>isLocked</th>
+          <td>{{ channel.isLocked }}</td>
+        </tr>
+      </nz-table>
+
+      <ng-template #actions>
+        <a nz-button nzType="link" nz-tooltip nzTitle="Go to channel" [routerLink]="['/channel', channel.name]">
+          <i nz-icon nzType="login"></i>
+        </a>
+        <a nz-button nzDanger nzType="link" nz-tooltip nzTitle="Delete this channel"
+          (click)="deleteChannel(channel, $event)">
+          <i nz-icon nzTheme="fill" nzType="delete"></i>
+        </a>
+      </ng-template>
+    </nz-collapse-panel>
+  </nz-collapse>
+</nz-card>

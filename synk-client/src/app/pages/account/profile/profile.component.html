@@ -1,5 +1,5 @@
 <div nz-row>
-  <div nzSpan="6" nzOffset="8" nz-col>
+  <div nz-col nzSpan="8">
     <nz-card nzTitle="Profile info" [nzCover]="coverTemplate" [nzLoading]="!(me$ | async)">
       <h5 *ngIf="me$ | async">Username:</h5>
       <pre>{{ me$ | async | username }}</pre>
@@ -9,7 +9,11 @@
       </div>
     </nz-card>
   </div>
+  <div nz-col nzSpan="16">
+    <app-owned-channels></app-owned-channels>
+  </div>
 </div>
+
 
 <ng-template #coverTemplate>
   <img alt="example" [src]="me$ | async | placehold" />

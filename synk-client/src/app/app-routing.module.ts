@@ -1,11 +1,20 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
+import { WelcomeComponent } from './pages/welcome/welcome.component';
+import { ChannelComponent } from './pages/channel/channel.component';
+import { RegisterComponent } from './pages/account/register/register.component';
+import { ProfileComponent } from './pages/account/profile/profile.component';
+import { LoginComponent } from './pages/account/login/login.component';
+
 const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: '/welcome' },
-  { path: 'welcome', loadChildren: () => import('./pages/welcome/welcome.module').then(m => m.WelcomeModule) },
-  { path: 'channel', loadChildren: () => import('./pages/channel/channel.module').then(m => m.ChannelModule) },
-  { path: 'account', loadChildren: () => import('./pages/account/account.module').then(m => m.AccountModule) }
+  { path: '', pathMatch: 'full', redirectTo: 'home' },
+  { path: '', component: WelcomeComponent },
+  { path: 'channel/:name', component: ChannelComponent },
+  { path: 'account/new', component: RegisterComponent },
+  { path: 'account/me', component: ProfileComponent },
+  { path: 'account/login', component: LoginComponent },
+  {path: '**', redirectTo: ''}
 ];
 
 @NgModule({

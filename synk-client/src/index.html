@@ -1,106 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>SynkClient</title>
-    <base href="/" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link
-      rel="apple-touch-icon"
-      sizes="120x120"
-      href="assets/favicon/apple-touch-icon.png?v=pglO8JJrWP"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="assets/favicon/favicon-32x32.png?v=pglO8JJrWP"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="assets/favicon/favicon-16x16.png?v=pglO8JJrWP"
-    />
-    <link rel="manifest" href="assets/favicon/site.webmanifest?v=pglO8JJrWP" />
-    <link
-      rel="mask-icon"
-      href="assets/favicon/safari-pinned-tab.svg?v=pglO8JJrWP"
-      color="#ff694e"
-    />
-    <link rel="shortcut icon" href="assets/favicon/favicon.ico?v=pglO8JJrWP" />
-    <meta name="apple-mobile-web-app-title" content="synk" />
-    <meta name="application-name" content="synk" />
-    <meta name="msapplication-TileColor" content="#da532c" />
-    <meta
-      name="msapplication-config"
-      content="assets/favicon/browserconfig.xml?v=pglO8JJrWP"
-    />
-    <meta name="theme-color" content="#ffffff" />
+<head>
+  <meta charset="utf-8" />
+  <title>Synk ฅ^•ﻌ•^ฅ</title>
+  <base href="/" />
 
-    <!-- inline spinner styles to be able to display spinner right away -->
-    <style type="text/css">
-      body,
-      html {
-        height: 100%;
-      }
-      .app-loading {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-      }
-      /* .app-loading .spinner {
-        height: 200px;
-        width: 200px;
-        animation: rotate 2s linear infinite;
-        transform-origin: center center;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        margin: auto;
-      }
-      .app-loading .spinner .path {
-        stroke-dasharray: 1, 200;
-        stroke-dashoffset: 0;
-        animation: dash 1.5s ease-in-out infinite;
-        stroke-linecap: round;
-        stroke: #ddd;
-      } */
-      @keyframes rotate {
-        100% {
-          transform: rotate(360deg);
-        }
-      }
-      @keyframes dash {
-        0% {
-          stroke-dasharray: 1, 200;
-          stroke-dashoffset: 0;
-        }
-        50% {
-          stroke-dasharray: 89, 200;
-          stroke-dashoffset: -35px;
-        }
-        100% {
-          stroke-dasharray: 89, 200;
-          stroke-dashoffset: -124px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <app-root>
-      <!-- loading layout replaced by app after startupp -->
-      <div class="app-loading">
-        <div class="logo"></div>
-        <img src="assets/logo.svg" alt="logo" />
-        <h1 style="font-family: sans-serif; color: white;">is loading...</h1>
-      </div>
-    </app-root>
-  </body>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#ff694e">
+  <meta name="msapplication-TileColor" content="#00aba9">
+  <meta name="theme-color" content="#ff694e">
+
+  <meta http-equiv="cache-control" content="max-age=0" />
+  <meta http-equiv="cache-control" content="no-cache" />
+  <meta http-equiv="expires" content="0" />
+  <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+  <meta http-equiv="pragma" content="no-cache" />
+
+  <!-- inline preloader spinner styles -->
+  <style type="text/css">
+    body,
+    html {
+      height: 100%;
+    }
+
+    .app-loading {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <app-root>
+    <!-- loading layout replaced by app after startupp -->
+    <div class="app-loading">
+      <div class="logo"></div>
+      <img src="assets/logo.svg" alt="logo" />
+      <h1 style="font-family: sans-serif; color: white;">is loading...</h1>
+    </div>
+  </app-root>
+</body>
+
 </html>

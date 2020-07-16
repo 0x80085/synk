@@ -1,0 +1,11 @@
+.description {
+  height: 100px;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  word-break: break-word;
+
+  &:hover {
+    overflow-y: auto;
+  }
+}
+

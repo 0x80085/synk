@@ -1,27 +1,44 @@
 import { MediaEvent } from './message';
-import { PlaylistItem, mockList, ItemContent } from './playlist-item';
+import { PlaylistItem, ItemContent } from './playlist-item';
+import { lookup } from '../../api/handlers/info/lookup-yt-video-info';
 
 export class Playlist {
   name: string;
-  list: PlaylistItem[] = []; // cloneOf(mockList);
-  current: PlaylistItem | null = this.list[0];
+  list: PlaylistItem[] = [];
+  current: PlaylistItem | null;
 
   constructor(name: string) {
     this.name = name;
   }
 
-  add(media: PlaylistItem) {
+  async add(
+    media: MediaEvent,
+    next: () => void = () => { },
+    error: (err: any) => void = () => { }
+  ) {
     const id = YouTubeGetID(media.mediaUrl);
     if (!id || id === '') {
       return;
     }
     const alreadyAdded = this.list.filter(i => i.mediaUrl === media.mediaUrl).length > 0;
-    if (!alreadyAdded) { this.list.push(media); }
+    if (alreadyAdded) {
+      error('duplicate id');
+    }
+    try {
+      const ytMetadata = await lookup(id);
+      const playlistItem: PlaylistItem = { ...ytMetadata, ...media, isPermanent: false };
+      console.log(playlistItem);
+
+      this.list.push(playlistItem);
+      next();
+    } catch (e) {
+      error(e);
+    }
   }
 
-  next(media: ItemContent, isPermenant: boolean, addedBy: string) {
+  queueUpSecondPosition(media: ItemContent, isPermanent: boolean, addedBy: string) {
     const item = new PlaylistItem(media.mediaUrl, addedBy);
-    item.isPermenant = isPermenant;
+    item.isPermanent = isPermanent;
 
     this.list.push(item);
     this.bump(media.mediaUrl, 2);
@@ -67,13 +84,6 @@ export class Playlist {
     ev: MediaEvent,
     afterUpdateCallback: (arg: MediaEvent) => void
   ) => {
-    this.update(ev);
-
-    this.publish(afterUpdateCallback);
-  }
-
-  update = (ev: MediaEvent) => {
-
     const selectedItem = this.list.find(it => it.mediaUrl === ev.mediaUrl);
 
     if (!selectedItem) {
@@ -81,6 +91,10 @@ export class Playlist {
     }
 
     this.current = selectedItem;
+    this.list.forEach(it => it.active = false);
+    selectedItem.active = true;
+
+    this.publish(afterUpdateCallback);
   }
 
   publish = (calledWithNewCurrentVideoState: (arg: ItemContent) => void) => {

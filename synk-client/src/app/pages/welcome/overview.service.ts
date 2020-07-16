@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
-import { environment } from 'src/environments/environment';
+import { environment } from '../../../environments/environment';
 
 export interface OverviewlistItem {
   roomName: string;
   description: string;
-  connectedUsers: number;
-  nowPlaying: string;
+  memberCount: number;
+  currentlyPlaying: string;
 }
 
 export interface ChannelDraft {

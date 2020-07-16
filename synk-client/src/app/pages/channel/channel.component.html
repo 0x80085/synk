@@ -1,6 +1,4 @@
-<p>Channel: {{ name }}</p>
-
-<div *ngIf="!(errorEvent$ | async); then channelStage; else errorConnecting"></div>
+<div *ngIf="isConnected$ | async; then channelStage; else connectionState"></div>
 
 <ng-template #channelStage>
   <div nz-row [nzGutter]="{ xs: 8, sm: 16, md: 24, lg: 32, xl: 32, xxl: 32 }">
@@ -8,40 +6,75 @@
       <app-chat-room [name]="name"></app-chat-room>
     </div>
     <div nz-col nzSpan="18" class="column gutter-row">
-      <app-media #player (mediaEndedEvent)="onVideoEnded()"></app-media>
+      <app-media *ngIf="playlist$ | async" #player (mediaEndedEvent)="onVideoEnded()"></app-media>
     </div>
     <div nz-col nzSpan="6" class="mt-1">
 
       <nz-list [nzBordered]="(members$  | async)" nzSize="small" [nzLoading]="!(members$  | async)"
         [nzDataSource]="members$ | async" [nzRenderItem]="member" [nzNoResult]="'No items'">
         <ng-template #member let-member>
-          <nz-list-item>
-            <nz-list-item-meta [nzTitle]="nzTitle" [nzAvatar]="member.isLeader ? leaderIcon : null"
-              [nzDescription]="member.userName">
+          <nz-list-item [nzActions]="[giveLeaderBtn, ownerIcon, leaderIcon]">
+            <nz-list-item-meta [nzTitle]="nzTitle">
               <ng-template #nzTitle>
-                <span>{{member.userName}}</span>
+                <span> {{ member.userName }}</span>
               </ng-template>
             </nz-list-item-meta>
           </nz-list-item>
           <ng-template #leaderIcon>
-            <i nz-icon style="color: white; font-size: 1rem;" nzType="play-circle"></i>
+            <i [hidden]="!member.isLeader" nz-icon style="color: white; font-size: 1rem;" nzType="interaction" nz-tooltip
+              nzTitle="This user currently controls the playback"></i>
+          </ng-template>
+          <ng-template #ownerIcon>
+            <i [hidden]="!member.isOwner" nz-icon style="color: white; font-size: 1rem;" nzType="shop" nz-tooltip
+              nzTitle="Owner of this channel"></i>
+          </ng-template>
+          <ng-template #giveLeaderBtn>
+            <button nz-button nzType="link" nz-tooltip nzTitle="Hand over playback control to user"
+              [hidden]="member.isLeader || !loggedInUserIsLeader" (click)="giveLeader(member)">
+              <i nz-icon nzType="api"></i>
+            </button>
           </ng-template>
         </ng-template>
       </nz-list>
     </div>
     <div nz-col nzSpan="18" class="mt-1">
-      <app-playlist [playlist$]="playlist$" [activeItem]="mediaUrl" [roomName]="name" [showAddMediaInput]="isLeader" (playMedia)="player.play($event.mediaUrl)">
+      <app-playlist [roomName]="name" (playMedia)="player.play($event.mediaUrl)">
       </app-playlist>
     </div>
   </div>
 </ng-template>
 
-<ng-template #disconnectedImg>
-  <i nz-icon style="font-size: 5rem; color: rgb(204, 254, 253);" nzType="frown"></i>
+<ng-template #connectionState>
+  <div *ngIf="isLoading$ | async; then busyConnecting; else errorConnecting"></div>
 </ng-template>
+
 <ng-template #errorConnecting>
   <div nz-col nzSpan="24" class="column">
-    <nz-empty [nzNotFoundImage]="disconnectedImg" nzNotFoundContent="Can't connect to channel. Try logging in?">
+    <nz-empty [nzNotFoundImage]="disconnectedImg" [nzNotFoundContent]="disconnectedText">
     </nz-empty>
   </div>
+</ng-template>
+
+<ng-template #busyConnecting>
+  <div nz-col nzSpan="24" class="column">
+    <nz-empty [nzNotFoundImage]="busyConnectingImg" [nzNotFoundContent]="busyConnectingText">
+    </nz-empty>
+  </div>
+</ng-template>
+
+<ng-template #disconnectedImg>
+  <i nz-icon style="font-size: 5rem; color: rgb(204, 254, 253);" nzTheme="fill" nzType="meh"></i>
+</ng-template>
+
+<ng-template #disconnectedText>
+  <h2>You don't have an account yet</h2>
+  <p>Please create one to be able to enter rooms</p>
+</ng-template>
+
+<ng-template #busyConnectingImg>
+  <i nz-icon style="font-size: 5rem; color: rgb(204, 254, 253);" nzType="sync" [nzSpin]="true"></i>
+</ng-template>
+
+<ng-template #busyConnectingText>
+  <h4>Connecting to server...</h4>
 </ng-template>

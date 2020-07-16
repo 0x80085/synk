@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
 import { AppStateService } from './app-state.service';
+import { tap, map } from 'rxjs/operators';
+import { SocketService } from './socket.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -10,9 +13,21 @@ export class AppComponent {
 
   isCollapsed = true;
 
-  isLoggedIn = this.state.isLoggedIn$.pipe();
-  isConnected = this.state.isSocketConnected$.pipe();
+  connectionState: Observable<{
+    event: string;
+    connected: boolean;
+  }> = this.socketService.connectionState$;
 
-  constructor(private state: AppStateService) { }
+  isLoggedIn = this.state.isLoggedIn$;
+  isConnected = this.connectionState.pipe(map(state => state.connected));
+
+
+
+  user = this.state.me$;
+
+  constructor(
+    private state: AppStateService,
+    private socketService: SocketService
+  ) { }
 
 }

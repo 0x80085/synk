@@ -24,6 +24,16 @@ export enum Roles {
   Newbie = 'Newbie'
 }
 
+export enum RoomCommands {
+  PM = 'private message',
+  JOIN_ROOM = 'join room',
+  EXIT_ROOM = 'exit room',
+  GROUP_MESSAGE = 'group message',
+  GIVE_LEADER = 'give leader',
+  USER_CONFIG = 'user config',
+  USER_LIST_UPDATE = 'userlist update',
+}
+
 export interface RoomUser {
   id: string;
   userName: string;
@@ -35,10 +45,8 @@ export interface RoomUser {
 export type RoomUserDto = RoomUser & { isLeader: boolean };
 
 export interface RoomUserConfig {
-  playlist: { currentTime: null; mediaUrl: string }[];
   role: Roles;
   permissionLevel: PermissionLevels;
   isLeader: boolean;
-  isAdmin: boolean;
-  members: RoomUserDto[];
+  isOwner: boolean;
 }

@@ -1,12 +1,3 @@
-<div
-  class="video">
-  <video muted="" autoplay="" loop="" playsinline=""
-    style="width: 100%; height: 100%; display:block; transform: scale(1.025); object-fit: fill;">
-    <source src="assets/bg-video.mp4" type="video/mp4">
-  </video>
-</div>
-
-
 <div nz-row>
   <div nz-col nzOffset="8" nzSpan="8">
     <h1>Welcome back!</h1>
@@ -34,17 +25,14 @@
         </nz-form-item>
         <nz-form-item>
           <nz-form-control>
-            <label nz-checkbox formControlName="remember">
-              <span nz-tooltip nzTitle="Haha this does nothing">Remember me</span>
-            </label>
-            <button nz-button class="login-form-button" [nzType]="'primary'">
+            <button nz-button class="login-form-button" [nzType]="'primary'" [nzLoading]="isSubmitting">
               Log in
             </button>
-            <div style="text-align:center;">
-              <a [routerLink]="['/account/new']" routerLinkActive="router-link-active">Or register now!</a>
-            </div>
           </nz-form-control>
         </nz-form-item>
+        <div style="text-align:center;">
+          <a [routerLink]="['/account/new']" routerLinkActive="router-link-active">Or register now!</a>
+        </div>
       </form>
     </nz-card>
     <nz-card *ngIf="isLoginSuccess" nzTitle="Login success" [nzCover]="coverTemplate" [nzExtra]="extraTemplate"
@@ -53,15 +41,15 @@
       </nz-card-meta>
     </nz-card>
     <ng-template #coverTemplate>
-      <div style="width:100%;height:0;padding-bottom:100%;position:relative;"><iframe
-          src="https://giphy.com/embed/l41m6umERsT8WHZkI" width="100%" height="100%" style="position:absolute"
-          frameBorder="0" class="giphy-embed" allowFullScreen></iframe></div>
-    </ng-template>
-    <ng-template #extraTemplate>
-      <i nz-icon style="color: rgb(204, 254, 253);" nzType="smile"></i>
-    </ng-template>
+      <div class="anti-hover" style="width:100%;height:0;padding-bottom:100%;position:relative;"><iframe
+        src="https://giphy.com/embed/l41m6umERsT8WHZkI" width="100%" height="100%" style="position:absolute"
+        frameBorder="0" class="giphy-embed" allowFullScreen></iframe></div>
+  </ng-template>
+  <ng-template #extraTemplate>
+    <i nz-icon style="color: rgb(204, 254, 253);" nzType="smile"></i>
+  </ng-template>
     <ng-template #successActions>
-      <button nz-button nzType="primary" [routerLink]="['/welcome']">
+      <button nz-button nzType="primary" [routerLink]="['/']">
         See all channels
         <i nz-icon style="color: rgb(204, 254, 253);" nzType="right"></i>
       </button>

@@ -1,13 +1,12 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Observable, of, Subject } from 'rxjs';
-import { map, withLatestFrom } from 'rxjs/operators';
 import { NzNotificationService } from 'ng-zorro-antd';
 
 import { MediaEvent } from '../models/room.models';
 import { ChatService } from '../chat.service';
 import { isValidYTid } from '../media/youtube/youtube.component';
-
-type ListItem = MediaEvent & { active: boolean };
+import { MediaService, PlaylistItem } from '../media.service';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-playlist',
@@ -16,25 +15,24 @@ type ListItem = MediaEvent & { active: boolean };
 })
 export class PlaylistComponent implements OnInit {
 
-  @Input() playlist$: Observable<MediaEvent[]>;
-  @Input() activeItem = '';
   @Input() roomName: string;
-  @Input() showAddMediaInput = true;
 
-  @Output() playMedia = new EventEmitter<MediaEvent>();
+  @Output() playMedia = new EventEmitter<MediaEvent>()
 
   newMedia: string;
+  showControls: boolean;
 
-  virtualPlaylist$: Observable<ListItem[]>;
-
-  showControls = false;
+  virtualPlaylist$: Observable<PlaylistItem[]> = this.mediaService.roomPlaylist$;
+  isLeader$ = this.chatService.roomUserConfig$.pipe(
+    map(conf => conf.isLeader),
+  );
 
   constructor(
+    private mediaService: MediaService,
     private chatService: ChatService,
     private notification: NzNotificationService) { }
 
   ngOnInit() {
-    this.createVirtualList();
   }
 
   onAddMedia() {
@@ -46,28 +44,31 @@ export class PlaylistComponent implements OnInit {
       return;
     }
 
-    const enw: MediaEvent = {
+    this.mediaService.addToPlaylist({
       mediaUrl: this.newMedia,
       roomName: this.roomName,
       currentTime: null
-    };
-
-    this.chatService.addToPlaylist(enw);
+    });
+    this.newMedia = '';
     this.notification.success('Success', 'Media added to playlist');
   }
 
-  private createVirtualList() {
-    this.virtualPlaylist$ = this.playlist$.pipe(
-      withLatestFrom(of(this.activeItem)),
-      map(([ls, a]) => {
-        const e: ListItem[] = ls.map(it => {
-          const active = it.mediaUrl === a;
-          return { ...it, active };
-        });
-        return e;
-      })
-    );
-
+  onRemoveMedia(mediaUrl: string) {
+    if (confirm(`Want to delete ${mediaUrl}?`)) {
+      this.mediaService.removeFromPlaylist({
+        mediaUrl,
+        roomName: this.roomName,
+        currentTime: null
+      });
+      this.notification.success('Success', 'Media removed from playlist');
+    }
   }
 
+  onNext() {
+    this.mediaService.playNext(this.roomName);
+  }
+
+  onShuffle() {
+    this.mediaService.shufflePlaylist(this.roomName);
+  }
 }

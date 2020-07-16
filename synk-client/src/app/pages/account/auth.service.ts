@@ -1,9 +1,12 @@
-import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { environment } from 'src/environments/environment';
-import { ChatService } from '../channel/chat.service';
-import { tap, mapTo } from 'rxjs/operators';
-import { AppStateService } from 'src/app/app-state.service';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+import { shareReplay, switchMap, tap } from 'rxjs/operators';
+
+import { environment } from '../../../environments/environment';
+import { AppStateService } from '../../app-state.service';
+import { SocketService } from '../../socket.service';
+
 
 interface LoginInfo {
   username: string;
@@ -15,14 +18,32 @@ export interface User {
   id: string;
 }
 
+export interface Channel {
+  id: string;
+  name: string;
+  description: string;
+  isPublic: string;
+  dateCreated: string;
+  isLocked: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
+  private refreshChannelsSubject = new BehaviorSubject(true);
+
+  userOwnedChannels$ = this.refreshChannelsSubject.pipe(
+    switchMap(() =>
+      this.http.get<Channel[]>(`${environment.api}/account/channels`, { withCredentials: true })
+    )).pipe(
+      shareReplay(1)
+    );
+
   constructor(
     private http: HttpClient,
-    private chatServ: ChatService,
+    private socketService: SocketService,
     private state: AppStateService
   ) { }
 
@@ -46,7 +67,8 @@ export class AuthService {
       .pipe(
         tap(() => {
           this.state.isLoggedInSubject.next(true);
-          this.chatServ.reconnect();
+          this.socketService.socket.close();
+          this.socketService.socket.open();
         })
       );
   }
@@ -58,16 +80,32 @@ export class AuthService {
       })
       .pipe(
         tap(() => {
-          this.state.isLoggedInSubject.next(true);
-          this.chatServ.reconnect();
-        })
+          this.state.isLoggedInSubject.next(false);
+          this.socketService.socket.close();
+        }),
       );
   }
 
   getUser() {
     return this.http.get<User>(`${environment.api}/account`, {
       withCredentials: true
-    });
+    }).pipe(
+      tap(res => {
+        this.state.isLoggedInSubject.next(true);
+        this.state.userSubject.next(res);
+      }),
+      shareReplay()
+    );
+  }
+
+  refreshChannels() {
+    this.refreshChannelsSubject.next(true);
+  }
+
+  deleteChannel(name: string) {
+    return this.http.delete<Channel[]>(
+      `${environment.api}/account/channels/${name}`,
+      { withCredentials: true });
   }
 
 }

@@ -1,26 +1,26 @@
+import * as https from 'https';
 import * as http from 'http';
+import * as fs from 'graceful-fs';
 import * as dotenv from 'dotenv';
 import * as express from 'express';
 import * as cors from 'cors';
-import * as uuid from 'uuid';
 import * as passport from 'passport';
 import * as bodyParser from 'body-parser';
 import * as morgan from 'morgan';
-import * as cookieParser from 'cookie-parser';
 import * as compression from 'compression';
+import * as helmet from 'helmet';
 
 import { Request, Response, NextFunction } from 'express-serve-static-core';
 
 import 'reflect-metadata';
 import { createConnection } from 'typeorm';
-import { TypeormStore } from 'typeorm-store';
 
 import setupAuthMiddleware, { SessionOptions } from './auth/middleware';
 import { setupRouting } from './api/routes';
 import { setupSockets } from './socket/setup';
-import { Session } from './domain/entity/Session';
 import { Logger } from './tools/logger';
 import { errorMeow } from './api/error-handler';
+import { configureSessionMiddleware } from './auth/config';
 
 export default async function configure(logger: Logger) {
   dotenv.config();
@@ -29,11 +29,6 @@ export default async function configure(logger: Logger) {
 
   const corsUseCredentials = process.env.CORS_USE_CREDENTIAL === 'TRUE';
   const corsOrigin = process.env.CORS_ALLOWED_ORIGIN;
-
-  const sessionSecret = process.env.SESSION_SECRET;
-  const saveUninitialized = process.env.SESSION_SAVEUNINITIALIZED === 'TRUE';
-  const resave = process.env.SESSION_RESAVE === 'TRUE';
-  const cookieMaxAge = +process.env.SESSION_COOKIE_MAXAGE;
 
   const connection = await createConnection();
 
@@ -49,28 +44,21 @@ export default async function configure(logger: Logger) {
   app.disable('x-powered-by');
   app.enable('trust proxy');
 
+  app.use(helmet());
+
   app.use(morgan('short'));
 
-  const wsHttp = new http.Server(app);
+  const credentials = getSSLCert();
 
-  const sessionRepo = connection.getRepository(Session);
-  const sessionStore = new TypeormStore({ repository: sessionRepo });
+  let server;
 
-  // TODO : Read https://www.npmjs.com/package/express-session thoroughly to set most appropriate config
-  const sessionMiddlewareConfig: SessionOptions = {
-    genid: () => {
-      return uuid(); // use UUIDs for session IDs
-    },
-    cookieParser,
-    secret: sessionSecret,
-    resave,
-    saveUninitialized,
-    rolling: true,
-    store: sessionStore,
-    cookie: {
-      maxAge: cookieMaxAge
-    }
-  };
+  if (credentials) {
+    server = https.createServer(credentials, app);
+  } else {
+    server = http.createServer(app);
+  }
+
+  const sessionMiddlewareConfig: SessionOptions = configureSessionMiddleware(connection);
 
   const { sessionMiddleware } = await setupAuthMiddleware(
     app,
@@ -79,7 +67,7 @@ export default async function configure(logger: Logger) {
     logger
   );
 
-  const { roomService } = setupSockets(wsHttp, sessionMiddlewareConfig, logger);
+  const { roomService } = setupSockets(server, sessionMiddlewareConfig, logger);
 
   app.use(sessionMiddleware);
 
@@ -89,8 +77,39 @@ export default async function configure(logger: Logger) {
   setupRouting(app, roomService, logger);
 
   app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-    errorMeow(err, res, logger);
+    errorMeow(err, res, logger, next);
   });
 
-  return { wsHttp };
+  return { server };
+}
+
+function getSSLCert() {
+
+  const pathToKey = process.env.SSL_KEY_PATH;
+  const pathToCert = process.env.SSL_CERT_PATH;
+  const pathToChain = process.env.SSL_CHAIN_PATH;
+
+  try {
+
+    if (!pathToKey || !pathToCert || !pathToChain) {
+      throw new Error('WARN no path to SSL certificate found, SLL can not be used');
+    }
+
+    const privateKey = fs.readFileSync(pathToKey, 'utf8');
+    const certificate = fs.readFileSync(pathToCert, 'utf8');
+    const chain = fs.readFileSync(pathToChain, 'utf8');
+
+    return {
+      key: privateKey,
+      cert: certificate,
+      ca: [chain]
+    };
+
+  } catch (e) {
+    console.log(`no file at ${pathToKey}`);
+    console.log(`no file at ${pathToCert}`);
+    console.log(e);
+    console.log('no cert found, resuming');
+    return null;
+  }
 }

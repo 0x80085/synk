@@ -1,23 +1,39 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { of, Subject } from 'rxjs';
+import { BehaviorSubject, merge, of } from 'rxjs';
+import { catchError, map, share, shareReplay, startWith } from 'rxjs/operators';
+
+import { environment } from '../environments/environment';
 import { User } from './pages/account/auth.service';
+import { SocketService } from './socket.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppStateService {
 
-  isLoggedInSubject: Subject<boolean> = new Subject();
-  isSocketConnectedSub: Subject<boolean> = new Subject();
-  userSubject: Subject<User> = new Subject();
+  isLoggedInSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  userSubject: BehaviorSubject<User> = new BehaviorSubject({ id: 'missingno', userName: '-----' });
 
-  isLoggedIn$ = this.isLoggedInSubject.pipe();
-  isSocketConnected$ = this.isSocketConnectedSub.pipe();
-  me$ = this.userSubject.pipe();
+  me$ = this.http.get<User>(`${environment.api}/account`,
+    {
+      withCredentials: true
+    }).pipe(
+      startWith({ id: 'missingno', userName: '-----' }),
+      share(),
+      catchError(() => (of(null)))
+    );
 
-  constructor() {
-    this.isLoggedInSubject.next(false);
-    this.isSocketConnectedSub.next(false);
-    this.userSubject.next({ id: 'missingno', userName: '-----' });
-  }
+  isLoggedIn$ = merge(
+    this.me$.pipe(map(me => !!me)),
+    this.socketService.isConnected$,
+    this.isLoggedInSubject
+  ).pipe(
+    shareReplay(1),
+  );
+
+  constructor(
+    private http: HttpClient,
+    private socketService: SocketService,
+  ) { }
 }

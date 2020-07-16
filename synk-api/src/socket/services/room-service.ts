@@ -13,7 +13,11 @@ export enum Commands {
   GROUP_MESSAGE = 'group message',
   MEDIA_EVENT = 'media event',
   ADD_MEDIA = 'add media',
-  DISCONNECT = 'disconnect'
+  REMOVE_MEDIA = 'remove media',
+  GIVE_LEADER = 'give leader',
+  DISCONNECT = 'disconnect',
+  PLAY_NEXT_MEDIA = "play next media",
+  SHUFFLE_PLAYLIST = "shuffle playlist"
 }
 
 export class RoomService {
@@ -67,8 +71,7 @@ export class RoomService {
         this.logger.info(data);
         this.logger.error(error);
       }
-    }
-    );
+    });
 
     socket.on(Commands.ADD_MEDIA, (data: MediaEvent) => {
       try {
@@ -79,17 +82,88 @@ export class RoomService {
         this.logger.info(data);
         this.logger.error(error);
       }
-    }
-    );
+    });
+
+    socket.on(Commands.REMOVE_MEDIA, (data: MediaEvent) => {
+      try {
+        this.onRemoveMedia(data);
+      } catch (error) {
+        this.logger.info('onAddMedia failed');
+        this.logger.info('broken data:');
+        this.logger.info(data);
+        this.logger.error(error);
+      }
+    });
+
+    socket.on(Commands.PLAY_NEXT_MEDIA, (roomName: string) => {
+      try {
+        this.onPlayNextMedia(roomName);
+      } catch (error) {
+        this.logger.info('play next media failed');
+        this.logger.info(roomName);
+        this.logger.error(error);
+      }
+    });
+
+    socket.on(Commands.SHUFFLE_PLAYLIST, (roomName: string) => {
+      try {
+        this.onShufflePlaylist(roomName);
+      } catch (error) {
+        this.logger.info('SHUFFLE_PLAYLIST failed');
+        this.logger.info(roomName);
+        this.logger.error(error);
+      }
+    });
+
+    socket.on(Commands.GIVE_LEADER, (data: { to: string, roomName: string }) => {
+      try {
+        this.onGiveLeader(data, socket);
+      } catch (error) {
+        this.logger.info('GIVE_LEADER failed');
+        this.logger.info('broken data:');
+        this.logger.info(data);
+        this.logger.error(error);
+      }
+    });
 
     socket.on(Commands.DISCONNECT, this.disconnect);
   }
 
-  createRoom(data: { name: string; description: string }) {
+  onPlayNextMedia(roomName: string) {
+    const room = this.getRoomByName(roomName);
+    if (!room) {
+      return;
+    }
+    room.currentPlayList.skip();
+    room.broadcastPlaylistToAll();
+  }
+
+  onShufflePlaylist(roomName: string) {
+    const room = this.getRoomByName(roomName);
+    if (!room) {
+      return;
+    }
+    room.currentPlayList.shuffle();
+    room.broadcastPlaylistToAll();
+  }
+
+  createRoom(data: { name: string; description: string }, creator: string) {
     const newRoom = new Room(data.name, this.io, this.logger, null);
     newRoom.description = data.description;
+    newRoom.creator = creator;
 
     this.addRoomToDirectory(newRoom);
+  }
+
+  deleteRoom(name: string, creator: string) {
+    const room = this.getRoomByName(name);
+    if (!room) {
+      return;
+    }
+    if (room.creator !== creator) {
+      return;
+    }
+    this.removeRoomfromDirectory(room);
   }
 
   addMediaToPlaylist(data: MediaEvent) {
@@ -100,6 +174,7 @@ export class RoomService {
     const room = this.getRoomByName(roomName);
 
     if (!room) {
+      // Todo - instead f creatun, check DB and throw if not in DB
       const newRoom = new Room(roomName, this.io, this.logger, socket);
       this.addRoomToDirectory(newRoom);
       newRoom.join(socket);
@@ -121,20 +196,34 @@ export class RoomService {
     };
 
     const room = this.getRoomByName(data.roomName);
+    if (!room) {
+      return Error('Room non-existant');
+    }
     const isLeader =
       room.leader && room.leader.userName === socket.request.user.username;
 
     if (isLeader) {
       room.currentPlayList.handleListUpdate(data, afterPlaylistUpdate);
+      room.broadcastPlaylistToAll();
     }
   }
 
   private onAddMedia = (data: MediaEvent) => {
     const room = this.getRoomByName(data.roomName);
-    room.currentPlayList.add({
-      ...data,
-      isPermenant: false
-    });
+    if (!room) {
+      return Error('Room non-existant');
+    }
+    room.currentPlayList.add({ ...data },
+      () => room.broadcastPlaylistToAll()
+    );
+  }
+
+  private onRemoveMedia = (data: MediaEvent) => {
+    const room = this.getRoomByName(data.roomName);
+    if (!room) {
+      return Error('Room non-existant');
+    }
+    room.currentPlayList.remove(data.mediaUrl);
     room.broadcastPlaylistToAll();
   }
 
@@ -151,17 +240,18 @@ export class RoomService {
     room.broadcastMessageToAll(socket, data);
   }
 
+  private onGiveLeader = (
+    { to, roomName }: { to: string, roomName: string },
+    socket: SocketPassport) => {
+    const room = this.getRoomByName(roomName);
+    if (room) {
+      room.giveLeader(socket, to);
+    }
+  }
+
   private disconnect = (socket: SocketPassport) => {
     if (socket.request && socket.request.user) {
-      /**
-       * Can be done better::
-       * keep dictionary:
-       *    dictionary['user-guid'].rooms;
-       * Prints:
-       *    ['rrom1', 'room2', 'rooom2']
-       * Then disconnect only from those rooms:
-       *    dictionary['user-guid'].rooms.foreach(rom => rom.exit(user));
-       */
+      // TODO: Improve performance
       this.publicRooms.forEach(room => room.exit(socket));
     }
   }
@@ -178,6 +268,10 @@ export class RoomService {
 
   private addRoomToDirectory(room: Room) {
     this.publicRooms.push(room);
+  }
+
+  private removeRoomfromDirectory(room: Room) {
+    this.publicRooms = this.publicRooms.filter(r => r.name !== room.name);
   }
 
   private getRoomByName(roomName: string) {

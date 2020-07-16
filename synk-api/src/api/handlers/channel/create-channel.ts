@@ -12,7 +12,6 @@ export async function createChannel(username: string, channelName: string, descr
     }
   });
   const chan = Channel.create(channelName, description, user);
-  chan.owner = user;
   await connection.manager.save(chan);
 }
 

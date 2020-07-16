@@ -15,6 +15,7 @@ import { WelcomeModule } from './pages/welcome/welcome.module';
 import { ChannelModule } from './pages/channel/channel.module';
 import { AccountModule } from './pages/account/account.module';
 import { AppStateService } from './app-state.service';
+import { SocketService } from './socket.service';
 
 registerLocaleData(en);
 
@@ -35,7 +36,8 @@ registerLocaleData(en);
   ],
   providers: [
     { provide: NZ_I18N, useValue: en_US },
-    AppStateService
+    SocketService,
+    AppStateService,
   ],
   bootstrap: [AppComponent]
 })
