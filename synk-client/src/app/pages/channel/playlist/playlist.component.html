@@ -33,8 +33,8 @@
         </nz-list-item>
         <ng-template #opAction>
           <button nz-button nzSize="small" nzType="link" (click)="playMedia.emit(item)"
-            nz-tooltip nzTitle="start video">
-            <i nz-icon [nzType]="item.active ? 'play-circle':'caret-right'"></i>
+            nz-tooltip [nzTitle]="item.active ?  'start video' : 'now playing'">
+            <i nz-icon [nzType]="item.active ? 'play-circle' : 'caret-right'"></i>
           </button>
           <!-- <button nz-button nzSize="small" nzType="link" disabled nz-tooltip
             nzTitle="set next in line (not yet implemented)">
