@@ -12,8 +12,6 @@ export async function getChannelsOwnedByUser(username: string) {
     }
   });
 
-  console.log(user.channels);
-
   return user.channels;
 }
 

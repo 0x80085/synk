@@ -13,8 +13,6 @@ export async function deleteChannel(username: string, channelName: string) {
     }
   });
 
-  console.log(user.channels);
-
   const chan = user.channels.find(ch => channelName === ch.name);
 
   if (chan) {
