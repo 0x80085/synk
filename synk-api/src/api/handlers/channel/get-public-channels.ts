@@ -26,7 +26,11 @@ export async function getPublicChannels(roomService: RoomService, amount = 50) {
 
   const res = mergeLists(channels, rooms);
 
-  return res;
+  const firstTwentyChannelsSortedByActiveUserCount = res
+    .sort((a, b) => b.memberCount - a.memberCount)
+    .slice(0, 20);
+
+  return firstTwentyChannelsSortedByActiveUserCount;
 }
 
 function mergeLists(allItems: ChannelSummary[], someItems: ChannelSummary[] = []) {
