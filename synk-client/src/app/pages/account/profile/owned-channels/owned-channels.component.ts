@@ -17,28 +17,20 @@ export class OwnedChannelsComponent {
     private notification: NzNotificationService) {
   }
 
-  refreshSubject = new BehaviorSubject(null);
-
-  channels$: Observable<Channel[]> = this.refreshSubject.pipe(
-    switchMap(() => {
-      return this.auth.userOwnedChannels$
-        .pipe(tap(e => console.log(e))
-        );
-    })
-  );
+  channels$: Observable<Channel[]> =  this.auth.userOwnedChannels$;
 
   deleteChannel(chan: Channel, ev: Event) {
     if (confirm(`You really want to delete ${chan.name}?`)) {
+      ev.preventDefault();
       this.auth.deleteChannel(chan.name)
         .pipe(
-          tap(() => this.refreshSubject.next(null)),
+          tap(() => this.auth.refreshChannels()),
           take(1)
           , catchError((err) => {
             this.notification.error('Delete failed', 'try again later');
             return err;
           }))
-        .subscribe();
-      ev.preventDefault();
+        .subscribe(() => this.auth.refreshChannels());
       return false;
     }
   }

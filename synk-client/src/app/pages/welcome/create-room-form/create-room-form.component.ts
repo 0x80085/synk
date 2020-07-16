@@ -3,6 +3,7 @@ import { OverviewService, ChannelDraft } from '../overview.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NzNotificationService } from 'ng-zorro-antd';
+import { AuthService } from '../../account/auth.service';
 
 @Component({
   selector: 'app-create-room-form',
@@ -14,6 +15,7 @@ export class CreateRoomFormComponent implements OnInit {
 
   constructor(
     private service: OverviewService,
+    private auth: AuthService,
     private fb: FormBuilder,
     private router: Router,
     private notification: NzNotificationService
@@ -33,8 +35,7 @@ export class CreateRoomFormComponent implements OnInit {
       description: [
         null,
         [Validators.required, Validators.maxLength(250), Validators.minLength(5)]
-      ],
-      remember: [true]
+      ]
     });
   }
 
@@ -49,6 +50,7 @@ export class CreateRoomFormComponent implements OnInit {
     };
     this.service.createChannel(results).subscribe(
       () => {
+        this.auth.refreshChannels();
         this.router.navigate(['/channel', results.name]);
       },
       err => {

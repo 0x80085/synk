@@ -1,11 +1,12 @@
-import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { tap, catchError, shareReplay } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+import { shareReplay, switchMap, tap } from 'rxjs/operators';
 
 import { environment } from '../../../environments/environment';
 import { AppStateService } from '../../app-state.service';
 import { SocketService } from '../../socket.service';
+
 
 interface LoginInfo {
   username: string;
@@ -31,11 +32,14 @@ export interface Channel {
 })
 export class AuthService {
 
-  userOwnedChannels$ = this.http.get<Channel[]>(`${environment.api}/account/channels`, {
-    withCredentials: true
-  }).pipe(
-    shareReplay(1)
-  );
+  private refreshChannelsSubject = new BehaviorSubject(true);
+
+  userOwnedChannels$ = this.refreshChannelsSubject.pipe(
+    switchMap(() =>
+      this.http.get<Channel[]>(`${environment.api}/account/channels`, { withCredentials: true })
+    )).pipe(
+      shareReplay(1)
+    );
 
   constructor(
     private http: HttpClient,
@@ -65,11 +69,7 @@ export class AuthService {
           this.state.isLoggedInSubject.next(true);
           this.socketService.socket.close();
           this.socketService.socket.open();
-        }),
-        // catchError(err => {
-        //   this.state.isLoggedInSubject.next(false);
-        //   return of(err);
-        // })
+        })
       );
   }
 
@@ -96,6 +96,10 @@ export class AuthService {
       }),
       shareReplay()
     );
+  }
+
+  refreshChannels() {
+    this.refreshChannelsSubject.next(true);
   }
 
   deleteChannel(name: string) {
