@@ -7,9 +7,12 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "API Debug",
-      "runtimeArgs": ["-r", "ts-node/register"],
-      "args": ["${workspaceFolder}/src/index.ts"]
-    }
+      "name": "Debug API",
+      "args": ["${workspaceFolder}/src/index.ts"],
+      "runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
+      "sourceMaps": true,
+      "cwd": "${workspaceRoot}",
+      "protocol": "inspector"
+  }
   ]
 }
