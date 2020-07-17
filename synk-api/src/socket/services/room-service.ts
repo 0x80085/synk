@@ -5,6 +5,8 @@ import { IncomingGroupMessage, MediaEvent } from '../models/message';
 import { SocketPassport } from '../models/socket.passport';
 import { ItemContent } from '../models/playlist-item';
 import { Logger } from '../../tools/logger';
+import { RoomMember } from '../models/user';
+
 
 export enum Commands {
   PM = 'private message',
@@ -16,15 +18,30 @@ export enum Commands {
   REMOVE_MEDIA = 'remove media',
   GIVE_LEADER = 'give leader',
   DISCONNECT = 'disconnect',
-  PLAY_NEXT_MEDIA = "play next media",
-  SHUFFLE_PLAYLIST = "shuffle playlist"
+  PLAY_NEXT_MEDIA = 'play next media',
+  SHUFFLE_PLAYLIST = 'shuffle playlist'
+}
+
+export interface MemberSocketInfo {
+  id: string;
+  socket: SocketPassport;
+  userName: string;
 }
 
 export class RoomService {
   private io: socketio.Server;
+  private logger: Logger;
 
   public publicRooms: Room[] = [];
-  private logger: Logger;
+  private allMembers: MemberSocketInfo[] = [];
+
+  allConnectedSocketsIds = () =>
+    this.io.sockets.sockets
+
+  allMembersInRooms = () =>
+    this.publicRooms
+      .map(({ members }) => [...members])
+      .reduce((acc, val) => [...acc, ...val], [])
 
   constructor(sio: socketio.Server, logger: Logger) {
     this.io = sio;
@@ -127,6 +144,34 @@ export class RoomService {
     });
 
     socket.on(Commands.DISCONNECT, this.disconnect);
+  }
+
+  addMemberSocket = (socket: SocketPassport) => {
+    const user = socket.request.user;
+    // first disconnect other sockets of same user
+    // this.disconnectUserById(user.id);
+    // this.allMembers = this.allMembers.filter(s => s.id !== socket.request.user.id);
+
+    this.allMembers.push({
+      id: socket.request.user.id,
+      socket,
+      userName: socket.request.user.username,
+    });
+
+    this.logger.info(`${socket.request.user.username} connected to socket server`);
+  }
+
+  removeMemberSocket = (socket: SocketPassport) => {
+    const user = socket.request.user;
+    this.disconnectUserById(user.id);
+    this.allMembers = this.allMembers.filter(s => s.id !== socket.request.user.id);
+    this.logger.info(`${socket.request.user.username} disconnected from socket server`);
+  }
+
+  disconnectUserById(id: string) {
+    this.allMembers
+      .filter(m => m.id === id)
+      .forEach(m => m.socket.disconnect());
   }
 
   onPlayNextMedia(roomName: string) {
@@ -253,6 +298,7 @@ export class RoomService {
     if (socket.request && socket.request.user) {
       // TODO: Improve performance
       this.publicRooms.forEach(room => room.exit(socket));
+      this.allMembers = this.allMembers.filter(m => m.id !== socket.request.user.id);
     }
   }
 

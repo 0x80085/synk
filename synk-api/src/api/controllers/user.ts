@@ -10,8 +10,9 @@ import { User } from '../../domain/entity/User';
 import { Logger } from '../../tools/logger';
 import { Playlist } from '../../domain/entity/Playlist';
 import { Video } from '../../domain/entity/Video';
+import { RoomService } from '../../socket/services/room-service';
 
-export type PassportRequest = Request & { user: { username: string } };
+export type PassportRequest = Request & { user: { id: string, username: string } };
 
 /**
  * POST /login
@@ -59,7 +60,8 @@ export const postLogin = (
  * GET /logout
  * Log out.
  */
-export const getLogout = (req: Request, res: Response, next: NextFunction) => {
+export const getLogout = (req: PassportRequest, res: Response, next: NextFunction, roomService: RoomService) => {
+  roomService.disconnectUserById(req.user.id);
   req.logOut();
   req.logout();
   return res.status(200).json('OK');

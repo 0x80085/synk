@@ -207,6 +207,7 @@ export class Room {
     const alreadyAdded = this.isUserIsMember(uname);
     if (alreadyAdded) {
       error('already joined');
+      socket.disconnect();
       return;
     }
 

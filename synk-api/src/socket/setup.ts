@@ -65,7 +65,8 @@ export function setupSockets(
   io
     .use(passportSocketIo.authorize(socketPassportConfig))
     .use(roomService.registerCommands)
-    .on('connection', (socket) => logger.info(`${socket.request.user.username} connected to socket server`));
+    .on('connection', (socket) =>
+      roomService.addMemberSocket(socket));
 
   return { roomService };
 }

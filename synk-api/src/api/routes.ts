@@ -67,7 +67,8 @@ const ALL_ROUTES = (roomService: RoomService, logger: Logger): RouteOptions[] =>
   },
   {
     route: '/logout',
-    handlers: [userController.getLogout],
+    handlers:  [(req: PassportRequest, res: Response, next: express.NextFunction) =>
+      userController.getLogout(req, res, next, roomService)],
     requireAuthentication: false,
     verb: 'GET'
   },
