@@ -126,7 +126,7 @@ export class Room {
   playNextMedia(socket: SocketPassport) {
     const initiator = this.getMemberFromSocket(socket);
 
-    if (initiator && initiator.userName !== this.leader.userName) {
+    if (!initiator || initiator.userName !== this.leader.userName) {
       return;
     }
     this.currentPlayList.skip();
@@ -137,7 +137,7 @@ export class Room {
   shufflePlaylist(socket: SocketPassport) {
     const initiator = this.getMemberFromSocket(socket);
 
-    if (initiator && initiator.userName !== this.leader.userName) {
+    if (!initiator || initiator.userName !== this.leader.userName) {
       return;
     }
     this.currentPlayList.shuffle();
