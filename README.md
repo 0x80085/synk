@@ -33,7 +33,7 @@ Then, in this directory, run:
 
 `docker-compose -f "docker-compose.yml" up -d --build`
 
-Or use the shortcut definied n package.json:
+Or use the shortcut in package.json:
 
  `npm run docker:run`
 
