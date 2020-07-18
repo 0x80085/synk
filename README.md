@@ -57,37 +57,24 @@ Or use the shortcut definied n package.json:
 
 ## Todo
 
-- Config script for DB
 - More docs
-- DB Migration scripts
 - Moderation
 - Custom emoji support
-- Deploy steps/script
 - Channel customization support
 - Rate limiting
 - Bans
 - Load Balancing/Testing
 - Refactor Middleware Sockets to make it more readable
-- Add Scrape.Tv Channel
 - Playlist control
-- 404 pages server and client
 
 ## Under construction at time of writing
 
+- disconnect socket/ session expire tests
 - user update + config settings
 - user channels management
-- connect Channels table to rooms socketio concept
-- Docker support
-- create better playlist component
+- Playlist management
 - fix scroll issue on chatbox
 - admin functions
-- make sessions more stable
-
-...next up
-
-- General styling
-- https
+- make sessions more stable (testing)
 - Implemet DB model and the handlers for the entities
-- concoct strategy for scraping videos
-- ratelimiting and security
-- prepare deployment (azure arm templates)
+- ratelimiting, manage user access, and security
