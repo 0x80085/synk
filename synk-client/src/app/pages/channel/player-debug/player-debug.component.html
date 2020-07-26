@@ -1,0 +1,11 @@
+<h1>PLAYER TESTING PAGE</h1>
+
+
+<app-html5-video (videoEnded)="onEnded()"></app-html5-video>
+
+<input type="text" name="url"  nz-input [(ngModel)]="videoUrl" >
+
+<button nz-button (click)="play()">
+  play
+</button>
+
