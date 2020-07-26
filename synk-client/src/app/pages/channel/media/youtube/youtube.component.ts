@@ -10,7 +10,9 @@ import { errorDictionary } from './player-errors.model';
   styleUrls: ['./youtube.component.scss']
 })
 export class YoutubeComponent implements BaseMediaComponent, OnInit {
-  @Output() videoEnded = new EventEmitter();
+
+  @Output()
+  videoEnded = new EventEmitter();
 
   isReady = false;
   player: YT.Player;
