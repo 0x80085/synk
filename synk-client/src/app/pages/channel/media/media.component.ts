@@ -3,15 +3,15 @@ import {
   ComponentFactoryResolver,
   ComponentRef,
   Directive,
+  EventEmitter,
   OnInit,
   ViewChild,
   ViewContainerRef,
-  Output
+  Output,
 } from '@angular/core';
 
 import { BaseMediaComponent } from './base-media.component';
 import { YoutubeComponent } from './youtube/youtube.component';
-import { EventEmitter } from '@angular/core';
 
 // tslint:disable-next-line: directive-selector
 @Directive({ selector: '[mediaHost]' })
