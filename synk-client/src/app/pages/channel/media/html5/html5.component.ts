@@ -12,25 +12,25 @@ import { mapTo, tap } from 'rxjs/operators';
 export class Html5Component implements BaseMediaComponent, AfterViewInit {
 
   @Output()
-  videoEnded: EventEmitter<unknown>;
+  videoEnded = new EventEmitter();
+
 
   @ViewChild('videoElement')
   videoElement: ElementRef<HTMLVideoElement>;
-
-  videoSubject = new BehaviorSubject('https://cdn.lbryplayer.xyz/api/v2/streams/free/lofi-remixes-vol-1-lofi-hiphop-mix/554a4bfa78919aa9bd6b80ec50d0e2027cc5bad7');
 
   player: HTMLVideoElement;
 
   ended$: Observable<boolean>;
   error$: Observable<boolean>;
 
+  canPlayEvent$: Observable<unknown>;
+
   constructor() { }
 
   isPlaying = () => !this.player.paused;
 
-  play = (url?: string) => {
-    this.player.src = url;
-    this.player.play();
+  play = (url: string) => {
+    this.changeSrc(url);
   }
 
   pause = () => this.player.pause();
@@ -44,19 +44,34 @@ export class Html5Component implements BaseMediaComponent, AfterViewInit {
 
   ngAfterViewInit() {
 
-    this.player = this.videoElement.nativeElement;
+    this.player = this.getPlayer();
+
+
+    this.canPlayEvent$ = fromEvent(this.getPlayer(), 'canplay')
+      .pipe(
+        tap(e => console.log(e)),
+        tap(() => this.player.play()),
+      );
 
     this.ended$ = merge(
-      fromEvent(this.videoElement.nativeElement, 'ended'),
-      fromEvent(this.videoElement.nativeElement, 'error')
+      fromEvent(this.getPlayer(), 'ended'),
+      fromEvent(this.getPlayer(), 'error')
     ).pipe(mapTo(true));
 
-    this.error$ = fromEvent(this.videoElement.nativeElement, 'error')
+    this.error$ = fromEvent(this.getPlayer(), 'error')
       .pipe(
         tap(e => console.log(e)),
         mapTo(true)
       );
   }
 
+  private getPlayer() {
+    return this.videoElement.nativeElement;
+  }
 
+  private changeSrc(url: string) {
+    this.player.src = url;
+    this.player.load();
+  }
 }
+
