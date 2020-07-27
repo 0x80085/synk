@@ -3,7 +3,6 @@ import { Request, Response } from 'express-serve-static-core';
 
 import * as userController from './controllers/user';
 import * as chatroomController from './controllers/room';
-import * as playlistController from './controllers/playlist';
 
 import { RoomService } from '../socket/services/room-service';
 import { PassportRequest } from './controllers/user';
@@ -102,38 +101,6 @@ const ALL_ROUTES = (roomService: RoomService, logger: Logger): RouteOptions[] =>
     ],
     requireAuthentication: false,
     verb: 'GET'
-  },
-  {
-    route: '/playlist/:playlistId',
-    handlers: [playlistController.getPlaylistById],
-    requireAuthentication: true,
-    verb: 'GET'
-  },
-  {
-    route: '/user/playlists',
-    handlers: [playlistController.getPlaylistsOfUser],
-    requireAuthentication: true,
-    verb: 'GET'
-  },
-  {
-    route: '/playlist/create',
-    handlers: [(req: PassportRequest, res: Response, next: express.NextFunction) =>
-      playlistController.createPlaylist(req, res, next, logger)],
-    requireAuthentication: true,
-    verb: 'POST'
-  },
-  {
-    route: '/playlist/:playlistId',
-    handlers: [playlistController.deletePlaylist],
-    requireAuthentication: true,
-    verb: 'DELETE'
-  },
-  {
-    route: '/playlist/:playlistId',
-    handlers: [(req: PassportRequest, res: Response, next: express.NextFunction) =>
-      playlistController.addVideoToList(req, res, roomService)],
-    requireAuthentication: true,
-    verb: 'PUT'
   },
   {
     route: '/error',
