@@ -16,23 +16,28 @@ export class Playlist {
     next: () => void = () => { },
     error: (err: any) => void = () => { }
   ) {
-    const id = YouTubeGetID(media.mediaUrl);
-    if (!id || id === '') {
-      return;
-    }
+    const YTid = YouTubeGetID(media.mediaUrl);
     const alreadyAdded = this.list.filter(i => i.mediaUrl === media.mediaUrl).length > 0;
+
     if (alreadyAdded) {
       error('duplicate id');
     }
-    try {
-      const ytMetadata = await lookup(id);
-      const playlistItem: PlaylistItem = { ...ytMetadata, ...media, isPermanent: false };
-      console.log(playlistItem);
+    if (YTid) {
+      try {
+        const ytMetadata = await lookup(YTid);
+        const playlistItem: PlaylistItem = { ...ytMetadata, ...media, isPermanent: false };
+        console.log(playlistItem);
 
-      this.list.push(playlistItem);
+        this.list.push(playlistItem);
+        next();
+      } catch (e) {
+        error(e);
+      }
+    }
+    else {
+      const playlistItem: PlaylistItem = { title: '?', duration: 0, meta: null, ...media, isPermanent: false };
       next();
-    } catch (e) {
-      error(e);
+
     }
   }
 

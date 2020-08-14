@@ -92,7 +92,7 @@ export class RoomService {
 
     socket.on(Commands.ADD_MEDIA, (data: MediaEvent) => {
       try {
-        this.onAddMedia(data);
+        this.onAddMedia(data, socket);
       } catch (error) {
         this.logger.info('onAddMedia failed');
         this.logger.info('broken data:');
@@ -211,10 +211,6 @@ export class RoomService {
     this.removeRoomfromDirectory(room);
   }
 
-  addMediaToPlaylist(data: MediaEvent) {
-    this.onAddMedia(data);
-  }
-
   private joinRoom(socket: socketio.Socket, roomName: string) {
     const room = this.getRoomByName(roomName);
 
@@ -253,14 +249,12 @@ export class RoomService {
     }
   }
 
-  private onAddMedia = (data: MediaEvent) => {
+  private onAddMedia = (data: MediaEvent, socket: SocketPassport) => {
     const room = this.getRoomByName(data.roomName);
     if (!room) {
       return Error('Room non-existant');
     }
-    room.currentPlayList.add({ ...data },
-      () => room.broadcastPlaylistToAll()
-    );
+    room.addMedia(socket, data, () => room.broadcastPlaylistToAll());
   }
 
   private onRemoveMedia = (data: MediaEvent) => {

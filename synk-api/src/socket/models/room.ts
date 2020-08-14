@@ -12,6 +12,7 @@ import { getUsername, SocketPassport } from './socket.passport';
 import { RequiresAuthentication } from '../decorators/auth.decorator';
 
 export class Room {
+
   id: string;
   name: string;
   description: string;
@@ -78,6 +79,13 @@ export class Room {
     this.sendRoomConfigToMember(candidateSocket);
 
     this.broadcastMemberListToAll();
+  }
+
+  @RequiresAuthentication()
+  addMedia(socket: SocketPassport, data: MediaEvent, afterAdd: () => void) {
+    if (this.getMemberFromSocket(socket)) {
+      this.currentPlayList.add(data, afterAdd);
+    }
   }
 
   exit(socket: socketio.Socket) {
