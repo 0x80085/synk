@@ -78,3 +78,4 @@ Or use the shortcut in package.json:
 - make sessions more stable (testing)
 - Implemet DB model and the handlers for the entities
 - ratelimiting, manage user access, and security
+- Add html5 player
