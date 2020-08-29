@@ -8,15 +8,23 @@ import {
   ViewChild,
   ViewContainerRef,
   Output,
+  Type,
 } from '@angular/core';
 
 import { BaseMediaComponent } from './base-media.component';
-import { YoutubeComponent } from './youtube/youtube.component';
+import { YoutubeComponent, isValidYTid } from './youtube/youtube.component';
+import { Subscription } from 'rxjs';
+import { Html5Component } from './html5/html5.v2.component';
+
+export enum SupportedPlayers {
+  YT = 'YT',
+  HTML5 = 'HTML5',
+}
 
 // tslint:disable-next-line: directive-selector
 @Directive({ selector: '[mediaHost]' })
 export class MediaHostDirective {
-  constructor(public viewContainerRef: ViewContainerRef) {}
+  constructor(public viewContainerRef: ViewContainerRef) { }
 }
 
 @Component({
@@ -31,13 +39,18 @@ export class MediaComponent implements OnInit {
 
   ref: ComponentRef<BaseMediaComponent>;
 
-  constructor(private componentFactoryResolver: ComponentFactoryResolver) {}
+  videoEndedSubscription: Subscription;
+
+  constructor(private componentFactoryResolver: ComponentFactoryResolver) { }
 
   ngOnInit() {
-    this.loadComponent();
+    // this.setupMediaPlayer();
   }
 
   play(url: string): void {
+
+    this.setupMediaPlayer(url);
+
     this.ref.instance.play(url);
   }
 
@@ -58,21 +71,54 @@ export class MediaComponent implements OnInit {
   }
 
   isPlaying() {
-    return this.ref.instance.isPlaying();
+    return  this.ref && this.ref.instance.isPlaying();
   }
 
-  private loadComponent() {
-    const componentFactory = this.componentFactoryResolver.resolveComponentFactory(
-      YoutubeComponent
-    );
+  private setupMediaPlayer(url: string) {
+    const playerType = this.resolveMediaType(url);
+    this.createPlayerOfType(playerType);
+  }
+
+
+  private resolveMediaType(url: string) {
+    return isValidYTid(url) ? SupportedPlayers.YT : SupportedPlayers.HTML5;
+  }
+
+  private createPlayerOfType(type: string) {
+    switch (type) {
+      case SupportedPlayers.YT:
+        this.assemblePlayer(YoutubeComponent)
+        break;
+      default:
+        this.assemblePlayer(Html5Component)
+        break;
+    }
+  }
+
+  private assemblePlayer(type: Type<BaseMediaComponent>) {
+    // const isSameAsCurrentPlayer = this.ref && this.ref.componentType === type;
+
+    // if (isSameAsCurrentPlayer) {
+    //   console.log('same as current');
+    //   return;
+    // }
 
     const viewContainerRef = this.host.viewContainerRef;
     viewContainerRef.clear();
 
+    const componentFactory = this.componentFactoryResolver.resolveComponentFactory(
+      type
+    );
     this.ref = viewContainerRef.createComponent(componentFactory);
+    this.resetVideoEndedSubscription();
+  }
 
-    this.ref.instance.videoEnded.subscribe(ev => {
+  private resetVideoEndedSubscription() {
+    if (this.videoEndedSubscription) { this.videoEndedSubscription.unsubscribe(); };
+    this.videoEndedSubscription = this.ref.instance.videoEnded.subscribe(ev => {
       this.mediaEndedEvent.emit();
     });
   }
+
+
 }

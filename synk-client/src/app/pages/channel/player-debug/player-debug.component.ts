@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Html5Component } from '../media/html5/html5.component';
+import { Html5Component } from '../media/html5/html5.v2.component';
 
 @Component({
   selector: 'app-player-debug',

@@ -39,10 +39,10 @@ export class PlaylistComponent implements OnInit {
     if (!this.newMedia) {
       return;
     }
-    if (!isValidYTid(this.newMedia)) {
-      this.notification.error('Invalid input', ` That's not valid YouTube video URL...`);
-      return;
-    }
+    // if (!isValidYTid(this.newMedia)) {
+    //   this.notification.error('Invalid input', ` That's not valid YouTube video URL...`);
+    //   return;
+    // }
 
     this.mediaService.addToPlaylist({
       mediaUrl: this.newMedia,

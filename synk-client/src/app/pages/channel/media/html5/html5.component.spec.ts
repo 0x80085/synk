@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Html5Component } from './html5.component';
+import { Html5Component } from './html5_OLD.component';
 
 describe('Html5Component', () => {
   let component: Html5Component;

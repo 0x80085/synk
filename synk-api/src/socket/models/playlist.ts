@@ -36,6 +36,7 @@ export class Playlist {
     }
     else {
       const playlistItem: PlaylistItem = { title: '?', duration: 0, meta: null, ...media, isPermanent: false };
+      this.list.push(playlistItem);
       next();
 
     }
