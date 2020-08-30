@@ -12,14 +12,14 @@ import { AdminRouteGuard } from './pages/account/admin-route.guard';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'home' },
-  { path: '', component: WelcomeComponent },
+  { path: 'home', component: WelcomeComponent },
   { path: 'channel/:name', component: ChannelComponent },
   { path: 'debug', component: PlayerDebugComponent },
   { path: 'account/new', component: RegisterComponent },
   { path: 'account/me', component: ProfileComponent },
   { path: 'account/login', component: LoginComponent },
   { path: 'account/admin', component: AdminComponent, canActivate: [AdminRouteGuard] },
-  { path: '**', redirectTo: '' }
+  { path: '**', redirectTo: 'home' }
 ];
 
 @NgModule({
