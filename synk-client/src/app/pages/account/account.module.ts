@@ -9,10 +9,11 @@ import { PlaceholdPipe } from './profile/placehold.pipe';
 import { UsernamePipe } from './profile/username.pipe';
 import { OwnedChannelsComponent } from './profile/owned-channels/owned-channels.component';
 import { RouterModule } from '@angular/router';
+import { AdminComponent } from './admin/admin.component';
 
 
 @NgModule({
-  declarations: [LoginComponent, ProfileComponent, RegisterComponent, PlaceholdPipe, UsernamePipe, OwnedChannelsComponent],
+  declarations: [LoginComponent, ProfileComponent, RegisterComponent, PlaceholdPipe, UsernamePipe, OwnedChannelsComponent, AdminComponent],
   imports: [
     RouterModule,
     CommonModule,

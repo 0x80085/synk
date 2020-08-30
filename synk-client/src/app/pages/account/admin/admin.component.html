@@ -1,0 +1,106 @@
+<h1 nz-typography>Administrational dept. of Synk Services</h1>
+
+
+<div nz-row>
+  <div nz-col nzSpan="12">
+    <nz-card nzTitle="Users" [nzLoading]="!(users$ | async)">
+      <nz-pagination [nzPageIndex]="1" [nzTotal]="85" [nzPageSize]="20" [nzShowTotal]="rangeTemplate"
+        style="margin-bottom: 1rem;">
+      </nz-pagination>
+
+      <ng-template #rangeTemplate let-range="range" let-total>
+        {{ range[0] }}-{{ range[1] }} of {{ total }} items
+      </ng-template>
+
+      <nz-collapse *ngIf="(users$ | async)?.length > 0">
+        <nz-collapse-panel *ngFor="let user of users$ | async" [nzHeader]="user.userName" [nzExtra]="actions"
+          [nzExpandedIcon]="expandIcon">
+          <ng-template #expandIcon>
+            <i nz-icon style="margin-right: 20px;" nzType="user"></i>
+          </ng-template>
+          <ng-template #actions>
+            <a nz-button nzDanger nzType="link" nz-tooltip nzTitle="Ban this user" (click)="ban(user, $event)">
+              <i nz-icon nzTheme="fill" nzType="delete"></i>
+            </a>
+          </ng-template>
+
+
+          <nz-descriptions nzTitle="User Info" nzLayout="vertical">
+            <nz-descriptions-item nzTitle="UserName">
+              <span nz-typography><code>{{ user.userName }}</code></span>
+            </nz-descriptions-item>
+            <nz-descriptions-item nzTitle="ID">
+              <span nz-typography><code>{{ user.id }}</code></span>
+            </nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Global permissions">
+              <span nz-typography><code>Coming soon</code></span>
+            </nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Room permissions">
+              <span nz-typography><code>Coming soon</code></span>
+            </nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Owner of rooms">
+              <span nz-typography><code>Coming soon</code></span>
+            </nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Currently in rooms">
+              <span nz-typography><code>Coming soon</code></span>
+            </nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Current active sessions">
+              <span nz-typography><code>Coming soon</code></span>
+            </nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Last known IP Address">
+              <span nz-typography><code>Coming soon</code></span>
+            </nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Aliases/Alts">
+              <span nz-typography><code>Coming soon</code></span>
+            </nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Is known TOR exit node?">
+              <span nz-typography><code>Coming soon</code></span>
+            </nz-descriptions-item>
+          </nz-descriptions>
+
+          <nz-divider></nz-divider>
+
+          <p nz-typography><strong>Permission actions</strong></p>
+          <p>
+            <button nz-button nzType="default">Change global permission level</button>
+            <button nz-button nzType="default" style=" margin-left: 0.5rem;">Change permission level in room...</button>
+          </p>
+          <p nz-typography><strong>Suspend actions</strong></p>
+          <p>
+            <button nz-button nzType="primary">Suspend account globally...</button>
+            <button nz-button nzType="primary" style=" margin-left: 0.5rem;">Suspend account from room...</button>
+          </p>
+          <p nz-typography><strong>Ban actions</strong></p>
+          <p>
+            <button nz-button nzType="primary">Account ban globally</button>
+            <button nz-button nzType="primary" style="margin-left: 0.5rem;">IP ban globally</button>
+          </p>
+
+          <nz-list nzBordered nzSize="small">
+            <nz-list-header>Ban history</nz-list-header>
+            <nz-list-item>
+              <nz-descriptions nzLayout="vertical">
+                <nz-descriptions-item nzTitle="Reason">
+                  <span nz-typography><code>Too cool</code></span>
+                </nz-descriptions-item>
+                <nz-descriptions-item nzTitle="Start date">
+                  <span nz-typography><code>Yesterday</code></span>
+                </nz-descriptions-item>
+                <nz-descriptions-item nzTitle="End date">
+                  <span nz-typography><code>29th april, 2021</code></span>
+                </nz-descriptions-item>
+                <nz-descriptions-item nzTitle="Is permanent?">
+                  <span nz-typography><code>No</code></span>
+                </nz-descriptions-item>
+              </nz-descriptions>
+            </nz-list-item>
+            <nz-list-footer>Total bans: <span nz-typography><code>1</code></span></nz-list-footer>
+          </nz-list>
+        </nz-collapse-panel>
+      </nz-collapse>
+
+    </nz-card>
+  </div>
+  <div nz-col nzSpan="16">
+  </div>
+</div>
