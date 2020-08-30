@@ -4,6 +4,7 @@ import { Observable, of } from 'rxjs';
 
 import { AuthService, User } from '../auth.service';
 import { AdminService } from '../admin.service';
+import { shareReplay } from 'rxjs/operators';
 
 @Component({
   selector: 'app-admin',
@@ -13,7 +14,7 @@ import { AdminService } from '../admin.service';
 export class AdminComponent implements OnInit {
 
   me$: Observable<User> = this.authService.getUser();
-  users$: Observable<User[]> = this.adminService.getUsers();
+  users$: Observable<User[]> = this.adminService.getUsers().pipe(shareReplay(1));
 
   constructor(
     private authService: AuthService,

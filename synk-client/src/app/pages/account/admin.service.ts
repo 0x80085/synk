@@ -14,10 +14,10 @@ export class AdminService {
   constructor(private http: HttpClient) { }
 
   getUsers(query?: string, pagzeSize?: number, index?: number): Observable<User[]> {
-    return this.http.get<User[]>(`${environment.api}/account`, {
+    return this.http.get<User[]>(`${environment.api}/DOESN NO EXISTS/`, {
       withCredentials: true
     }).pipe(
-      shareReplay(),
+      shareReplay(1),
       catchError(() => of([{ id: "IDXXXX", userName: 'Peter Post' } as User]))
     );
   }
