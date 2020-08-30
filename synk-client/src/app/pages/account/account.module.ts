@@ -10,6 +10,8 @@ import { UsernamePipe } from './profile/username.pipe';
 import { OwnedChannelsComponent } from './profile/owned-channels/owned-channels.component';
 import { RouterModule } from '@angular/router';
 import { AdminComponent } from './admin/admin.component';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { RequestLogInterceptor } from './interceptors/auth-error.interceptor';
 
 
 @NgModule({
@@ -20,6 +22,9 @@ import { AdminComponent } from './admin/admin.component';
     FormsModule,
     ReactiveFormsModule,
     NgZorroAntdModule
+  ],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: RequestLogInterceptor, multi: true },
   ]
 })
 export class AccountModule { }

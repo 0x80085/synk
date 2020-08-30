@@ -9,7 +9,7 @@ import { SocketService } from '../../../socket.service';
 export class RequestLogInterceptor implements HttpInterceptor {
 
   constructor(private stateService: AppStateService,
-    private socketService: SocketService
+    private socketService: SocketService,
   ) { }
 
   intercept(
