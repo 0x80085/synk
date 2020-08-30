@@ -15,13 +15,13 @@ export class RequestLogInterceptor implements HttpInterceptor {
   intercept(
     request: HttpRequest<any>, next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    console.log(request.url);
-
-
     return next.handle(request).pipe(
       catchError((error: any) =>
         of(error).pipe(
           tap(err => {
+            console.warn("HTTP ERROR occurred");
+            console.warn(err);
+
             if (err.status === 403) {
               this.stateService.isLoggedInSubject.next(false);
               this.socketService.socket.close();
