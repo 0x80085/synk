@@ -21,11 +21,11 @@ export class RequestLogInterceptor implements HttpInterceptor {
           tap(err => {
             console.warn("HTTP ERROR occurred");
             console.warn(err);
-
             if (err.status === 403) {
               this.stateService.isLoggedInSubject.next(false);
               this.socketService.socket.close();
             }
+            throw err;
           })
         ))
     );
