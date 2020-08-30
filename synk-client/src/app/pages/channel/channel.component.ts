@@ -9,6 +9,7 @@ import { ChatService } from './chat.service';
 import { MediaService } from './media.service';
 import { MediaComponent } from './media/media.component';
 import { MediaEvent, RoomUserDto } from './models/room.models';
+import { AppStateService } from '../../app-state.service';
 
 @Component({
   selector: 'app-channel',
@@ -25,14 +26,14 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   activeItemSubject: BehaviorSubject<string> = new BehaviorSubject(null);
 
-  isConnected$ = this.socketService.isConnected$;
+  isConnected$ = merge(this.socketService.isConnected$, this.state.isLoggedIn$);
 
-  isLoading$ = this.isConnected$
+  isLoading$ = merge(
+    this.socketService.reconnectionAttempt$.pipe(mapTo(true)),
+    this.isConnected$.pipe(mapTo(false)),
+  )
     .pipe(
-      mapTo(false)
-    )
-    .pipe(
-      startWith(true)
+      startWith(false)
     );
 
   members$: Observable<RoomUserDto[]> = this.chatService.roomUserList$.pipe(
@@ -83,6 +84,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private socketService: SocketService,
+    private state: AppStateService,
     private chatService: ChatService,
     private mediaService: MediaService,
     private notification: NzNotificationService
