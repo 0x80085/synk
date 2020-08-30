@@ -13,8 +13,7 @@ import { AdminService } from '../admin.service';
 export class AdminComponent implements OnInit {
 
   me$: Observable<User> = this.authService.getUser();
-  // users$: Observable<User[]> = this.adminService.getUsers();
-  users$: Observable<User[]> = of([{ id: "IDXXXX", userName: 'Peter Post' } as User]);
+  users$: Observable<User[]> = this.adminService.getUsers();
 
   constructor(
     private authService: AuthService,

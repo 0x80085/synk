@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 import { User } from './auth.service';
 import { HttpClient } from '@angular/common/http';
-import { tap, shareReplay } from 'rxjs/operators';
+import { tap, shareReplay, catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -13,15 +13,12 @@ export class AdminService {
 
   constructor(private http: HttpClient) { }
 
-  getUsers(pagzeSize?: number, index?: number): Observable<User[]> {
+  getUsers(query?: string, pagzeSize?: number, index?: number): Observable<User[]> {
     return this.http.get<User[]>(`${environment.api}/account`, {
       withCredentials: true
     }).pipe(
-      tap(res => {
-        // this.state.isLoggedInSubject.next(true);
-        // this.state.userSubject.next(res);
-      }),
-      shareReplay()
+      shareReplay(),
+      catchError(() => of([{ id: "IDXXXX", userName: 'Peter Post' } as User]))
     );
   }
 
