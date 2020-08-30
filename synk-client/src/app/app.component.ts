@@ -21,9 +21,8 @@ export class AppComponent {
   isLoggedIn = this.state.isLoggedIn$;
   isConnected = this.connectionState.pipe(map(state => state.connected));
 
-
-
-  user = this.state.me$;
+  isAdmin$ = this.state.isAdmin$;
+  user$ = this.state.me$;
 
   constructor(
     private state: AppStateService,
