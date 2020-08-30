@@ -9,7 +9,6 @@ import { map, tap } from 'rxjs/operators';
 })
 export class AdminRouteGuard implements CanActivate {
 
-
   constructor(private authService: AuthService) { }
 
   canActivate(
@@ -18,7 +17,6 @@ export class AdminRouteGuard implements CanActivate {
     return this.authService.getUser().pipe(
       map(user => ({ ...user, isAdmin: true })), // remove after tests
       map(user => user.isAdmin),
-      tap(is => console.log("AdminRouteGuard", is)), // remove after tests
     );
   }
 
