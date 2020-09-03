@@ -13,13 +13,8 @@ export class AppComponent {
 
   isCollapsed = true;
 
-  connectionState: Observable<{
-    event: string;
-    connected: boolean;
-  }> = this.socketService.connectionState$;
-
   isLoggedIn = this.state.isLoggedIn$;
-  isConnected = this.connectionState.pipe(map(state => state.connected));
+  isConnected = this.socketService.isConnected$;
 
   isAdmin$ = this.isLoggedIn.pipe(
     withLatestFrom(this.state.isAdmin$),
