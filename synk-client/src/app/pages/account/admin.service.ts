@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 
-import { User } from './auth.service';
+import { User, Channel } from './auth.service';
 import { HttpClient } from '@angular/common/http';
 import { tap, shareReplay, catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
@@ -19,6 +19,15 @@ export class AdminService {
     }).pipe(
       shareReplay(1),
       catchError(() => of([{ id: "IDXXXX", userName: 'Peter Post' } as User]))
+    );
+  }
+
+  getRooms(query?: string, pagzeSize?: number, index?: number): Observable<Channel[]> {
+    return this.http.get<Channel[]>(`${environment.api}/DOESN NO EXISTS/`, {
+      withCredentials: true
+    }).pipe(
+      shareReplay(1),
+      catchError(() => of([{ id: "IDXXXX", name: 'De Postkamer' } as Channel]))
     );
   }
 
