@@ -29,7 +29,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   isConnected$ = merge(this.socketService.isConnected$, this.state.isLoggedIn$);
 
   isLoading$ = merge(
-    this.socketService.reconnectionAttempt$.pipe(mapTo(true)),
+    this.socketService.reconnectionError$.pipe(mapTo(true)),
     this.isConnected$.pipe(mapTo(false)),
   )
     .pipe(
