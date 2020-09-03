@@ -1,11 +1,10 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, merge, of } from 'rxjs';
-import { catchError, map, share, shareReplay, startWith, tap } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 
-import { environment } from '../environments/environment';
 import { User } from './pages/account/auth.service';
 import { SocketService } from './socket.service';
+
 
 @Injectable({
   providedIn: 'root'
