@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NzNotificationService } from 'ng-zorro-antd';
 import { Observable, of } from 'rxjs';
 
-import { AuthService, User } from '../auth.service';
+import { AuthService, User, Channel } from '../auth.service';
 import { AdminService } from '../admin.service';
 import { shareReplay } from 'rxjs/operators';
 
@@ -15,6 +15,7 @@ export class AdminComponent implements OnInit {
 
   me$: Observable<User> = this.authService.getUser();
   users$: Observable<User[]> = this.adminService.getUsers().pipe(shareReplay(1));
+  rooms$: Observable<Channel[]> = this.adminService.getRooms().pipe(shareReplay(1));
 
   constructor(
     private authService: AuthService,

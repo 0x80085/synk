@@ -1,9 +1,9 @@
 <h1 nz-typography>Administrational dept. of Synk Services</h1>
-
-
-<div nz-row>
+<nz-divider></nz-divider>
+<div nz-row  [nzGutter]="25">
   <div nz-col nzSpan="12">
-    <nz-card nzTitle="Users" [nzLoading]="!(users$ | async)">
+    <h2 nz-typography>Users</h2>
+    <nz-card [nzLoading]="!(users$ | async)">
       <nz-pagination [nzPageIndex]="1" [nzTotal]="85" [nzPageSize]="20" [nzShowTotal]="rangeTemplate"
         style="margin-bottom: 1rem;">
       </nz-pagination>
@@ -13,17 +13,11 @@
       </ng-template>
 
       <nz-collapse *ngIf="(users$ | async)?.length > 0">
-        <nz-collapse-panel *ngFor="let user of users$ | async" [nzHeader]="user.userName" [nzExtra]="actions"
+        <nz-collapse-panel *ngFor="let user of users$ | async" [nzHeader]="user.userName"
           [nzExpandedIcon]="expandIcon">
           <ng-template #expandIcon>
             <i nz-icon style="margin-right: 20px;" nzType="user"></i>
           </ng-template>
-          <ng-template #actions>
-            <a nz-button nzDanger nzType="link" nz-tooltip nzTitle="Ban this user" (click)="ban(user, $event)">
-              <i nz-icon nzTheme="fill" nzType="delete"></i>
-            </a>
-          </ng-template>
-
 
           <nz-descriptions nzTitle="User Info" nzLayout="vertical">
             <nz-descriptions-item nzTitle="UserName">
@@ -31,6 +25,12 @@
             </nz-descriptions-item>
             <nz-descriptions-item nzTitle="ID">
               <span nz-typography><code>{{ user.id }}</code></span>
+            </nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Date created">
+              <span nz-typography><code>Coming soon</code></span>
+            </nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Last seen">
+              <span nz-typography><code>Coming soon</code></span>
             </nz-descriptions-item>
             <nz-descriptions-item nzTitle="Global permissions">
               <span nz-typography><code>Coming soon</code></span>
@@ -101,6 +101,45 @@
 
     </nz-card>
   </div>
-  <div nz-col nzSpan="16">
+  <div nz-col nzSpan="12">
+    <h2 nz-typography>Rooms</h2>
+
+    <nz-card [nzLoading]="!(rooms$ | async)">
+      <nz-pagination [nzPageIndex]="1" [nzTotal]="85" [nzPageSize]="20" [nzShowTotal]="rangeTemplate"
+        style="margin-bottom: 1rem;">
+      </nz-pagination>
+
+      <ng-template #rangeTemplate let-range="range" let-total>
+        {{ range[0] }}-{{ range[1] }} of {{ total }} items
+      </ng-template>
+
+      <nz-collapse *ngIf="(rooms$ | async)?.length > 0">
+        <nz-collapse-panel *ngFor="let room of rooms$ | async" [nzHeader]="room.name"
+          [nzExpandedIcon]="expandIcon">
+          <ng-template #expandIcon>
+            <i nz-icon style="margin-right: 20px;" nzType="video-camera"></i>
+          </ng-template>
+
+          <nz-descriptions nzTitle="User Info" nzLayout="vertical">
+            <nz-descriptions-item nzTitle="UserName">
+              <span nz-typography><code>{{ room.name }}</code></span>
+            </nz-descriptions-item>
+            <nz-descriptions-item nzTitle="ID">
+              <span nz-typography><code>{{ room.id }}</code></span>
+            </nz-descriptions-item>
+          </nz-descriptions>
+
+          <nz-divider></nz-divider>
+
+          <p nz-typography><strong>Permission actions</strong></p>
+          <p>
+            <button nz-button nzType="default">Change global permission level</button>
+            <button nz-button nzType="default" style=" margin-left: 0.5rem;">Change permission level in room...</button>
+          </p>
+        </nz-collapse-panel>
+      </nz-collapse>
+
+    </nz-card>
+
   </div>
 </div>
