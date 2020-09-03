@@ -23,30 +23,42 @@ export class SocketService {
     share()
   );
 
+  ping$ = this.listenForEvent('ping').pipe(mapTo({ event: 'ping', connected: true }));
+  pong$ = this.listenForEvent('pong').pipe(mapTo({ event: 'pong', connected: true }));
+
   connectionSuccess$ = this.listenForEvent('connect').pipe(mapTo({ event: 'connect', connected: true }));
-  reconnectionAttempt$ = this.listenForEvent('reconnect_attempt').pipe(mapTo({ event: 'reconnect_attempt', connected: false }));
+
   reconnectionSuccess$ = this.listenForEvent('reconnect').pipe(mapTo({ event: 'reconnect', connected: true }));
-  permissionError$ = this.listenForEvent('authentication error').pipe(mapTo({ event: 'authentication error', connected: false }));
+  reconnectionAttempt$ = this.listenForEvent('reconnect_attempt').pipe(mapTo({ event: 'reconnect_attempt', connected: false }));
+  reconnectionError$ = this.listenForEvent('reconnect_error').pipe(mapTo({ event: 'reconnect_error', connected: false }));
+  reconnectionFail$ = this.listenForEvent('reconnect_failed').pipe(mapTo({ event: 'reconnect_failed', connected: false }));
+
   connectionError$ = this.listenForEvent('error').pipe(mapTo({ event: 'error', connected: false }));
-  connectionFail$ = this.listenForEvent('reconnect_failed').pipe(mapTo({ event: 'reconnect_failed', connected: false }));
   connectionTimeOut$ = this.listenForEvent('connect_timeout').pipe(mapTo({ event: 'connect_timeout', connected: false }));
+
+  permissionError$ = this.listenForEvent('authentication error').pipe(mapTo({ event: 'authentication error', connected: false }));
   disconnection$ = this.listenForEvent('disconnect').pipe(mapTo({ event: 'disconnect', connected: false }));
 
   connectionState$ = merge(
     this.connectionSuccess$,
     this.reconnectionSuccess$,
     this.reconnectionAttempt$,
+    this.reconnectionError$,
     this.permissionError$,
     this.connectionError$,
     this.disconnection$,
-    this.connectionFail$,
+    this.reconnectionFail$,
     this.connectionTimeOut$,
+    this.ping$,
+    this.pong$,
   ).pipe(
-    share()
+    tap(e => console.log('connetced SOCKET::' + e)),
+    tap(e => console.log(e)),
   );
 
   isConnected$ = this.connectionState$.pipe(
-    map(({ connected }) => connected)
+    map(({ connected }) => connected),
+    shareReplay()
   );
 
   constructor(private notification: NzNotificationService) { }
@@ -55,7 +67,7 @@ export class SocketService {
     return (src: Observable<RealTimeCommand>) =>
       src.pipe(
         withLatestFrom(this.socket$),
-        tap(([{ command, payload }, { }]) => console.log('emitCOmmannd', command, payload)),
+        tap(([{ command, payload }]) => console.log('emitCOmmannd', command, payload)),
         tap(([{ command, payload }, socket]) => socket.emit(command, payload)),
         map(([rtc, _]) => rtc),
         this.catchSocketErr(),
