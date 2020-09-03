@@ -15,26 +15,19 @@ export class AppStateService {
   isLoggedInSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
   userSubject: BehaviorSubject<User> = new BehaviorSubject({ id: 'missingno', userName: '-----' });
 
-  me$ = this.http.get<User>(`${environment.api}/account`, { withCredentials: true }).pipe(
-    shareReplay(1),
-  );
+  me$ = this.userSubject.pipe();
 
-  isAdmin$ = this.me$.pipe(
+  isAdmin$ = this.userSubject.pipe(
     map(user => ({ ...user, isAdmin: true })), // remove after tests
     map(user => user.isAdmin),
-    tap(user =>console.log('isAdmin'))
+    catchError(() => of(false))
   );
 
   isLoggedIn$ = merge(
     this.me$.pipe(map(me => !!me)),
     this.socketService.isConnected$,
     this.isLoggedInSubject
-  ).pipe(
-    shareReplay(1),
   );
 
-  constructor(
-    private http: HttpClient,
-    private socketService: SocketService,
-  ) { }
+  constructor(private socketService: SocketService) { }
 }

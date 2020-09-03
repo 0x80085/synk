@@ -46,8 +46,7 @@ export class SocketService {
   );
 
   isConnected$ = this.connectionState$.pipe(
-    map(({ connected }) => connected),
-    shareReplay(1)
+    map(({ connected }) => connected)
   );
 
   constructor(private notification: NzNotificationService) { }

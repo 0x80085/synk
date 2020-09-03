@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { AppStateService } from './app-state.service';
-import { tap, map } from 'rxjs/operators';
+import { tap, map, withLatestFrom } from 'rxjs/operators';
 import { SocketService } from './socket.service';
 import { Observable } from 'rxjs';
 
@@ -21,7 +21,10 @@ export class AppComponent {
   isLoggedIn = this.state.isLoggedIn$;
   isConnected = this.connectionState.pipe(map(state => state.connected));
 
-  isAdmin$ = this.state.isAdmin$;
+  isAdmin$ = this.isLoggedIn.pipe(
+    withLatestFrom(this.state.isAdmin$),
+    map(([isAdmin, isLoggedIn]) => isAdmin && isLoggedIn)
+  );
   user$ = this.state.me$;
 
   constructor(
