@@ -6,6 +6,7 @@ import { environment } from '../environments/environment';
 import { switchMap, map, tap, share, withLatestFrom, catchError, mapTo, shareReplay } from 'rxjs/operators';
 import { NzNotificationService } from 'ng-zorro-antd';
 import { PossibleCommands } from './pages/channel/models/commands.enum';
+import { doLog } from './utils/custom.operators';
 
 export interface RealTimeCommand {
   command: PossibleCommands;
@@ -52,8 +53,7 @@ export class SocketService {
     this.ping$,
     this.pong$,
   ).pipe(
-    tap(e => console.log('connetced SOCKET::' + e)),
-    tap(e => console.log(e)),
+    doLog('connectionState$', true),
   );
 
   isConnected$ = this.connectionState$.pipe(
@@ -67,7 +67,7 @@ export class SocketService {
     return (src: Observable<RealTimeCommand>) =>
       src.pipe(
         withLatestFrom(this.socket$),
-        tap(([{ command, payload }]) => console.log('emitCOmmannd', command, payload)),
+        tap(([{ command, payload }]) => console.log('emitCommannd', command, payload)),
         tap(([{ command, payload }, socket]) => socket.emit(command, payload)),
         map(([rtc, _]) => rtc),
         this.catchSocketErr(),
