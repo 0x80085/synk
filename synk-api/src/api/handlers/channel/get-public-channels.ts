@@ -34,7 +34,7 @@ export async function getPublicChannels(roomService: RoomService, amount = 50) {
 }
 
 function mergeLists(allItems: ChannelSummary[], someItems: ChannelSummary[] = []) {
-  const someItemsDict = toDictionary(someItems);
+  const someItemsDict = toChannelDictionary(someItems);
   return allItems.map(it => {
     const secondListEntry: ChannelSummary = someItemsDict[it.roomName];
     const summary: ChannelSummary = {
@@ -48,10 +48,10 @@ function mergeLists(allItems: ChannelSummary[], someItems: ChannelSummary[] = []
 }
 
 function summarize(it: Room | Channel): ChannelSummary {
-  function isRoom(ting: Room | Channel): ting is Room {
+  function hasMembers(ting: Room | Channel): ting is Room {
     return (ting as Room).members !== undefined;
   }
-  return isRoom(it)
+  return hasMembers(it)
     ? {
       roomName: it.name,
       description: it.description,
@@ -66,12 +66,12 @@ function summarize(it: Room | Channel): ChannelSummary {
 }
 
 
-function toDictionary(arr: ChannelSummary[]) {
-  const dict: any = {};
-  arr.forEach(it => {
-    dict[it.roomName] = it;
+function toChannelDictionary(channels: ChannelSummary[]) {
+  const channelMap: any = {};
+  channels.forEach(it => {
+    channelMap[it.roomName] = it;
   });
-  return dict;
+  return channelMap;
 }
 
 function getCurrentlyPlaying(room: Room) {
