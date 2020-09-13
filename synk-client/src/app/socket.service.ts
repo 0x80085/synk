@@ -24,9 +24,6 @@ export class SocketService {
     share()
   );
 
-  ping$ = this.listenForEvent('ping').pipe(mapTo({ event: 'ping', connected: true }));
-  pong$ = this.listenForEvent('pong').pipe(mapTo({ event: 'pong', connected: true }));
-
   connectionSuccess$ = this.listenForEvent('connect').pipe(mapTo({ event: 'connect', connected: true }));
 
   reconnectionSuccess$ = this.listenForEvent('reconnect').pipe(mapTo({ event: 'reconnect', connected: true }));
@@ -50,8 +47,6 @@ export class SocketService {
     this.disconnection$,
     this.reconnectionFail$,
     this.connectionTimeOut$,
-    this.ping$,
-    this.pong$,
   ).pipe(
     doLog('connectionState$', true),
   );
