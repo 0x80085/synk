@@ -5,7 +5,6 @@ import { catchError, map, shareReplay } from 'rxjs/operators';
 import { User } from './pages/account/auth.service';
 import { SocketService } from './socket.service';
 
-
 @Injectable({
   providedIn: 'root'
 })
@@ -19,7 +18,7 @@ export class AppStateService {
 
 
   isAdmin$ = this.userSubject.pipe(
-    map(user => ({ ...user, isAdmin: true })), // remove after tests
+    map(user => ({ ...user, isAdmin: mockAdmin(user) })), // remove after tests
     map(user => user.isAdmin),
     catchError(() => of(false))
   );
@@ -32,3 +31,8 @@ export class AppStateService {
 
   constructor(private socketService: SocketService) { }
 }
+
+const mockAdmin = (user: User) =>
+  user.userName === 'JanitorOne'
+  || user.userName === 'root';
+
