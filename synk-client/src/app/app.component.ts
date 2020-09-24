@@ -3,6 +3,7 @@ import { AppStateService } from './app-state.service';
 import { tap, map, withLatestFrom } from 'rxjs/operators';
 import { SocketService } from './socket.service';
 import { Observable } from 'rxjs';
+import { AuthService } from './pages/account/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -20,9 +21,10 @@ export class AppComponent {
     withLatestFrom(this.state.isAdmin$),
     map(([isAdmin, isLoggedIn]) => isAdmin && isLoggedIn)
   );
-  user$ = this.state.me$;
+  user$ = this.auth.getUser();
 
   constructor(
+    private auth: AuthService,
     private state: AppStateService,
     private socketService: SocketService
   ) { }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, merge, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, shareReplay } from 'rxjs/operators';
 
 import { User } from './pages/account/auth.service';
 import { SocketService } from './socket.service';
@@ -12,9 +12,11 @@ import { SocketService } from './socket.service';
 export class AppStateService {
 
   isLoggedInSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  userSubject: BehaviorSubject<User> = new BehaviorSubject({ id: 'missingno', userName: '-----' });
+  isLogged$ = this.isLoggedInSubject.pipe(shareReplay(1));
 
+  userSubject: BehaviorSubject<User> = new BehaviorSubject({ id: 'missingno', userName: '-----' });
   me$ = this.userSubject.pipe();
+
 
   isAdmin$ = this.userSubject.pipe(
     map(user => ({ ...user, isAdmin: true })), // remove after tests
@@ -25,7 +27,7 @@ export class AppStateService {
   isLoggedIn$ = merge(
     this.me$.pipe(map(me => !!me)),
     this.socketService.isConnected$,
-    this.isLoggedInSubject
+    this.isLogged$
   );
 
   constructor(private socketService: SocketService) { }

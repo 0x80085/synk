@@ -94,7 +94,7 @@ export class AuthService {
         this.state.isLoggedInSubject.next(true);
         this.state.userSubject.next(res);
       }),
-      shareReplay()
+      shareReplay(1)
     );
   }
 
