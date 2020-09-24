@@ -19,42 +19,8 @@ import { EventService } from './events.service';
 })
 export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDestroy {
 
-  @Input()
-  get time() {
-    return this.getVideoTag().currentTime;
-  }
-
-  set time(val: number) {
-    const video: HTMLVideoElement = this.getVideoTag();
-    if (video && val) {
-      if (val > video.duration) {
-        val = video.duration;
-      }
-      if (val < 0) {
-        val = 0;
-      }
-      if (Math.abs(val - video.currentTime) > 0.0001) {
-        video.currentTime = val;
-      }
-      if (Math.abs(this.lastTime - video.currentTime) > 0.0001) {
-        setTimeout(() => this.timeChange.emit(video.currentTime), 0);
-        this.lastTime = video.currentTime;
-      }
-    }
-  }
-
   constructor(private renderer: Renderer2, private evt: EventService) { }
   @ViewChild("video", { static: false }) private video: ElementRef;
-
-  @Input() title: string = null;
-  @Input() autoplay = false;
-  @Input() preload = true;
-  @Input() quality = true;
-  @Input() fullscreen = true;
-  @Input() poster: string = null;
-  @Input() keyboard = true;
-
-  @Output() timeChange = new EventEmitter<number>();
 
   src: string;
 
@@ -64,7 +30,6 @@ export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDest
 
   videoWidth: number;
   videoHeight: number;
-  lastTime: number;
 
   videoLoaded = false;
 
@@ -92,10 +57,11 @@ export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDest
     player.pause();
   }
   seek(to: number): void {
-    this.time = to;
+    this.video.nativeElement.c = to;
   }
   getCurrentTime(): number {
-    return this.time;
+    const player = this.video.nativeElement as HTMLVideoElement;
+    return player.currentTime;
   }
   getCurrentUrl(): string {
     return this.src;
@@ -127,12 +93,7 @@ export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDest
         callback: event => console.error("Unhandled Video Error", event),
         dispose: null
       },
-      {
-        element: this.video.nativeElement,
-        name: "timeupdate",
-        callback: event => this.evTimeUpdate(event),
-        dispose: null
-      }
+
     ];
     this.video.nativeElement.onloadeddata = () => {
       this.videoLoaded = true;
@@ -163,10 +124,6 @@ export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDest
     this.videoWidth = this.video.nativeElement.videoWidth;
     this.videoHeight = this.video.nativeElement.videoHeight;
     this.videoLoaded = true;
-  }
-
-  evTimeUpdate(event: any): void {
-    this.time = this.getVideoTag().currentTime;
   }
 
   private setVideoSrc(src: string): void {

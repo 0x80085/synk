@@ -14,7 +14,7 @@ import {
 import { BaseMediaComponent } from './base-media.component';
 import { YoutubeComponent, isValidYTid } from './youtube/youtube.component';
 import { Subscription } from 'rxjs';
-import { Html5Component } from './html5/html5.v2.component';
+import { Html5Component } from './html5/html5.component';
 
 export enum SupportedPlayers {
   YT = 'YT',
