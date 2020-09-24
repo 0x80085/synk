@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 
-import { WelcomeComponent } from './welcome.component';
+import { HomeComponent } from './home.component';
 import { OverviewComponent } from './overview/overview.component';
 import { NgZorroAntdModule } from 'ng-zorro-antd';
 import { CommonModule } from '@angular/common';
@@ -20,13 +20,13 @@ import { RouterModule } from '@angular/router';
     NgZorroAntdModule
   ],
   declarations: [
-    WelcomeComponent,
+    HomeComponent,
     OverviewComponent,
     SushiBannerComponent,
     PopcornBannerComponent,
     NekoBannerComponent,
     OverviewItemComponent
   ],
-  exports: [WelcomeComponent]
+  exports: [HomeComponent]
 })
-export class WelcomeModule { }
+export class HomeModule { }
