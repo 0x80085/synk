@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Html5Component } from '../media/html5/html5_OLD.component';
+import { MediaComponent } from '../media/media.component';
 
 @Component({
   selector: 'app-player-debug',
@@ -9,7 +9,7 @@ import { Html5Component } from '../media/html5/html5_OLD.component';
 export class PlayerDebugComponent implements OnInit {
 
   constructor() { }
-  @ViewChild(Html5Component) player: Html5Component;
+  @ViewChild(MediaComponent) player: MediaComponent;
 
   videoUrl = 'https://cdn.lbryplayer.xyz/api/v3/streams/free/Pandemic-Explained-David-Icke/5c9719a0dfb7b8d72bb9b8558ec07e7afcae3ea7/be58c0';
 
@@ -18,6 +18,18 @@ export class PlayerDebugComponent implements OnInit {
 
   play() {
     this.player.play(this.videoUrl);
+  }
+
+  showYoutubePlayer(){
+    this.player.play("https://www.youtube.com/watch?v=wWS1LrzWeiY&t=95s");
+  }
+
+  showHtml5Player(){
+    this.player.play("https://cdn.lbryplayer.xyz/api/v3/streams/free/Pandemic-Explained-David-Icke/5c9719a0dfb7b8d72bb9b8558ec07e7afcae3ea7/be58c0");
+  }
+
+  clear(){
+    this.player.ref.destroy();
   }
 
   onEnded() {

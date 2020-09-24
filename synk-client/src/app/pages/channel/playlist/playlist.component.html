@@ -21,7 +21,7 @@
   <div nz-col nzSpan="24" [hidden]="!(isLeader$ |async)">
     <nz-input-group [hidden]="!showControls" nzSearch nzSize="large" [nzAddOnAfter]="suffixButton"
       style="margin-bottom: 1rem;">
-      <input type="text" nz-input placeholder="Enter url to add video" [(ngModel)]="newMedia" />
+      <input type="text" nz-input placeholder="Enter url to add video" [(ngModel)]="mediaUrlInput" />
     </nz-input-group>
   </div>
   <div nz-col nzSpan="24">

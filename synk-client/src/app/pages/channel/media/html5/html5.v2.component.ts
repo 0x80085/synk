@@ -4,11 +4,9 @@ import {
   ElementRef,
   EventEmitter,
   Input,
-  OnChanges,
   OnDestroy,
   Output,
   Renderer2,
-  SimpleChanges,
   ViewChild
 } from "@angular/core";
 import { BaseMediaComponent } from '../base-media.component';
@@ -16,23 +14,10 @@ import { EventService } from './events.service';
 
 @Component({
   selector: "app-video",
-  templateUrl: "./html5.v2.component.html",
+  templateUrl: "./html5.component.html",
   styleUrls: ["./html5.component.scss"]
 })
 export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDestroy {
-  @ViewChild("player", { static: false }) private player: ElementRef;
-  @ViewChild("video", { static: false }) private video: ElementRef;
-
-  @Input() title: string = null;
-  @Input() autoplay = false;
-  @Input() preload = true;
-  @Input() quality = true;
-  @Input() fullscreen = true;
-  @Input() poster: string = null;
-  @Input() keyboard = true;
-
-  @Output() timeChange = new EventEmitter<number>();
-
 
   @Input()
   get time() {
@@ -58,6 +43,19 @@ export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDest
     }
   }
 
+  constructor(private renderer: Renderer2, private evt: EventService) { }
+  @ViewChild("video", { static: false }) private video: ElementRef;
+
+  @Input() title: string = null;
+  @Input() autoplay = false;
+  @Input() preload = true;
+  @Input() quality = true;
+  @Input() fullscreen = true;
+  @Input() poster: string = null;
+  @Input() keyboard = true;
+
+  @Output() timeChange = new EventEmitter<number>();
+
   src: string | MediaStream | MediaSource | Blob = null;
 
   playing = false;
@@ -70,13 +68,16 @@ export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDest
 
   videoLoaded = false;
 
+  videoEnded: EventEmitter<unknown> = new EventEmitter();
+
   private srcObjectURL: string;
 
   private events: any[];
 
-  constructor(private renderer: Renderer2, private evt: EventService) { }
 
-  videoEnded: EventEmitter<unknown> = new EventEmitter();
+  setCurrentUrl(url: string): void {
+    this.setVideoSrc(url);
+  }
 
   isPlaying(): boolean {
     return this.videoLoaded;

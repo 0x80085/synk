@@ -4,7 +4,6 @@ import { NzNotificationService } from 'ng-zorro-antd';
 
 import { MediaEvent } from '../models/room.models';
 import { ChatService } from '../chat.service';
-import { isValidYTid } from '../media/youtube/youtube.component';
 import { MediaService, PlaylistItem } from '../media.service';
 import { map } from 'rxjs/operators';
 
@@ -17,9 +16,9 @@ export class PlaylistComponent implements OnInit {
 
   @Input() roomName: string;
 
-  @Output() playMedia = new EventEmitter<MediaEvent>()
+  @Output() playMedia = new EventEmitter<MediaEvent>();
 
-  newMedia: string;
+  mediaUrlInput: string;
   showControls: boolean;
 
   virtualPlaylist$: Observable<PlaylistItem[]> = this.mediaService.roomPlaylist$;
@@ -36,20 +35,16 @@ export class PlaylistComponent implements OnInit {
   }
 
   onAddMedia() {
-    if (!this.newMedia) {
+    if (!this.mediaUrlInput) {
       return;
     }
-    // if (!isValidYTid(this.newMedia)) {
-    //   this.notification.error('Invalid input', ` That's not valid YouTube video URL...`);
-    //   return;
-    // }
 
     this.mediaService.addToPlaylist({
-      mediaUrl: this.newMedia,
+      mediaUrl: this.mediaUrlInput,
       roomName: this.roomName,
       currentTime: null
     });
-    this.newMedia = '';
+    this.mediaUrlInput = '';
     this.notification.success('Success', 'Media added to playlist');
   }
 

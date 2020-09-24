@@ -1,11 +1,9 @@
 <div class="stage">
-  <video controls #videoElement>
-    <source [src]="currentMediaUrl | async" type="video/mp4">
-    <source [src]="currentMediaUrl | async" type="video/webm">
+  <video controls #video>
     <p>Your browser doesn't support HTML5 video.</p>
   </video>
 </div>
-<div class="stats">
+<!-- <div class="stats">
   <pre>URL: {{ currentMediaUrl | async }}</pre>
   <p>
     <label>Ended:</label>
@@ -19,4 +17,4 @@
     <label>Canplay:</label>
     {{ canPlayEvent$ | async  }}
   </p>
-</div>
+</div> -->

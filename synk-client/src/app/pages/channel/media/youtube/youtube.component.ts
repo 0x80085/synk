@@ -51,8 +51,12 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
         }
         this.current = url;
         this.player.loadVideoById(YouTubeGetID(url), 0);
+        this.player.playVideo();
       }, 5);
       return;
+    } else {
+      this.player.loadVideoById(YouTubeGetID(url), 0);
+      this.player.playVideo();
     }
 
     if (url) {
@@ -79,9 +83,14 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
     return this.current;
   }
 
+  setCurrentUrl(url:string){
+    this.current = url;
+  }
+
   onPlayerReady = event => {
     this.player = event.target;
     this.isReady = true;
+    this.play(this.current);
   }
 
   onPlayerStateChange = event => {

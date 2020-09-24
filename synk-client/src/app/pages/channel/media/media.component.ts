@@ -21,6 +21,11 @@ export enum SupportedPlayers {
   HTML5 = 'HTML5',
 }
 
+export const PlayerComponentMap = {
+  [SupportedPlayers.YT] : YoutubeComponent,
+  [SupportedPlayers.HTML5] : Html5Component,
+};
+
 // tslint:disable-next-line: directive-selector
 @Directive({ selector: '[mediaHost]' })
 export class MediaHostDirective {
@@ -48,9 +53,7 @@ export class MediaComponent implements OnInit {
   }
 
   play(url: string): void {
-
     this.setupMediaPlayer(url);
-
     this.ref.instance.play(url);
   }
 
@@ -71,37 +74,40 @@ export class MediaComponent implements OnInit {
   }
 
   isPlaying() {
-    return  this.ref && this.ref.instance.isPlaying();
+    return this.ref && this.ref.instance.isPlaying();
   }
 
   private setupMediaPlayer(url: string) {
     const playerType = this.resolveMediaType(url);
+
     this.createPlayerOfType(playerType);
+    this.ref.instance.setCurrentUrl(url);
   }
 
-
   private resolveMediaType(url: string) {
-    return isValidYTid(url) ? SupportedPlayers.YT : SupportedPlayers.HTML5;
+    return isValidYTid(url)
+      ? SupportedPlayers.YT
+      : SupportedPlayers.HTML5;
   }
 
   private createPlayerOfType(type: string) {
     switch (type) {
       case SupportedPlayers.YT:
-        this.assemblePlayer(YoutubeComponent)
+        this.assemblePlayer(YoutubeComponent);
         break;
       default:
-        this.assemblePlayer(Html5Component)
+        this.assemblePlayer(Html5Component);
         break;
     }
   }
 
   private assemblePlayer(type: Type<BaseMediaComponent>) {
-    // const isSameAsCurrentPlayer = this.ref && this.ref.componentType === type;
+    const isSameAsCurrentPlayer = this.ref && this.ref.componentType === type;
 
-    // if (isSameAsCurrentPlayer) {
-    //   console.log('same as current');
-    //   return;
-    // }
+    if (isSameAsCurrentPlayer) {
+      console.log('same as current');
+      return;
+    }
 
     const viewContainerRef = this.host.viewContainerRef;
     viewContainerRef.clear();
@@ -114,7 +120,7 @@ export class MediaComponent implements OnInit {
   }
 
   private resetVideoEndedSubscription() {
-    if (this.videoEndedSubscription) { this.videoEndedSubscription.unsubscribe(); };
+    if (this.videoEndedSubscription) { this.videoEndedSubscription.unsubscribe(); }
     this.videoEndedSubscription = this.ref.instance.videoEnded.subscribe(ev => {
       this.mediaEndedEvent.emit();
     });
