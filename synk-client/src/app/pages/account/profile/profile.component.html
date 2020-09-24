@@ -13,6 +13,13 @@
     <app-owned-channels></app-owned-channels>
   </div>
 </div>
+<div nz-row>
+  <div nz-col nzSpan="8">
+    <nz-card nzTitle="New channel" [nzLoading]="!(me$ | async)">
+      <app-create-room-form></app-create-room-form>
+    </nz-card>
+  </div>
+</div>
 
 
 <ng-template #coverTemplate>

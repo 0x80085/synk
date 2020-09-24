@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { OverviewService, ChannelDraft } from '../overview.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NzNotificationService } from 'ng-zorro-antd';
 import { AuthService } from '../../account/auth.service';
+import { AccountService, ChannelDraft } from '../account.service';
 
 @Component({
   selector: 'app-create-room-form',
@@ -14,7 +14,7 @@ export class CreateRoomFormComponent implements OnInit {
   form: FormGroup;
 
   constructor(
-    private service: OverviewService,
+    private service: AccountService,
     private auth: AuthService,
     private fb: FormBuilder,
     private router: Router,
@@ -35,7 +35,8 @@ export class CreateRoomFormComponent implements OnInit {
       description: [
         null,
         [Validators.required, Validators.maxLength(250), Validators.minLength(5)]
-      ]
+      ],
+      // isPublic: true
     });
   }
 

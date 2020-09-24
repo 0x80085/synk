@@ -12,10 +12,19 @@ import { RouterModule } from '@angular/router';
 import { AdminComponent } from './admin/admin.component';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestLogInterceptor } from './interceptors/auth-error.interceptor';
+import { CreateRoomFormComponent } from './create-room-form/create-room-form.component';
 
 
 @NgModule({
-  declarations: [LoginComponent, ProfileComponent, RegisterComponent, PlaceholdPipe, UsernamePipe, OwnedChannelsComponent, AdminComponent],
+  declarations: [
+    CreateRoomFormComponent,
+    LoginComponent,
+    ProfileComponent,
+    RegisterComponent,
+    PlaceholdPipe,
+    UsernamePipe,
+    OwnedChannelsComponent,
+    AdminComponent],
   imports: [
     RouterModule,
     CommonModule,

@@ -9,14 +9,6 @@
   </ng-template>
 </nz-list>
 
-<div *ngIf="isLoggedIn$ | async" nz-row>
-  <div nz-col nzSpan="8">
-    <nz-card nzTitle="New channel">
-      <app-create-room-form></app-create-room-form>
-    </nz-card>
-  </div>
-</div>
-
 <ng-template #noResults>
   <nz-empty></nz-empty>
 </ng-template>
