@@ -56,7 +56,7 @@ export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDest
 
   @Output() timeChange = new EventEmitter<number>();
 
-  src: string | MediaStream | MediaSource | Blob = null;
+  src: string;
 
   playing = false;
 
@@ -70,10 +70,7 @@ export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDest
 
   videoEnded: EventEmitter<unknown> = new EventEmitter();
 
-  private srcObjectURL: string;
-
   private events: any[];
-
 
   setCurrentUrl(url: string): void {
     this.setVideoSrc(url);
@@ -84,9 +81,6 @@ export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDest
   }
   play(url?: string): void {
     this.setVideoSrc(url);
-    if (!this.videoLoaded) {
-      this.load();
-    }
 
     if (this.videoLoaded) {
       const player = this.video.nativeElement as HTMLVideoElement;
@@ -98,14 +92,13 @@ export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDest
     player.pause();
   }
   seek(to: number): void {
-    const player = this.video.nativeElement as HTMLVideoElement;
-    player.currentTime = to;
+    this.time = to;
   }
   getCurrentTime(): number {
     return this.time;
   }
   getCurrentUrl(): string {
-    return this.srcObjectURL;
+    return this.src;
   }
 
   ngAfterViewInit(): void {
@@ -124,6 +117,12 @@ export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDest
       },
       {
         element: this.video.nativeElement,
+        name: "ended",
+        callback: event => this.videoEnded.next(event),
+        dispose: null
+      },
+      {
+        element: this.video.nativeElement,
         name: "error",
         callback: event => console.error("Unhandled Video Error", event),
         dispose: null
@@ -138,9 +137,9 @@ export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDest
     this.video.nativeElement.onloadeddata = () => {
       this.videoLoaded = true;
       const player = this.video.nativeElement as HTMLVideoElement;
-      this.setVideoSrc(this.src);
-      this.play();
+      player.play();
     };
+    this.setVideoSrc(this.src);
     this.evt.addEvents(this.renderer, this.events);
   }
 
@@ -170,30 +169,15 @@ export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDest
     this.time = this.getVideoTag().currentTime;
   }
 
-  private setVideoSrc(src: string | MediaStream | MediaSource | Blob): void {
+  private setVideoSrc(src: string): void {
     this.src = src;
 
-    if (this.srcObjectURL) {
-      URL.revokeObjectURL(this.srcObjectURL);
-      this.srcObjectURL = null;
-    }
-
     if (!this.video || !this.video.nativeElement) {
+      console.log('setVideoSrc cant find player');
+
       return;
     }
 
-    if (!src) {
-      this.video.nativeElement.src = null;
-      if ("srcObject" in HTMLVideoElement.prototype) {
-        this.video.nativeElement.srcObject = new MediaStream();
-      }
-    } else if (typeof src === "string") {
-      this.video.nativeElement.src = src;
-    } else if ("srcObject" in HTMLVideoElement.prototype) {
-      this.video.nativeElement.srcObject = src;
-    } else {
-      this.srcObjectURL = URL.createObjectURL(src);
-      this.video.nativeElement.src = this.srcObjectURL;
-    }
+    this.video.nativeElement.src = src;
   }
 }
