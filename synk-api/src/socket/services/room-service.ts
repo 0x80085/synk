@@ -143,7 +143,7 @@ export class RoomService {
       }
     });
 
-    socket.on(Commands.DISCONNECT, this.disconnect);
+    socket.once(Commands.DISCONNECT, this.disconnect);
   }
 
   addMemberSocket = (socket: SocketPassport) => {
