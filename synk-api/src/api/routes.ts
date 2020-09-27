@@ -3,6 +3,7 @@ import { Request, Response } from 'express-serve-static-core';
 
 import * as userController from './controllers/user';
 import * as chatroomController from './controllers/room';
+import * as adminController from './controllers/admin';
 
 import { RoomService } from '../socket/services/room-service';
 import { PassportRequest } from './controllers/user';
@@ -84,6 +85,30 @@ const ALL_ROUTES = (roomService: RoomService, logger: Logger): RouteOptions[] =>
     ],
     requireAuthentication: true,
     verb: 'POST'
+  },
+  {
+    route: '/admin/channels',
+    handlers: [(req: PassportRequest, res: Response, next: express.NextFunction) =>
+      adminController.getRoomsAndChannels(req, res, roomService)
+    ],
+    requireAuthentication: true,
+    verb: 'GET'
+  },
+  {
+    route: '/admin/users',
+    handlers: [(req: PassportRequest, res: Response, next: express.NextFunction) =>
+      adminController.getUsers(req, res, roomService)
+    ],
+    requireAuthentication: true,
+    verb: 'GET'
+  },
+  {
+    route: '/admin/channels/:id',
+    handlers: [(req: PassportRequest, res: Response, next: express.NextFunction) =>
+      adminController.deleteChannelByAdmin(req, res, roomService, logger)
+    ],
+    requireAuthentication: true,
+    verb: 'DELETE'
   },
   {
     route: '/account/channels/:name',
