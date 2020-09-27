@@ -5,13 +5,6 @@ import { Logger } from '../../tools/logger';
 import * as channelHandler from '../handlers/channel/';
 import { PassportRequest } from './user';
 
-export interface RoomDto {
-  roomName: string;
-  description: string;
-  connectedUsers?: number;
-  nowPlaying?: string;
-}
-
 /**
  * `GET /public-rooms`
  * Get all public chat rooms
@@ -76,7 +69,7 @@ export const deleteRoom = (
 ) => {
 
   try {
-    channelHandler.deleteChannel(req.user.username, req.params.name);
+    channelHandler.deleteChannelOfUser(req.user.username, req.params.name);
     roomService.deleteRoom(req.params.name, req.user.username);
 
     res.status(200).json('OK');
