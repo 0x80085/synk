@@ -46,7 +46,9 @@ export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDest
     player.pause();
   }
   seek(to: number): void {
-    this.video.nativeElement.c = to;
+    const player = this.video.nativeElement as HTMLVideoElement;
+    player.currentTime = to;
+    // Doesnt work
   }
   getCurrentTime(): number {
     const player = this.video.nativeElement as HTMLVideoElement;
