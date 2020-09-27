@@ -13,12 +13,11 @@ export class AppStateService {
   isLoggedInSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
   isLogged$ = this.isLoggedInSubject.pipe(shareReplay(1));
 
-  userSubject: BehaviorSubject<User> = new BehaviorSubject({ id: 'missingno', userName: '-----' });
+  userSubject: BehaviorSubject<User> = new BehaviorSubject({ id: 'missingno', userName: '-----', isAdmin: false });
   me$ = this.userSubject.pipe();
 
 
   isAdmin$ = this.userSubject.pipe(
-    map(user => ({ ...user, isAdmin: mockAdmin(user) })), // remove after tests
     map(user => user.isAdmin),
     catchError(() => of(false))
   );

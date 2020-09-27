@@ -7,7 +7,6 @@ import { environment } from '../../../environments/environment';
 import { AppStateService } from '../../app-state.service';
 import { SocketService } from '../../socket.service';
 
-
 interface LoginInfo {
   username: string;
   password: string;
@@ -16,6 +15,7 @@ interface LoginInfo {
 export interface User {
   userName: string;
   id: string;
+  isAdmin: boolean;
 }
 
 export interface Channel {

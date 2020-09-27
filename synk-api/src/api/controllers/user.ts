@@ -12,7 +12,17 @@ import { Playlist } from '../../domain/entity/Playlist';
 import { Video } from '../../domain/entity/Video';
 import { RoomService } from '../../socket/services/room-service';
 
-export type PassportRequest = Request & { user: { id: string, username: string } };
+export interface PassportUserData {
+  id: string;
+  username: string;
+  isAdmin: boolean;
+}
+
+export interface PassportInfo {
+  user: PassportUserData;
+}
+
+export type PassportRequest = Request & PassportInfo;
 
 /**
  * POST /login
@@ -145,7 +155,8 @@ export const getAccount = async (req: PassportRequest, res: Response, next: Next
     const userDto = {
       userName: user.username,
       channels: user.channels,
-      id: user.id
+      id: user.id,
+      isAdmin: user.isAdmin
     };
 
     return res.status(200).json(userDto);
