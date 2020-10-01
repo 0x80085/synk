@@ -10,6 +10,7 @@ import { YoutubeComponent } from './media/youtube/youtube.component';
 import { PlaylistComponent } from './playlist/playlist.component';
 import { Html5Component } from './media/html5/html5.component';
 import { PlayerDebugComponent } from './player-debug/player-debug.component';
+import { TwitchComponent } from './media/twitch/twitch.component';
 
 @NgModule({
   entryComponents: [
@@ -23,7 +24,8 @@ import { PlayerDebugComponent } from './player-debug/player-debug.component';
     YoutubeComponent,
     PlaylistComponent,
     Html5Component,
-    PlayerDebugComponent
+    PlayerDebugComponent,
+    TwitchComponent
   ],
   imports: [
     CommonModule,
