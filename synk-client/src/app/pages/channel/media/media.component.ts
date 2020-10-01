@@ -15,16 +15,13 @@ import { BaseMediaComponent } from './base-media.component';
 import { YoutubeComponent, isValidYTid } from './youtube/youtube.component';
 import { Subscription } from 'rxjs';
 import { Html5Component } from './html5/html5.component';
+import { isTwitchChannelUrl, TwitchComponent } from './twitch/twitch.component';
 
 export enum SupportedPlayers {
   YT = 'YT',
   HTML5 = 'HTML5',
+  TWITCH = 'TWITCH',
 }
-
-export const PlayerComponentMap = {
-  [SupportedPlayers.YT] : YoutubeComponent,
-  [SupportedPlayers.HTML5] : Html5Component,
-};
 
 // tslint:disable-next-line: directive-selector
 @Directive({ selector: '[mediaHost]' })
@@ -85,15 +82,24 @@ export class MediaComponent implements OnInit {
   }
 
   private resolveMediaType(url: string) {
-    return isValidYTid(url)
-      ? SupportedPlayers.YT
-      : SupportedPlayers.HTML5;
+    const isTwitch = isTwitchChannelUrl(url);
+    const isYT = isValidYTid(url);
+    if (isTwitch) {
+      return SupportedPlayers.TWITCH;
+    } else if (isYT) {
+      return SupportedPlayers.YT;
+    } else {
+      return SupportedPlayers.HTML5;
+    }
   }
 
   private createPlayerOfType(type: string) {
     switch (type) {
       case SupportedPlayers.YT:
         this.assemblePlayer(YoutubeComponent);
+        break;
+      case SupportedPlayers.TWITCH:
+        this.assemblePlayer(TwitchComponent);
         break;
       default:
         this.assemblePlayer(Html5Component);
