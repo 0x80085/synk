@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --prod",
+    "build": "ng build --prod --aot --optimization",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
@@ -23,6 +23,8 @@
     "@angular/platform-browser-dynamic": "~9.1.7",
     "@angular/router": "~9.1.7",
     "ng-zorro-antd": "^9.1.2",
+    "ngx-plyr": "^4.0.0",
+    "plyr": "^3.6.2",
     "rxjs": "~6.5.5",
     "socket.io-client": "^2.3.0",
     "tslib": "^2.0.0",
