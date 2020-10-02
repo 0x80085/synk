@@ -73,9 +73,10 @@ export class TwitchComponent implements BaseMediaComponent {
       channel,
       autoplay: true,
       muted: false,
-      height: 500,
-      width: 1020
+      height: '100%',
+      width: '100%'
     });
+
   }
 
   private extractChannelNameFromUrl(url: string) {
