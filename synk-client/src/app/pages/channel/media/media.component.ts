@@ -4,7 +4,6 @@ import {
   ComponentRef,
   Directive,
   EventEmitter,
-  OnInit,
   ViewChild,
   ViewContainerRef,
   Output,
@@ -16,6 +15,7 @@ import { YoutubeComponent, isValidYTid } from './youtube/youtube.component';
 import { Subscription } from 'rxjs';
 import { Html5Component } from './html5/html5.component';
 import { isTwitchChannelUrl, TwitchComponent } from './twitch/twitch.component';
+import { PlyrComponent } from './plyr/plyr.component';
 
 export enum SupportedPlayers {
   YT = 'YT',
@@ -34,7 +34,7 @@ export class MediaHostDirective {
   templateUrl: './media.component.html',
   styleUrls: ['./media.component.scss']
 })
-export class MediaComponent implements OnInit {
+export class MediaComponent {
   @Output() mediaEndedEvent: EventEmitter<any> = new EventEmitter();
 
   @ViewChild(MediaHostDirective, { static: true }) host: MediaHostDirective;
@@ -44,10 +44,6 @@ export class MediaComponent implements OnInit {
   videoEndedSubscription: Subscription;
 
   constructor(private componentFactoryResolver: ComponentFactoryResolver) { }
-
-  ngOnInit() {
-    // this.setupMediaPlayer();
-  }
 
   play(url: string): void {
     this.setupMediaPlayer(url);
@@ -102,7 +98,8 @@ export class MediaComponent implements OnInit {
         this.assemblePlayer(TwitchComponent);
         break;
       default:
-        this.assemblePlayer(Html5Component);
+        this.assemblePlayer(PlyrComponent);
+        // this.assemblePlayer(Html5Component);
         break;
     }
   }
