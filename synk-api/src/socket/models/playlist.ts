@@ -17,6 +17,9 @@ export class Playlist {
     error: (err: any) => void = () => { }
   ) {
     const YTid = YouTubeGetID(media.mediaUrl);
+    const twitchChannelName = new URL(media.mediaUrl).hostname.includes('twitch.tv')
+      && `Twitch channel: ${new URL(media.mediaUrl).pathname.replace('/', '')}`;
+
     const alreadyAdded = this.list.filter(i => i.mediaUrl === media.mediaUrl).length > 0;
 
     if (alreadyAdded) {
@@ -33,9 +36,13 @@ export class Playlist {
       } catch (e) {
         error(e);
       }
+    } else if (twitchChannelName) {
+      const playlistItem: PlaylistItem = { title: twitchChannelName, duration: 0, meta: null, ...media, isPermanent: false };
+      this.list.push(playlistItem);
+      next();
     }
     else {
-      const playlistItem: PlaylistItem = { title: '?', duration: 0, meta: null, ...media, isPermanent: false };
+      const playlistItem: PlaylistItem = { title: 'unkwn', duration: 0, meta: null, ...media, isPermanent: false };
       this.list.push(playlistItem);
       next();
 
