@@ -12,11 +12,5 @@
 
 ## Todo
 
-- Hide and change the credentials
-- Test migration against DB
 - Backup strategy (volume?)
-- Investigate and implement best practice security measures
-- Should prob have 3 users?:
-    - synk-user for API _(read, write for synk db only)_
-    - janitor-user for maintenance _(read, write synk db and metadata db)_
-    - super-user for when sh*t hits the fan _(god mode)_
+- Investigate and implement best practice security measure
