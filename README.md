@@ -10,7 +10,7 @@ Run `npm i` in all folders that contain a package.json
 
 ## Prerequisites
 
-- Node installed
+- NodeJS
 - Postgres DB (see ormconfig for DB user + execute `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";` on the DB server)
 - Angular cli
 - Typescript
@@ -48,6 +48,7 @@ Or use the shortcut in package.json:
 
 [![made-with-Angular](https://img.shields.io/badge/Angular-1f425f.svg)](https://angular.io/)
 [![made-with-Ant-Design](https://img.shields.io/badge/Ant%20Design-1f425f.svg)](https://ng.ant.design/)
+[![made-with-Plyr](https://plyr.io/)
 
 ### Back end
 
@@ -58,23 +59,19 @@ Or use the shortcut in package.json:
 ## Todo
 
 - More docs
-- Moderation
-- Custom emoji support
-- Channel customization support
+- Moderation of channel
+- Custom emoji support , gif, bot
+- Channel customizatioqn support
 - Rate limiting
-- Bans
-- Load Balancing/Testing
 - Refactor Middleware Sockets to make it more readable
 - Playlist control
 
 ## Under construction at time of writing
 
-- disconnect socket/ session expire tests
+- disconnect socket/ session expire tests (find solution to socketio sometmes not notifying client disconnect)
 - user update + config settings
 - user channels management
-- Playlist management
 - fix scroll issue on chatbox
 - admin functions
 - make sessions more stable (testing)
-- Implemet DB model and the handlers for the entities
 - ratelimiting, manage user access, and security
