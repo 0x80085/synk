@@ -25,7 +25,7 @@ Need to know all tables in the synk db?
 Combined with scripts:
 `SELECT CONCAT('DROP TABLE ', table_name, ' ;')  FROM information_schema.tables WHERE table_schema='public';`
 
-## Minification/Compilation/Packaging
+## TS Compilation
 
 See the prod.Dockerfile for the commands to compile the source
 
