@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn, JoinTable } from 'typeorm';
 import { User } from './User';
 import { Video } from './Video';
 
@@ -18,6 +18,7 @@ export class Playlist {
   createdBy: User;
 
   @ManyToMany(type => Video, video => video.playlist)
+  @JoinTable()
   videos: Video[];
 
   static create(name: string) {

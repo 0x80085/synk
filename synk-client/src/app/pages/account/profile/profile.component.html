@@ -1,6 +1,9 @@
+<h1 nz-typography>Your stuff</h1>
+<nz-divider></nz-divider>
 <div nz-row>
   <div nz-col nzSpan="8">
-    <nz-card nzTitle="Profile info" [nzCover]="coverTemplate" [nzLoading]="!(me$ | async)">
+    <h2 nz-typography>Info</h2>
+    <nz-card [nzCover]="coverTemplate" [nzLoading]="!(me$ | async)">
       <h5 *ngIf="me$ | async">Username:</h5>
       <pre>{{ me$ | async | username }}</pre>
       <button *ngIf="(me$ | async)" nz-button nzType="primary" (click)="onLogout()">Logout</button>
@@ -11,6 +14,14 @@
   </div>
   <div nz-col nzSpan="16">
     <app-owned-channels></app-owned-channels>
+  </div>
+</div>
+<div nz-row>
+  <div nz-col nzSpan="8">
+    <h2 nz-typography>Create channel</h2>
+    <nz-card [nzLoading]="!(me$ | async)">
+      <app-create-room-form></app-create-room-form>
+    </nz-card>
   </div>
 </div>
 

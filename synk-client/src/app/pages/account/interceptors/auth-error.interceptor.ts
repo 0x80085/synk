@@ -9,23 +9,23 @@ import { SocketService } from '../../../socket.service';
 export class RequestLogInterceptor implements HttpInterceptor {
 
   constructor(private stateService: AppStateService,
-    private socketService: SocketService
+    private socketService: SocketService,
   ) { }
 
   intercept(
     request: HttpRequest<any>, next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    console.log(request.url);
-
-
     return next.handle(request).pipe(
       catchError((error: any) =>
         of(error).pipe(
           tap(err => {
+            console.warn("HTTP ERROR occurred");
+            console.warn(err);
             if (err.status === 403) {
               this.stateService.isLoggedInSubject.next(false);
               this.socketService.socket.close();
             }
+            throw err;
           })
         ))
     );

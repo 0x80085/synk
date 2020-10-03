@@ -42,7 +42,8 @@
             ],
             "styles": [
               "src/theme.less",
-              "src/styles.scss"
+              "src/styles.scss",
+              "node_modules/plyr/dist/plyr.css"
             ],
             "scripts": []
           },

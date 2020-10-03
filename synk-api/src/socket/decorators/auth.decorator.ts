@@ -8,7 +8,7 @@ export function disconnectIfNotLoggedIn(socket: SocketPassport) {
   ) {
     console.log('disconnectIfNotLoggedIn', socket.request.user);
     console.log('disconnectIfNotLoggedIn', socket.request.isAuthenticated());
-    socket.disconnect();
+    socket.disconnect(true);
     throw new Error('authentication error');
   }
 }

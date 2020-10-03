@@ -1,62 +1,102 @@
-import { Component, OnInit, EventEmitter, ViewChild, ElementRef, Output, AfterViewInit } from '@angular/core';
-import { BehaviorSubject, fromEvent, Observable, merge } from 'rxjs';
-
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  OnDestroy,
+  ViewChild
+} from "@angular/core";
 import { BaseMediaComponent } from '../base-media.component';
-import { mapTo, tap } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-html5-video',
-  templateUrl: './html5.component.html',
-  styleUrls: ['./html5.component.scss']
+  selector: "app-video",
+  templateUrl: "./html5.component.html",
+  styleUrls: ["./html5.component.scss"]
 })
-export class Html5Component implements BaseMediaComponent, AfterViewInit {
-
-  @Output()
-  videoEnded: EventEmitter<unknown>;
-
-  @ViewChild('videoElement')
-  videoElement: ElementRef<HTMLVideoElement>;
-
-  videoSubject = new BehaviorSubject('https://cdn.lbryplayer.xyz/api/v2/streams/free/lofi-remixes-vol-1-lofi-hiphop-mix/554a4bfa78919aa9bd6b80ec50d0e2027cc5bad7');
-
-  player: HTMLVideoElement;
-
-  ended$: Observable<boolean>;
-  error$: Observable<boolean>;
+export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDestroy {
 
   constructor() { }
+  @ViewChild("video", { static: false }) private video: ElementRef;
 
-  isPlaying = () => !this.player.paused;
+  src: string;
 
-  play = (url?: string) => {
-    this.player.src = url;
-    this.player.play();
+  playing = false;
+
+  videoLoaded = false;
+
+  videoEnded: EventEmitter<unknown> = new EventEmitter();
+
+  setCurrentUrl(url: string): void {
+    this.setVideoSrc(url);
   }
 
-  pause = () => this.player.pause();
+  isPlaying(): boolean {
+    return this.videoLoaded;
+  }
+  play(url?: string): void {
+    this.setVideoSrc(url);
 
-  seek = (to: number) => this.player.currentTime = to;
-
-  getCurrentTime = () => this.player.currentTime;
-
-  getCurrentUrl = () => this.player.src;
-
-
-  ngAfterViewInit() {
-
-    this.player = this.videoElement.nativeElement;
-
-    this.ended$ = merge(
-      fromEvent(this.videoElement.nativeElement, 'ended'),
-      fromEvent(this.videoElement.nativeElement, 'error')
-    ).pipe(mapTo(true));
-
-    this.error$ = fromEvent(this.videoElement.nativeElement, 'error')
-      .pipe(
-        tap(e => console.log(e)),
-        mapTo(true)
-      );
+    if (this.videoLoaded) {
+      const player = this.video.nativeElement as HTMLVideoElement;
+      player.play();
+    }
+  }
+  pause(): void {
+    const player = this.video.nativeElement as HTMLVideoElement;
+    player.pause();
+  }
+  seek(to: number): void {
+    const player = this.video.nativeElement as HTMLVideoElement;
+    player.currentTime = to;
+    // Doesnt work
+  }
+  getCurrentTime(): number {
+    const player = this.video.nativeElement as HTMLVideoElement;
+    return player.currentTime;
+  }
+  getCurrentUrl(): string {
+    return this.src;
   }
 
+  ngAfterViewInit(): void {
+    this.video.nativeElement.onended = () => {
+      this.videoEnded.next();
+    };
+    this.video.nativeElement.onerror = (event: any) => {
+      console.log(event);
+      this.videoEnded.next();
+    };
+    this.video.nativeElement.onloadeddata = () => {
+      this.videoLoaded = true;
+      const player = this.video.nativeElement as HTMLVideoElement;
+      player.play();
+    };
+    this.setVideoSrc(this.src);
+  }
 
+  ngOnDestroy(): void {
+    this.video.nativeElement.onloadeddata = null;
+  }
+
+  load(): void {
+    if (this.video && this.video.nativeElement) {
+      this.video.nativeElement.load();
+    }
+  }
+
+  getVideoTag(): HTMLVideoElement | null {
+    return this.video && this.video.nativeElement ? (this.video.nativeElement as HTMLVideoElement) : null;
+  }
+
+  private setVideoSrc(src: string): void {
+    this.src = src;
+
+    if (!this.video || !this.video.nativeElement) {
+      console.log('setVideoSrc cant find player');
+
+      return;
+    }
+
+    this.video.nativeElement.src = src;
+  }
 }

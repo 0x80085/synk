@@ -1,9 +1,7 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, merge, of } from 'rxjs';
-import { catchError, map, share, shareReplay, startWith } from 'rxjs/operators';
+import { catchError, map, shareReplay } from 'rxjs/operators';
 
-import { environment } from '../environments/environment';
 import { User } from './pages/account/auth.service';
 import { SocketService } from './socket.service';
 
@@ -13,27 +11,27 @@ import { SocketService } from './socket.service';
 export class AppStateService {
 
   isLoggedInSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  userSubject: BehaviorSubject<User> = new BehaviorSubject({ id: 'missingno', userName: '-----' });
+  isLogged$ = this.isLoggedInSubject.pipe(shareReplay(1));
 
-  me$ = this.http.get<User>(`${environment.api}/account`,
-    {
-      withCredentials: true
-    }).pipe(
-      startWith({ id: 'missingno', userName: '-----' }),
-      share(),
-      catchError(() => (of(null)))
-    );
+  userSubject: BehaviorSubject<User> = new BehaviorSubject({ id: 'missingno', userName: '-----', isAdmin: false });
+  me$ = this.userSubject.pipe();
+
+
+  isAdmin$ = this.userSubject.pipe(
+    map(user => user.isAdmin),
+    catchError(() => of(false))
+  );
 
   isLoggedIn$ = merge(
     this.me$.pipe(map(me => !!me)),
     this.socketService.isConnected$,
-    this.isLoggedInSubject
-  ).pipe(
-    shareReplay(1),
+    this.isLogged$
   );
 
-  constructor(
-    private http: HttpClient,
-    private socketService: SocketService,
-  ) { }
+  constructor(private socketService: SocketService) { }
 }
+
+const mockAdmin = (user: User) =>
+  user.userName === 'JanitorOne'
+  || user.userName === 'root';
+

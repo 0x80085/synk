@@ -11,7 +11,7 @@ import en from '@angular/common/locales/en';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { WelcomeModule } from './pages/welcome/welcome.module';
+import { HomeModule } from './pages/home/home.module';
 import { ChannelModule } from './pages/channel/channel.module';
 import { AccountModule } from './pages/account/account.module';
 import { AppStateService } from './app-state.service';
@@ -30,7 +30,7 @@ registerLocaleData(en);
     ReactiveFormsModule,
     HttpClientModule,
     BrowserAnimationsModule,
-    WelcomeModule,
+    HomeModule,
     ChannelModule,
     AccountModule
   ],

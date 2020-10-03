@@ -19,6 +19,12 @@ Run `ts-node ./node_modules/typeorm/cli.js migration:generate -n <name of migrat
 
 Run `ts-node ./node_modules/typeorm/cli.js migration:run` to migrate
 
+Need to know all tables in the synk db?
+`SELECT table_name  FROM information_schema.tables WHERE table_schema='public';`
+
+Combined with scripts:
+`SELECT CONCAT('DROP TABLE ', table_name, ' ;')  FROM information_schema.tables WHERE table_schema='public';`
+
 ## Minification/Compilation/Packaging
 
 See the prod.Dockerfile for the commands to compile the source

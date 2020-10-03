@@ -1,5 +1,5 @@
 <nz-list [nzDataSource]="data$ | async" [nzRenderItem]="item"
-  [nzGrid]="{ gutter: 16, xs: 24, sm: 12, md: 6}" [nzNoResult]="noResults">
+  [nzGrid]="{ gutter: 16, xs: 24, sm: 12, md: 6}" [nzLoading]="!(data$ | async)" [nzNoResult]="noResults">
   <ng-template #item let-item>
     <nz-list-item [ngClass]="'item'" routerLink="/channel/{{ item.roomName }}" [nzContent]="nzContent">
       <ng-template #nzContent>
@@ -8,14 +8,6 @@
     </nz-list-item>
   </ng-template>
 </nz-list>
-
-<div *ngIf="isLoggedIn$ | async" nz-row>
-  <div nz-col nzSpan="8">
-    <nz-card nzTitle="New channel">
-      <app-create-room-form></app-create-room-form>
-    </nz-card>
-  </div>
-</div>
 
 <ng-template #noResults>
   <nz-empty></nz-empty>

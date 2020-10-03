@@ -10,6 +10,7 @@ import { User } from '../domain/entity/User';
 
 import { Strategy as LocalStrategy, IVerifyOptions } from 'passport-local';
 import { Logger } from '../tools/logger';
+import { PassportUserData } from '../api/controllers/user';
 
 export type SessionOptions = session.SessionOptions & { cookieParser: any };
 
@@ -42,12 +43,12 @@ export default async function setupAuthMiddleware(
           if (!user) {
             return done(null, false, { message: 'Could not find that user' });
           } else {
-            const passwordIsCorrect = await bcrypt.compare(
+            const isCorrectPassword = await bcrypt.compare(
               password,
               user.passwordHash
             );
 
-            if (passwordIsCorrect) {
+            if (isCorrectPassword) {
               setTimeout(() =>
                 done(null, user),
                 Math.floor(Math.random() * 20));
@@ -68,10 +69,9 @@ export default async function setupAuthMiddleware(
 
   passport.serializeUser((user: User, done: PassportDoneFn) => {
     try {
-      done(null, { id: user.id, username: user.username });
+      done(null, { id: user.id, username: user.username, isAdmin: user.isAdmin } as PassportUserData);
     } catch (error) {
       logger.info(`serializeUser error: ${error}`);
-
       done({ message: 'Something went wrong' }, null);
     }
   });
@@ -81,7 +81,7 @@ export default async function setupAuthMiddleware(
       try {
         const user = await userRepo.findOne({ where: { id } });
         if (user) {
-          done(null, { id: user.id, username: user.username });
+          done(null, { id: user.id, username: user.username, isAdmin: user.isAdmin } as PassportUserData);
         } else {
           done({ message: 'Not found' }, null);
         }

@@ -1,14 +1,15 @@
-import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NzNotificationService } from 'ng-zorro-antd';
 import { BehaviorSubject, merge, Observable, Subscription, timer } from 'rxjs';
-import { mapTo, startWith, tap } from 'rxjs/operators';
+import { mapTo, startWith, tap, shareReplay, take, filter } from 'rxjs/operators';
 
 import { SocketService } from '../../socket.service';
 import { ChatService } from './chat.service';
 import { MediaService } from './media.service';
 import { MediaComponent } from './media/media.component';
 import { MediaEvent, RoomUserDto } from './models/room.models';
+import { AppStateService } from '../../app-state.service';
 
 @Component({
   selector: 'app-channel',
@@ -19,20 +20,23 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   @ViewChild('player', { static: false }) player: MediaComponent;
 
+  playlist: string[] = [];
+
   name: string;
-  mediaUrl = '';
+  nowPlayingUrl: string;
   loggedInUserIsLeader = false;
 
   activeItemSubject: BehaviorSubject<string> = new BehaviorSubject(null);
+  activeItem$ = this.activeItemSubject.pipe(shareReplay(1));
 
-  isConnected$ = this.socketService.isConnected$;
+  isConnected$ = merge(this.socketService.isConnected$, this.state.isLoggedIn$);
 
-  isLoading$ = this.isConnected$
+  isLoading$ = merge(
+    this.socketService.reconnectionError$.pipe(mapTo(true)),
+    this.isConnected$.pipe(mapTo(false)),
+  )
     .pipe(
-      mapTo(false)
-    )
-    .pipe(
-      startWith(true)
+      startWith(false)
     );
 
   members$: Observable<RoomUserDto[]> = this.chatService.roomUserList$.pipe(
@@ -78,11 +82,11 @@ export class ChannelComponent implements OnInit, OnDestroy {
       this.mediaSyncEventSubscription.unsubscribe();
     })).subscribe();
 
-  playlist: string[] = [];
 
   constructor(
     private route: ActivatedRoute,
     private socketService: SocketService,
+    private state: AppStateService,
     private chatService: ChatService,
     private mediaService: MediaService,
     private notification: NzNotificationService
@@ -98,12 +102,18 @@ export class ChannelComponent implements OnInit, OnDestroy {
   }
 
   onVideoEnded() {
-    const i = this.playlist.findIndex(it => it === this.mediaUrl);
-    const next = this.playlist[i + 1] || this.playlist[0];
-    this.mediaUrl = next;
-    this.activeItemSubject.next(this.mediaUrl);
+    this.activeItem$.pipe(
+      filter(it => it !== null),
+      take(1)
+    ).subscribe(it => {
+      const i = this.playlist.findIndex(url => it === url);
+      const next = this.playlist[i + 1] || this.playlist[0];
 
-    this.player.play(this.mediaUrl);
+      this.nowPlayingUrl = next;
+      this.activeItemSubject.next(this.nowPlayingUrl);
+
+      this.player.play(this.nowPlayingUrl);
+    });
   }
 
 
@@ -118,44 +128,47 @@ export class ChannelComponent implements OnInit, OnDestroy {
         // Dont update when leader paused video.
         return;
       }
+      this.nowPlayingUrl = this.player.getCurrentUrl();
+      this.activeItemSubject.next( this.nowPlayingUrl);
       this.mediaService.sendMediaEvent({
-        mediaUrl: this.player.getCurrentUrl(),
+        mediaUrl:  this.nowPlayingUrl,
         currentTime: this.player.getCurrentTime(),
         roomName: this.name
       });
     } catch (error) {
+      console.log(error);
       console.log('Player may not be loaded yet', error);
     }
   }
 
   private syncPlayer(ev: MediaEvent) {
-    if (!this.shouldSyncPlayer(ev)) {
-      return;
-    }
-
-    try {
+    if (this.shouldSyncPlayer(ev)) {
       console.log('syncing...');
-      if (this.player.getCurrentUrl() !== ev.mediaUrl) {
-        this.mediaUrl = ev.mediaUrl;
-        this.player.play(this.mediaUrl);
-        this.activeItemSubject.next(this.mediaUrl);
+      if (!this.player.isPlaying()) {
+        this.player.play(ev.mediaUrl);
       }
-      if (this.isCurrentTimeOutOfSync(ev.currentTime)) {
-        if (!this.player.isPlaying()) {
-          this.player.play(ev.mediaUrl);
-          return;
+      if (this.nowPlayingUrl !== ev.mediaUrl) {
+        this.nowPlayingUrl = ev.mediaUrl;
+        this.activeItemSubject.next(this.nowPlayingUrl);
+      }
+      try {
+        if (this.isCurrentTimeOutOfSync(ev.currentTime)) {
+          if (!this.player.isPlaying()) {
+            this.player.play(ev.mediaUrl);
+            return;
+          }
+          this.player.seek(ev.currentTime);
         }
-        this.player.seek(ev.currentTime);
+      } catch (error) {
+        console.log('Error while syncing player - probably not ready yet');
+        console.log(error);
       }
-    } catch (error) {
-      console.log('Error while syncing player - probably not ready yet');
-      console.log(error);
     }
   }
 
   private shouldSyncPlayer(ev: MediaEvent) {
     return (
-      this.mediaUrl !== ev.mediaUrl ||
+      this.nowPlayingUrl !== ev.mediaUrl ||
       this.isCurrentTimeOutOfSync(ev.currentTime)
     );
   }
@@ -171,19 +184,19 @@ export class ChannelComponent implements OnInit, OnDestroy {
       const isOutOfSync =
         clientTime < maxTimeBehind || clientTime > maxTimeAhead;
 
-      console.log(
-        `
-        Client time:\t${clientTime}
-        Client URL:\t${this.mediaUrl}
-        maxTimeBehind :\t${maxTimeBehind}
-        maxTimeAhead :\t${maxTimeAhead}
-        Leader time:\t${originTime}
+      // console.log(
+      //   `
+      //   Client time:\t${clientTime}
+      //   Client URL:\t${this.nowPlayingUrl}
+      //   maxTimeBehind :\t${maxTimeBehind}
+      //   maxTimeAhead :\t${maxTimeAhead}
+      //   Leader time:\t${originTime}
 
-        client out of sync:\t${isOutOfSync}
-        client behind :\t${clientTime < maxTimeBehind}
-        maxTimeAhead :\t${clientTime > maxTimeAhead}
-        `
-      );
+      //   client out of sync:\t${isOutOfSync}
+      //   client behind :\t${clientTime < maxTimeBehind}
+      //   maxTimeAhead :\t${clientTime > maxTimeAhead}
+      //   `
+      // );
 
       return isOutOfSync;
     } catch (error) {

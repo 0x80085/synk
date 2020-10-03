@@ -3,7 +3,7 @@ import { getConnection } from 'typeorm';
 import { Channel } from '../../../domain/entity/Channel';
 import { User } from '../../../domain/entity/User';
 
-export async function deleteChannel(username: string, channelName: string) {
+export async function deleteChannelOfUser(username: string, channelName: string) {
   const connection = getConnection();
 
   const user = await connection.manager.findOneOrFail(User, {

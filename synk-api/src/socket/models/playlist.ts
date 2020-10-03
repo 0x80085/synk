@@ -16,23 +16,36 @@ export class Playlist {
     next: () => void = () => { },
     error: (err: any) => void = () => { }
   ) {
-    const id = YouTubeGetID(media.mediaUrl);
-    if (!id || id === '') {
-      return;
-    }
+    const YTid = YouTubeGetID(media.mediaUrl);
+    const twitchChannelName = new URL(media.mediaUrl).hostname.includes('twitch.tv')
+      && `Twitch channel: ${new URL(media.mediaUrl).pathname.replace('/', '')}`;
+
     const alreadyAdded = this.list.filter(i => i.mediaUrl === media.mediaUrl).length > 0;
+
     if (alreadyAdded) {
       error('duplicate id');
     }
-    try {
-      const ytMetadata = await lookup(id);
-      const playlistItem: PlaylistItem = { ...ytMetadata, ...media, isPermanent: false };
-      console.log(playlistItem);
+    if (YTid) {
+      try {
+        const ytMetadata = await lookup(YTid);
+        const playlistItem: PlaylistItem = { ...ytMetadata, ...media, isPermanent: false };
+        console.log(playlistItem);
 
+        this.list.push(playlistItem);
+        next();
+      } catch (e) {
+        error(e);
+      }
+    } else if (twitchChannelName) {
+      const playlistItem: PlaylistItem = { title: twitchChannelName, duration: 0, meta: null, ...media, isPermanent: false };
       this.list.push(playlistItem);
       next();
-    } catch (e) {
-      error(e);
+    }
+    else {
+      const playlistItem: PlaylistItem = { title: 'unkwn', duration: 0, meta: null, ...media, isPermanent: false };
+      this.list.push(playlistItem);
+      next();
+
     }
   }
 

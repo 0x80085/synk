@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, fromEvent, merge, throwError } from 'rxjs';
+import { Observable, of, fromEvent, merge } from 'rxjs';
 import * as io from 'socket.io-client';
 
 import { environment } from '../environments/environment';
 import { switchMap, map, tap, share, withLatestFrom, catchError, mapTo, shareReplay } from 'rxjs/operators';
 import { NzNotificationService } from 'ng-zorro-antd';
 import { PossibleCommands } from './pages/channel/models/commands.enum';
+import { doLog } from './utils/custom.operators';
 
 export interface RealTimeCommand {
   command: PossibleCommands;
@@ -24,30 +25,35 @@ export class SocketService {
   );
 
   connectionSuccess$ = this.listenForEvent('connect').pipe(mapTo({ event: 'connect', connected: true }));
-  reconnectionAttempt$ = this.listenForEvent('reconnect_attempt').pipe(mapTo({ event: 'reconnect_attempt', connected: false }));
+
   reconnectionSuccess$ = this.listenForEvent('reconnect').pipe(mapTo({ event: 'reconnect', connected: true }));
-  permissionError$ = this.listenForEvent('authentication error').pipe(mapTo({ event: 'authentication error', connected: false }));
+  reconnectionAttempt$ = this.listenForEvent('reconnect_attempt').pipe(mapTo({ event: 'reconnect_attempt', connected: false }));
+  reconnectionError$ = this.listenForEvent('reconnect_error').pipe(mapTo({ event: 'reconnect_error', connected: false }));
+  reconnectionFail$ = this.listenForEvent('reconnect_failed').pipe(mapTo({ event: 'reconnect_failed', connected: false }));
+
   connectionError$ = this.listenForEvent('error').pipe(mapTo({ event: 'error', connected: false }));
-  connectionFail$ = this.listenForEvent('reconnect_failed').pipe(mapTo({ event: 'reconnect_failed', connected: false }));
   connectionTimeOut$ = this.listenForEvent('connect_timeout').pipe(mapTo({ event: 'connect_timeout', connected: false }));
+
+  permissionError$ = this.listenForEvent('authentication error').pipe(mapTo({ event: 'authentication error', connected: false }));
   disconnection$ = this.listenForEvent('disconnect').pipe(mapTo({ event: 'disconnect', connected: false }));
 
   connectionState$ = merge(
     this.connectionSuccess$,
     this.reconnectionSuccess$,
     this.reconnectionAttempt$,
+    this.reconnectionError$,
     this.permissionError$,
     this.connectionError$,
     this.disconnection$,
-    this.connectionFail$,
+    this.reconnectionFail$,
     this.connectionTimeOut$,
   ).pipe(
-    share()
+    doLog('connectionState$', true),
   );
 
   isConnected$ = this.connectionState$.pipe(
     map(({ connected }) => connected),
-    shareReplay(1)
+    shareReplay()
   );
 
   constructor(private notification: NzNotificationService) { }
@@ -56,7 +62,7 @@ export class SocketService {
     return (src: Observable<RealTimeCommand>) =>
       src.pipe(
         withLatestFrom(this.socket$),
-        tap(([{ command, payload }, { }]) => console.log('emitCOmmannd', command, payload)),
+        tap(([{ command, payload }]) => console.log('emitCommannd', command, payload)),
         tap(([{ command, payload }, socket]) => socket.emit(command, payload)),
         map(([rtc, _]) => rtc),
         this.catchSocketErr(),

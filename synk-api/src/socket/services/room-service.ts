@@ -6,6 +6,8 @@ import { SocketPassport } from '../models/socket.passport';
 import { ItemContent } from '../models/playlist-item';
 import { Logger } from '../../tools/logger';
 import { RoomMember } from '../models/user';
+import { Channel } from '../../domain/entity/Channel';
+import { getConnection } from 'typeorm';
 
 
 export enum Commands {
@@ -42,6 +44,10 @@ export class RoomService {
     this.publicRooms
       .map(({ members }) => [...members])
       .reduce((acc, val) => [...acc, ...val], [])
+
+  allConnectedMembers() {
+    return this.allMembers.map(({ id, socket: { id: socketId }, userName, }) => ({ id, socketId, userName }));
+  }
 
   constructor(sio: socketio.Server, logger: Logger) {
     this.io = sio;
@@ -92,7 +98,7 @@ export class RoomService {
 
     socket.on(Commands.ADD_MEDIA, (data: MediaEvent) => {
       try {
-        this.onAddMedia(data);
+        this.onAddMedia(data, socket);
       } catch (error) {
         this.logger.info('onAddMedia failed');
         this.logger.info('broken data:');
@@ -143,7 +149,7 @@ export class RoomService {
       }
     });
 
-    socket.on(Commands.DISCONNECT, this.disconnect);
+    socket.once(Commands.DISCONNECT, this.disconnect);
   }
 
   addMemberSocket = (socket: SocketPassport) => {
@@ -200,33 +206,38 @@ export class RoomService {
     this.addRoomToDirectory(newRoom);
   }
 
-  deleteRoom(name: string, creator: string) {
+  deleteRoom(name: string, creator: string, isAdmin = false) {
     const room = this.getRoomByName(name);
     if (!room) {
       return;
     }
-    if (room.creator !== creator) {
+    if (room.creator !== creator || !isAdmin) {
       return;
     }
     this.removeRoomfromDirectory(room);
-  }
-
-  addMediaToPlaylist(data: MediaEvent) {
-    this.onAddMedia(data);
   }
 
   private joinRoom(socket: socketio.Socket, roomName: string) {
     const room = this.getRoomByName(roomName);
 
     if (!room) {
-      // Todo - instead f creatun, check DB and throw if not in DB
-      const newRoom = new Room(roomName, this.io, this.logger, socket);
-      this.addRoomToDirectory(newRoom);
-      newRoom.join(socket);
-      return;
+      const connection = getConnection();
+      connection.manager.findOneOrFail(Channel, {
+        relations: ['owner'],
+        where: {
+          name: roomName
+        }
+      }).then((channel) => {
+        const newRoom = new Room(roomName, this.io, this.logger, socket);
+        newRoom.creator = channel.owner.username;
+        this.addRoomToDirectory(newRoom);
+        newRoom.join(socket);
+        this.logger.info(`Added [${roomName}] to room directory `);
+      });
+    } else {
+      room.join(socket);
     }
 
-    room.join(socket);
   }
 
   private onMediaEvent = (data: MediaEvent, socket: SocketPassport) => {
@@ -253,14 +264,12 @@ export class RoomService {
     }
   }
 
-  private onAddMedia = (data: MediaEvent) => {
+  private onAddMedia = (data: MediaEvent, socket: SocketPassport) => {
     const room = this.getRoomByName(data.roomName);
     if (!room) {
       return Error('Room non-existant');
     }
-    room.currentPlayList.add({ ...data },
-      () => room.broadcastPlaylistToAll()
-    );
+    room.addMedia(socket, data, () => room.broadcastPlaylistToAll());
   }
 
   private onRemoveMedia = (data: MediaEvent) => {

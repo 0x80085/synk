@@ -1,0 +1,15 @@
+.stage {
+  min-height: calc(100vh - 250px);
+  height: calc(100vh - 150px);
+  border-radius: 4px;
+  width: 100% !important;
+  height: auto !important;
+  position: relative;
+
+  video {
+    width: 100%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}

@@ -9,16 +9,31 @@ import { PlaceholdPipe } from './profile/placehold.pipe';
 import { UsernamePipe } from './profile/username.pipe';
 import { OwnedChannelsComponent } from './profile/owned-channels/owned-channels.component';
 import { RouterModule } from '@angular/router';
+import { AdminComponent } from './admin/admin.component';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { RequestLogInterceptor } from './interceptors/auth-error.interceptor';
+import { CreateRoomFormComponent } from './create-room-form/create-room-form.component';
 
 
 @NgModule({
-  declarations: [LoginComponent, ProfileComponent, RegisterComponent, PlaceholdPipe, UsernamePipe, OwnedChannelsComponent],
+  declarations: [
+    CreateRoomFormComponent,
+    LoginComponent,
+    ProfileComponent,
+    RegisterComponent,
+    PlaceholdPipe,
+    UsernamePipe,
+    OwnedChannelsComponent,
+    AdminComponent],
   imports: [
     RouterModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     NgZorroAntdModule
+  ],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: RequestLogInterceptor, multi: true },
   ]
 })
 export class AccountModule { }

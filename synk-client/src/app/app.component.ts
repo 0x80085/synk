@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 import { AppStateService } from './app-state.service';
-import { tap, map } from 'rxjs/operators';
+import { tap, map, withLatestFrom } from 'rxjs/operators';
 import { SocketService } from './socket.service';
 import { Observable } from 'rxjs';
+import { AuthService } from './pages/account/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -13,19 +14,17 @@ export class AppComponent {
 
   isCollapsed = true;
 
-  connectionState: Observable<{
-    event: string;
-    connected: boolean;
-  }> = this.socketService.connectionState$;
-
   isLoggedIn = this.state.isLoggedIn$;
-  isConnected = this.connectionState.pipe(map(state => state.connected));
+  isConnected = this.socketService.isConnected$;
 
-
-
-  user = this.state.me$;
+  isAdmin$ = this.isLoggedIn.pipe(
+    withLatestFrom(this.state.isAdmin$),
+    map(([isAdmin, isLoggedIn]) => isAdmin && isLoggedIn)
+  );
+  user$ = this.auth.getUser();
 
   constructor(
+    private auth: AuthService,
     private state: AppStateService,
     private socketService: SocketService
   ) { }
