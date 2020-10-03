@@ -48,7 +48,7 @@ Or use the shortcut in package.json:
 
 [![made-with-Angular](https://img.shields.io/badge/Angular-1f425f.svg)](https://angular.io/)
 [![made-with-Ant-Design](https://img.shields.io/badge/Ant%20Design-1f425f.svg)](https://ng.ant.design/)
-[![made-with-Plyr](https://img.shields.io/badge/Plyr-1f425f.svg)(https://plyr.io/)
+[![made-with-Plyr](https://img.shields.io/badge/Plyr-1f425f.svg)](https://plyr.io/)
 
 ### Back end
 
