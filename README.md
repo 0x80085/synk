@@ -2,7 +2,11 @@
 
 > Watch youtube vids in sync and chat with friends
 
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/0x80085/synk/graphs/commit-activity) [![Website synkd.cf](https://img.shields.io/website-up-down-green-red/http/synkd.cf.svg)](https://synkd.cf/) [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://tldrlegal.com/license/mit-license) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com) [![GitHub contributors](https://img.shields.io/github/contributors/0x80085/synk)](https://github.com/0x80085/synk/graphs/contributors/) [![Dockerized](https://img.shields.io/static/v1?label=&message=Dockerized&logo=docker&color=0db7ed)](https://www.docker.com/) [![Open Source Love svg2](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://www.gnu.org/philosophy/floss-and-foss.en.html)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/0x80085/synk/graphs/commit-activity) [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://tldrlegal.com/license/mit-license) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com) [![GitHub contributors](https://img.shields.io/github/contributors/0x80085/synk)](https://github.com/0x80085/synk/graphs/contributors/) [![Dockerized](https://img.shields.io/static/v1?label=&message=Dockerized&logo=docker&color=0db7ed)](https://www.docker.com/) [![Open Source Love svg2](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://www.gnu.org/philosophy/floss-and-foss.en.html)
+
+## Live Demo
+
+[![Website synkd.cf](https://img.shields.io/website-up-down-green-red/http/synkd.cf.svg)](https://synkd.cf/)
 
 ## Install
 
@@ -61,7 +65,7 @@ Or use the shortcut in package.json:
 - More docs
 - Moderation of channel
 - Custom emoji support , gif, bot
-- Channel customizatioqn support
+- Channel customization support
 - Rate limiting
 - Refactor Middleware Sockets to make it more readable
 - Playlist control
