@@ -27,24 +27,3 @@ export class PlaylistItem extends ItemContent {
   }
 }
 
-// export const mockList: PlaylistItem[] = [
-//   {
-//     addedByUsername: 'lain',
-//     currentTime: null,
-//     isPermanent: false,
-//     mediaUrl: 'https://www.youtube.com/watch?v=p2LMwxo0MVk'
-//   },
-
-//   {
-//     addedByUsername: 'lain',
-//     currentTime: null,
-//     isPermanent: false,
-//     mediaUrl: 'https://www.youtube.com/watch?v=_1rF38MjpHE'
-//   },
-//   {
-//     addedByUsername: 'lain',
-//     currentTime: null,
-//     isPermanent: false,
-//     mediaUrl: 'https://www.youtube.com/watch?v=qUDEyONQaCA'
-//   }
-// ];
