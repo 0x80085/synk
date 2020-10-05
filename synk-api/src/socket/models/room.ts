@@ -42,6 +42,8 @@ export class Room {
     const defaultPlaylist = new Playlist('default');
     this.currentPlayList = defaultPlaylist;
     this.playlists.push(defaultPlaylist);
+
+    this.logger.info(`${this.creator} added room ${this.name}`)
   }
 
   @RequiresAuthentication()
@@ -52,7 +54,7 @@ export class Room {
         this.sendPlaylistToMember(socket);
         this.broadcastMemberListToAll();
       },
-      (e) => socket.emit(e)
+      (error) => socket.emit(error)
     );
 
   }
@@ -214,6 +216,7 @@ export class Room {
 
     const alreadyAdded = this.isUserIsMember(uname);
     if (alreadyAdded) {
+      this.logger.error(`${uname} joined room ${this.name}`);
       error('already joined');
       socket.disconnect();
       return;
@@ -228,6 +231,7 @@ export class Room {
     socket.join(this.name);
     this.members.push(newMember);
 
+    this.logger.info(`${newMember.userName} joined room ${this.name}`);
     this.sendMsgToMembers('info', `${newMember.userName} joined`);
     next();
   }

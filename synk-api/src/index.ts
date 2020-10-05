@@ -1,3 +1,4 @@
+import { logServerSettings } from './logServerSettings';
 import configure from './startup';
 import { Logger } from './tools/logger';
 
@@ -14,9 +15,8 @@ async function RUN() {
 
   logger.info('Launching server...');
 
-  server.listen(3000, () => {
-    logger.info(`🚀 \t SERVER LAUNCHED \t 🚀`);
-    logger.info(`🛰 \t Started on port ${process.env.HOST_PORT} \t 🛰`);
+  server.listen(process.env.HOST_PORT, () => {
+    logServerSettings(logger);
   });
 }
 

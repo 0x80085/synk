@@ -84,7 +84,8 @@ export const getLogout = (req: PassportRequest, res: Response, next: NextFunctio
 export const postSignup = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
+  logger: Logger
 ) => {
 
   check(req.body.username, 'username not valid').isLength({ min: 4 });
@@ -130,7 +131,8 @@ export const postSignup = async (
 
       await connection.manager.save(newRecord);
 
-      return res.status(200).json(['ok', 'user added. try logging in']);
+      logger.info(`New user added: ${req.body.username}`);
+      return res.status(200).json(['ok']);
     }
   }
 };

@@ -48,9 +48,11 @@ export const createRoom = (
   try {
     channelHandler.createChannel(req.user.username, req.body.name, req.body.description);
     roomService.createRoom(req.body, req.user.username);
+    logger.info(`${req.user.username} created channel ${req.body.name}`);
 
     res.status(200).json('OK');
   } catch (error) {
+    logger.info(`${req.user.username} cfailed to create room ${req.body.name}`);
     logger.error(error);
 
     res.status(500).json('ERROR - Room not created');
@@ -71,9 +73,11 @@ export const deleteRoom = (
   try {
     channelHandler.deleteChannelOfUser(req.user.username, req.params.name);
     roomService.deleteRoom(req.params.name, req.user.username);
+    logger.info(`${req.user.username} DELETED channel ${req.body.name}`);
 
     res.status(200).json('OK');
   } catch (error) {
+    logger.info(`${req.user.username} FAILED TO DELETE channel ${req.body.name}`);
     logger.error(error);
 
     res.status(500).json('ERROR - Room not deleted');

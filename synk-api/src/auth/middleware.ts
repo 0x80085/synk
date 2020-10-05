@@ -49,6 +49,7 @@ export default async function setupAuthMiddleware(
             );
 
             if (isCorrectPassword) {
+              logger.info(`User ${username} logged in`);
               setTimeout(() =>
                 done(null, user),
                 Math.floor(Math.random() * 20));

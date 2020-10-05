@@ -61,7 +61,8 @@ const ALL_ROUTES = (roomService: RoomService, logger: Logger): RouteOptions[] =>
   },
   {
     route: '/signup',
-    handlers: [userController.postSignup],
+    handlers:  [(req: Request, res: Response, next: express.NextFunction) =>
+      userController.postSignup(req, res, next, logger)],
     requireAuthentication: false,
     verb: 'POST'
   },
