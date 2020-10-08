@@ -1,4 +1,4 @@
-import { Logger } from './tools/logger';
+import { Logger } from './logger';
 
 export function logServerSettings(loggr: Logger) {
   loggr.info(`🚀 \t SERVER LAUNCHED \t 🚀`);
@@ -38,6 +38,7 @@ export function logServerSettings(loggr: Logger) {
   loggr.info('');
   loggr.info('Server Settings:');
   loggr.info('######################');
+  loggr.info(`logger is set to debug mode::${loggr.isDebugMode}`);
 
   envSettings.forEach(setting => {
     loggr.info(`${setting}`);

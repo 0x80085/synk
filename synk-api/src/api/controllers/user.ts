@@ -131,7 +131,7 @@ export const postSignup = async (
 
       await connection.manager.save(newRecord);
 
-      logger.info(`New user added: ${req.body.username}`);
+      logger.info(`New user added: [${req.body.username}]`);
       return res.status(200).json(['ok']);
     }
   }

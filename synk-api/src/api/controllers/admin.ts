@@ -116,7 +116,7 @@ export const deleteChannelByAdmin = async (
     if (channel) {
       await connection.manager.delete(Channel, { id: channel.id });
       roomService.deleteRoom(channel.name, req.user.username, true);
-      logger.info(`ADMIN ${req.user.username} Deleted channel ${channel.name}`);
+      logger.info(`ADMIN [${req.user.username}] Deleted channel [${channel.name}]`);
     }
     res.status(200).json('OK');
   } catch (error) {

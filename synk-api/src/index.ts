@@ -1,27 +1,28 @@
-import { logServerSettings } from './logServerSettings';
+import { logServerSettings } from './tools/logServerSettings';
 import configure from './startup';
 import { Logger } from './tools/logger';
 
-const isProduction = process.env.NODE_ENV === 'production';
-const logger = new Logger('logs', 'trace.log', !isProduction);
+async function RUN(loggr: Logger) {
+  const isProduction = process.env.NODE_ENV === 'production';
 
-async function RUN() {
+  loggr.info(`Configuring API for ${isProduction ? 'PRD' : 'DEV'} environment...`);
 
-  logger.info(`Configuring API for ${isProduction ? 'PRD' : 'DEV'} environment...`);
+  const { server } = await configure(loggr);
 
-  const { server } = await configure(logger);
+  loggr.info('Configuring COMPLETED!');
 
-  logger.info('Configuring COMPLETED!');
-
-  logger.info('Launching server...');
+  loggr.info('Launching server...');
 
   server.listen(process.env.HOST_PORT, () => {
-    logServerSettings(logger);
+    logServerSettings(loggr);
   });
 }
 
+const logger = new Logger('logs', 'trace.log', process.env.NODE_ENV === 'production');
+
 try {
-  RUN()
+
+  RUN(logger)
     .catch(err => {
       logger.error(`\t SERVER CRASHED`);
       logger.error(err);

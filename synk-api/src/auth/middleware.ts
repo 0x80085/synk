@@ -49,7 +49,7 @@ export default async function setupAuthMiddleware(
             );
 
             if (isCorrectPassword) {
-              logger.info(`User ${username} logged in`);
+              logger.info(`User [${username}] logged in`);
               setTimeout(() =>
                 done(null, user),
                 Math.floor(Math.random() * 20));
@@ -61,7 +61,7 @@ export default async function setupAuthMiddleware(
             }
           }
         } catch (error) {
-          logger.info(`use error ${error}`);
+          logger.error(`Login error passport LocalStrategy  ${error}`);
           return done({ message: 'Something went wrong' }, null);
         }
 
@@ -72,7 +72,7 @@ export default async function setupAuthMiddleware(
     try {
       done(null, { id: user.id, username: user.username, isAdmin: user.isAdmin } as PassportUserData);
     } catch (error) {
-      logger.info(`serializeUser error: ${error}`);
+      logger.error(`serializeUser error: ${error}`);
       done({ message: 'Something went wrong' }, null);
     }
   });
@@ -87,7 +87,7 @@ export default async function setupAuthMiddleware(
           done({ message: 'Not found' }, null);
         }
       } catch (error) {
-        logger.info(`deserializeUser error: ${error}`);
+        logger.error(`deserializeUser error: ${error}`);
         done({ message: 'Something went wrong' }, null);
       }
     }
@@ -113,21 +113,21 @@ export function ensureAuthenticated(
 
     if (!isAuthenticated) {
       if (socket) {
-        logger.info(socket.client.request.session);
-
+        logger.error(`Socket not authentciated, ${socket.client.id}. Blocking access`);
         return next(new Error('authentication error'));
       } else {
+        logger.error(`Http request not authentciated, ${req.ip}. Blocking access`);
         return res.sendStatus(403);
       }
     }
-
     next();
-
   } catch (error) {
-
-    logger.info(`ensureAuthenticated error: ${error}`);
+    logger.error(`ensureAuthenticated error: ${error}`);
+    logger.error(`error client info ${socket ? socket.client.id : req.ip}`);
+    if (socket && socket.request.user && socket.request.user.username) {
+      logger.error(`error client info [${socket.request.user.username}] failed to authenticate`);
+    }
     return next(new Error('authentication error'));
-
   }
 
 }

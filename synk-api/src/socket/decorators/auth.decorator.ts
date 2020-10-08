@@ -1,6 +1,7 @@
 import { SocketPassport } from '../models/socket.passport';
 
-export function disconnectIfNotLoggedIn(socket: SocketPassport) {
+
+export function disconnectIfNotAuthenticated(socket: SocketPassport) {
   if (!socket.request.user
     || !socket.request.user.logged_in
     || !socket.client.request.isAuthenticated()
@@ -13,14 +14,15 @@ export function disconnectIfNotLoggedIn(socket: SocketPassport) {
   }
 }
 
-export function RequiresAuthentication() {
+
+export function ThrowIfNotAuthenticated() {
   return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
     const originalMethod = descriptor.value;
 
     descriptor.value = function (...args: [SocketPassport, ...any[]]) {
       try {
         const [socket] = args;
-        disconnectIfNotLoggedIn(socket);
+        disconnectIfNotAuthenticated(socket);
         originalMethod.apply(this, args);
       } catch (error) {
         console.log('user not logged in');

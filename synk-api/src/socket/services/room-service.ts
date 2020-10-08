@@ -164,14 +164,14 @@ export class RoomService {
       userName: socket.request.user.username,
     });
 
-    this.logger.info(`${socket.request.user.username} connected to socket server`);
+    this.logger.info(`[${socket.request.user.username}] connected to socket server`);
   }
 
   removeMemberSocket = (socket: SocketPassport) => {
     const user = socket.request.user;
     this.disconnectUserById(user.id);
     this.allMembers = this.allMembers.filter(s => s.id !== socket.request.user.id);
-    this.logger.info(`${socket.request.user.username} disconnected from socket server`);
+    this.logger.info(`[${socket.request.user.username}] disconnected from socket server`);
   }
 
   disconnectUserById(id: string) {
@@ -228,8 +228,7 @@ export class RoomService {
           name: roomName
         }
       }).then((channel) => {
-        const newRoom = new Room(roomName, this.io, this.logger, socket);
-        newRoom.creator = channel.owner.username;
+        const newRoom = new Room(roomName, this.io, this.logger, socket, channel.owner.username);
         this.addRoomToDirectory(newRoom);
         newRoom.join(socket);
         this.logger.info(`Added [${roomName}] to room directory `);

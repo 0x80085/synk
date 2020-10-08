@@ -9,7 +9,7 @@ import {
 import { Playlist } from './playlist';
 import { Logger } from '../../tools/logger';
 import { getUsername, SocketPassport } from './socket.passport';
-import { RequiresAuthentication } from '../decorators/auth.decorator';
+import { ThrowIfNotAuthenticated } from '../decorators/auth.decorator';
 
 export class Room {
 
@@ -32,21 +32,26 @@ export class Room {
     sIO: socketio.Server,
     logger: Logger,
     originSocket?: socketio.Socket,
+    ownerName?: string,
   ) {
     this.io = sIO;
     this.logger = logger;
     this.name = name;
 
-    this.creator = originSocket ? getUsername(originSocket) : 'Lain';
+    if (ownerName) {
+      this.creator = ownerName;
+    } else {
+      this.creator = originSocket ? getUsername(originSocket) : 'Lain';
+    }
 
     const defaultPlaylist = new Playlist('default');
     this.currentPlayList = defaultPlaylist;
     this.playlists.push(defaultPlaylist);
 
-    this.logger.info(`${this.creator} added room ${this.name}`)
+    this.logger.info(`[${this.creator}] added room [${this.name}]`);
   }
 
-  @RequiresAuthentication()
+  @ThrowIfNotAuthenticated()
   join(socket: socketio.Socket) {
     this.addMemberFromSocket(socket,
       () => {
@@ -59,7 +64,7 @@ export class Room {
 
   }
 
-  @RequiresAuthentication()
+  @ThrowIfNotAuthenticated()
   giveLeader(originSocket: SocketPassport, to: string) {
     const initiator = this.getMemberFromSocket(originSocket);
 
@@ -83,7 +88,7 @@ export class Room {
     this.broadcastMemberListToAll();
   }
 
-  @RequiresAuthentication()
+  @ThrowIfNotAuthenticated()
   addMedia(socket: SocketPassport, data: MediaEvent, afterAdd: () => void) {
     if (this.getMemberFromSocket(socket)) {
       this.currentPlayList.add(data, afterAdd);
@@ -106,7 +111,7 @@ export class Room {
     socket.leave(this.name);
   }
 
-  @RequiresAuthentication()
+  @ThrowIfNotAuthenticated()
   broadcastMessageToAll(socket: socketio.Socket, msg: IncomingGroupMessage) {
     this.sendMsgToMembers(getUsername(socket), msg.content.text);
   }
@@ -115,7 +120,7 @@ export class Room {
     this.io.to(this.name).emit('playlist update', this.currentPlayList.list);
   }
 
-  @RequiresAuthentication()
+  @ThrowIfNotAuthenticated()
   broadcastMediaEventToAll(socket: socketio.Socket, data: MediaEvent) {
     socket.to(this.name).emit('media event', data);
   }
@@ -132,7 +137,7 @@ export class Room {
     this.io.to(this.name).emit('userlist update', members);
   }
 
-  @RequiresAuthentication()
+  @ThrowIfNotAuthenticated()
   playNextMedia(socket: SocketPassport) {
     const initiator = this.getMemberFromSocket(socket);
 
@@ -143,7 +148,7 @@ export class Room {
     this.broadcastPlaylistToAll();
   }
 
-  @RequiresAuthentication()
+  @ThrowIfNotAuthenticated()
   shufflePlaylist(socket: SocketPassport) {
     const initiator = this.getMemberFromSocket(socket);
 
@@ -216,7 +221,7 @@ export class Room {
 
     const alreadyAdded = this.isUserIsMember(uname);
     if (alreadyAdded) {
-      this.logger.error(`${uname} joined room ${this.name}`);
+      this.logger.error(`[${uname}] failed to join room [${this.name}] ALREADY_JOINED`);
       error('already joined');
       socket.disconnect();
       return;
@@ -231,7 +236,7 @@ export class Room {
     socket.join(this.name);
     this.members.push(newMember);
 
-    this.logger.info(`${newMember.userName} joined room ${this.name}`);
+    this.logger.info(`[${newMember.userName}] joined room [${this.name}]`);
     this.sendMsgToMembers('info', `${newMember.userName} joined`);
     next();
   }

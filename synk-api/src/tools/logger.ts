@@ -4,8 +4,8 @@ import * as path from 'path';
 
 export class Logger {
 
+  isDebugMode = false;
   private writer: bunyan;
-  private isDebugMode = false;
 
   constructor(folderName: string, fileName: string, isDebugMode: boolean) {
     this.isDebugMode = isDebugMode;
@@ -74,7 +74,7 @@ export class Logger {
   }
 
   private start(pathTo: string) {
-    const level = this.isDebugMode ? bunyan.INFO : bunyan.ERROR;
+    const level = this.isDebugMode ? bunyan.DEBUG : bunyan.INFO;
     this.writer = bunyan.createLogger({
       name: 'synk-api',
       streams: [{
