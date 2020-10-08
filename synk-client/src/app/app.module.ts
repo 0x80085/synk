@@ -16,6 +16,7 @@ import { ChannelModule } from './pages/channel/channel.module';
 import { AccountModule } from './pages/account/account.module';
 import { AppStateService } from './app-state.service';
 import { SocketService } from './socket.service';
+import { MetaModule } from './pages/meta/meta.module';
 
 registerLocaleData(en);
 
@@ -32,7 +33,8 @@ registerLocaleData(en);
     BrowserAnimationsModule,
     HomeModule,
     ChannelModule,
-    AccountModule
+    AccountModule,
+    MetaModule,
   ],
   providers: [
     { provide: NZ_I18N, useValue: en_US },
