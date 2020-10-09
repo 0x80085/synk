@@ -48,7 +48,6 @@ export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDest
   seek(to: number): void {
     const player = this.video.nativeElement as HTMLVideoElement;
     player.currentTime = to;
-    // Doesnt work
   }
   getCurrentTime(): number {
     const player = this.video.nativeElement as HTMLVideoElement;

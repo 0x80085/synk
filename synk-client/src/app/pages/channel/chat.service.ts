@@ -57,23 +57,4 @@ export class ChatService {
     this.socketService.socket.off(RoomCommands.GROUP_MESSAGE);
     this.messageQueue = [];
   }
-
-  // setupMessageQueueGCTimer() {
-  //   timer(500).pipe()
-  //     .subscribe(
-  //       value => {
-  //         console.log(value);
-
-  //         this.messageQueue = this.messageQueue.slice(0, -50);
-  //       },
-  //       err => console.log(err),
-  //     );
-  // }
-
-  // flushQueue() {
-  //   this.messageQueue = [];
-  //   this.groupMessages$ = new Observable(observer => {
-  //     observer.next(this.messageQueue);
-  //   });
-  // }
 }

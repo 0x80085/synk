@@ -29,8 +29,6 @@ export class Playlist {
       try {
         const ytMetadata = await lookup(YTid);
         const playlistItem: PlaylistItem = { ...ytMetadata, ...media, isPermanent: false };
-        console.log(playlistItem);
-
         this.list.push(playlistItem);
         next();
       } catch (e) {

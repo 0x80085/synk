@@ -83,7 +83,6 @@ export class RoomService {
       try {
 
         if (!this.getRoomByName(data.roomName)) {
-          console.log('doIfRoomExists.. ROOM does not exist!');
           return;
         }
         this.onMediaEvent(data, socket);

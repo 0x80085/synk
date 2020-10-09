@@ -48,7 +48,7 @@ export default async function configure(logger: Logger) {
 
   app.use(morgan('short'));
 
-  const credentials = getSSLCert();
+  const credentials = getSSLCert(logger);
 
   let server;
 
@@ -83,7 +83,7 @@ export default async function configure(logger: Logger) {
   return { server };
 }
 
-function getSSLCert() {
+function getSSLCert(logger: Logger) {
 
   const pathToKey = process.env.SSL_KEY_PATH;
   const pathToCert = process.env.SSL_CERT_PATH;
@@ -106,10 +106,11 @@ function getSSLCert() {
     };
 
   } catch (e) {
-    console.log(`no file at ${pathToKey}`);
-    console.log(`no file at ${pathToCert}`);
-    console.log(e);
-    console.log('no cert found, resuming');
+    logger.info(`getSSLCert failed to find SLL certificates`);
+    logger.info(e);
+    logger.info(`no file at ${pathToKey}`);
+    logger.info(`no file at ${pathToCert}`);
+    logger.info('no cert found, resuming');
     return null;
   }
 }

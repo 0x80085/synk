@@ -39,11 +39,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
       startWith(false)
     );
 
-  members$: Observable<RoomUserDto[]> = this.chatService.roomUserList$.pipe(
-    tap(ev => {
-      console.log('roomUserList update', ev);
-    })
-  );
+  members$: Observable<RoomUserDto[]> = this.chatService.roomUserList$;
 
   playlist$: Observable<MediaEvent[]> = this.mediaService.roomPlaylist$.pipe(
     tap(ev => {
@@ -66,7 +62,6 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   roomUserConfigSubscription = this.chatService.roomUserConfig$.subscribe(ev => {
     this.loggedInUserIsLeader = ev.isLeader;
-    console.log(ev);
   });
 
   errorEventSubscription = merge(
@@ -74,10 +69,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
     this.socketService.permissionError$
   ).pipe(
     tap(x => {
-      console.log(x);
-
       this.notification.error('Hmm.. Something went wrong here', 'Maybe try logging in again?');
-
       this.mediaUpdateTimerSubscription.unsubscribe();
       this.mediaSyncEventSubscription.unsubscribe();
     })).subscribe();

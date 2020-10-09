@@ -17,7 +17,7 @@ export class OwnedChannelsComponent {
     private notification: NzNotificationService) {
   }
 
-  channels$: Observable<Channel[]> =  this.auth.userOwnedChannels$;
+  channels$: Observable<Channel[]> = this.auth.userOwnedChannels$;
 
   deleteChannel(chan: Channel, ev: Event) {
     if (confirm(`You really want to delete ${chan.name}?`)) {
@@ -33,10 +33,6 @@ export class OwnedChannelsComponent {
         .subscribe(() => this.auth.refreshChannels());
       return false;
     }
-  }
-
-  openSettings(chan: Channel) {
-    console.log(chan);
   }
 
 }

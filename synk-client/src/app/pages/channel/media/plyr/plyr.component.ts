@@ -20,10 +20,6 @@ export class PlyrComponent implements BaseMediaComponent {
 
   constructor() { }
 
-  played(event: Plyr.PlyrEvent) {
-    console.log('played', event);
-  }
-
   play(url?: string): void {
     this.setCurrentUrl(url);
     if (this.plyr && !this.isPlaying()) {
