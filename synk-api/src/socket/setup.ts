@@ -6,6 +6,7 @@ import { RoomService } from './services/room-service';
 import { SessionOptions } from '../auth/middleware';
 import { Store } from 'express-session';
 import { Logger } from '../tools/logger';
+import { PassportSocketIoOptions } from 'passport.socketio';
 
 export function setupSockets(
   wsHttp: http.Server,
@@ -21,7 +22,7 @@ export function setupSockets(
      * https://github.com/calzoneman/sync/issues/780
      */
     pingTimeout: 120000,
-    pingInterval:5000,
+    pingInterval: 5000,
 
     /*
      * Per `ws` docs: "Note that Node.js has a variety of issues with
@@ -45,21 +46,23 @@ export function setupSockets(
 
   const roomService = new RoomService(io, logger);
 
-  const socketPassportConfig = {
+  const socketPassportConfig: PassportSocketIoOptions = {
     key: 'connect.sid', // make sure is the same as in your session settings in app.js
     secret: sessionMiddleware.secret as string, // make sure is the same as in your session settings in app.js
     store: sessionMiddleware.store as Store, // you need to use the same sessionStore you defined in the app.use(session({... in app.js
     success: (socket: socketio.Socket, next: (err?: any) => void) => {
       return onAuthorizeSuccess(socket, next, logger);
     }, // *optional* callback on success
-    fail: (
-      data: socketio.Socket,
-      message: string,
-      error: string,
-      next: (err?: any) => void
-    ) => {
-      return onAuthorizeFail(data, message, error, next, logger);
-    },
+    fail:
+      // (
+      //   data: socketio.Socket,
+      //   message: string,
+      //   error: string,
+      //   next: (err?: any) => void
+      // )
+      (data: any, message: string, critical: boolean, accept: (err?: any, accepted?: boolean) => void) => {
+        return onAuthorizeFail(data, message, critical, accept, logger);
+      },
   };
 
   // Set up the Socket.IO server
@@ -84,11 +87,11 @@ function onAuthorizeSuccess(
 function onAuthorizeFail(
   data: socketio.Socket,
   message: string,
-  error: string,
-  next: (err?: any) => void,
+  isCritical: boolean,
+  accept: (err?: any, accepted?: boolean) => void,
   logger: Logger
 ) {
-  logger.info(`failed connection to socket.io: ${error}`);
+  logger.info(`failed connection to socket.io. Critical error? :: ${isCritical}`);
   logger.info(`ERR MSG: ${message}`);
-  next(new Error(message));
+  accept(null, false);
 }
