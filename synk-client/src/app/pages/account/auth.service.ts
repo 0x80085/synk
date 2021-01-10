@@ -34,9 +34,10 @@ export class AuthService {
 
   private refreshChannelsSubject = new BehaviorSubject(true);
 
+  // TODO Should be in some other service tho
   userOwnedChannels$ = this.refreshChannelsSubject.pipe(
     switchMap(() =>
-      this.http.get<Channel[]>(`${environment.api}/account/channels`, { withCredentials: true })
+      this.http.get<Channel[]>(`${environment.api}/channels/mine`, { withCredentials: true })
     )).pipe(
       shareReplay(1)
     );
@@ -50,7 +51,7 @@ export class AuthService {
   createAccount(userCreds: LoginInfo) {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
-    return this.http.post(`${environment.api}/signup`, userCreds, {
+    return this.http.post(`${environment.api}/auth/sign-up`, userCreds, {
       headers,
       withCredentials: true
     });
@@ -60,7 +61,7 @@ export class AuthService {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
     return this.http
-      .post(`${environment.api}/login`, userCreds, {
+      .post(`${environment.api}/auth/login`, userCreds, {
         headers,
         withCredentials: true
       })
@@ -75,7 +76,7 @@ export class AuthService {
 
   logout() {
     return this.http
-      .get(`${environment.api}/logout`, {
+      .get(`${environment.api}/auth/logout`, {
         withCredentials: true
       })
       .pipe(
@@ -102,9 +103,10 @@ export class AuthService {
     this.refreshChannelsSubject.next(true);
   }
 
-  deleteChannel(name: string) {
+  // TODO Should also be in other service tho
+  deleteChannel(id: string) {
     return this.http.delete<Channel[]>(
-      `${environment.api}/account/channels/${name}`,
+      `${environment.api}/channels/${id}`,
       { withCredentials: true });
   }
 

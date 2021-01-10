@@ -79,7 +79,7 @@ export class AdminService {
   constructor(private http: HttpClient) { }
 
   getUsers(query?: string, pagzeSize?: number, index?: number): Observable<UserInfo> {
-    return this.http.get<UserInfo>(`${environment.api}/admin/users`, {
+    return this.http.get<UserInfo>(`${environment.api}/admin/members`, {
       withCredentials: true
     }).pipe(
       shareReplay(1)
@@ -87,6 +87,14 @@ export class AdminService {
   }
 
   getRooms(query?: string, pagzeSize?: number, index?: number): Observable<ChannelResponse> {
+    return this.http.get<ChannelResponse>(`${environment.api}/admin/rooms`, {
+      withCredentials: true
+    }).pipe(
+      shareReplay(1)
+    );
+  }
+
+  getChannels(query?: string, pagzeSize?: number, index?: number): Observable<ChannelResponse> {
     return this.http.get<ChannelResponse>(`${environment.api}/admin/channels`, {
       withCredentials: true
     }).pipe(

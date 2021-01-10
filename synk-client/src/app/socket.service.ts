@@ -18,7 +18,7 @@ export interface RealTimeCommand {
 })
 export class SocketService {
 
-  socket = io(`${environment.api}`, { transports: ['websocket'], upgrade: false });
+  socket = io(`${environment.api}`);
 
   private socket$ = of(this.socket).pipe(
     share()

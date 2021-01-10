@@ -18,7 +18,7 @@ export class AccountService {
   createChannel(channel: ChannelDraft) {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
-    return this.http.post(`${environment.api}/create-room`, channel, {
+    return this.http.post(`${environment.api}/channels`, channel, {
       headers,
       withCredentials: true
     });
