@@ -74,10 +74,10 @@
 
 <ng-template #socketDisonnected>
   <i nz-icon nzType="smile" style="cursor: pointer;" (click)="isCollapsed = !isCollapsed" nzTheme="fill" nz-tooltip
-    [nzTitle]="(user$ | async)?.userName"></i>
+    [nzTitle]="(user$ | async)?.username"></i>
 </ng-template>
 
 <ng-template #socketConnected>
   <i nz-icon [style.color]=" '#00ff00'" nzType="smile" style="cursor: pointer;" (click)="isCollapsed = !isCollapsed"
-    nzTheme="fill" nz-tooltip [nzTitle]="(user$ | async)?.userName"></i>
+    nzTheme="fill" nz-tooltip [nzTitle]="(user$ | async)?.username"></i>
 </ng-template>

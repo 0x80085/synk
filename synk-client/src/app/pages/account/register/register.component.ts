@@ -22,7 +22,7 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      userName: [
+      username: [
         null,
         [
           Validators.required,
@@ -47,7 +47,7 @@ export class RegisterComponent implements OnInit {
     }
 
     const creds = {
-      username: this.form.controls.userName.value,
+      username: this.form.controls.username.value,
       password: this.form.controls.password.value
     };
 

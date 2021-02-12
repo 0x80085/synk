@@ -7,7 +7,7 @@ import { User } from '../auth.service';
 export class UsernamePipe implements PipeTransform {
 
   transform(user: User): string {
-    return user ? user.userName : `errrrr`;
+    return user ? user.username : `errrrr`;
   }
 
 }

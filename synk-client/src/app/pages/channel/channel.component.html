@@ -8,30 +8,7 @@
       <app-media *ngIf="playlist$ | async" #player (mediaEndedEvent)="onVideoEnded()"></app-media>
     </div>
     <div nz-col nzSpan="6" class="mt-1">
-
-      <nz-list [nzBordered]="(members$  | async)" nzSize="small" [nzLoading]="!(members$  | async)"
-        [nzDataSource]="members$ | async" [nzRenderItem]="member" [nzNoResult]="'No items'">
-        <ng-template #member let-member>
-          <nz-list-item [nzActions]="[giveLeaderBtn, ownerIcon, leaderIcon]">
-            <nz-list-item-meta [nzTitle]="member.userName">
-            </nz-list-item-meta>
-          </nz-list-item>
-          <ng-template #leaderIcon>
-            <i [hidden]="!member.isLeader" nz-icon style="color: white; font-size: 1rem;" nzType="interaction"
-              nz-tooltip nzTitle="This user currently controls the playback"></i>
-          </ng-template>
-          <ng-template #ownerIcon>
-            <i [hidden]="!member.isOwner" nz-icon style="color: white; font-size: 1rem;" nzType="shop" nz-tooltip
-              nzTitle="Owner of this channel"></i>
-          </ng-template>
-          <ng-template #giveLeaderBtn>
-            <button nz-button nzType="link" nz-tooltip nzTitle="Hand over playback control to user"
-              [hidden]="member.isLeader || !loggedInUserIsLeader" (click)="giveLeader(member)">
-              <i nz-icon nzType="api"></i>
-            </button>
-          </ng-template>
-        </ng-template>
-      </nz-list>
+      <app-connected-members (giveLeader)="giveLeader($event)"></app-connected-members>
     </div>
     <div nz-col nzSpan="18" class="mt-1">
       <app-playlist [roomName]="name" (playMedia)="player.play($event.mediaUrl)">

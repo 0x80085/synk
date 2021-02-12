@@ -23,7 +23,7 @@ export interface RoomDto {
 export interface UserSocketInfo {
   id: string;
   socketId: string;
-  userName: string;
+  username: string;
 }
 
 export interface UserAccountInfo {
@@ -37,7 +37,7 @@ export interface UserAccountInfo {
 
 export interface UserOfRoomInfo {
   id: string;
-  userName: string;
+  username: string;
   role: string;
   permissionLevel: string;
 }

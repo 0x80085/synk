@@ -37,8 +37,8 @@ export class AdminComponent implements OnInit {
   }
 
   ban(user: User, $event) {
-    console.log(`banning user [${user.userName}]`);
-    this.notification.success('Success', `Banned user [${user.userName}]`);
+    console.log(`banning user [${user.username}]`);
+    this.notification.success('Success', `Banned user [${user.username}]`);
   }
 
   ngOnInit(): void {

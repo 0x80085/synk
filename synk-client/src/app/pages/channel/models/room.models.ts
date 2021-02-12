@@ -1,5 +1,5 @@
 export interface Message {
-  userName?: string;
+  username?: string;
   text: string;
 }
 
@@ -14,7 +14,6 @@ export interface MediaEvent {
   roomName: string;
 }
 
-export type PermissionLevels = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
 export enum Roles {
   Admin = 'Admin',
@@ -36,17 +35,12 @@ export enum RoomCommands {
 
 export interface RoomUser {
   id: string;
-  userName: string;
-  role: Roles;
+  username: string;
   isLeader: boolean;
-  permissionLevel: PermissionLevels;
 }
-
-export type RoomUserDto = RoomUser & { isLeader: boolean };
 
 export interface RoomUserConfig {
   role: Roles;
-  permissionLevel: PermissionLevels;
   isLeader: boolean;
   isOwner: boolean;
 }

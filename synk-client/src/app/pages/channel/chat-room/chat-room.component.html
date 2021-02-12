@@ -1,7 +1,7 @@
 <p *ngIf="roomError$ | async">Error joining room..</p>
 <div class="wrapper">
   <nz-card [nzTitle]="name" class="feed" [nzBodyStyle]="{ overflowY : 'auto', height: '90%' }" #feed>
-    <nz-comment *ngFor="let message of messages$ | async | slice: -10" [nzAuthor]="message.userName">
+    <nz-comment *ngFor="let message of messages$ | async | slice: -10" [nzAuthor]="message.username">
       <nz-comment-content>
         {{ message.text }}
       </nz-comment-content>

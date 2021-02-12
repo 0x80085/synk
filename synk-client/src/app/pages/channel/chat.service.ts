@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
 
-import { Observable, fromEvent, timer } from 'rxjs';
+import { Observable} from 'rxjs';
 
 import {
   Message,
   RoomMessage,
   RoomUserConfig,
-  RoomUserDto,
+  RoomUser,
   RoomCommands
 } from './models/room.models';
 import { SocketService, RealTimeCommand } from '../../socket.service';
-import { map, withLatestFrom, tap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -19,8 +19,8 @@ export class ChatService {
   messageQueue: Message[] = [];
 
   roomMessages$ = this.socketService.listenForEvent(RoomCommands.GROUP_MESSAGE).pipe(
-    map((data: RoomMessage) => {
-      this.messageQueue = this.messageQueue.concat(data.content);
+    map((data: Message[]) => {
+      this.messageQueue = this.messageQueue.concat(data);
       return this.messageQueue;
     })
   );
@@ -29,7 +29,7 @@ export class ChatService {
 
   roomUserConfig$ = this.socketService.listenForEvent<RoomUserConfig>(RoomCommands.USER_CONFIG);
 
-  roomUserList$ = this.socketService.listenForEvent<RoomUserDto[]>(RoomCommands.USER_LIST_UPDATE);
+  roomUserList$ = this.socketService.listenForEvent<RoomUser[]>(RoomCommands.USER_LIST_UPDATE);
 
   constructor(private socketService: SocketService) { }
 
@@ -48,8 +48,8 @@ export class ChatService {
     this.socketService.socket.emit(RoomCommands.JOIN_ROOM, roomName);
   }
 
-  giveLeader({ member, roomName }: { member: RoomUserDto, roomName: string }) {
-    this.socketService.socket.emit(RoomCommands.GIVE_LEADER, { to: member.userName, roomName });
+  giveLeader({ member, roomName }: { member: RoomUser, roomName: string }) {
+    this.socketService.socket.emit(RoomCommands.GIVE_LEADER, { to: member.username, roomName });
   }
 
   exit(name: string) {

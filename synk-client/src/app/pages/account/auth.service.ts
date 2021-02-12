@@ -13,7 +13,7 @@ interface LoginInfo {
 }
 
 export interface User {
-  userName: string;
+  username: string;
   id: string;
   isAdmin: boolean;
 }

@@ -15,6 +15,7 @@ import { YoutubeComponent } from './media/youtube/youtube.component';
 import { PlayerDebugComponent } from './player-debug/player-debug.component';
 import { PlaylistComponent } from './playlist/playlist.component';
 import { PlyrComponent } from './media/plyr/plyr.component';
+import { ConnectedMembersComponent } from './connected-members/connected-members.component';
 
 @NgModule({
   entryComponents: [
@@ -30,7 +31,8 @@ import { PlyrComponent } from './media/plyr/plyr.component';
     Html5Component,
     PlayerDebugComponent,
     TwitchComponent,
-    PlyrComponent
+    PlyrComponent,
+    ConnectedMembersComponent
   ],
   imports: [
     CommonModule,

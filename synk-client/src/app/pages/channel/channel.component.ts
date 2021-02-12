@@ -8,7 +8,7 @@ import { SocketService } from '../../socket.service';
 import { ChatService } from './chat.service';
 import { MediaService } from './media.service';
 import { MediaComponent } from './media/media.component';
-import { MediaEvent, RoomUserDto } from './models/room.models';
+import { MediaEvent, RoomUser } from './models/room.models';
 import { AppStateService } from '../../app-state.service';
 
 @Component({
@@ -39,7 +39,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
       startWith(false)
     );
 
-  members$: Observable<RoomUserDto[]> = this.chatService.roomUserList$;
+  members$: Observable<RoomUser[]> = this.chatService.roomUserList$;
 
   playlist$: Observable<MediaEvent[]> = this.mediaService.roomPlaylist$.pipe(
     tap(ev => {
@@ -109,7 +109,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   }
 
 
-  giveLeader(member: RoomUserDto) {
+  giveLeader(member: RoomUser) {
     this.chatService.giveLeader({ member, roomName: this.name });
   }
 
