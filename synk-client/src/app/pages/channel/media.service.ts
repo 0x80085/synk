@@ -1,23 +1,45 @@
 import { Injectable } from '@angular/core';
-import { shareReplay } from 'rxjs/operators';
+import { filter, map, shareReplay } from 'rxjs/operators';
 
 import { SocketService } from '../../socket.service';
-import { MediaEvent } from './models/room.models';
+import { AddMediaExceptionEvent, MediaEvent } from './models/room.models';
 import { MediaCommands } from './models/media.models';
+import { SocketCommands } from './models/commands.enum';
 
-export type PlaylistItem = MediaEvent & { active: boolean };
+export interface PlaylistRepresentation {
+  id: string;
+  name: string;
+  entries: MediaRepresentation[];
+  nowPlaying: MediaRepresentation;
+}
+
+export class MediaRepresentation {
+  title: string;
+  url: string;
+  length: number;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class MediaService {
 
-  roomPlaylist$ = this.socketService.listenForEvent<PlaylistItem[]>(MediaCommands.PLAYLIST_UPDATE)
+  roomPlaylistUpdateEvents$ = this.socketService.listenForEvent<PlaylistRepresentation>(MediaCommands.PLAYLIST_UPDATE)
     .pipe(
       shareReplay(1)
     );
 
   roomMediaEvent$ = this.socketService.listenForEvent<MediaEvent>(MediaCommands.MEDIA_EVENT);
+
+  addMediaErrEvent$ = this.socketService.listenForEvent<AddMediaExceptionEvent>(SocketCommands.EXCEPTION)
+    .pipe(
+      filter(({ message }) => message === "AddMediaException")
+    );
+
+  addMediaSuccessEvent$ = this.socketService.listenForEvent<any>(MediaCommands.ADD_MEDIA_REQUEST_APPROVED)
+    .pipe(
+      map((mediaUrl) => mediaUrl)
+    );
 
   constructor(private socketService: SocketService) { }
 

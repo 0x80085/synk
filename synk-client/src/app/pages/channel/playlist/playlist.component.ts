@@ -1,18 +1,25 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Observable, of, Subject } from 'rxjs';
+import { Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
 import { NzNotificationService } from 'ng-zorro-antd';
+import { Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 
-import { MediaEvent } from '../models/room.models';
 import { ChatService } from '../chat.service';
-import { MediaService, PlaylistItem } from '../media.service';
-import { map } from 'rxjs/operators';
+import { MediaService } from '../media.service';
+import { MediaEvent } from '../models/room.models';
+
+
+interface PlaylistItem {
+  active: boolean;
+  title: string;
+  mediaUrl: string;
+}
 
 @Component({
   selector: 'app-playlist',
   templateUrl: './playlist.component.html',
   styleUrls: ['./playlist.component.scss']
 })
-export class PlaylistComponent implements OnInit {
+export class PlaylistComponent implements OnDestroy {
 
   @Input() roomName: string;
 
@@ -21,18 +28,33 @@ export class PlaylistComponent implements OnInit {
   mediaUrlInput: string;
   showControls: boolean;
 
-  virtualPlaylist$: Observable<PlaylistItem[]> = this.mediaService.roomPlaylist$;
+  virtualPlaylist$: Observable<PlaylistItem[]> = this.mediaService.roomPlaylistUpdateEvents$.pipe(
+    map(({ entries, nowPlaying }) =>
+      entries
+        .map(it => ({
+          ...it,
+          mediaUrl: it.url,
+          active: it.url === nowPlaying.url
+        }))
+    ),
+  );
+
   isLeader$ = this.chatService.roomUserConfig$.pipe(
     map(conf => conf.isLeader),
   );
+
+  errorFeedback$ = this.mediaService.addMediaErrEvent$.pipe(
+    tap(_ => this.notification.error('Error', `Couldnt add media to playlist...`))
+  ).subscribe();
+
+  succesFeedback$ = this.mediaService.addMediaSuccessEvent$.pipe(
+    tap(_ => this.notification.success('Media added!', `Request to add media to playlist succeeded!`))
+  ).subscribe();
 
   constructor(
     private mediaService: MediaService,
     private chatService: ChatService,
     private notification: NzNotificationService) { }
-
-  ngOnInit() {
-  }
 
   onAddMedia() {
     if (!this.mediaUrlInput) {
@@ -45,7 +67,7 @@ export class PlaylistComponent implements OnInit {
       currentTime: null
     });
     this.mediaUrlInput = '';
-    this.notification.success('Success', 'Media added to playlist');
+    this.notification.info('Request Submitted', 'The request to add media to the current list is in progress. You will be updated if the request was (un)succesful'); // we dunno if that happened
   }
 
   onRemoveMedia(mediaUrl: string) {
@@ -65,5 +87,10 @@ export class PlaylistComponent implements OnInit {
 
   onShuffle() {
     this.mediaService.shufflePlaylist(this.roomName);
+  }
+
+  ngOnDestroy(): void {
+    this.errorFeedback$.unsubscribe();
+    this.succesFeedback$.unsubscribe();
   }
 }

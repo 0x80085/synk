@@ -6,7 +6,7 @@ import { mapTo, startWith, tap, shareReplay, take, filter } from 'rxjs/operators
 
 import { SocketService } from '../../socket.service';
 import { ChatService } from './chat.service';
-import { MediaService } from './media.service';
+import { MediaService, PlaylistRepresentation } from './media.service';
 import { MediaComponent } from './media/media.component';
 import { MediaEvent, RoomUser } from './models/room.models';
 import { AppStateService } from '../../app-state.service';
@@ -41,12 +41,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   members$: Observable<RoomUser[]> = this.chatService.roomUserList$;
 
-  playlist$: Observable<MediaEvent[]> = this.mediaService.roomPlaylist$.pipe(
-    tap(ev => {
-      this.playlist = ev.map(i => {
-        return i.mediaUrl;
-      });
-    }));
+  playlist$: Observable<PlaylistRepresentation> = this.mediaService.roomPlaylistUpdateEvents$;
 
   mediaUpdateTimerSubscription: Subscription = timer(1000, 2000).subscribe(val => {
     if (this.loggedInUserIsLeader && this.player) {

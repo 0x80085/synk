@@ -76,8 +76,8 @@ export class AuthService {
 
   logout() {
     return this.http
-      .get(`${environment.api}/auth/logout`, {
-        withCredentials: true
+      .post(`${environment.api}/auth/logout`, null, {
+        withCredentials: true,
       })
       .pipe(
         tap(() => {

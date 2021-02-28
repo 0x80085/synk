@@ -22,7 +22,7 @@ export class OwnedChannelsComponent {
   deleteChannel(chan: Channel, ev: Event) {
     if (confirm(`You really want to delete ${chan.name}?`)) {
       ev.preventDefault();
-      this.auth.deleteChannel(chan.name)
+      this.auth.deleteChannel(chan.id)
         .pipe(
           tap(() => this.auth.refreshChannels()),
           take(1)

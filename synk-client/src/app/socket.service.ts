@@ -35,6 +35,8 @@ export class SocketService {
   connectionTimeOut$ = this.listenForEvent('connect_timeout').pipe(mapTo({ event: 'connect_timeout', connected: false }));
 
   permissionError$ = this.listenForEvent('authentication error').pipe(mapTo({ event: 'authentication error', connected: false }));
+  // should prob be more like  this.socketService.listenForEvent<AddMediaExceptionEvent>(SocketCommands.EXCEPTION).pipe(filter(({ message }) => message === "AddMediaException")
+
   disconnection$ = this.listenForEvent('disconnect').pipe(mapTo({ event: 'disconnect', connected: false }));
 
   connectionState$ = merge(

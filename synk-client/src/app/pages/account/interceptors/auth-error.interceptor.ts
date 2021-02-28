@@ -1,5 +1,6 @@
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { NzNotificationService } from 'ng-zorro-antd';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { AppStateService } from '../../../app-state.service';
@@ -10,6 +11,7 @@ export class RequestLogInterceptor implements HttpInterceptor {
 
   constructor(private stateService: AppStateService,
     private socketService: SocketService,
+    private notification: NzNotificationService
   ) { }
 
   intercept(
@@ -22,8 +24,14 @@ export class RequestLogInterceptor implements HttpInterceptor {
             console.warn("HTTP ERROR occurred");
             console.warn(err);
             if (err.status === 403) {
-              this.stateService.isLoggedInSubject.next(false);
-              this.socketService.socket.close();
+              if (err.message == "session expired") {
+                this.stateService.isLoggedInSubject.next(false);
+                this.socketService.socket.close();
+                this.notification.warning('Session expired', `Please log in again`);
+              } else {
+                this.notification.warning(`Nothing here`, `Chirp chrip...`);
+
+              }
             }
             throw err;
           })

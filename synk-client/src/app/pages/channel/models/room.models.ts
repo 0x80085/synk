@@ -14,6 +14,11 @@ export interface MediaEvent {
   roomName: string;
 }
 
+export type AddMediaExceptionEvent = {
+  status: "error";
+  message: "AddMediaException";
+}
+
 
 export enum Roles {
   Admin = 'Admin',
