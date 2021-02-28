@@ -36,7 +36,7 @@ export class CreateRoomFormComponent implements OnInit {
         null,
         [Validators.required, Validators.maxLength(250), Validators.minLength(5)]
       ],
-      // isPublic: true
+      isPublic: true
     });
   }
 
@@ -47,7 +47,8 @@ export class CreateRoomFormComponent implements OnInit {
 
     const results: ChannelDraft = {
       name: this.form.controls.name.value,
-      description: this.form.controls.description.value
+      description: this.form.controls.description.value,
+      isPublic: this.form.controls.isPublic.value,
     };
     this.service.createChannel(results).subscribe(
       () => {

@@ -5,6 +5,7 @@ import { environment } from '../../../environments/environment';
 export interface ChannelDraft {
   name: string;
   description: string;
+  isPublic: boolean;
 }
 
 @Injectable({
