@@ -12,9 +12,7 @@ import {
 import { SocketService, RealTimeCommand } from '../../socket.service';
 import { map } from 'rxjs/operators';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class ChatService {
   messageQueue: Message[] = [];
 

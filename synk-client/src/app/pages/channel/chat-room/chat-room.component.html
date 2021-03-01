@@ -1,21 +1,45 @@
-<p *ngIf="roomError$ | async">Error joining room..</p>
-<div class="wrapper">
-  <nz-card [nzTitle]="name" class="feed" [nzBodyStyle]="{ overflowY : 'auto', height: '90%' }" #feed>
-    <nz-comment *ngFor="let message of messages$ | async | slice: -10" [nzAuthor]="message.username">
-      <nz-comment-content>
-        {{ message.text }}
-      </nz-comment-content>
-    </nz-comment>
-  </nz-card>
+<div *ngIf="roomError$ | async; then error; else chatRoom"></div>
 
-  <nz-card [nzActions]="[sendIcon]" class="textbox">
-    <textarea nz-input placeholder="Type something..." [(ngModel)]="msgBoxValue" name="textarea" rows="5" cols="30"
-      minlength="10" maxlength="512" (keyup.enter)="submitPressedSubject.next({ text:msgBoxValue, ev: $event })"
-      nzAutosize></textarea>
-  </nz-card>
-</div>
 
-<ng-template #sendIcon>
-  <i nz-icon nzType="edit" title="Send message" style="color: #fff;"
-    (click)="submitPressedSubject.next({ text:msgBoxValue, ev: $event })"></i>
+<ng-template #chatRoom>
+
+  <div class="wrapper">
+    <div class="header">
+      <h2 nz-typography>
+        {{ name }}
+      </h2>
+    </div>
+    <div class="feed">
+      <div *ngFor="let message of messages$ | async | slice: -10">
+        <p>
+          <span>{{ message.username }}</span>
+          {{ message.text }}
+        </p>
+      </div>
+    </div>
+    <div class="input">
+      <textarea placeholder="Type something..." [(ngModel)]="msgBoxValue" name="textarea"
+        (keyup.enter)="submitPressedSubject.next({ text:msgBoxValue, ev: $event })">
+        </textarea>
+    </div>
+  </div>
+
+  <!--
+
+    <div class="wrapper">
+    <nz-card [nzTitle]="name" class="feed" [nzBodyStyle]="{ overflowY : 'auto', height: '90%' }" #feed>
+      <nz-comment *ngFor="let message of messages$ | async | slice: -10" [nzAuthor]="message.username">
+        <nz-comment-content>
+          {{ message.text }}
+        </nz-comment-content>
+      </nz-comment>
+    </nz-card>
+
+ -->
+</ng-template>
+
+<ng-template #error>
+
+  <p *ngIf="roomError$ | async">Error joining room..</p>
+
 </ng-template>
