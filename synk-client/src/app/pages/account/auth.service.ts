@@ -25,6 +25,8 @@ export interface Channel {
   isPublic: string;
   dateCreated: string;
   isLocked: boolean;
+  connectedMemberCount: number;
+  nowPlaying: string;
 }
 
 @Injectable({
