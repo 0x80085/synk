@@ -1,10 +1,10 @@
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
+import { map, shareReplay } from 'rxjs/operators';
 
-import { User, Channel } from './auth.service';
-import { HttpClient } from '@angular/common/http';
-import { tap, shareReplay, catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+import { Channel } from './auth.service';
 
 interface ChannelSummary {
   roomName: string;
@@ -43,9 +43,8 @@ export interface UserOfRoomInfo {
 }
 
 export interface UserInfo {
-  accounts: UserAccountInfo[];
-  usersActiveInAtLeastOneRoom: UserOfRoomInfo[];
-  usersConnectedToSocketServer: UserSocketInfo[];
+  items: UserAccountInfo[];
+  meta: any;
 }
 
 export interface ChannelResponse {
@@ -78,26 +77,33 @@ export class AdminService {
 
   constructor(private http: HttpClient) { }
 
-  getUsers(query?: string, pagzeSize?: number, index?: number): Observable<UserInfo> {
+  getUsers(query?: string, page?: number, limit?: number): Observable<UserInfo> {
+    const params = new HttpParams({
+      fromObject: {
+        limit: String(limit || 100),
+        page: String(page || 1),
+      }
+    });
     return this.http.get<UserInfo>(`${environment.api}/admin/members`, {
-      withCredentials: true
+      withCredentials: true,
+      params
     }).pipe(
       shareReplay(1)
     );
   }
 
-  getRooms(query?: string, pagzeSize?: number, index?: number): Observable<ChannelResponse> {
-    return this.http.get<ChannelResponse>(`${environment.api}/admin/rooms`, {
-      withCredentials: true
+  getChannels(query?: string, page?: number, limit?: number): Observable<Channel[]> {
+    const params = new HttpParams({
+      fromObject: {
+        limit: String(limit || 100),
+        page: String(page || 1),
+      }
+    });
+    return this.http.get<{ items: Channel[], meta: any }>(`${environment.api}/admin/channels`, {
+      withCredentials: true,
+      params
     }).pipe(
-      shareReplay(1)
-    );
-  }
-
-  getChannels(query?: string, pagzeSize?: number, index?: number): Observable<ChannelResponse> {
-    return this.http.get<ChannelResponse>(`${environment.api}/admin/channels`, {
-      withCredentials: true
-    }).pipe(
+      map(data => data.items),
       shareReplay(1)
     );
   }

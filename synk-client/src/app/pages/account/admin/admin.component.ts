@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { map, shareReplay, take, tap } from 'rxjs/operators';
 
 import { AdminService, ChannelResponse, UserAccountInfo, UserInfo, UserOfRoomInfo, UserSocketInfo } from '../admin.service';
-import { AuthService, User } from '../auth.service';
+import { AuthService, Channel, User } from '../auth.service';
 
 
 @Component({
@@ -16,11 +16,9 @@ export class AdminComponent implements OnInit {
 
   me$: Observable<User> = this.authService.getUser();
   users$: Observable<UserInfo> = this.adminService.getUsers().pipe(shareReplay(1));
-  rooms$: Observable<ChannelResponse> = this.adminService.getRooms().pipe(shareReplay(1));
+  channels$: Observable<Channel[]> = this.adminService.getChannels().pipe(shareReplay(1));
 
-  accounts$: Observable<UserAccountInfo[]> = this.users$.pipe(map(it => it.accounts));
-  usersActiveInAtLeastOneRoom$: Observable<UserOfRoomInfo[]> = this.users$.pipe(map(it => it.usersActiveInAtLeastOneRoom));
-  usersConnectedToSocketServer$: Observable<UserSocketInfo[]> = this.users$.pipe(map(it => it.usersConnectedToSocketServer));
+  accounts$: Observable<UserAccountInfo[]> = this.users$.pipe(map(it => it.items));
 
   constructor(
     private authService: AuthService,
