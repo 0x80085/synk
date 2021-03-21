@@ -25,7 +25,7 @@
     "ng-zorro-antd": "^11.2.0",
     "ngx-plyr": "^4.0.0",
     "plyr": "^3.6.2",
-    "rxjs": "~6.5.5",
+    "rxjs": "~6.6.6",
     "socket.io-client": "^2.3.0",
     "tslib": "^2.0.0",
     "twitch-player": "^1.0.2",
