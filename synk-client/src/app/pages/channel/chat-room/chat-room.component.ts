@@ -3,7 +3,7 @@ import { Observable, Subject } from 'rxjs';
 import { distinctUntilChanged, debounceTime, tap, take, filter, map, mapTo, startWith } from 'rxjs/operators';
 import { ChatService } from '../chat.service';
 import { Message } from '../models/room.models';
-import { NzNotificationService } from 'ng-zorro-antd';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 @Component({
   selector: 'app-chat-room',

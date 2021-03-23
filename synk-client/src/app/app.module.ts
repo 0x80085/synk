@@ -1,8 +1,11 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
+import { NZ_I18N, en_US } from 'ng-zorro-antd/i18n';
+import { NzIconModule  } from 'ng-zorro-antd/icon';
+
+
 import { IconsProviderModule } from './icons-provider.module';
-import { NgZorroAntdModule, NZ_I18N, en_US } from 'ng-zorro-antd';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -17,6 +20,7 @@ import { AccountModule } from './pages/account/account.module';
 import { AppStateService } from './app-state.service';
 import { SocketService } from './socket.service';
 import { MetaModule } from './pages/meta/meta.module';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 registerLocaleData(en);
 
@@ -26,7 +30,7 @@ registerLocaleData(en);
     BrowserModule,
     AppRoutingModule,
     IconsProviderModule,
-    NgZorroAntdModule,
+    NzIconModule,
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
@@ -40,6 +44,7 @@ registerLocaleData(en);
     { provide: NZ_I18N, useValue: en_US },
     SocketService,
     AppStateService,
+    NzNotificationService
   ],
   bootstrap: [AppComponent]
 })

@@ -69,7 +69,7 @@ export class TwitchComponent implements BaseMediaComponent {
   }
 
   private createPlayer(channel: string) {
-    this.player = new TwitchPlayer('stage', {
+    this.player = TwitchPlayer.FromOptions('stage', {
       channel,
       autoplay: true,
       muted: false,

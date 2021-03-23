@@ -1,6 +1,6 @@
 import { Component, HostListener, OnDestroy, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { NzNotificationService } from 'ng-zorro-antd';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { BehaviorSubject, merge, Observable, Subscription, timer } from 'rxjs';
 import { mapTo, startWith, tap, shareReplay, take, filter } from 'rxjs/operators';
 

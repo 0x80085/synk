@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { NzNotificationService } from 'ng-zorro-antd';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 import { BaseMediaComponent } from '../base-media.component';
 import { errorDictionary } from './player-errors.model';
@@ -151,7 +151,7 @@ export function isValidYTid(url: string) {
 }
 
 function sleep(timer) {
-  return new Promise(resolve => {
+  return new Promise<void>(resolve => {
     timer = timer || 2000;
     setTimeout(() => {
       resolve();

@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { LoginComponent } from './login/login.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ProfileComponent } from './profile/profile.component';
-import { NgZorroAntdModule } from 'ng-zorro-antd';
 import { RegisterComponent } from './register/register.component';
 import { PlaceholdPipe } from './profile/placehold.pipe';
 import { UsernamePipe } from './profile/username.pipe';
@@ -30,7 +29,6 @@ import { CreateRoomFormComponent } from './create-room-form/create-room-form.com
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    NgZorroAntdModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: RequestLogInterceptor, multi: true },

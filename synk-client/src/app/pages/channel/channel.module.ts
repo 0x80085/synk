@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { NgZorroAntdModule } from 'ng-zorro-antd';
 import { PlyrModule } from 'ngx-plyr';
 
 import { ChannelComponent } from './channel.component';
@@ -37,7 +36,6 @@ import { ConnectedMembersComponent } from './connected-members/connected-members
   imports: [
     CommonModule,
     FormsModule,
-    NgZorroAntdModule,
     PlyrModule
   ],
   providers: [ChatService]

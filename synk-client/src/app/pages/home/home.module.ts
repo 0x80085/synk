@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 
 import { HomeComponent } from './home.component';
 import { OverviewComponent } from './overview/overview.component';
-import { NgZorroAntdModule } from 'ng-zorro-antd';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SushiBannerComponent } from './banners/sushi-banner/sushi-banner.component';
@@ -16,8 +15,7 @@ import { RouterModule } from '@angular/router';
     RouterModule,
     CommonModule,
     FormsModule,
-    ReactiveFormsModule,
-    NgZorroAntdModule
+    ReactiveFormsModule
   ],
   declarations: [
     HomeComponent,

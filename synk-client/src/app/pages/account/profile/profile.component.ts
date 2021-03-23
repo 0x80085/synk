@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { AuthService, User } from '../auth.service';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
-import { NzNotificationService } from 'ng-zorro-antd';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 @Component({
   selector: 'app-profile',
