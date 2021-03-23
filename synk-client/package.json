@@ -23,7 +23,7 @@
     "@angular/platform-browser": "~11.2.6",
     "@angular/platform-browser-dynamic": "~11.2.6",
     "@angular/router": "~11.2.6",
-    "ng-zorro-antd": "^11.2.0",
+    "ng-zorro-antd": "^11.3.0",
     "ngx-plyr": "^4.0.0",
     "plyr": "^3.6.4",
     "rxjs": "~6.6.6",
