@@ -33,7 +33,7 @@
         </nz-list-item>
         <ng-template #opAction>
           <button nz-button nzSize="small" nzType="link" (click)="playMedia.emit(item)"
-            nz-tooltip [nzTitle]="item.active ?  'start video' : 'now playing'">
+            nz-tooltip [nzTooltipTitle]="item.active ?  'start video' : 'now playing'">
             <i nz-icon [nzType]="item.active ? 'play-circle' : 'caret-right'"></i>
           </button>
           <!-- <button nz-button nzSize="small" nzType="link" disabled nz-tooltip
@@ -41,7 +41,7 @@
             <i nz-icon nzType="double-right"></i>
           </button> -->
           <button nz-button nzSize="small" nzDanger nzType="link" (click)="onRemoveMedia(item.mediaUrl)" nz-tooltip
-            nzTitle="Remove from list">
+          nzTooltipTitle="Remove from list">
             <i nz-icon nzType="delete"></i>
           </button>
         </ng-template>

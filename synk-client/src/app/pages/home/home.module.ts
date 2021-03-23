@@ -1,5 +1,10 @@
 import { NgModule } from '@angular/core';
 
+import { NzCarouselModule } from 'ng-zorro-antd/carousel';
+import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { NzListModule } from 'ng-zorro-antd/list';
+import { NzEmptyModule } from 'ng-zorro-antd/empty';
+
 import { HomeComponent } from './home.component';
 import { OverviewComponent } from './overview/overview.component';
 import { CommonModule } from '@angular/common';
@@ -15,7 +20,11 @@ import { RouterModule } from '@angular/router';
     RouterModule,
     CommonModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NzCarouselModule,
+    NzDividerModule,
+    NzListModule,
+    NzEmptyModule
   ],
   declarations: [
     HomeComponent,

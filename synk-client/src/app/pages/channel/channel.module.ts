@@ -4,6 +4,14 @@ import { FormsModule } from '@angular/forms';
 
 import { PlyrModule } from 'ngx-plyr';
 
+import { NzListModule } from 'ng-zorro-antd/list';
+import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzEmptyModule } from 'ng-zorro-antd/empty';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzInputModule } from 'ng-zorro-antd/input';
+
 import { ChannelComponent } from './channel.component';
 import { ChatRoomComponent } from './chat-room/chat-room.component';
 import { ChatService } from './chat.service';
@@ -31,12 +39,19 @@ import { ConnectedMembersComponent } from './connected-members/connected-members
     PlayerDebugComponent,
     TwitchComponent,
     PlyrComponent,
-    ConnectedMembersComponent
+    ConnectedMembersComponent,
   ],
   imports: [
     CommonModule,
     FormsModule,
-    PlyrModule
+    PlyrModule,
+    NzListModule,
+    NzDividerModule,
+    NzCardModule,
+    NzFormModule,
+    NzEmptyModule,
+    NzButtonModule,
+    NzInputModule,
   ],
   providers: [ChatService]
 })
