@@ -11,6 +11,7 @@ import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 
 import { ChannelComponent } from './channel.component';
 import { ChatRoomComponent } from './chat-room/chat-room.component';
@@ -23,6 +24,7 @@ import { PlayerDebugComponent } from './player-debug/player-debug.component';
 import { PlaylistComponent } from './playlist/playlist.component';
 import { PlyrComponent } from './media/plyr/plyr.component';
 import { ConnectedMembersComponent } from './connected-members/connected-members.component';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 
 @NgModule({
   entryComponents: [
@@ -52,6 +54,9 @@ import { ConnectedMembersComponent } from './connected-members/connected-members
     NzEmptyModule,
     NzButtonModule,
     NzInputModule,
+    NzCollapseModule,
+    NzIconModule
+
   ],
   providers: [ChatService]
 })

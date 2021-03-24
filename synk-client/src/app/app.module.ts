@@ -23,6 +23,7 @@ import { AccountModule } from './pages/account/account.module';
 import { AppStateService } from './app-state.service';
 import { SocketService } from './socket.service';
 import { MetaModule } from './pages/meta/meta.module';
+import { NzButtonModule } from 'ng-zorro-antd/button';
 
 registerLocaleData(en);
 
@@ -32,7 +33,6 @@ registerLocaleData(en);
     BrowserModule,
     AppRoutingModule,
     IconsProviderModule,
-    NzIconModule,
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
@@ -41,10 +41,12 @@ registerLocaleData(en);
     ChannelModule,
     AccountModule,
     MetaModule,
+    NzIconModule,
     NzNotificationModule,
     NzLayoutModule,
     NzMenuModule,
     NzToolTipModule,
+    NzButtonModule,
   ],
   providers: [
     { provide: NZ_I18N, useValue: en_US },
