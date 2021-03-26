@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, fromEvent, merge } from 'rxjs';
-// import { io } from 'socket.io-client';
 import * as io from 'socket.io-client';
 
 import { environment } from '../environments/environment';
@@ -19,7 +18,6 @@ export interface RealTimeCommand {
 })
 export class SocketService {
 
-  // socket = io(`${environment.api}`, { withCredentials: true });
   socket = io(`${environment.api}`);
 
   private socket$ = of(this.socket).pipe(
