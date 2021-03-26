@@ -76,6 +76,7 @@ export class SocketService {
       switchMap((socket) =>
         fromEvent(socket, event)
       ),
+      doLog('listenForEvent', true),
       map(e => (e as T)),
     );
   }
