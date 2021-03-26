@@ -25,6 +25,7 @@ import { PlaylistComponent } from './playlist/playlist.component';
 import { PlyrComponent } from './media/plyr/plyr.component';
 import { ConnectedMembersComponent } from './connected-members/connected-members.component';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 
 @NgModule({
   entryComponents: [
@@ -55,7 +56,8 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
     NzButtonModule,
     NzInputModule,
     NzCollapseModule,
-    NzIconModule
+    NzIconModule,
+    NzToolTipModule,
 
   ],
   providers: [ChatService]
