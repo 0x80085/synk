@@ -18,6 +18,7 @@ export class ChatService {
 
   roomMessages$ = this.socketService.listenForEvent(RoomCommands.GROUP_MESSAGE).pipe(
     map((data: Message[]) => {
+      this.messageQueue = [];
       this.messageQueue = this.messageQueue.concat(data);
       return this.messageQueue;
     })
