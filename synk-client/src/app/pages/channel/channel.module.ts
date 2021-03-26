@@ -2,8 +2,16 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { NgZorroAntdModule } from 'ng-zorro-antd';
 import { PlyrModule } from 'ngx-plyr';
+
+import { NzListModule } from 'ng-zorro-antd/list';
+import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzEmptyModule } from 'ng-zorro-antd/empty';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 
 import { ChannelComponent } from './channel.component';
 import { ChatRoomComponent } from './chat-room/chat-room.component';
@@ -16,6 +24,7 @@ import { PlayerDebugComponent } from './player-debug/player-debug.component';
 import { PlaylistComponent } from './playlist/playlist.component';
 import { PlyrComponent } from './media/plyr/plyr.component';
 import { ConnectedMembersComponent } from './connected-members/connected-members.component';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 
 @NgModule({
   entryComponents: [
@@ -32,13 +41,22 @@ import { ConnectedMembersComponent } from './connected-members/connected-members
     PlayerDebugComponent,
     TwitchComponent,
     PlyrComponent,
-    ConnectedMembersComponent
+    ConnectedMembersComponent,
   ],
   imports: [
     CommonModule,
     FormsModule,
-    NgZorroAntdModule,
-    PlyrModule
+    PlyrModule,
+    NzListModule,
+    NzDividerModule,
+    NzCardModule,
+    NzFormModule,
+    NzEmptyModule,
+    NzButtonModule,
+    NzInputModule,
+    NzCollapseModule,
+    NzIconModule
+
   ],
   providers: [ChatService]
 })

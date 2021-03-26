@@ -4,7 +4,7 @@ import * as io from 'socket.io-client';
 
 import { environment } from '../environments/environment';
 import { switchMap, map, tap, share, withLatestFrom, catchError, mapTo, shareReplay } from 'rxjs/operators';
-import { NzNotificationService } from 'ng-zorro-antd';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { PossibleCommands } from './pages/channel/models/commands.enum';
 import { doLog } from './utils/custom.operators';
 
@@ -76,6 +76,7 @@ export class SocketService {
       switchMap((socket) =>
         fromEvent(socket, event)
       ),
+      doLog('listenForEvent', true),
       map(e => (e as T)),
     );
   }

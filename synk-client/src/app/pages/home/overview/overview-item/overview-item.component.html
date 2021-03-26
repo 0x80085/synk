@@ -5,14 +5,14 @@
 </nz-card>
 
 <ng-template #members>
-  <button nz-button nzType="link" nz-tooltip [nzTitle]="item.connectedMemberCount + ' user(s) in room'"
+  <button nz-button nzType="link" nz-tooltip [nzTooltipTitle]="item.connectedMemberCount + ' user(s) in room'"
     style="margin: 0 .5rem; margin-top: 5px;">
     <i nz-icon nzType="team"></i>{{ item.connectedMemberCount }}
   </button>
 </ng-template>
 
 <ng-template #nowPlaying>
-  <p nz-tooltip [nzTitle]="item.nowPlaying" nzType="link" nz-paragraph nzEllipsis nzEllipsisRows="1"
+  <p nz-tooltip [nzTooltipTitle]="item.nowPlaying" nzType="link" nz-paragraph nzEllipsis nzEllipsisRows="1"
     style="margin: 0 .5rem; margin-top: 5px;">
     <i nz-icon nzType="caret-right"></i>{{ item.nowPlaying }}</p>
 </ng-template>

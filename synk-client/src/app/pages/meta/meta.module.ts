@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { NgZorroAntdModule } from 'ng-zorro-antd';
+
+import { NzLayoutModule } from 'ng-zorro-antd/layout';
+import { NzStatisticModule } from 'ng-zorro-antd/statistic';
 
 import { AboutComponent } from './about/about.component';
 
@@ -8,7 +10,8 @@ import { AboutComponent } from './about/about.component';
   declarations: [AboutComponent],
   imports: [
     CommonModule,
-    NgZorroAntdModule
+    NzStatisticModule,
+    NzLayoutModule,
   ]
 })
 export class MetaModule { }

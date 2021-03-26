@@ -7,14 +7,14 @@
   </nz-list-item>
   <ng-template #leaderIcon>
     <i [hidden]="!member.isLeader" nz-icon style="color: white; font-size: 1rem;" nzType="interaction"
-      nz-tooltip nzTitle="This user currently controls the playback"></i>
+      nz-tooltip nzTooltipTitle="This user currently controls the playback"></i>
   </ng-template>
   <ng-template #ownerIcon>
     <i [hidden]="!member.isOwner" nz-icon style="color: white; font-size: 1rem;" nzType="shop" nz-tooltip
-      nzTitle="Owner of this channel"></i>
+    nzTooltipTitle="Owner of this channel"></i>
   </ng-template>
   <ng-template #giveLeaderBtn>
-    <button nz-button nzType="link" nz-tooltip nzTitle="Hand over playback control to user"
+    <button nz-button nzType="link" nz-tooltip nzTooltipTitle="Hand over playback control to user"
       [hidden]="member.isLeader || !(loggedInUserIsLeader$ | async)" (click)="this.giveLeader.emit(member)">
       <i nz-icon nzType="api"></i>
     </button>

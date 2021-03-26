@@ -1,8 +1,14 @@
 import { NgModule } from '@angular/core';
 
+import { NzCarouselModule } from 'ng-zorro-antd/carousel';
+import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { NzListModule } from 'ng-zorro-antd/list';
+import { NzEmptyModule } from 'ng-zorro-antd/empty';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+
 import { HomeComponent } from './home.component';
 import { OverviewComponent } from './overview/overview.component';
-import { NgZorroAntdModule } from 'ng-zorro-antd';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SushiBannerComponent } from './banners/sushi-banner/sushi-banner.component';
@@ -10,6 +16,7 @@ import { PopcornBannerComponent } from './banners/popcorn-banner/popcorn-banner.
 import { NekoBannerComponent } from './banners/neko-banner/neko-banner.component';
 import { OverviewItemComponent } from './overview/overview-item/overview-item.component';
 import { RouterModule } from '@angular/router';
+import { NzButtonModule } from 'ng-zorro-antd/button';
 
 @NgModule({
   imports: [
@@ -17,7 +24,13 @@ import { RouterModule } from '@angular/router';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    NgZorroAntdModule
+    NzCarouselModule,
+    NzDividerModule,
+    NzListModule,
+    NzEmptyModule,
+    NzCardModule,
+    NzToolTipModule,
+    NzButtonModule
   ],
   declarations: [
     HomeComponent,
