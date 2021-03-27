@@ -13,6 +13,8 @@ import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzCollapseModule } from 'ng-zorro-antd/collapse';
+import { NzTableModule } from 'ng-zorro-antd/table';
 
 import { AdminComponent } from './admin/admin.component';
 import { OwnedChannelsComponent } from './profile/owned-channels/owned-channels.component';
@@ -48,6 +50,8 @@ import { CreateRoomFormComponent } from './create-room-form/create-room-form.com
     NzButtonModule,
     NzInputModule,
     NzCheckboxModule,
+    NzCollapseModule,
+    NzTableModule,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: RequestLogInterceptor, multi: true },
