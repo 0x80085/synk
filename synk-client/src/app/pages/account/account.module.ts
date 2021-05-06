@@ -25,6 +25,7 @@ import { PlaceholdPipe } from './profile/placehold.pipe';
 import { UsernamePipe } from './profile/username.pipe';
 import { RequestLogInterceptor } from './interceptors/auth-error.interceptor';
 import { CreateRoomFormComponent } from './create-room-form/create-room-form.component';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 
 @NgModule({
   declarations: [
@@ -52,6 +53,7 @@ import { CreateRoomFormComponent } from './create-room-form/create-room-form.com
     NzCheckboxModule,
     NzCollapseModule,
     NzTableModule,
+    NzIconModule,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: RequestLogInterceptor, multi: true },

@@ -34,7 +34,7 @@ export class SocketService {
   connectionError$ = this.listenForEvent('error').pipe(mapTo({ event: 'error', connected: false }));
   connectionTimeOut$ = this.listenForEvent('connect_timeout').pipe(mapTo({ event: 'connect_timeout', connected: false }));
 
-  permissionError$ = this.listenForEvent('authentication error').pipe(mapTo({ event: 'authentication error', connected: false }));
+  permissionError$ = this.listenForEvent('exception').pipe(map(({ message }) => message as string));
   // should prob be more like  this.socketService.listenForEvent<AddMediaExceptionEvent>(SocketCommands.EXCEPTION).pipe(filter(({ message }) => message === "AddMediaException")
 
   disconnection$ = this.listenForEvent('disconnect').pipe(mapTo({ event: 'disconnect', connected: false }));
@@ -44,7 +44,6 @@ export class SocketService {
     this.reconnectionSuccess$,
     this.reconnectionAttempt$,
     this.reconnectionError$,
-    this.permissionError$,
     this.connectionError$,
     this.disconnection$,
     this.reconnectionFail$,

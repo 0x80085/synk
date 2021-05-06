@@ -59,10 +59,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
     this.loggedInUserIsLeader = ev.isLeader;
   });
 
-  errorEventSubscription = merge(
-    this.socketService.connectionError$,
-    this.socketService.permissionError$
-  ).pipe(
+  errorEventSubscription = this.socketService.connectionError$.pipe(
     tap(x => {
       this.notification.error('Hmm.. Something went wrong here', 'Maybe try logging in again?');
       this.mediaUpdateTimerSubscription.unsubscribe();
@@ -116,9 +113,9 @@ export class ChannelComponent implements OnInit, OnDestroy {
         return;
       }
       this.nowPlayingUrl = this.player.getCurrentUrl();
-      this.activeItemSubject.next( this.nowPlayingUrl);
+      this.activeItemSubject.next(this.nowPlayingUrl);
       this.mediaService.sendMediaEvent({
-        mediaUrl:  this.nowPlayingUrl,
+        mediaUrl: this.nowPlayingUrl,
         currentTime: this.player.getCurrentTime(),
         roomName: this.name
       });

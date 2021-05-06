@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Observable} from 'rxjs';
+import { Observable } from 'rxjs';
 
 import {
   Message,
@@ -10,21 +10,16 @@ import {
   RoomCommands
 } from './models/room.models';
 import { SocketService, RealTimeCommand } from '../../socket.service';
-import { map } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 
 @Injectable()
 export class ChatService {
-  messageQueue: Message[] = [];
 
-  roomMessages$ = this.socketService.listenForEvent(RoomCommands.GROUP_MESSAGE).pipe(
-    map((data: Message[]) => {
-      this.messageQueue = [];
-      this.messageQueue = this.messageQueue.concat(data);
-      return this.messageQueue;
-    })
+  roomMessages$ = this.socketService.listenForEvent<Message[]>(RoomCommands.GROUP_MESSAGE);
+
+  alreadyJoinedRoomError$ = this.socketService.permissionError$.pipe(
+    filter((msg) => msg === "already joined")
   );
-
-  alreadyJoinedRoomError$ = this.socketService.listenForEvent('already joined');
 
   roomUserConfig$ = this.socketService.listenForEvent<RoomUserConfig>(RoomCommands.USER_CONFIG);
 
@@ -54,6 +49,5 @@ export class ChatService {
   exit(name: string) {
     this.socketService.socket.emit(RoomCommands.EXIT_ROOM, name);
     this.socketService.socket.off(RoomCommands.GROUP_MESSAGE);
-    this.messageQueue = [];
   }
 }
