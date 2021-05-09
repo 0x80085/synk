@@ -26,6 +26,7 @@ import { PlyrComponent } from './media/plyr/plyr.component';
 import { ConnectedMembersComponent } from './connected-members/connected-members.component';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+import { NzTypographyModule } from 'ng-zorro-antd/typography';
 
 @NgModule({
   entryComponents: [
@@ -58,6 +59,7 @@ import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
     NzCollapseModule,
     NzIconModule,
     NzToolTipModule,
+    NzTypographyModule
 
   ],
   providers: [ChatService]

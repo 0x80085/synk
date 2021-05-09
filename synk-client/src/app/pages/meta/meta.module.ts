@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzStatisticModule } from 'ng-zorro-antd/statistic';
+import { NzTypographyModule } from 'ng-zorro-antd/typography';
 
 import { AboutComponent } from './about/about.component';
 
@@ -12,6 +13,7 @@ import { AboutComponent } from './about/about.component';
     CommonModule,
     NzStatisticModule,
     NzLayoutModule,
+    NzTypographyModule
   ]
 })
 export class MetaModule { }
