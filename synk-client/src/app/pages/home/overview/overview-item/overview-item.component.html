@@ -12,7 +12,6 @@
 </ng-template>
 
 <ng-template #nowPlaying>
-  <p nz-tooltip [nzTooltipTitle]="item.nowPlaying" nzType="link" nz-paragraph nzEllipsis nzEllipsisRows="1"
+  <p nz-tooltip [nzTooltipTitle]="item.nowPlaying" nzType="link" [nzContent]="item.nowPlaying" nz-paragraph nzEllipsis nzEllipsisRows="1"
     style="margin: 0 .5rem; margin-top: 5px;">
-    <i nz-icon nzType="caret-right"></i>{{ item.nowPlaying }}</p>
 </ng-template>
