@@ -148,6 +148,40 @@
       </nz-collapse>
 
     </nz-card>
+    
+    <nz-card [nzLoading]="!(connections$ | async)">
+      
+
+
+        <pre> {{ connections$ | async | json  }} </pre>
+
+        <!-- <nz-collapse-panel *ngFor="let connection of (connections$ | async)" [nzHeader]="room.name"
+          [nzExpandedIcon]="expandIcon">
+          <ng-template #expandIcon>
+            <i nz-icon style="margin-right: 20px;" nzType="video-camera"></i>
+          </ng-template>
+
+          <nz-descriptions nzTitle="User Info" nzLayout="vertical">
+            <nz-descriptions-item nzTitle="Name">
+              <span nz-typography><code>{{ room.name }}</code></span>
+            </nz-descriptions-item>
+            <nz-descriptions-item nzTitle="ID">
+              <span nz-typography><code>{{ room.id }}</code></span>
+            </nz-descriptions-item>
+          </nz-descriptions>
+
+          <nz-divider></nz-divider>
+
+          <p nz-typography><strong>Permission actions</strong></p>
+          <p>
+            <button nz-button nzType="default">Change global permission level</button>
+            <button nz-button nzType="default" style=" margin-left: 0.5rem;">Change permission level in room...</button>
+            <button nz-button nzType="default" nzDanger style=" margin-left: 0.5rem;"
+              (click)="deleteRoom(room.id, room.name)">Delete room</button>
+          </p>
+        </nz-collapse-panel> -->
+
+    </nz-card>
 
   </div>
 </div>

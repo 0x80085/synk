@@ -17,6 +17,7 @@ export class AdminComponent implements OnInit {
   me$: Observable<User> = this.authService.getUser();
   users$: Observable<UserInfo> = this.adminService.getUsers().pipe(shareReplay(1));
   channels$: Observable<Channel[]> = this.adminService.getChannels().pipe(shareReplay(1));
+  connections$ = this.adminService.getConnections().pipe(shareReplay(1));
 
   accounts$: Observable<UserAccountInfo[]> = this.users$.pipe(map(it => it.items));
 

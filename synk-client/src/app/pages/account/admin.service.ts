@@ -65,6 +65,19 @@ export interface ChannelResponse {
   publicChannels: ChannelSummary[];
 }
 
+export interface ConnectionsResponse {
+  memberInRoomTrackerList: {
+      memberId: string;
+      roomId: string;
+      socketId: string;
+  }[];
+  clientsList: {
+      roomId: string;
+      socketId: string;
+      memberId: string;
+  }[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -104,6 +117,14 @@ export class AdminService {
       params
     }).pipe(
       map(data => data.items),
+      shareReplay(1)
+    );
+  }
+
+  getConnections(): Observable<ConnectionsResponse> {
+    return this.http.get<ConnectionsResponse>(`${environment.api}/admin/connections`, {
+      withCredentials: true,
+    }).pipe(
       shareReplay(1)
     );
   }
