@@ -25,6 +25,7 @@ import { SocketService } from './socket.service';
 import { MetaModule } from './pages/meta/meta.module';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
 
 registerLocaleData(en);
 
@@ -49,6 +50,7 @@ registerLocaleData(en);
     NzToolTipModule,
     NzButtonModule,
     NzTypographyModule,
+    NzAlertModule,
   ],
   providers: [
     { provide: NZ_I18N, useValue: en_US },

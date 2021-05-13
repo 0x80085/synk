@@ -5,6 +5,13 @@
   max-width: 100vw;
 }
 
+nz-alert {
+  margin-bottom: 12px;
+  ::ng-deep span {
+    color: black;
+  }
+}
+
 .menu-sidebar {
   position: relative;
   z-index: 10;
@@ -15,7 +22,7 @@
   height: 64px;
   padding: 20px 24px;
   cursor: pointer;
-  transition: all .3s,padding 0s;
+  transition: all 0.3s, padding 0s;
 }
 
 .sidebar-logo {
@@ -24,7 +31,7 @@
   padding-left: 24px;
   overflow: hidden;
   line-height: 64px;
-  transition: all .3s;
+  transition: all 0.3s;
 }
 
 .sidebar-logo img {
@@ -54,7 +61,7 @@ nz-header {
   padding: 0;
 }
 
-.item:hover{
+.item:hover {
   background-color: rgb(255, 105, 78);
 }
 

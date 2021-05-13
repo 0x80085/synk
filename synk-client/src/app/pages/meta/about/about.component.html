@@ -1,41 +1,56 @@
 <nz-layout>
   <nz-content>
-
     <h1 nz-typography>About Synk</h1>
 
     <p nz-typography>
-      <nz-statistic [nzValue]="version" [nzTitle]="'Version'" [nzPrefix]="prefixTpl"></nz-statistic>
+      <nz-statistic
+        [nzValue]="version"
+        [nzTitle]="'Version'"
+        [nzPrefix]="prefixTpl"
+      ></nz-statistic>
       <ng-template #prefixTpl><i nz-icon nzType="tag"></i></ng-template>
     </p>
-    <p nz-typography>
-      New releases will be announced on the Synk discord
-    </p>
+    <p nz-typography>New releases will be announced on the Synk discord</p>
 
     <h1 nz-typography>What this</h1>
+
     <p nz-typography>
-      Intro about section
+      Viewers can watch videos together with other connected viewers in
+      viewer-maintained channels.
+    <br>
+      Video content can be added from different video hosts (e.g., YouTube,
+      Twitch) and the playback is synchronized for all the viewers in the
+      channel.
+    </p>
+    <p nz-typography>
+      Each channel has a chat feed for discussion and a playlist where users can
+      queue up videos to play.
+    </p>
+
+    <p nz-typography>
+      Currently only logged in users can enter channels and watch content but
+      that may change in the future.
+    </p>
+
+    <p nz-typography>
+      This project is intended to be open sourced once I deem it stable enough
+      to release to the public.
     </p>
 
     <h2 nz-typography>Terms and Conditions</h2>
-    <p nz-typography>
-      Some link to T&C document
-    </p>
+    <p nz-typography>Some link to T&C document (todo)</p>
 
     <h2 nz-typography>Community</h2>
-    <p nz-typography>
-
-      Join discord and stuff
-    </p>
+    <p nz-typography>Join discord once I open source this project</p>
 
     <h2 nz-typography>Contribute</h2>
-    <p nz-typography>
-      LInk to GH repo
-    </p>
+    <p nz-typography>Link to GH repo once open sourced</p>
 
     <h2 nz-typography>Donate</h2>
+    <p nz-typography>Well i would be greedy to ask dons this early.</p>
     <p nz-typography>
-      gib me magic interweb moniez plox
+      So if you catch me in the chat, just ask if you wanna join forces in
+      developing this platform
     </p>
-
   </nz-content>
 </nz-layout>
