@@ -1,0 +1,273 @@
+import * as socketio from 'socket.io';
+
+import { Logger } from '@nestjs/common';
+import {
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  OnGatewayInit,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+  WsException
+} from '@nestjs/websockets';
+
+import { getMemberSummary } from '../models/member/member.representation';
+import { toRepresentation } from '../models/playlist/playlist.representation';
+import { RoomService } from '../services/room.service';
+import { MessageTypes } from './message-types.enum';
+import { SOCKET_IO_CONFIG } from './socketio.config';
+import { Roles } from 'src/domain/entity';
+import { Media } from '../models/media/media';
+import { YouTubeGetID, YoutubeV3Service } from 'src/tv/crawlers/youtube-v3.service';
+import { ConnectionTrackingService } from '../services/connection-tracking.service';
+import { Room } from '../models/room/room';
+import { catchError, map, mergeMap, switchMap, tap } from 'rxjs/operators';
+import { from, iif, of } from 'rxjs';
+
+@WebSocketGateway(SOCKET_IO_CONFIG)
+export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+
+  private readonly logger = new Logger(RoomMessagesGateway.name);
+
+  @WebSocketServer()
+  server: socketio.Server;
+
+  constructor(
+    private roomService: RoomService,
+    private ytService: YoutubeV3Service,
+    private tracker: ConnectionTrackingService,
+  ) { }
+
+  handleConnection(client: socketio.Socket) {
+    try {
+      this.tracker.trackMemberConnection(client);
+    } catch (error) {
+      this.logger.log(error);
+      this.logger.log(`^^^ Failed to handleConnection from [${this.tracker.getIpFromSocket(client)}]`);
+      client.disconnect();
+    }
+  }
+
+  handleDisconnect(client: socketio.Socket) {
+    // TODO leave from connected rooms for member also update the tracker.clients
+    // TODO Or use the hearbeat/ping to determine connected and remove stale connections 
+    this.logger.log(client.handshake.address);
+  }
+
+  afterInit(server: socketio.Server) {
+    this.logger.log('WS server started');
+  }
+
+  @SubscribeMessage(MessageTypes.GROUP_MESSAGE)
+  async handleMessage(client: socketio.Socket, { roomName, content }: { roomName: string, content: { text: string } }) {
+    const member = await this.tracker.getMemberBySocket(client);
+
+    const room = this.roomService.getRoomByName(roomName);
+    room.addMessage(member, content.text);
+
+    this.broadcastGroupMessageToRoom(room);
+  }
+
+  @SubscribeMessage(MessageTypes.MEDIA_EVENT)
+  async handleUpdateNowPlaying(client: socketio.Socket, { roomName, currentTime: time, mediaUrl: url }: { roomName: string, mediaUrl: string, currentTime: any }) {
+    const room = this.roomService.getRoomByName(roomName);
+    const member = await this.tracker.getMemberBySocket(client);
+
+    room.updateNowPlaying(member, { time, url });
+
+    this.broadcastNowPlayingToRoom(room);
+    this.broadcastPlaylistToRoom(room);
+  }
+
+  @SubscribeMessage(MessageTypes.JOIN_ROOM)
+  async handleJoinRoom(client: socketio.Socket, name: string) {
+    const room = this.roomService.getRoomByName(name)
+
+    this.logger.log("handleJoinRoom")
+
+    if (this.tracker.isClientInRoom(client, room.id)) {
+      console.log(this.tracker.memberInRoomTracker);
+
+      throw new WsException('already joined');
+    }
+
+    const member = await this.tracker.getMemberBySocket(client);
+    try {
+
+      room.enter(member);
+      client.join(room.id);
+
+      this.tracker.memberJoinsRoom(client, room.id)
+
+      this.logger.log(`${client.id} ${room.id}`);
+      this.logger.log(`${client.rooms}`);
+
+
+      this.broadcastMemberlistToRoom(room);
+      this.broadcastGroupMessageToRoom(room);
+
+      this.sendRoomConfigToMember(room, member.id, client);
+      this.sendPlaylistToMember(room, member.id, client);
+
+    } catch (error) {
+      if (error.message === "already joined") {
+        throw new WsException("already joined");
+      } else {
+        throw new WsException("error");
+      }
+    }
+  }
+
+  @SubscribeMessage(MessageTypes.EXIT_ROOM)
+  async handleLeaveRoom(client: socketio.Socket, name: string) {
+    this.logger.log('handleLeaveRoom');
+
+    const member = await this.tracker.getMemberBySocket(client)
+    const room = this.roomService.getRoomByName(name);
+
+    if (this.tracker.isClientInRoom(client, room.id)) {
+      room.leave(member);
+      client.leave(room.id);
+
+      this.tracker.memberLeavesRoom(client, room.id);
+
+      this.broadcastMemberlistToRoom(room);
+      this.broadcastGroupMessageToRoom(room);
+      this.logger.log(`handleLeaveRoom - client left`);
+    } else {
+      this.logger.log(`handleLeaveRoom - noop no user was connected in that room`);
+    }
+  }
+
+  @SubscribeMessage(MessageTypes.VOTE_SKIP)
+  async handleVoteSkip(client: socketio.Socket, name: string) {
+    this.logger.log('handleVoteSkip');
+
+    const member = await this.tracker.getMemberBySocket(client);
+    const room = this.roomService.getRoomByName(name);
+
+    if (room.members.indexOf(member) != -1) {
+      room.voteSkip(member);
+      this.broadcastVoteSkipResultsToRoom(room);
+    }
+  }
+
+
+  @SubscribeMessage(MessageTypes.GIVE_LEADER)
+  async handleGiveLeader(requestingMemberSocket: socketio.Socket, { roomName, newLeaderId }: { roomName: string, newLeaderId: string }) {
+    this.logger.log('handleGiveLeader');
+
+    // TODO move this logic somewhere else model or/and service  
+    const requestingMember = await this.tracker.getMemberBySocket(requestingMemberSocket);
+    const newLeaderSocket = this.tracker.getSocketByMemberId(newLeaderId);
+
+    const room = this.roomService.getRoomByName(roomName);
+
+    this.roomService.giveLeader(room.id, requestingMember, newLeaderId);
+
+    this.broadcastMemberlistToRoom(room);
+    this.sendRoomConfigToMember(room, requestingMember.id, requestingMemberSocket);
+    this.sendRoomConfigToMember(room, newLeaderId, newLeaderSocket);
+  }
+
+  @SubscribeMessage(MessageTypes.ADD_MEDIA)
+  handleAddMedia(client: socketio.Socket, { roomName, mediaUrl }: { roomName: string, mediaUrl: string }) {
+    this.logger.log('handleAddMedia');
+    const placeholder = new Media(mediaUrl, "unkown", 1000);
+
+    // TODO move to service
+    return from(this.tracker.getMemberBySocket(client)).pipe(
+      map(member => ({ member, room: this.roomService.getRoomByName(roomName), ytVideoId: YouTubeGetID(mediaUrl) })),
+      mergeMap(({ member, room, ytVideoId }) =>
+        iif(
+          () => !Boolean(ytVideoId),
+          of({ media: placeholder, room, member }),
+          this.ytService.getVideoMetaData(ytVideoId).pipe(
+            map(({ title, duration }) => new Media(mediaUrl, title, duration)),
+            map(media => ({ media, room, member })),
+            catchError((e) => {
+              this.logger.error("YT failed to query video", e)
+              console.log(e);
+              throw new WsException("AddMediaException");
+            }))
+        )),
+      tap(({ media, room, member }) => room.addMediaToPlaylist(member, media)),
+      tap(({ room }) => this.broadcastPlaylistToRoom(room)),
+      tap(_ => client.emit(MessageTypes.ADD_MEDIA_REQUEST_APPROVED, mediaUrl)),
+      catchError(e => {
+        if (e.message === 'Unauthorized') { throw new WsException("Unauthorized"); }
+        throw new WsException("AddMediaException");
+      }));
+  }
+
+  @SubscribeMessage(MessageTypes.REMOVE_MEDIA)
+  async handleRemoveMedia(client: socketio.Socket, { roomName, mediaUrl }: { roomName: string, mediaUrl: string }) {
+    this.logger.log('handelRemoveMeida');
+
+    return from(this.tracker.getMemberBySocket(client)).pipe(
+      map(member => ({ member, room: this.roomService.getRoomByName(roomName) })),
+      tap(({ room, member }) => room.removeMediaFromPlaylist(member, mediaUrl)),
+      tap(({ room }) => this.broadcastPlaylistToRoom(room)),
+      tap(_ => client.emit(MessageTypes.REMOVE_MEDIA_SUCCESS, mediaUrl)),
+      catchError(e => {
+        if (e.message === 'Unauthorized') { throw new WsException("Unauthorized"); }
+        throw new WsException(MessageTypes.REMOVE_MEDIA_FAILED);
+      })
+    )
+  }
+
+  private broadcastMemberlistToRoom(room: Room) {
+    const list = room.members.map(m => getMemberSummary(m, room));
+
+    this.server.in(room.id).emit(MessageTypes.MEMBERLIST_UPDATE, list);
+  }
+
+  private broadcastPlaylistToRoom(room: Room) {
+    const playlist = toRepresentation(room.currentPlaylist);
+    this.server.in(room.id).emit(MessageTypes.PLAYLIST_UPDATE, playlist);
+  }
+
+  private broadcastGroupMessageToRoom(room: Room) {
+    const lastMessages = room.messages.queue.toArray()
+      .map((msg) => ({
+        username: msg.author.username,
+        text: msg.displayText
+      }));
+    this.server.in(room.id).emit(MessageTypes.GROUP_MESSAGE, lastMessages);
+  }
+
+  private broadcastNowPlayingToRoom(room: Room) {
+    const mediaEvent = {
+      mediaUrl: room.currentPlaylist.nowPlaying().media.url,
+      currentTime: room.currentPlaylist.nowPlaying().time
+    }
+    this.server.in(room.id).emit(MessageTypes.MEDIA_EVENT, mediaEvent);
+  }
+
+  private broadcastVoteSkipResultsToRoom(room: Room) {
+    this.server.in(room.id).emit(MessageTypes.VOTE_SKIP, room.currentPlaylist.voteSkipCount);
+  }
+
+  private sendRoomConfigToMember(room: Room, memberId: string, client: socketio.Socket) {
+    const moderator = room.moderators.find(mod => mod.member.id === memberId);
+    const role = !!moderator
+      ? Roles.moderator
+      : room.owner.id === memberId
+        ? Roles.admin
+        : Roles.member
+
+    const config = {
+      isLeader: room.leader.id === memberId,
+      isOwner: room.owner.id === memberId,
+      permissionLevel: moderator?.level || 0,
+      role
+    };
+
+    client.emit(MessageTypes.USER_CONFIG, config);
+  }
+
+  private sendPlaylistToMember(room: Room, id: string, client: socketio.Socket) {
+    const playlist = toRepresentation(room.currentPlaylist);
+    client.emit(MessageTypes.PLAYLIST_UPDATE, playlist);
+  }
+}

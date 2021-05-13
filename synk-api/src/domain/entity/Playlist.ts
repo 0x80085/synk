@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn, JoinTable } from 'typeorm';
-import { User } from './User';
+import { Member } from './Member';
 import { Video } from './Video';
 
 @Entity()
@@ -14,17 +14,10 @@ export class Playlist {
   @Column({ default: false })
   isLocked: boolean;
 
-  @ManyToOne(type => User, user => user.playlists)
-  createdBy: User;
+  @ManyToOne(type => Member, member => member.playlists)
+  createdBy: Member;
 
-  @ManyToMany(type => Video, video => video.playlist)
+  @ManyToMany(type => Video, video => video.playlist, { onDelete: 'CASCADE' })
   @JoinTable()
   videos: Video[];
-
-  static create(name: string) {
-    const ls = new Playlist();
-    ls.name = name;
-    return ls;
-  }
-
 }

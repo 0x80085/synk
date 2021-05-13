@@ -1,6 +1,6 @@
-import { Column, Entity, ManyToMany, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Playlist } from './Playlist';
-import { User } from './User';
+import { Member } from './Member';
 
 @Entity()
 export class Video {
@@ -17,16 +17,9 @@ export class Video {
   @Column()
   dateAdded: Date;
 
-  @OneToMany(type => User, user => user.videos)
-  addedBy: User;
+  @OneToMany(type => Member, member => member.videos)
+  addedBy: Member;
 
   @ManyToMany(type => Playlist, playlist => playlist.videos)
   playlist: Playlist;
-
-  static create(url: any): Video {
-    const video = new Video();
-    video.url = url;
-    video.dateAdded = new Date();
-    return video;
-  }
 }
