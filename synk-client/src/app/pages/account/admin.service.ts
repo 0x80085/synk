@@ -125,7 +125,6 @@ export class AdminService {
     return this.http.get<ConnectionsResponse>(`${environment.api}/admin/connections`, {
       withCredentials: true,
     }).pipe(
-      shareReplay(1)
     );
   }
 
