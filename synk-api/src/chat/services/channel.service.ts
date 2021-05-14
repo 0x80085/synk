@@ -63,7 +63,7 @@ export class ChannelService {
         return this.channelRepository.find({ where: { isPublic: true } })
             .then(channels => channels.map((channel) => ({ channel, room: this.roomService.getRoomById(channel.id) })))
             .then(entries => entries.map(getChannelShortRepresentation))
-            .then((entries) => entries.sort((a, b) => a.connectedMemberCount - b.connectedMemberCount));
+            .then((entries) => entries.sort((a, b) =>  b.connectedMemberCount - a.connectedMemberCount));
     }
 
     async getById(id: string): Promise<ChannelRepresentation> {
