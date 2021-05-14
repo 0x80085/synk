@@ -50,8 +50,31 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
 
   handleDisconnect(client: socketio.Socket) {
     // TODO leave from connected rooms for member also update the tracker.clients
-    // TODO Or use the hearbeat/ping to determine connected and remove stale connections 
-    this.logger.log(client.handshake.address);
+    // TODO Or use the hearbeat/ping to determine connected and remove stale connections
+    try {
+      console.log('handleDisconnect for ' + client.handshake.address);
+      const memberId = (client.handshake as any).session.passport.user.id;
+
+      this.tracker.getMemberBySocket(client)
+        .then(member => { this.logger.log(` -> handleDisconnect for  ${memberId}`); return member })
+        .then(member => ({ connections: this.tracker.memberInRoomTracker.get(member.id), member }))
+        .then(({ connections, member }) => (connections || [] as {
+          roomId: string;
+          socketId: string;
+        }[])
+          .filter((conn) => conn.socketId === client.id)
+          .forEach(connection => {
+            console.log(connection);
+            
+            this.roomService.leaveRoom(connection.roomId, member)
+          }))
+        .then(() => client.leaveAll())
+        .then(() => this.tracker.memberDisconnects(client))
+        .catch(console.log)
+
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   afterInit(server: socketio.Server) {

@@ -16,10 +16,16 @@ export class ConnectionTrackingService {
 
     private readonly logger = new Logger(ConnectionTrackingService.name);
 
+    /**
+     *  [ key => ipAddress, value => { MemberId, socket } ]
+     */
     clients = new Map<string, { memberId: string, client: socketio.Socket }[]>();
     globallyBannedIps = new Map<string, string>();
 
-    memberInRoomTracker = new Map<string, { roomId: string, socketId: string }[]>(); // [ key => roomId, value => { memberId, socketId } ]
+    /**
+     *  [ key => memberId, value => { roomId, socketId } ]
+     */
+    memberInRoomTracker = new Map<string, { roomId: string, socketId: string }[]>();
 
     constructor(
         @InjectRepository(Member)
@@ -90,8 +96,9 @@ export class ConnectionTrackingService {
         }
     }
 
-    isClientInRoom = (client: socketio.Socket, roomId: string) => {
+    isClientInRoom(client: socketio.Socket, roomId: string) {
         const memberId = this.getMemberId(client);
+        const ipaddress = this.getIpFromSocket(client);
         const roomsOfMember = this.memberInRoomTracker.get(memberId);
         const socketId = client.id;
 
@@ -99,7 +106,17 @@ export class ConnectionTrackingService {
             return false;
         }
 
-        return  roomsOfMember.some(e => e.roomId === roomId && e.socketId === socketId);
+        const otherConnections = this.clients.get(ipaddress)
+            .filter(c => c.memberId === memberId && c.client.id !== socketId)
+            .map(conn => ({ client: conn.client, isInRoom: !!conn.client.rooms[roomId] }))
+
+        const hasOtherActiveSockets = otherConnections.filter(conn => conn.isInRoom && conn.client.connected)
+
+        // remove stale 
+
+        // join if all stale removed and none left
+
+        return roomsOfMember.some(e => e.roomId === roomId && e.socketId === socketId);
     }
 
     memberJoinsRoom(client: socketio.Socket, roomId: string) {
@@ -125,6 +142,28 @@ export class ConnectionTrackingService {
             this.logger.log("memberLeavesRoom updatedMemberList")
             this.logger.log(this.memberInRoomTracker)
         }
+    }
+
+    memberDisconnects(client: socketio.Socket) {
+        try {
+            const socketId = client.id;
+            const ipAddress = this.getIpFromSocket(client);
+            const memberId = this.getMemberId(client);
+
+            const trackRecords = this.clients.get(ipAddress);
+            const updateTrackRecods = trackRecords.filter(entry => entry.client.id !== socketId)
+
+            const roomTrackRecords = this.memberInRoomTracker.get(memberId);
+            const updateRoomTrackRecods = roomTrackRecords.filter(entry => entry.socketId !== socketId);
+
+
+            this.memberInRoomTracker.set(memberId, updateRoomTrackRecods);
+            this.clients.set(ipAddress, updateTrackRecods);
+        } catch (error) {
+            console.log(error);
+
+        }
+
     }
 
     private getMemberId = (client: socketio.Socket): string => ((client.handshake as any).session.passport.user.id);
