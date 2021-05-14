@@ -31,14 +31,14 @@ export class AdminService {
         let clients: any[] = [];
 
         [...this.trackingService.clients]
-            .map(([roomId, value]) => ({ roomId, value: value.map(v => ({ socketId: v.client.id, memberId: v.memberId })) }))
-            .map(({ roomId, value }) => {
+            .map(([ip, value]) => ({ ip, value: value.map(v => ({ socketId: v.client.id, memberId: v.memberId })) }))
+            .map(({ ip, value }) => {
                 value.forEach(it => {
-                    clients.push({ roomId, ...it })
+                    clients.push({ ip, ...it })
                 })
             });
 
-        const members = [...this.trackingService.memberInRoomTracker].map(([memberId, value]) => ({ memberId, ...value }))
+        const members = [...this.trackingService.memberInRoomTracker].map(([memberId, roomConnections]) => ({ memberId, roomConnections }))
 
 
         return { clients, members }
