@@ -34,12 +34,17 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
 
   messages$: Observable<Message[]> = this.chatServ.roomMessages$;
 
+  scrollDownListenerSub = this.messages$.pipe(
+    tap(_ => this.shouldScrollDown = true)
+  ).subscribe()
+
   roomError$ = this.chatServ.alreadyJoinedRoomError$.pipe(
     mapTo(true),
     tap(() => {
       this.notification.error('Illegal operation', `Can't join the same room more than once!`);
     })
   );
+  shouldScrollDown: boolean;
 
   constructor(private chatServ: ChatService,
     private notification: NzNotificationService
@@ -57,9 +62,11 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
 
   private scrollChatFeedDown() {
     try {
-      const feed: HTMLDivElement = this.feed.nativeElement.children[1];
+      const feed: HTMLDivElement = this.feed.nativeElement;
       feed.scrollTop = feed.scrollHeight;
-    } catch (error) { }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   ngOnInit() {
@@ -68,10 +75,14 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
 
   ngOnDestroy() {
     this.sendMessageSub.unsubscribe();
+    this.scrollDownListenerSub.unsubscribe();
     this.chatServ.exit(this.name);
   }
 
   ngAfterViewChecked() {
-    this.scrollChatFeedDown();
+    if (this.shouldScrollDown) {
+      this.scrollChatFeedDown()
+      this.shouldScrollDown = false;
+    }
   }
 }

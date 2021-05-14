@@ -9,7 +9,7 @@
         {{ name }}
       </h2>
     </div>
-    <div class="feed">
+    <div class="feed"  #feed> 
       <div *ngFor="let message of messages$ | async">
         <p>
           <span>{{ message.username }}</span>
