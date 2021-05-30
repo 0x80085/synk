@@ -21,8 +21,10 @@ import { Media } from '../models/media/media';
 import { YouTubeGetID, YoutubeV3Service } from 'src/tv/crawlers/youtube-v3.service';
 import { ConnectionTrackingService } from '../services/connection-tracking.service';
 import { Room } from '../models/room/room';
-import { catchError, map, mergeMap, switchMap, tap } from 'rxjs/operators';
+import { catchError, map, mapTo, mergeMap, switchMap, tap } from 'rxjs/operators';
 import { from, iif, of } from 'rxjs';
+import { CommandBus } from '@nestjs/cqrs';
+import { AddMediaToRoomCommand } from '../models/commands/add-media-to-room.command';
 
 @WebSocketGateway(SOCKET_IO_CONFIG)
 export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -34,8 +36,8 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
 
   constructor(
     private roomService: RoomService,
-    private ytService: YoutubeV3Service,
     private tracker: ConnectionTrackingService,
+    private commandBus: CommandBus,
   ) { }
 
   handleConnection(client: socketio.Socket) {
@@ -65,7 +67,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
           .filter((conn) => conn.socketId === client.id)
           .forEach(connection => {
             console.log(connection);
-            
+
             this.roomService.leaveRoom(connection.roomId, member)
           }))
         .then(() => client.leaveAll())
@@ -196,31 +198,15 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   @SubscribeMessage(MessageTypes.ADD_MEDIA)
   handleAddMedia(client: socketio.Socket, { roomName, mediaUrl }: { roomName: string, mediaUrl: string }) {
     this.logger.log('handleAddMedia');
-    const placeholder = new Media(mediaUrl, "unkown", 1000);
 
-    // TODO move to service
     return from(this.tracker.getMemberBySocket(client)).pipe(
-      map(member => ({ member, room: this.roomService.getRoomByName(roomName), ytVideoId: YouTubeGetID(mediaUrl) })),
-      mergeMap(({ member, room, ytVideoId }) =>
-        iif(
-          () => !Boolean(ytVideoId),
-          of({ media: placeholder, room, member }),
-          this.ytService.getVideoMetaData(ytVideoId).pipe(
-            map(({ title, duration }) => new Media(mediaUrl, title, duration)),
-            map(media => ({ media, room, member })),
-            catchError((e) => {
-              this.logger.error("YT failed to query video", e)
-              console.log(e);
-              throw new WsException("AddMediaException");
-            }))
-        )),
-      tap(({ media, room, member }) => room.addMediaToPlaylist(member, media)),
-      tap(({ room }) => this.broadcastPlaylistToRoom(room)),
-      tap(_ => client.emit(MessageTypes.ADD_MEDIA_REQUEST_APPROVED, mediaUrl)),
-      catchError(e => {
-        if (e.message === 'Unauthorized') { throw new WsException("Unauthorized"); }
-        throw new WsException("AddMediaException");
-      }));
+      map(member => ({ member, room: this.roomService.getRoomByName(roomName) })),
+      switchMap(({ member, room }) =>
+        from(this.commandBus.execute<AddMediaToRoomCommand>(new AddMediaToRoomCommand(mediaUrl, member, room, client, this.server))).pipe(
+          catchError(e => {
+            throw new WsException(e.message);
+          })
+        )));
   }
 
   @SubscribeMessage(MessageTypes.REMOVE_MEDIA)

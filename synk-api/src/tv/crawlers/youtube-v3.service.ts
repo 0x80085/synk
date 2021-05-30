@@ -9,6 +9,12 @@ export class YoutubeV3Service {
 
     constructor(private httpService: HttpService) { }
 
+    /**
+     * 
+     * @param id youtube video id 
+     * @returns metadata of YT video if found
+     * (code taken from cytube thx guise :3)
+     */
     getVideoMetaData(id: string) {
         const API_KEY = process.env.YT_V3_API_KEY;
 

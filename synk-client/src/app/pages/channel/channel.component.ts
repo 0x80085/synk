@@ -1,8 +1,8 @@
 import { Component, HostListener, OnDestroy, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { BehaviorSubject, merge, Observable, Subscription, timer } from 'rxjs';
-import { mapTo, startWith, tap, shareReplay, take, filter } from 'rxjs/operators';
+import { BehaviorSubject, iif, merge, noop, Observable, of, Subscription, timer } from 'rxjs';
+import { mapTo, startWith, tap, shareReplay, take, filter, map, mergeMap, catchError, withLatestFrom, switchMap } from 'rxjs/operators';
 
 import { SocketService } from '../../socket.service';
 import { ChatService } from './chat.service';
@@ -23,7 +23,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   playlist: string[] = [];
 
   name: string;
-  nowPlayingUrl: string;
+
   loggedInUserIsLeader = false;
 
   activeItemSubject: BehaviorSubject<string> = new BehaviorSubject(null);
@@ -49,11 +49,17 @@ export class ChannelComponent implements OnInit, OnDestroy {
     }
   });
 
-  mediaSyncEventSubscription = this.mediaService.roomMediaEvent$.subscribe(ev => {
-    if (!this.loggedInUserIsLeader) {
-      this.syncPlayer(ev);
-    }
-  });
+  mediaSyncEventSubscription = this.mediaService.roomMediaEvent$.pipe(
+    mergeMap((event) =>
+      iif(
+        () => !this.loggedInUserIsLeader,
+        of(noop()),
+        of(event).pipe(
+          withLatestFrom(this.activeItem$),
+          tap(([event, nowPlaying]) => this.syncPlayer(event, nowPlaying))
+        )
+      )))
+    .subscribe();
 
   roomUserConfigSubscription = this.chatService.roomUserConfig$.subscribe(ev => {
     this.loggedInUserIsLeader = ev.isLeader;
@@ -87,16 +93,14 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   onVideoEnded() {
     this.activeItem$.pipe(
-      filter(it => it !== null),
-      take(1)
+      filter(it => !!it),
     ).subscribe(it => {
       const i = this.playlist.findIndex(url => it === url);
       const next = this.playlist[i + 1] || this.playlist[0];
 
-      this.nowPlayingUrl = next;
-      this.activeItemSubject.next(this.nowPlayingUrl);
+      this.activeItemSubject.next(next);
 
-      this.player.play(this.nowPlayingUrl);
+      this.player.play(next);
     });
   }
 
@@ -112,10 +116,10 @@ export class ChannelComponent implements OnInit, OnDestroy {
         // Dont update when leader paused video.
         return;
       }
-      this.nowPlayingUrl = this.player.getCurrentUrl();
-      this.activeItemSubject.next(this.nowPlayingUrl);
+      const mediaUrl = this.player.getCurrentUrl();
+      this.activeItemSubject.next(mediaUrl);
       this.mediaService.sendMediaEvent({
-        mediaUrl: this.nowPlayingUrl,
+        mediaUrl,
         currentTime: this.player.getCurrentTime(),
         roomName: this.name
       });
@@ -125,15 +129,17 @@ export class ChannelComponent implements OnInit, OnDestroy {
     }
   }
 
-  private syncPlayer(ev: MediaEvent) {
-    if (this.shouldSyncPlayer(ev)) {
+  private syncPlayer(ev: MediaEvent, nowPlayingUrl: string) {
+    const shouldSyncPlayer = nowPlayingUrl !== ev.mediaUrl ||
+      this.isCurrentTimeOutOfSync(ev.currentTime)
+
+    if (shouldSyncPlayer) {
       console.log('syncing...');
       if (!this.player.isPlaying()) {
         this.player.play(ev.mediaUrl);
       }
-      if (this.nowPlayingUrl !== ev.mediaUrl) {
-        this.nowPlayingUrl = ev.mediaUrl;
-        this.activeItemSubject.next(this.nowPlayingUrl);
+      if (nowPlayingUrl !== ev.mediaUrl) {
+        this.activeItemSubject.next(ev.mediaUrl);
       }
       try {
         if (this.isCurrentTimeOutOfSync(ev.currentTime)) {
@@ -148,13 +154,6 @@ export class ChannelComponent implements OnInit, OnDestroy {
         console.log(error);
       }
     }
-  }
-
-  private shouldSyncPlayer(ev: MediaEvent) {
-    return (
-      this.nowPlayingUrl !== ev.mediaUrl ||
-      this.isCurrentTimeOutOfSync(ev.currentTime)
-    );
   }
 
   private isCurrentTimeOutOfSync(originTime: number) {

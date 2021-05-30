@@ -7,13 +7,13 @@ import { Channel, Session, Member, Role, ChannelConfig } from '../domain/entity'
 
 import { ChannelController } from './controllers/channel.controller';
 import { RoomMessagesGateway } from './gateways/room-messages.gateway';
+import { AddMediaToRoomHandler } from './handlers/add-media-to-room-playlist.handler';
 import { ChannelService } from './services/channel.service';
 import { ConnectionTrackingService } from './services/connection-tracking.service';
 import { RoomService } from './services/room.service';
 
 export const CommandHandlers = [
-  // AddRoomHandler,
-  // PatchRoomConfigHandler
+  AddMediaToRoomHandler
 ];
 
 export const QueryHandlers = [
