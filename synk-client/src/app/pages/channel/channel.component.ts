@@ -34,10 +34,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   isLoading$ = merge(
     this.socketService.reconnectionError$.pipe(mapTo(true)),
     this.isConnected$.pipe(mapTo(false)),
-  )
-    .pipe(
-      startWith(false)
-    );
+  ).pipe(startWith(false));
 
   members$: Observable<RoomUser[]> = this.chatService.roomUserList$;
 
@@ -50,15 +47,12 @@ export class ChannelComponent implements OnInit, OnDestroy {
   });
 
   mediaSyncEventSubscription = this.mediaService.roomMediaEvent$.pipe(
-    mergeMap((event) =>
-      iif(
-        () => !this.loggedInUserIsLeader,
-        of(noop()),
-        of(event).pipe(
-          withLatestFrom(this.activeItem$),
-          tap(([event, nowPlaying]) => this.syncPlayer(event, nowPlaying))
-        )
-      )))
+    switchMap((event) =>
+      this.loggedInUserIsLeader
+        ? of(noop())
+        : of(event).pipe(
+          tap((event) => this.syncPlayer(event, this.player.getCurrentUrl()))
+        )))
     .subscribe();
 
   roomUserConfigSubscription = this.chatService.roomUserConfig$.subscribe(ev => {
@@ -129,25 +123,27 @@ export class ChannelComponent implements OnInit, OnDestroy {
     }
   }
 
-  private syncPlayer(ev: MediaEvent, nowPlayingUrl: string) {
-    const shouldSyncPlayer = nowPlayingUrl !== ev.mediaUrl ||
-      this.isCurrentTimeOutOfSync(ev.currentTime)
+  private syncPlayer({ currentTime, mediaUrl }: MediaEvent, nowPlayingUrl: string) {
+
+    const shouldSyncPlayer = nowPlayingUrl !== mediaUrl ||
+      this.isCurrentTimeOutOfSync(currentTime)
 
     if (shouldSyncPlayer) {
       console.log('syncing...');
       if (!this.player.isPlaying()) {
-        this.player.play(ev.mediaUrl);
+        this.player.play(mediaUrl);
       }
-      if (nowPlayingUrl !== ev.mediaUrl) {
-        this.activeItemSubject.next(ev.mediaUrl);
+      if (nowPlayingUrl !== mediaUrl) {
+        this.player.play(mediaUrl)
+        this.activeItemSubject.next(mediaUrl);
       }
       try {
-        if (this.isCurrentTimeOutOfSync(ev.currentTime)) {
+        if (this.isCurrentTimeOutOfSync(currentTime)) {
           if (!this.player.isPlaying()) {
-            this.player.play(ev.mediaUrl);
+            this.player.play(mediaUrl);
             return;
           }
-          this.player.seek(ev.currentTime);
+          this.player.seek(currentTime);
         }
       } catch (error) {
         console.log('Error while syncing player - probably not ready yet');

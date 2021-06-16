@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { iif, of } from "rxjs";
-import { catchError, map, mergeMap, switchMap, tap } from "rxjs/operators";
+import { of } from "rxjs";
+import { catchError, map, switchMap, tap } from "rxjs/operators";
 
 import { YouTubeGetID, YoutubeV3Service } from "src/tv/crawlers/youtube-v3.service";
 import { MessageTypes } from "../gateways/message-types.enum";
@@ -8,21 +8,21 @@ import { AddMediaToRoomCommand } from "../models/commands/add-media-to-room.comm
 import { Media } from "../models/media/media";
 import { toRepresentation } from "../models/playlist/playlist.representation";
 import { Room } from "../models/room/room";
-import { RoomService } from "../services/room.service";
 
 @CommandHandler(AddMediaToRoomCommand)
 export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomCommand> {
     constructor(private ytService: YoutubeV3Service) { }
 
     async execute({ url, room, member, socket, socketServer }: AddMediaToRoomCommand) {
+        
         const ytVideoId = YouTubeGetID(url)
+
         return of({ room, ytVideoId }).pipe(
             switchMap(({ room, ytVideoId }) =>
                 !Boolean(ytVideoId)
                     ? this.getMetadataFromElsewhere(url).pipe(map(media => ({ media, room })))
                     : this.getMetadataFromYoutubeApi(ytVideoId).pipe(map(media => ({ media, room })))
             ),
-            tap(res => console.log(JSON.stringify(res))),
             tap(({ room, media }) => room.addMediaToPlaylist(member, media)),
             tap(() => this.broadcastPlaylistToRoom(room, socketServer)),
             tap(_ => socket.emit(MessageTypes.ADD_MEDIA_REQUEST_APPROVED, url)),

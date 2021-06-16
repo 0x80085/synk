@@ -1,6 +1,5 @@
-import * as socketio from 'socket.io';
-
 import { Logger } from '@nestjs/common';
+import { CommandBus } from '@nestjs/cqrs';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -10,21 +9,19 @@ import {
   WebSocketServer,
   WsException
 } from '@nestjs/websockets';
+import { from } from 'rxjs';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import * as socketio from 'socket.io';
 
+import { Roles } from '../../domain/entity';
+import { AddMediaToRoomCommand } from '../models/commands/add-media-to-room.command';
 import { getMemberSummary } from '../models/member/member.representation';
 import { toRepresentation } from '../models/playlist/playlist.representation';
+import { Room } from '../models/room/room';
+import { ConnectionTrackingService } from '../services/connection-tracking.service';
 import { RoomService } from '../services/room.service';
 import { MessageTypes } from './message-types.enum';
 import { SOCKET_IO_CONFIG } from './socketio.config';
-import { Roles } from 'src/domain/entity';
-import { Media } from '../models/media/media';
-import { YouTubeGetID, YoutubeV3Service } from 'src/tv/crawlers/youtube-v3.service';
-import { ConnectionTrackingService } from '../services/connection-tracking.service';
-import { Room } from '../models/room/room';
-import { catchError, map, mapTo, mergeMap, switchMap, tap } from 'rxjs/operators';
-import { from, iif, of } from 'rxjs';
-import { CommandBus } from '@nestjs/cqrs';
-import { AddMediaToRoomCommand } from '../models/commands/add-media-to-room.command';
 
 @WebSocketGateway(SOCKET_IO_CONFIG)
 export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -132,7 +129,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
       this.broadcastGroupMessageToRoom(room);
 
       this.sendRoomConfigToMember(room, member.id, client);
-      this.sendPlaylistToMember(room, member.id, client);
+      this.sendPlaylistToMember(room, client);
 
     } catch (error) {
       if (error.message === "already joined") {
@@ -275,7 +272,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     client.emit(MessageTypes.USER_CONFIG, config);
   }
 
-  private sendPlaylistToMember(room: Room, id: string, client: socketio.Socket) {
+  private sendPlaylistToMember(room: Room, client: socketio.Socket) {
     const playlist = toRepresentation(room.currentPlaylist);
     client.emit(MessageTypes.PLAYLIST_UPDATE, playlist);
   }

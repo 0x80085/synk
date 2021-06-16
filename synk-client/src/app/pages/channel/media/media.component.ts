@@ -63,7 +63,12 @@ export class MediaComponent {
   }
 
   getCurrentUrl(): string {
-    return this.ref.instance.getCurrentUrl();
+    try {
+      return this.ref.instance.getCurrentUrl();
+    } catch (error) {
+      console.log("this.ref.instance not available - prob no player rendered.");
+      return;
+    }
   }
 
   isPlaying() {
