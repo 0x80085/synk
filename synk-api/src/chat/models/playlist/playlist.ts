@@ -67,6 +67,13 @@ export class Playlist {
     }
 
     add(media: Media, member: Member) {
+        const alreadyAdded = this.queue.toArray().find(it => it.media.url === media.url);
+        if (alreadyAdded) {
+            console.log("alreadyAdded");
+            console.log(this.queue.toArray());
+            
+            throw new Error("No duplicates allowed");
+        }
         this.queue.enqueue({ media, addedBy: member });
     }
 
