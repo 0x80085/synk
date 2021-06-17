@@ -1,7 +1,7 @@
 import { Component, HostListener, OnDestroy, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { BehaviorSubject, iif, merge, noop, Observable, of, Subscription, timer } from 'rxjs';
+import { BehaviorSubject, combineLatest, iif, merge, noop, Observable, of, Subscription, timer } from 'rxjs';
 import { mapTo, startWith, tap, shareReplay, take, filter, map, mergeMap, catchError, withLatestFrom, switchMap } from 'rxjs/operators';
 
 import { SocketService } from '../../socket.service';
@@ -19,8 +19,6 @@ import { AppStateService } from '../../app-state.service';
 export class ChannelComponent implements OnInit, OnDestroy {
 
   @ViewChild('player', { static: false }) player: MediaComponent;
-
-  playlist: string[] = [];
 
   name: string;
 
@@ -86,16 +84,16 @@ export class ChannelComponent implements OnInit, OnDestroy {
   }
 
   onVideoEnded() {
-    this.activeItem$.pipe(
-      filter(it => !!it),
-    ).subscribe(it => {
-      const i = this.playlist.findIndex(url => it === url);
-      const next = this.playlist[i + 1] || this.playlist[0];
+    combineLatest([this.activeItem$, this.playlist$])
+      .pipe(take(1)) // if needed - maybe not
+      .subscribe(([nowPlayingUrl, { entries }]) => {
+        const i = entries.findIndex(entry => entry.url === nowPlayingUrl);
+        const next = entries[i + 1] || entries[0];
 
-      this.activeItemSubject.next(next);
+        this.activeItemSubject.next(next.url);
 
-      this.player.play(next);
-    });
+        this.player.play(next.url);
+      });
   }
 
 
