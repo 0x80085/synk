@@ -48,22 +48,34 @@ export class Room {
         }
     }
 
-    leave(member: Member) {
+    /**
+     * Let a room know that a member left so the room can correct the memberlist and assign a new leader position
+     * @param member member who leaves the room
+     */
+    leave(member: Member): Member | null {
         const toBeRemoved = this.selectFromMembers(member);
+        let newLeader;
+
         if (toBeRemoved) {
             if (this.leader && this.leader.id == member.id) {
-                if (this.members.length > 1) {
-                    this.replaceLeader(this.members[0])
+                const hasAtleast2MembersInRoom = this.members.length >= 2;
+                if (hasAtleast2MembersInRoom) {
+                    const elegibleMembers = this.members.filter(m => m.id !== this.leader.id)
+                    newLeader = elegibleMembers[0];
+                    this.replaceLeader(elegibleMembers[0])
                 } else {
                     this.removeLeader();
                     console.log(`[${member.username}] was removed as leader of [${this.name}]`);
+                    newLeader = null;
                 }
             }
 
             this.members = this.removeMember(this.members, member);
             console.log(`[${member.username}] left [${this.name}]`);
             console.log(`${member.username} left.`);
-            this.messages.post({ author: { username: '' } as Member, content: `${member.username} left.` })
+            this.messages.post({ author: { username: '' } as Member, content: `${member.username} left.` });
+            
+            return newLeader;
         } else {
             console.log(`LEAVE ROOM - ${member.username} not found, not removed.`);
         }

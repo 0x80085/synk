@@ -148,10 +148,14 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     const room = this.roomService.getRoomByName(name);
 
     if (this.tracker.isClientInRoom(client, room.id)) {
-      room.leave(member);
+      const newLeader = room.leave(member);
       client.leave(room.id);
 
       this.tracker.memberLeavesRoom(client, room.id);
+
+      if (newLeader) {
+        this.sendRoomConfigToMember(room, newLeader.id, this.tracker.getSocketByMemberId(newLeader.id));
+      }
 
       this.broadcastMemberlistToRoom(room);
       this.broadcastGroupMessageToRoom(room);
