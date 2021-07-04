@@ -3,11 +3,11 @@ import { NestExpressApplication } from '@nestjs/platform-express/interfaces/nest
 
 export function setupSwagger(app: NestExpressApplication, port: number) {
   const options = new DocumentBuilder()
-    .setTitle('Chink TeeVee')
-    .setDescription(`Chinking the net with synk tv chat`)
-    .setVersion('1.0')
+    .setTitle('Synk API')
+    .setDescription(`Synked videos and chatting`)
+    .setVersion(process.env.npm_package_version)
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('swagger', app, document);
 }

@@ -26,10 +26,15 @@ export class AppController {
     return this.appService.patchConfig(config);
   }
 
-  // @UseGuards(AdminGuard)
+  @UseGuards(AdminGuard)
   @Get('/sys')
   getSystemInfo(): any {
     return this.appService.getSysInfo();
+  }
+
+  @Get('/version')
+  getVersion(): any {
+    return { version: this.appService.getVersion() };
   }
 
 }

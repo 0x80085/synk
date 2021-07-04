@@ -1,17 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 
+import { MetaService } from '../meta.service';
+
 @Component({
   selector: 'app-about',
   templateUrl: './about.component.html',
   styleUrls: ['./about.component.scss']
 })
-export class AboutComponent implements OnInit {
+export class AboutComponent {
 
-  version = 0.1;
+  version$ = this.metaService.version$;
 
-  constructor() { }
-
-  ngOnInit(): void {
-  }
-
+  constructor(private metaService: MetaService) { }
 }

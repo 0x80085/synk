@@ -45,15 +45,19 @@ export class AppService {
     maxMessagesPerRoom: 400,
     maxChannelsOwnedByUser: 4,
     isRegistrationLocked: false,
-    reservedUserNames: ['admin', 'administrator']
+    reservedUserNames: ['admin', 'administrator', 'synk-admin']
   };
+
+  version: string;
+
+  constructor() {
+    this.version = process.env.npm_package_version;
+  }
 
   defaultGreeting(): string {
     return `
     Welcome to Chink TeeVee
     ==
-    Access the JSON openapi at <host>:<port>/api-json
-    Access the swagger user friendly api explorer at <host>:<port>/api
     `;
   }
 
@@ -78,5 +82,9 @@ export class AppService {
       },
       uptime: uptime()
     }
+  }
+
+  getVersion() {
+    return this.version;
   }
 }
