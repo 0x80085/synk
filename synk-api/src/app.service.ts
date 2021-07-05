@@ -3,6 +3,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { freemem, totalmem, loadavg } from 'os';
 import { cpuUsage } from './util/sys-info';
 
+import { readFileSync } from 'graceful-fs';
+import { join } from 'path';
+
 export interface AppConfig {
   maxRooms: number;
   maxUsers: number;
@@ -51,7 +54,9 @@ export class AppService {
   version: string;
 
   constructor() {
-    this.version = process.env.npm_package_version;
+    const pkgJsonPath = join(__dirname, 'package.json');
+    const pkgJsonContent = readFileSync(pkgJsonPath, 'utf8');
+    this.version = JSON.parse(pkgJsonContent).version;
   }
 
   defaultGreeting(): string {
