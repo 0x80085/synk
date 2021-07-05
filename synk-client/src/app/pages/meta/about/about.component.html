@@ -2,6 +2,7 @@
   <nz-content>
     <h1 nz-typography>About Synk</h1>
 
+    <ng-template #loading><i nz-icon [nzType]="'loading'"></i></ng-template>
     <p nz-typography *ngIf="version$ | async as version; else loading">
       <nz-statistic
         [nzValue]="version"
@@ -9,7 +10,6 @@
         [nzPrefix]="prefixTpl"
       ></nz-statistic>
       <ng-template #prefixTpl><i nz-icon nzType="tag"></i></ng-template>
-      <ng-template #loading>...</ng-template>
     </p>
     <p nz-typography>New releases will be announced on the Synk discord</p>
 

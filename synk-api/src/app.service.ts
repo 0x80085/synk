@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { freemem, totalmem, loadavg } from 'os';
 import { cpuUsage } from './util/sys-info';
 
 import { readFileSync } from 'graceful-fs';
 import { join } from 'path';
+import { cwd } from 'process';
 
 export interface AppConfig {
   maxRooms: number;
@@ -38,6 +39,7 @@ export class AppConfigInput implements AppConfig {
   @ApiProperty()
   reservedUserNames: string[];
 }
+
 @Injectable()
 export class AppService {
 
@@ -53,10 +55,13 @@ export class AppService {
 
   version: string;
 
+  private readonly logger = new Logger(AppService.name);
+
   constructor() {
-    const pkgJsonPath = join(__dirname, 'package.json');
+    const pkgJsonPath = join(cwd(), 'package.json');
     const pkgJsonContent = readFileSync(pkgJsonPath, 'utf8');
     this.version = JSON.parse(pkgJsonContent).version;
+    this.logger.log(`🚀 Starting Synk (verion: ${this.version})`);
   }
 
   defaultGreeting(): string {

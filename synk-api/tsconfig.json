@@ -11,7 +11,8 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
+    "resolveJsonModule": true
   },
-  "include": ["src"],
+  "include": ["src", "./package.json"],
   "exclude": ["client"]
 }

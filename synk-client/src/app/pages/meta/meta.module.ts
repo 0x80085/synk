@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzStatisticModule } from 'ng-zorro-antd/statistic';
@@ -13,7 +14,8 @@ import { AboutComponent } from './about/about.component';
     CommonModule,
     NzStatisticModule,
     NzLayoutModule,
-    NzTypographyModule
+    NzTypographyModule,
+    NzIconModule
   ]
 })
 export class MetaModule { }
