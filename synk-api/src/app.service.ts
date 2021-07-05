@@ -61,7 +61,7 @@ export class AppService {
     const pkgJsonPath = join(cwd(), 'package.json');
     const pkgJsonContent = readFileSync(pkgJsonPath, 'utf8');
     this.version = JSON.parse(pkgJsonContent).version;
-    this.logger.log(`🚀 Starting Synk (verion: ${this.version})`);
+    this.logger.log(`🚀 Starting Synk (version: ${this.version})`);
   }
 
   defaultGreeting(): string {
