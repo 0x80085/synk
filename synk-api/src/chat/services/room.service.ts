@@ -97,11 +97,9 @@ export class RoomService {
     async giveLeader(roomId: string, requestingMember: Member, newLeaderId: string) {
         const targetedMember = await this.memberRepository.findOneOrFail(newLeaderId);
         // Only mods, admins and leaders can assign other members as leaders
-        if (requestingMember/* TODO can do that stuff and targetedMember can be that stuff*/) { // TODO put in Room model
-            this.roomsList
-                .find(r => r.id === roomId)
-                ?.makeLeader(targetedMember, requestingMember);
-        }
+        this.roomsList
+            .find(r => r.id === roomId)
+            ?.makeLeader(targetedMember, requestingMember);
     }
 
     getRoomById(id: string,) {

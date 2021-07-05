@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { ConflictException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
@@ -28,6 +28,9 @@ export class ChannelService {
 
     async createChannel(name: string, ownerId: string, description: string, isPublic: boolean) {
         const member = await this.memberRepository.findOneOrFail({ where: { id: ownerId } })
+
+        await this.throwIfChannelCannotBeCreated(name, member);
+
         const channel = this.channelRepository.create({
             name,
             description,
@@ -49,7 +52,7 @@ export class ChannelService {
             coverUrl: "",
             logoUrl: "",
             emojiListUrl: "",
-            maxUsers: DEFAULT_MAX_USER_COUNT, // TODO Set from configservice or so
+            maxUsers: DEFAULT_MAX_USER_COUNT, // TODO Set from globalsettingsservice or so
             channel,
         })
 
@@ -63,7 +66,7 @@ export class ChannelService {
         return this.channelRepository.find({ where: { isPublic: true } })
             .then(channels => channels.map((channel) => ({ channel, room: this.roomService.getRoomById(channel.id) })))
             .then(entries => entries.map(getChannelShortRepresentation))
-            .then((entries) => entries.sort((a, b) =>  b.connectedMemberCount - a.connectedMemberCount));
+            .then((entries) => entries.sort((a, b) => b.connectedMemberCount - a.connectedMemberCount));
     }
 
     async getById(id: string): Promise<ChannelRepresentation> {
@@ -147,7 +150,7 @@ export class ChannelService {
         const channel = await this.channelRepository.findOneOrFail({ where: { id: channelId }, relations: ["configs", "owner"] })
         const owner = await this.memberRepository.findOneOrFail({ where: { id: ownerId } })
 
-        // todo also delete from socketio rooms
+        // todo also delete from socketio rooms --> use command or so?
         if (channel.owner.id == ownerId || owner.isAdmin) {
             await this.configRepository.remove(channel.configs);
             await this.channelRepository.remove(channel);
@@ -159,6 +162,25 @@ export class ChannelService {
     private getChannelAndRoom(id: string): Promise<{ room: Room, channel: Channel }> {
         return this.channelRepository.findOneOrFail({ where: { id }, relations: ["owner"] })
             .then(channel => ({ channel, room: this.roomService.getRoomById(channel.id) }));
+    }
 
+    private async throwIfChannelCannotBeCreated(name: string, member: Member) {
+
+        const maxRooms = 200;
+        const maxChannelsOwnedByUser = 5;
+
+        const isDupelicateName = await this.channelRepository.count({ where: { name } }).then(count => count > 0);
+        const hasMaxRoomsBeenReached = await this.channelRepository.count().then(count => count >= maxRooms);
+        const hasMaxRoomsBeenReachedForUser = await this.channelRepository.count({ where: { owner: member } }).then(count => count >= maxChannelsOwnedByUser);
+
+        if (isDupelicateName) {
+            throw new ConflictException("A channel's name must be unique");
+        }
+        if (hasMaxRoomsBeenReached) {
+            throw new ConflictException("Global max channel quota reached");
+        }
+        if (hasMaxRoomsBeenReachedForUser) {
+            throw new ConflictException("User max channel quota reached");
+        }
     }
 }
