@@ -154,14 +154,16 @@ export class ConnectionTrackingService {
             const updateTrackRecods = trackRecords.filter(entry => entry.client.id !== socketId)
 
             const roomTrackRecords = this.memberInRoomTracker.get(memberId);
-            const updateRoomTrackRecods = roomTrackRecords.filter(entry => entry.socketId !== socketId);
+            if (!!roomTrackRecords) {
+                const updatedRoomTrackRecods = roomTrackRecords.filter(entry => entry.socketId !== socketId);
+                this.memberInRoomTracker.set(memberId, updatedRoomTrackRecods);
+            }
 
-
-            this.memberInRoomTracker.set(memberId, updateRoomTrackRecods);
             this.clients.set(ipAddress, updateTrackRecods);
-        } catch (error) {
-            console.log(error);
 
+        } catch (error) {
+            this.logger.error("Something went wrong trying to update connection track records:", error)
+            console.log(error)
         }
 
     }
