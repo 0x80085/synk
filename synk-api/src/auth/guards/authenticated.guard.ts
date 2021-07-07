@@ -1,4 +1,4 @@
-import { ExecutionContext, Injectable, CanActivate } from '@nestjs/common';
+import { ExecutionContext, Injectable, CanActivate, UnauthorizedException } from '@nestjs/common';
 
 @Injectable()
 export class AuthenticatedGuard implements CanActivate {
@@ -9,9 +9,15 @@ export class AuthenticatedGuard implements CanActivate {
 
   static validateSession(request: any) {
     const now = new Date();
-    return request.session.cookie.expires > now
+    const isLoggedIn  =  request.session.cookie.expires > now
       && !!request.session.passport
       && !!request.session.passport.user
       && !!request.session.passport.user.id;
+
+      if (!isLoggedIn) {
+        throw new UnauthorizedException();
+      }
+
+      return isLoggedIn;
   }
 }

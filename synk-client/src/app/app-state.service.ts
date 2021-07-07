@@ -30,8 +30,3 @@ export class AppStateService {
 
   constructor(private socketService: SocketService) { }
 }
-
-const mockAdmin = (user: User) =>
-  user.username === 'JanitorOne'
-  || user.username === 'root';
-

@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import { SerializedUserData } from '../../auth/local.serializer';
 import { Member } from '../../domain/entity/Member';
 import { AuthenticatedGuard } from 'src/auth/guards/authenticated.guard';
+import { MessageTypes } from '../gateways/message-types.enum';
 
 @Injectable()
 export class ConnectionTrackingService {
@@ -92,7 +93,7 @@ export class ConnectionTrackingService {
             const memberId = this.getMemberId(socket);
             return await this.memberRepository.findOneOrFail(memberId);
         } catch (error) {
-            throw new WsException('authentication error');
+            throw new WsException(MessageTypes.NOT_AUTHENTICATED);
         }
     }
 
@@ -155,8 +156,8 @@ export class ConnectionTrackingService {
 
             const roomTrackRecords = this.memberInRoomTracker.get(memberId);
             if (!!roomTrackRecords) {
-                const updatedRoomTrackRecods = roomTrackRecords.filter(entry => entry.socketId !== socketId);
-                this.memberInRoomTracker.set(memberId, updatedRoomTrackRecods);
+                const updatedRoomTrackRecords = roomTrackRecords.filter(entry => entry.socketId !== socketId);
+                this.memberInRoomTracker.set(memberId, updatedRoomTrackRecords);
             }
 
             this.clients.set(ipAddress, updateTrackRecods);
@@ -187,7 +188,7 @@ export class ConnectionTrackingService {
         if (!hasValidSessionData) {
             const clientIp = this.getIpFromSocket(client)
             this.logger.log(`Denied connection for unauthorized IP [${clientIp}]`);
-            throw new WsException('authentication error');
+            throw new WsException(MessageTypes.NOT_AUTHENTICATED);
         }
     }
 
@@ -195,7 +196,7 @@ export class ConnectionTrackingService {
         const clientIp = this.getIpFromSocket(client);
         if (this.globallyBannedIps.get(clientIp)) {
             this.logger.log(`Denied connection for banned IP [${clientIp}]`);
-            throw new WsException('InternalServerErrorException');
+            throw new WsException(MessageTypes.INTERNAL_SERVER_ERROR);
         }
     }
 }

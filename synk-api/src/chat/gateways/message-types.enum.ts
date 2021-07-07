@@ -19,4 +19,9 @@ export enum MessageTypes {
   MEMBERLIST_UPDATE = 'userlist update',
   USER_CONFIG = 'user config',
   DISCONNECT = 'disconnect',
+  FORBIDDEN = 'forbidden',
+  ALREADY_JOINED = 'already joined',
+  NOT_AUTHENTICATED = 'authentication error',
+  INTERNAL_SERVER_ERROR = 'InternalServerErrorException',
+  GENERIC_ERROR = 'error',
 }

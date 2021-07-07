@@ -48,8 +48,6 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   handleDisconnect(client: socketio.Socket) {
-    // TODO leave from connected rooms for member also update the tracker.clients
-    // TODO Or use the hearbeat/ping to determine connected and remove stale connections
     try {
       console.log('handleDisconnect for ' + client.handshake.address);
       const memberId = (client.handshake as any).session.passport.user.id;
@@ -110,7 +108,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     if (this.tracker.isClientInRoom(client, room.id)) {
       console.log(this.tracker.memberInRoomTracker);
 
-      throw new WsException('already joined');
+      throw new WsException(MessageTypes.ALREADY_JOINED);
     }
 
     const member = await this.tracker.getMemberBySocket(client);
@@ -132,10 +130,10 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
       this.sendPlaylistToMember(room, client);
 
     } catch (error) {
-      if (error.message === "already joined") {
-        throw new WsException("already joined");
+      if (error.message === MessageTypes.ALREADY_JOINED) {
+        throw new WsException(MessageTypes.ALREADY_JOINED);
       } else {
-        throw new WsException("error");
+        throw new WsException(MessageTypes.GENERIC_ERROR);
       }
     }
   }
@@ -212,7 +210,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
 
   @SubscribeMessage(MessageTypes.REMOVE_MEDIA)
   async handleRemoveMedia(client: socketio.Socket, { roomName, mediaUrl }: { roomName: string, mediaUrl: string }) {
-    this.logger.log('handelRemoveMeida');
+    this.logger.log('handelRemoveMedia');
 
     return from(this.tracker.getMemberBySocket(client)).pipe(
       map(member => ({ member, room: this.roomService.getRoomByName(roomName) })),
@@ -220,7 +218,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
       tap(({ room }) => this.broadcastPlaylistToRoom(room)),
       tap(_ => client.emit(MessageTypes.REMOVE_MEDIA_SUCCESS, mediaUrl)),
       catchError(e => {
-        if (e.message === 'Unauthorized') { throw new WsException("Unauthorized"); }
+        if (e.message === 'Forbidden') { throw new WsException(MessageTypes.FORBIDDEN); }
         throw new WsException(MessageTypes.REMOVE_MEDIA_FAILED);
       })
     )

@@ -1,4 +1,5 @@
-import { UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException } from '@nestjs/common';
+import { MessageTypes } from 'src/chat/gateways/message-types.enum';
 import { Member, Roles } from '../../../domain/entity';
 import { Feed } from '../feed/feed';
 import { Media } from '../media/media';
@@ -218,14 +219,14 @@ export class Room {
             ;
 
         if (!isAllowed) {
-            throw new UnauthorizedException();
+            throw new ForbiddenException();
         }
     }
 
     private throwIfMemberAlreadyJoined(member: Member) {
         const found = this.members.find(m => member.id === m.id)
         if (found) {
-            throw new Error("already joined");
+            throw new Error(MessageTypes.ALREADY_JOINED);
         }
     }
 }

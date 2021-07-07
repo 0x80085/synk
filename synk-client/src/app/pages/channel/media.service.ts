@@ -2,9 +2,8 @@ import { Injectable } from '@angular/core';
 import { filter, map, shareReplay } from 'rxjs/operators';
 
 import { SocketService } from '../../socket.service';
-import { AddMediaExceptionEvent, MediaEvent } from './models/room.models';
+import { MediaEvent } from './models/room.models';
 import { MediaCommands } from './models/media.models';
-import { SocketCommands } from './models/commands.enum';
 
 export interface PlaylistRepresentation {
   id: string;
@@ -31,12 +30,12 @@ export class MediaService {
 
   roomMediaEvent$ = this.socketService.listenForEvent<MediaEvent>(MediaCommands.MEDIA_EVENT);
 
-  addMediaErrEvent$ = this.socketService.listenForEvent<AddMediaExceptionEvent>(SocketCommands.EXCEPTION)
+  addMediaErrEvent$ = this.socketService.exceptionEvent$
     .pipe(
       filter(({ message }) => message === "AddMediaException")
     );
 
-  addMediaSuccessEvent$ = this.socketService.listenForEvent<any>(MediaCommands.ADD_MEDIA_REQUEST_APPROVED)
+  addMediaSuccessEvent$ = this.socketService.listenForEvent<{ mediaUrl: string }>(MediaCommands.ADD_MEDIA_REQUEST_APPROVED)
     .pipe(
       map((mediaUrl) => mediaUrl)
     );

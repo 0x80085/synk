@@ -5,7 +5,7 @@ import * as io from 'socket.io-client';
 import { environment } from '../environments/environment';
 import { switchMap, map, tap, share, withLatestFrom, catchError, mapTo, shareReplay } from 'rxjs/operators';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { PossibleCommands } from './pages/channel/models/commands.enum';
+import { PossibleCommands, SocketCommands } from './pages/channel/models/commands.enum';
 import { doLog } from './utils/custom.operators';
 
 export interface RealTimeCommand {
@@ -24,20 +24,19 @@ export class SocketService {
     share()
   );
 
-  connectionSuccess$ = this.listenForEvent('connect').pipe(mapTo({ event: 'connect', connected: true }));
+  connectionSuccess$ = this.listenForEvent(SocketCommands.CONNECT).pipe(mapTo({ event: SocketCommands.CONNECT, connected: true }));
 
-  reconnectionSuccess$ = this.listenForEvent('reconnect').pipe(mapTo({ event: 'reconnect', connected: true }));
-  reconnectionAttempt$ = this.listenForEvent('reconnect_attempt').pipe(mapTo({ event: 'reconnect_attempt', connected: false }));
-  reconnectionError$ = this.listenForEvent('reconnect_error').pipe(mapTo({ event: 'reconnect_error', connected: false }));
-  reconnectionFail$ = this.listenForEvent('reconnect_failed').pipe(mapTo({ event: 'reconnect_failed', connected: false }));
+  reconnectionSuccess$ = this.listenForEvent(SocketCommands.RECONNECT).pipe(mapTo({ event: SocketCommands.RECONNECT, connected: true }));
+  reconnectionAttempt$ = this.listenForEvent(SocketCommands.RECONNECT_ATTEMPT).pipe(mapTo({ event: SocketCommands.RECONNECT_ATTEMPT, connected: false }));
+  reconnectionError$ = this.listenForEvent(SocketCommands.RECONNECT_ERROR).pipe(mapTo({ event: SocketCommands.RECONNECT_ERROR, connected: false }));
+  reconnectionFail$ = this.listenForEvent(SocketCommands.RECONNECT_FAILED).pipe(mapTo({ event: SocketCommands.RECONNECT_FAILED, connected: false }));
 
-  connectionError$ = this.listenForEvent('error').pipe(mapTo({ event: 'error', connected: false }));
-  connectionTimeOut$ = this.listenForEvent('connect_timeout').pipe(mapTo({ event: 'connect_timeout', connected: false }));
+  connectionError$ = this.listenForEvent(SocketCommands.ERROR).pipe(mapTo({ event: SocketCommands.ERROR, connected: false }));
+  connectionTimeOut$ = this.listenForEvent(SocketCommands.CONNECT_TIMEOUT).pipe(mapTo({ event: SocketCommands.CONNECT_TIMEOUT, connected: false }));
 
-  permissionError$ = this.listenForEvent('exception').pipe(map(({ message }) => message as string));
-  // should prob be more like  this.socketService.listenForEvent<AddMediaExceptionEvent>(SocketCommands.EXCEPTION).pipe(filter(({ message }) => message === "AddMediaException")
+  exceptionEvent$ = this.listenForEvent<{ status: string, message: string }>(SocketCommands.EXCEPTION);
 
-  disconnection$ = this.listenForEvent('disconnect').pipe(mapTo({ event: 'disconnect', connected: false }));
+  disconnection$ = this.listenForEvent(SocketCommands.DISCONNECT).pipe(mapTo({ event: SocketCommands.DISCONNECT, connected: false }));
 
   connectionState$ = merge(
     this.connectionSuccess$,

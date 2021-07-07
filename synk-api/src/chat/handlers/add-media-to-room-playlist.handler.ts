@@ -1,3 +1,4 @@
+import { ForbiddenException } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { of } from "rxjs";
 import { catchError, map, switchMap, tap } from "rxjs/operators";
@@ -27,7 +28,7 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
             tap(() => this.broadcastPlaylistToRoom(room, socketServer)),
             tap(_ => socket.emit(MessageTypes.ADD_MEDIA_REQUEST_APPROVED, url)),
             catchError(e => {
-                if (e.message === 'Unauthorized') { throw new Error("Unauthorized"); }
+                if (e.message === 'Unauthorized') { throw new ForbiddenException(); }
                 throw new Error("AddMediaException");
             })
         ).toPromise();

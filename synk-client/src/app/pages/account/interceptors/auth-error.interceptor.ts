@@ -21,18 +21,25 @@ export class RequestLogInterceptor implements HttpInterceptor {
       catchError((error: any) =>
         of(error).pipe(
           tap(err => {
-            console.warn("HTTP ERROR occurred");
-            console.warn(err);
-            if (err.status === 403) {
-              if (err.message == "session expired") {
-                this.stateService.isLoggedInSubject.next(false);
-                this.socketService.socket.close();
-                this.notification.warning('Session expired', `Please log in again`);
-              } else {
-                this.notification.warning(`Nothing here`, `Chirp chrip...`);
 
-              }
+            switch (err.status) {
+              case 401:
+                this.notification.error(`Please login`, `You need to be logged in to access this part`);
+                this.socketService.socket.disconnect();
+                this.stateService.isLoggedInSubject.next(false);
+                this.stateService.userSubject.next(null);
+                break;
+              case 403:
+                this.notification.warning(`ಠ_ಠ`, `That is not allowed!`);
+                break;
+
+              default:
+                this.notification.error(`Something went wrong here`, `Here's some tea 🍵`);
+                break;
             }
+
+            console.warn("HTTP ERROR occurred");
+            console.log(err);
             throw err;
           })
         ))

@@ -14,12 +14,6 @@ export interface MediaEvent {
   roomName: string;
 }
 
-export type AddMediaExceptionEvent = {
-  status: "error";
-  message: "AddMediaException";
-}
-
-
 export enum Roles {
   Admin = 'Admin',
   Mod = 'Mod',
@@ -36,6 +30,10 @@ export enum RoomCommands {
   GIVE_LEADER = 'give leader',
   USER_CONFIG = 'user config',
   USER_LIST_UPDATE = 'userlist update',
+}
+
+export enum RoomErrors {
+  ALREADY_JOINED = 'already joined'
 }
 
 export interface RoomUser {

@@ -7,7 +7,8 @@ import {
   RoomMessage,
   RoomUserConfig,
   RoomUser,
-  RoomCommands
+  RoomCommands,
+  RoomErrors
 } from './models/room.models';
 import { SocketService, RealTimeCommand } from '../../socket.service';
 import { filter, map } from 'rxjs/operators';
@@ -17,8 +18,8 @@ export class ChatService {
 
   roomMessages$ = this.socketService.listenForEvent<Message[]>(RoomCommands.GROUP_MESSAGE);
 
-  alreadyJoinedRoomError$ = this.socketService.permissionError$.pipe(
-    filter((msg) => msg === "already joined")
+  alreadyJoinedRoomError$ = this.socketService.exceptionEvent$.pipe(
+    filter(({message}) => message === RoomErrors.ALREADY_JOINED)
   );
 
   roomUserConfig$ = this.socketService.listenForEvent<RoomUserConfig>(RoomCommands.USER_CONFIG);
