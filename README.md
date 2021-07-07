@@ -72,7 +72,7 @@ Or use the shortcut in package.json:
 
 ## Under construction at time of writing
 
-- disconnect socket/ session expire tests (find solution to socketio sometmes not notifying client disconnect)
+- disconnect socket/ session expire tests
 - user update + config settings
 - user channels management
 - fix scroll issue on chatbox
