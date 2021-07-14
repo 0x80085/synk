@@ -2,6 +2,9 @@
 import { IconDefinition } from '@ant-design/icons-angular';
 
 import {
+    ExperimentFill,
+    DashboardOutline,
+    CompassOutline,
     CrownOutline,
     BugOutline,
     MehFill,
@@ -16,7 +19,7 @@ import {
     TeamOutline,
     TagFill,
     UserOutline,
-    LockFill,
+    LockOutline,
     NotificationFill,
     SyncOutline,
     RightOutline,
@@ -29,7 +32,11 @@ import {
 
 } from '@ant-design/icons-angular/icons';
 
-export const NZ_ICONS: IconDefinition[] = [CrownOutline,
+export const NZ_ICONS: IconDefinition[] = [
+    ExperimentFill,
+    DashboardOutline,
+    CompassOutline,
+    CrownOutline,
     BugOutline,
     MehFill,
     SmileFill,
@@ -43,7 +50,7 @@ export const NZ_ICONS: IconDefinition[] = [CrownOutline,
     TeamOutline,
     TagFill,
     UserOutline,
-    LockFill,
+    LockOutline,
     NotificationFill,
     SyncOutline,
     RightOutline,
