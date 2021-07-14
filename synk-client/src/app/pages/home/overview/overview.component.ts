@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { OverviewlistItem, OverviewService } from '../overview.service';
-import { share } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { AppStateService } from '../../../app-state.service';
 
 @Component({
@@ -11,7 +11,7 @@ import { AppStateService } from '../../../app-state.service';
 })
 export class OverviewComponent {
 
-  data$: Observable<OverviewlistItem[]> = this.overviewService.getChannels().pipe(share());
+  data$: Observable<OverviewlistItem[]> = this.overviewService.getChannels().pipe(share(),catchError(() => of([])));
 
   isLoggedIn$ = this.state.isLoggedIn$.pipe(share());
 

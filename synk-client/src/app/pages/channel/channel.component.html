@@ -1,19 +1,25 @@
 <div *ngIf="isConnected$ | async; then channelStage; else connectionState"></div>
+
 <ng-template #channelStage>
-  <div nz-row [nzGutter]="{ xs: 8, sm: 16, md: 24, lg: 32, xl: 32, xxl: 32 }">
-    <div nz-col nzSpan="6" class="column gutter-row">
-      <app-chat-room [name]="name"></app-chat-room>
+  <div nz-row [nzGutter]="{ xs: 0, sm: 0, md: 24, lg: 32, xl: 32, xxl: 32 }">
+    
+    <div nz-col [nzLg]="{ span: 6, offset: 0 }" [nzMd]="{ span: 6, offset: 0 }" [nzXs]="{ span: 24, offset: 0 }" >
+      <app-chat-room [name]="name"  class="hide-on-mobile"></app-chat-room>
     </div>
-    <div nz-col nzSpan="18" class="column gutter-row">
+    
+    <div nz-col nzSpan="18" >
       <app-media *ngIf="playlist$ | async" #player (mediaEndedEvent)="onVideoEnded()"></app-media>
     </div>
-    <div nz-col nzSpan="6" class="mt-1">
+    
+    <div nz-col nzSpan="6" class="mt-1 hide-on-mobile">
       <app-connected-members (giveLeader)="giveLeader($event)"></app-connected-members>
     </div>
-    <div nz-col nzSpan="18" class="mt-1">
+    
+    <div nz-col nzSpan="18" class="mt-1 hide-on-mobile">
       <app-playlist [roomName]="name" (playMedia)="player.play($event.mediaUrl)">
       </app-playlist>
     </div>
+  
   </div>
 </ng-template>
 

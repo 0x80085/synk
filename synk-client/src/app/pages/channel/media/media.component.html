@@ -1,1 +1,15 @@
-<div mediaHost></div>
+<ng-container *ngIf="isAnyMediaPlayerPresent | async; else loading">
+  <div mediaHost></div>
+</ng-container>
+
+<ng-template #loading>
+  <div nz-row nzJustify="center" nzAlign="middle" style=" height: 100%;">
+    <div nz-col nzSpan="12" style="text-align: center;">
+        <div>
+            <i nz-icon [nzType]="'loading'" style="font-size: 4rem;"></i>
+            <p nz-typography>Loading the player...</p>
+        </div>
+    </div>
+  </div>
+</ng-template>
+

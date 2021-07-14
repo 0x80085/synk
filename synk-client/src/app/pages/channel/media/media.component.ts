@@ -12,7 +12,7 @@ import {
 
 import { BaseMediaComponent } from './base-media.component';
 import { YoutubeComponent, isValidYTid } from './youtube/youtube.component';
-import { Subscription } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { Html5Component } from './html5/html5.component';
 import { isTwitchChannelUrl, TwitchComponent } from './twitch/twitch.component';
 import { PlyrComponent } from './plyr/plyr.component';
@@ -42,6 +42,8 @@ export class MediaComponent {
   ref: ComponentRef<BaseMediaComponent>;
 
   videoEndedSubscription: Subscription;
+
+  isAnyMediaPlayerPresent = new BehaviorSubject(false);
 
   constructor(private componentFactoryResolver: ComponentFactoryResolver) { }
 
@@ -76,10 +78,14 @@ export class MediaComponent {
   }
 
   private setupMediaPlayer(url: string) {
+    this.isAnyMediaPlayerPresent.next(false);
+    
     const playerType = this.resolveMediaType(url);
 
     this.createPlayerOfType(playerType);
     this.ref.instance.setCurrentUrl(url);
+
+    this.isAnyMediaPlayerPresent.next(true);
   }
 
   private resolveMediaType(url: string) {
