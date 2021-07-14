@@ -162,6 +162,8 @@ export class ConnectionTrackingService {
 
             this.clients.set(ipAddress, updateTrackRecods);
 
+            this.logger.log(`${ipAddress}:${socketId} was removed from tracker`);
+
         } catch (error) {
             this.logger.error("Something went wrong trying to update connection track records:", error)
             console.log(error)

@@ -24,9 +24,11 @@ import { PlayerDebugComponent } from './player-debug/player-debug.component';
 import { PlaylistComponent } from './playlist/playlist.component';
 import { PlyrComponent } from './media/plyr/plyr.component';
 import { ConnectedMembersComponent } from './connected-members/connected-members.component';
-import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
+import { NzGridModule } from 'ng-zorro-antd/grid';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NZ_ICONS } from 'src/app/icons';
 
 @NgModule({
   entryComponents: [
@@ -57,9 +59,10 @@ import { NzTypographyModule } from 'ng-zorro-antd/typography';
     NzButtonModule,
     NzInputModule,
     NzCollapseModule,
-    NzIconModule,
     NzToolTipModule,
-    NzTypographyModule
+    NzGridModule,
+    NzTypographyModule,
+    NzIconModule.forRoot(NZ_ICONS),
 
   ],
   providers: [ChatService]
