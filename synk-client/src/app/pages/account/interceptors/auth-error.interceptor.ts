@@ -32,9 +32,10 @@ export class RequestLogInterceptor implements HttpInterceptor {
               case 403:
                 this.notification.warning(`ಠ_ಠ`, `That is not allowed!`);
                 break;
-
+              case 500:
+                this.notification.error(`Something went wrong...`, `Here's some tea 🍵`);
+                break;
               default:
-                this.notification.error(`Something went wrong here`, `Here's some tea 🍵`);
                 break;
             }
 
