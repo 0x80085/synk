@@ -5,13 +5,14 @@ import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { AppStateService } from '../../../app-state.service';
 import { SocketService } from '../../../socket.service';
+import { AuthService } from '../auth.service';
 
 @Injectable()
 export class RequestLogInterceptor implements HttpInterceptor {
 
-  constructor(private stateService: AppStateService,
-    private socketService: SocketService,
-    private notification: NzNotificationService
+  constructor(
+    private notification: NzNotificationService,
+    private authService: AuthService
   ) { }
 
   intercept(
@@ -25,9 +26,7 @@ export class RequestLogInterceptor implements HttpInterceptor {
             switch (err.status) {
               case 401:
                 this.notification.error(`Please login`, `You need to be logged in to access this part`);
-                this.socketService.socket.disconnect();
-                this.stateService.isLoggedInSubject.next(false);
-                this.stateService.userSubject.next(null);
+                this.authService.logout().subscribe()
                 break;
               case 403:
                 this.notification.warning(`ಠ_ಠ`, `That is not allowed!`);

@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { shareReplay, switchMap, tap } from 'rxjs/operators';
 
@@ -47,7 +48,8 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private socketService: SocketService,
-    private state: AppStateService
+    private state: AppStateService,
+    private router: Router
   ) { }
 
   createAccount(userCreds: LoginInfo) {
@@ -78,13 +80,13 @@ export class AuthService {
 
   logout() {
     return this.http
-      .post(`${environment.api}/auth/logout`, null, {
-        withCredentials: true,
-      })
+      .post(`${environment.api}/auth/logout`, null)
       .pipe(
         tap(() => {
           this.state.isLoggedInSubject.next(false);
           this.socketService.socket.close();
+          this.state.userSubject.next(null);
+          this.router.navigate(['']);
         }),
       );
   }
