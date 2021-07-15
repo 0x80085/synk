@@ -18,6 +18,7 @@ import { PopcornBannerComponent } from './banners/popcorn-banner/popcorn-banner.
 import { NekoBannerComponent } from './banners/neko-banner/neko-banner.component';
 import { OverviewItemComponent } from './overview/overview-item/overview-item.component';
 import { RouterModule } from '@angular/router';
+import { NzGridModule } from 'ng-zorro-antd/grid';
 
 @NgModule({
   imports: [
@@ -32,6 +33,7 @@ import { RouterModule } from '@angular/router';
     NzCardModule,
     NzToolTipModule,
     NzButtonModule,
+    NzGridModule,
     NzTypographyModule
   ],
   declarations: [
