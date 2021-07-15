@@ -1,15 +1,15 @@
-import { Component, HostListener, OnDestroy, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { BehaviorSubject, combineLatest, iif, merge, noop, Observable, of, Subscription, timer } from 'rxjs';
-import { mapTo, startWith, tap, shareReplay, take, filter, map, mergeMap, catchError, withLatestFrom, switchMap } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, merge, noop, Observable, of, Subscription, timer } from 'rxjs';
+import { mapTo, shareReplay, startWith, switchMap, take, tap } from 'rxjs/operators';
 
+import { AppStateService } from '../../app-state.service';
 import { SocketService } from '../../socket.service';
 import { ChatService } from './chat.service';
 import { MediaService, PlaylistRepresentation } from './media.service';
 import { MediaComponent } from './media/media.component';
 import { MediaEvent, RoomUser } from './models/room.models';
-import { AppStateService } from '../../app-state.service';
 
 @Component({
   selector: 'app-channel',
@@ -127,7 +127,6 @@ export class ChannelComponent implements OnInit, OnDestroy {
       this.isCurrentTimeOutOfSync(currentTime)
 
     if (shouldSyncPlayer) {
-      console.log('syncing...');
       if (!this.player.isPlaying()) {
         this.player.play(mediaUrl);
       }
