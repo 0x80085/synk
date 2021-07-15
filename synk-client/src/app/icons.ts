@@ -1,38 +1,12 @@
 
 import { IconDefinition } from '@ant-design/icons-angular';
-
 import {
-    ExperimentFill,
-    DashboardOutline,
-    CompassOutline,
-    CrownOutline,
-    BugOutline,
-    MehFill,
-    SmileFill,
-    SmileOutline,
-    LoginOutline,
-    ApiOutline,
-    MenuOutline,
-    SwapOutline,
-    FrownOutline,
-    DeleteOutline,
-    EllipsisOutline,
-    TeamOutline,
-    TagFill,
-    UserOutline,
-    LockOutline,
-    NotificationFill,
-    SyncOutline,
-    RightOutline,
-    InteractionOutline,
-    ShopOutline,
-    LoadingOutline,
-    ForwardOutline,
-    PlayCircleOutline,
-    CaretRightFill,
-    VideoCameraOutline,
-    TagOutline
+    ApiOutline, BugOutline, CaretRightOutline, CompassOutline,
+    CrownOutline, DashboardOutline, DeleteOutline, DeleteFill,
+    EllipsisOutline, ExperimentFill, ForwardOutline, FrownOutline, InteractionOutline, LoadingOutline, LockOutline, LoginOutline, MehFill, MenuOutline, NotificationFill, PlayCircleOutline, RightOutline, ShopOutline, SmileFill,
+    SmileOutline, SwapOutline, SyncOutline, TagFill, TagOutline, TeamOutline, UserOutline, VideoCameraOutline
 } from '@ant-design/icons-angular/icons';
+
 
 export const NZ_ICONS: IconDefinition[] = [
     ExperimentFill,
@@ -49,6 +23,7 @@ export const NZ_ICONS: IconDefinition[] = [
     SwapOutline,
     FrownOutline,
     DeleteOutline,
+    DeleteFill,
     EllipsisOutline,
     TeamOutline,
     TagFill,
@@ -62,7 +37,7 @@ export const NZ_ICONS: IconDefinition[] = [
     LoadingOutline,
     ForwardOutline,
     PlayCircleOutline,
-    CaretRightFill,
+    CaretRightOutline,
     VideoCameraOutline,
     TagOutline
 ];
