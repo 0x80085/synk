@@ -68,6 +68,9 @@ nz-header {
 nz-content {
   margin: 24px;
 }
+::ng-deep .ant-menu-sub.ant-menu-inline {
+  background-color: #191919;
+}
 
 .inner-content {
   padding: 24px;
