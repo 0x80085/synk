@@ -4,7 +4,7 @@
       <span>
         <ng-container *ngIf="(isLoggedIn | async); then userLoggedIn; else userNotLoggedIn"></ng-container>
         <h1 style="cursor: pointer;" (click)="isCollapsed = !isCollapsed">
-          synkd.cf
+          {{ hostName }}
         </h1>
       </span>
     </div>

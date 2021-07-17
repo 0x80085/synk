@@ -9,6 +9,11 @@ export class TermsOfUseComponent implements OnInit {
 
   constructor() { }
 
+  hostName = () => {
+    const url = new URL(window.location.href);
+    return `${url.protocol}//${url.hostname}`
+  };
+
   ngOnInit(): void {
   }
 
