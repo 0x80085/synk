@@ -4,7 +4,7 @@ import {
     ApiOutline, BugOutline, CaretRightOutline, CompassOutline,
     CrownOutline, DashboardOutline, DeleteOutline, DeleteFill,
     EllipsisOutline, ExperimentFill, ForwardOutline, FrownOutline, InteractionOutline, LoadingOutline, LockOutline, LoginOutline, MehFill, MenuOutline, NotificationFill, PlayCircleOutline, RightOutline, ShopOutline, SmileFill,
-    SmileOutline, SwapOutline, SyncOutline, TagFill, TagOutline, TeamOutline, UserOutline, VideoCameraOutline,RobotOutline
+    SmileOutline, SwapOutline, SyncOutline, TagFill, TagOutline, TeamOutline, UserOutline, VideoCameraOutline,VideoCameraAddOutline, RobotOutline
 } from '@ant-design/icons-angular/icons';
 
 
@@ -39,6 +39,7 @@ export const NZ_ICONS: IconDefinition[] = [
     PlayCircleOutline,
     CaretRightOutline,
     VideoCameraOutline,
+    VideoCameraAddOutline,
     TagOutline,
     RobotOutline
 ];

@@ -178,20 +178,31 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
 
 
   @SubscribeMessage(MessageTypes.GIVE_LEADER)
-  async handleGiveLeader(requestingMemberSocket: socketio.Socket, { roomName, newLeaderId }: { roomName: string, newLeaderId: string }) {
+  async handleGiveLeader(requestingMemberSocket: socketio.Socket,  { to, roomName }: { to: string, roomName: string }) {
     this.logger.log('handleGiveLeader');
 
+    try {
     // TODO move this logic somewhere else model or/and service  
     const requestingMember = await this.tracker.getMemberBySocket(requestingMemberSocket);
-    const newLeaderSocket = this.tracker.getSocketByMemberId(newLeaderId);
-
     const room = this.roomService.getRoomByName(roomName);
-
-    this.roomService.giveLeader(room.id, requestingMember, newLeaderId);
+    
+    const newLeader = await this.roomService.giveLeader(room.id, requestingMember, to);
+    
+    const newLeaderSocket = await this.tracker.getSocketByMemberId(newLeader.id);
+    this.sendRoomConfigToMember(room, newLeader.id, newLeaderSocket);
+    this.sendRoomConfigToMember(room, requestingMember.id, requestingMemberSocket);
 
     this.broadcastMemberlistToRoom(room);
-    this.sendRoomConfigToMember(room, requestingMember.id, requestingMemberSocket);
-    this.sendRoomConfigToMember(room, newLeaderId, newLeaderSocket);
+      
+    } catch (error) {
+      this.logger.error(error)
+      
+      if (error.message === "Forbidden") {
+        throw new WsException(MessageTypes.FORBIDDEN)
+      }
+      throw new WsException(MessageTypes.GENERIC_ERROR)
+    }
+
   }
 
   @SubscribeMessage(MessageTypes.ADD_MEDIA)
