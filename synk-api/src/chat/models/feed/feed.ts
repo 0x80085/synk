@@ -16,16 +16,15 @@ interface RawMessage {
 
 export class Feed {
 
-    // constructor(private appService: AppService) { }
+    // constructor(private globalConfigService: GlobalConfigService) { } // todo make the global conf module 
 
     queue: Queue<Message> = new Queue();
 
-    // TODO dont use Member for author prop
     post({ author, content }: RawMessage) {
         this.queue.enqueue({ author, displayText: content, originalText: content });
 
-        // if (this.queue.length > this.appService.config.maxMessagesPerRoom) {
-        //     this.queue.removeTail();
-        // }
+        if (this.queue.length > 150) {
+            this.queue.removeTail();
+        }
     }
 }
