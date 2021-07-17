@@ -1,6 +1,7 @@
 :host {
   display: block;
-  height: 100vh;
+  min-height: 100vh;
+  height: 100%;
   width: 100%;
   max-width: 100vw;
 }
@@ -12,11 +13,7 @@ nz-alert {
   }
 }
 
-.menu-sidebar {
-  position: relative;
-  z-index: 10;
-  min-height: 100vh;
-}
+
 
 .header-trigger {
   height: 64px;
@@ -49,10 +46,23 @@ nz-alert {
   vertical-align: middle;
 }
 
-nz-header {
-  padding: 0;
-  width: 100%;
-  z-index: 2;
+.menu-sidebar {
+  position: fixed;
+  z-index: 10;
+  min-height: 100vh;
+  height: 100%;
+}
+
+nz-content {
+  margin: 24px;
+  margin-left: 96px;
+}
+::ng-deep .ant-menu-sub.ant-menu-inline {
+  background-color: #191919;
+}
+
+nz-alert {
+  margin-left: 80px;
 }
 
 .app-header {
@@ -65,12 +75,7 @@ nz-header {
   background-color: rgb(255, 105, 78);
 }
 
-nz-content {
-  margin: 24px;
-}
-::ng-deep .ant-menu-sub.ant-menu-inline {
-  background-color: #191919;
-}
+
 
 .inner-content {
   padding: 24px;

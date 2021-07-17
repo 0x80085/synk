@@ -1,6 +1,6 @@
 .wrapper {
   display: grid;
-  height: 100%;
+  height: 75vh;
   grid-template-columns: 1fr;
   grid-template-rows: 0.1fr 0.75fr 0.15fr;
   gap: 0px 1px;
@@ -8,16 +8,6 @@
     "."
     "."
     ".";
-  justify-items: stretch;
-  border: 1px #191919 solid;
-
-  > div {
-    border-bottom: 1px #191919 solid;
-  }
-
-  &:last-child {
-    border-bottom: 0;
-  }
 
   .header {
     display: flex;
@@ -37,12 +27,20 @@
 
   textarea {
     display: block;
+    margin: 1rem 0;
+    padding: 0.25rem;
+    border-radius: 8px;
+    border: 1px solid #ff694e;
     background-color: #191919;
     color: whitesmoke;
     width: 100%;
     height: 100%;
     resize: none;
     min-height: 100px;
+    outline: none !important;
+    ::placeholder {
+      padding: 1rem;
+    }
     overflow: auto;
   }
 }

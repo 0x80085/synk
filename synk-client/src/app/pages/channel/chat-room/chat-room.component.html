@@ -10,11 +10,21 @@
       </h2>
     </div>
     <div class="feed"  #feed> 
-      <div *ngFor="let message of messages$ | async">
-        <p>
-          <span>{{ message.username }}</span>
+      <div *ngFor="let message of messages$ | async; last as isLast;">
+
+        <ng-template #username>
+          <span nz-typography><code>{{ message.username }}</code></span>
+        </ng-template>
+
+        <ng-template #system>
+          <span nz-typography><code><i nz-icon nzType="robot" nzTheme="outline" title="Message from server"></i></code></span>
+        </ng-template>
+
+        <p nz-typography>
+          <ng-container *ngIf="message.username; then username; else system;"></ng-container>
           {{ message.text }}
         </p>
+        <nz-divider *ngIf="!isLast"></nz-divider>
       </div>
     </div>
     <div class="input">
@@ -23,19 +33,6 @@
         </textarea>
     </div>
   </div>
-
-  <!--
-
-    <div class="wrapper">
-    <nz-card [nzTitle]="name" class="feed" [nzBodyStyle]="{ overflowY : 'auto', height: '90%' }" #feed>
-      <nz-comment *ngFor="let message of messages$ | async | slice: -10" [nzAuthor]="message.username">
-        <nz-comment-content>
-          {{ message.text }}
-        </nz-comment-content>
-      </nz-comment>
-    </nz-card>
-
- -->
 </ng-template>
 
 <ng-template #error>

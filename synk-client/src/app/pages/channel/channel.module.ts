@@ -62,6 +62,7 @@ import { NZ_ICONS } from 'src/app/icons';
     NzToolTipModule,
     NzGridModule,
     NzTypographyModule,
+    NzDividerModule,
     NzIconModule.forRoot(NZ_ICONS),
 
   ],

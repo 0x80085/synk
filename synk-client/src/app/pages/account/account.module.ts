@@ -29,6 +29,7 @@ import { CreateRoomFormComponent } from './create-room-form/create-room-form.com
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NZ_ICONS } from 'src/app/icons';
+import { NzGridModule } from 'ng-zorro-antd/grid';
 
 @NgModule({
   declarations: [
@@ -58,6 +59,7 @@ import { NZ_ICONS } from 'src/app/icons';
     NzTableModule,
     NzDescriptionsModule,
     NzTypographyModule,
+    NzGridModule,
     NzIconModule.forRoot(NZ_ICONS),
   ],
   providers: [
