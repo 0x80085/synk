@@ -43,7 +43,7 @@ export class MediaComponent {
 
   videoEndedSubscription: Subscription;
 
-  isAnyMediaPlayerPresent = new BehaviorSubject(false);
+  isMediaSelected = new BehaviorSubject(false);
 
   constructor(private componentFactoryResolver: ComponentFactoryResolver) { }
 
@@ -78,14 +78,12 @@ export class MediaComponent {
   }
 
   private setupMediaPlayer(url: string) {
-    this.isAnyMediaPlayerPresent.next(false);
+    this.isMediaSelected.next(true);
     
     const playerType = this.resolveMediaType(url);
-
+    
     this.createPlayerOfType(playerType);
     this.ref.instance.setCurrentUrl(url);
-
-    this.isAnyMediaPlayerPresent.next(true);
   }
 
   private resolveMediaType(url: string) {
@@ -119,7 +117,6 @@ export class MediaComponent {
     const isSameAsCurrentPlayer = this.ref && this.ref.componentType === type;
 
     if (isSameAsCurrentPlayer) {
-      console.log('same as current');
       return;
     }
 
