@@ -1,13 +1,10 @@
 <div nz-row>
-  <div nz-col nzSpan="24" style="min-height: 3rem;" [hidden]="!(isLeader$ |async)">
+  
+  <div nz-col nzSpan="24" style="min-height: 3rem;">
     <button nz-button nzType="link" (click)="showControls = !showControls">
-      <i nz-icon nzType="menu"></i>
+      <i nz-icon nzType="video-camera-add" nzTheme="outline" nz-tooltip  nzTooltipTitle="Add media to playlist"></i>
     </button>
-    <nz-button-group style="margin-left: 0.875rem;" [hidden]="!showControls">
-      <!-- <button nzGhost nz-button nzType="default">
-        <i nz-icon nzType="down-square" nzTheme="outline" (click)="onLoadPlaylist()"></i>
-        Load Playlist
-      </button> -->
+    <!-- <nz-button-group style="margin-left: 0.875rem;" [hidden]="!showControls">
       <button nz-button nzType="default" (click)="onShuffle()">
         <i nz-icon nzType="swap" nzTheme="outline"></i>
         Shuffle Playlist
@@ -16,32 +13,30 @@
         <i nz-icon nzType="forward" nzTheme="outline"></i>
         Next
       </button>
-    </nz-button-group>
+    </nz-button-group> -->
   </div>
-  <div nz-col nzSpan="24" [hidden]="!(isLeader$ |async)">
+  
+  <div nz-col nzSpan="24">
     <nz-input-group [hidden]="!showControls" nzSearch nzSize="large" [nzAddOnAfter]="suffixButton"
       style="margin-bottom: 1rem;">
       <input type="text" nz-input placeholder="Enter url to add video" [(ngModel)]="mediaUrlInput" />
     </nz-input-group>
   </div>
+
   <div nz-col nzSpan="24">
     <nz-list [nzBordered]="(virtualPlaylist$ | async)" nzSize="small" [nzLoading]="!(virtualPlaylist$| async)"
-      [nzDataSource]="virtualPlaylist$| async" [nzRenderItem]="item" [nzNoResult]="'No items'">
+      [nzDataSource]="virtualPlaylist$| async" [nzRenderItem]="item" [nzNoResult]="noItems">
       <ng-template #item let-item>
         <nz-list-item style="border-bottom: 1px solid rgb(25, 25, 25);" class="playlist-item" [class.active]="true"
           nzSplit [nzContent]="item.title" [nzActions]="[opAction]" nzNoFlex>
         </nz-list-item>
         <ng-template #opAction>
           <button nz-button nzSize="small" nzType="link" (click)="playMedia.emit(item)"
-            nz-tooltip [nzTitle]="item.active ?  'start video' : 'now playing'">
+            nz-tooltip [nzTooltipTitle]="item.active ? 'now playing' : 'start video'">
             <i nz-icon [nzType]="item.active ? 'play-circle' : 'caret-right'"></i>
           </button>
-          <!-- <button nz-button nzSize="small" nzType="link" disabled nz-tooltip
-            nzTitle="set next in line (not yet implemented)">
-            <i nz-icon nzType="double-right"></i>
-          </button> -->
           <button nz-button nzSize="small" nzDanger nzType="link" (click)="onRemoveMedia(item.mediaUrl)" nz-tooltip
-            nzTitle="Remove from list">
+          nzTooltipTitle="Remove from list">
             <i nz-icon nzType="delete"></i>
           </button>
         </ng-template>
@@ -52,4 +47,13 @@
 
 <ng-template #suffixButton>
   <button nz-button nzType="primary" nzSearch (click)="onAddMedia()">Add</button>
+</ng-template>
+
+<ng-template #noItems>
+  <p nz-typography> 
+    <i nz-icon nzType="ellipsis" nzTheme="outline"></i>
+  </p>
+  <p nz-typography> 
+    Nothing queued
+  </p>
 </ng-template>

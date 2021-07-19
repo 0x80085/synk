@@ -1,35 +1,30 @@
 import { Injectable } from '@angular/core';
 
-import { Observable, fromEvent, timer } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import {
   Message,
   RoomMessage,
   RoomUserConfig,
-  RoomUserDto,
-  RoomCommands
+  RoomUser,
+  RoomCommands,
+  RoomErrors
 } from './models/room.models';
 import { SocketService, RealTimeCommand } from '../../socket.service';
-import { map, withLatestFrom, tap } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class ChatService {
-  messageQueue: Message[] = [];
 
-  roomMessages$ = this.socketService.listenForEvent(RoomCommands.GROUP_MESSAGE).pipe(
-    map((data: RoomMessage) => {
-      this.messageQueue = this.messageQueue.concat(data.content);
-      return this.messageQueue;
-    })
+  roomMessages$ = this.socketService.listenForEvent<Message[]>(RoomCommands.GROUP_MESSAGE);
+
+  alreadyJoinedRoomError$ = this.socketService.exceptionEvent$.pipe(
+    filter(({message}) => message === RoomErrors.ALREADY_JOINED)
   );
-
-  alreadyJoinedRoomError$ = this.socketService.listenForEvent('already joined');
 
   roomUserConfig$ = this.socketService.listenForEvent<RoomUserConfig>(RoomCommands.USER_CONFIG);
 
-  roomUserList$ = this.socketService.listenForEvent<RoomUserDto[]>(RoomCommands.USER_LIST_UPDATE);
+  roomUserList$ = this.socketService.listenForEvent<RoomUser[]>(RoomCommands.USER_LIST_UPDATE);
 
   constructor(private socketService: SocketService) { }
 
@@ -48,32 +43,12 @@ export class ChatService {
     this.socketService.socket.emit(RoomCommands.JOIN_ROOM, roomName);
   }
 
-  giveLeader({ member, roomName }: { member: RoomUserDto, roomName: string }) {
-    this.socketService.socket.emit(RoomCommands.GIVE_LEADER, { to: member.userName, roomName });
+  giveLeader({ member, roomName }: { member: RoomUser, roomName: string }) {
+    this.socketService.socket.emit(RoomCommands.GIVE_LEADER, { to: member.username, roomName });
   }
 
   exit(name: string) {
     this.socketService.socket.emit(RoomCommands.EXIT_ROOM, name);
     this.socketService.socket.off(RoomCommands.GROUP_MESSAGE);
-    this.messageQueue = [];
   }
-
-  // setupMessageQueueGCTimer() {
-  //   timer(500).pipe()
-  //     .subscribe(
-  //       value => {
-  //         console.log(value);
-
-  //         this.messageQueue = this.messageQueue.slice(0, -50);
-  //       },
-  //       err => console.log(err),
-  //     );
-  // }
-
-  // flushQueue() {
-  //   this.messageQueue = [];
-  //   this.groupMessages$ = new Observable(observer => {
-  //     observer.next(this.messageQueue);
-  //   });
-  // }
 }

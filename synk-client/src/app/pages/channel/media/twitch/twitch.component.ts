@@ -4,9 +4,8 @@ import { TwitchPlayer, TwitchPlayerEvent } from 'twitch-player';
 import { BaseMediaComponent } from '../base-media.component';
 
 export function isTwitchChannelUrl(url: string) {
-  const urlObj = new URL(url);
-  const isTwitchHostname = urlObj.hostname.includes('twitch.tv');
-  return isTwitchHostname;
+  const regx = /^(?:https?:\/\/)?(?:www\.|go\.)?twitch\.tv\/([a-z0-9_]+)($|\?)/
+  return regx.test(url);
 }
 
 @Component({
@@ -69,7 +68,7 @@ export class TwitchComponent implements BaseMediaComponent {
   }
 
   private createPlayer(channel: string) {
-    this.player = new TwitchPlayer('stage', {
+    this.player = TwitchPlayer.FromOptions('stage', {
       channel,
       autoplay: true,
       muted: false,

@@ -10,7 +10,7 @@ export class PlaceholdPipe implements PipeTransform {
 
   transform = (user: User): string =>
     user
-      ? `https://via.placeholder.com/400x300/c0ffee?text=${user.userName}`
+      ? `https://via.placeholder.com/400x300/c0ffee?text=${user.username}`
       : `https://via.placeholder.com/400x300/c0ffee`
 
 }

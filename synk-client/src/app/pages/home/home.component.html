@@ -1,22 +1,25 @@
-<div nz-row>
+<div nz-row [nzGutter]="[25, 25]">
   <div nz-col nzSpan="24">
     <nz-carousel nzEffect="scrollx" nzAutoPlay>
-      <div nz-carousel-content style="display: flex;">
+      <div nz-carousel-content style="display: flex">
         <app-sushi-banner></app-sushi-banner>
       </div>
-      <div nz-carousel-content style="display: flex;">
+      <div nz-carousel-content style="display: flex">
         <app-popcorn-banner></app-popcorn-banner>
       </div>
-      <div nz-carousel-content style="display: flex;">
+      <div nz-carousel-content style="display: flex">
         <app-neko-banner></app-neko-banner>
       </div>
     </nz-carousel>
   </div>
 </div>
-<nz-divider></nz-divider>
-<h1 nz-typography>Channel Directory</h1>
-<nz-divider nzText="Public channels"></nz-divider>
-<div nz-row>
+<div nz-row [nzGutter]="[25, 25]">
+  <div nz-col nzSpan="24">
+    <h1 nz-typography>Channel Directory</h1>
+  </div>
+  <div nz-col nzSpan="24" style="text-align: center">
+    <p nz-typography><strong>Public channels</strong></p>
+  </div>
   <div nz-col nzSpan="24">
     <app-overview></app-overview>
   </div>

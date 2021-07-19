@@ -1,6 +1,8 @@
-# Builds/packages the API
+FROM node:lts-alpine AS build
 
-FROM node:lts-alpine
+###################
+## BUILD STAGE
+###################
 
 # Install pkgs to build npm deps
 RUN apk add --no-cache --virtual .gyp \
@@ -9,19 +11,50 @@ RUN apk add --no-cache --virtual .gyp \
     g++
 
 # Create folder on container
-WORKDIR /synk-api
-
-# Copy build config files to container
-COPY package*.json ./
-COPY .env.docker ./.env
-COPY ormconfig.docker.json ./ormconfig.json
-COPY tsconfig.json ./
+WORKDIR /build
 
 # Install deps
+COPY package.json .
+COPY .env ./.env
+COPY tsconfig.json .
+COPY tsconfig.build.json .
+COPY nest-cli.json .
+
 RUN npm install
 
 # Copy src
 COPY ./src ./src
 
-# Run dev start
-CMD ["npm", "start"]
+# Build JS binaries
+RUN npm run build
+
+# Migrate DB
+RUN npm run db:migrate:run
+
+###################
+## DEPLOY STAGE
+###################
+
+FROM fedora:latest AS deploy 
+
+WORKDIR /api
+
+# Install nodejs and npm
+RUN dnf -y update && dnf -y install npm && dnf clean all
+
+# Somehow https / nginx / letsencrypt 
+# .. ?
+
+# Install deps
+COPY package.json .
+COPY .env.docker ./.env
+ENV NODE_ENV=production
+RUN npm install
+
+# copy bin from build stage 
+COPY --from=build /build/dist .
+
+EXPOSE 3000
+
+
+CMD ["node", "main.js"]

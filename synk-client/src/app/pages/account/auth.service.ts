@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { shareReplay, switchMap, tap } from 'rxjs/operators';
 
@@ -13,7 +14,7 @@ interface LoginInfo {
 }
 
 export interface User {
-  userName: string;
+  username: string;
   id: string;
   isAdmin: boolean;
 }
@@ -25,6 +26,8 @@ export interface Channel {
   isPublic: string;
   dateCreated: string;
   isLocked: boolean;
+  connectedMemberCount: number;
+  nowPlaying: string;
 }
 
 @Injectable({
@@ -34,9 +37,10 @@ export class AuthService {
 
   private refreshChannelsSubject = new BehaviorSubject(true);
 
+  // TODO Should be in some other service tho
   userOwnedChannels$ = this.refreshChannelsSubject.pipe(
     switchMap(() =>
-      this.http.get<Channel[]>(`${environment.api}/account/channels`, { withCredentials: true })
+      this.http.get<Channel[]>(`${environment.api}/channels/mine`, { withCredentials: true })
     )).pipe(
       shareReplay(1)
     );
@@ -44,13 +48,14 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private socketService: SocketService,
-    private state: AppStateService
+    private state: AppStateService,
+    private router: Router
   ) { }
 
   createAccount(userCreds: LoginInfo) {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
-    return this.http.post(`${environment.api}/signup`, userCreds, {
+    return this.http.post(`${environment.api}/auth/sign-up`, userCreds, {
       headers,
       withCredentials: true
     });
@@ -60,7 +65,7 @@ export class AuthService {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
 
     return this.http
-      .post(`${environment.api}/login`, userCreds, {
+      .post(`${environment.api}/auth/login`, userCreds, {
         headers,
         withCredentials: true
       })
@@ -75,13 +80,13 @@ export class AuthService {
 
   logout() {
     return this.http
-      .get(`${environment.api}/logout`, {
-        withCredentials: true
-      })
+      .post(`${environment.api}/auth/logout`, null)
       .pipe(
         tap(() => {
           this.state.isLoggedInSubject.next(false);
           this.socketService.socket.close();
+          this.state.userSubject.next(null);
+          this.router.navigate(['']);
         }),
       );
   }
@@ -102,9 +107,10 @@ export class AuthService {
     this.refreshChannelsSubject.next(true);
   }
 
-  deleteChannel(name: string) {
+  // TODO Should also be in other service tho
+  deleteChannel(id: string) {
     return this.http.delete<Channel[]>(
-      `${environment.api}/account/channels/${name}`,
+      `${environment.api}/channels/${id}`,
       { withCredentials: true });
   }
 

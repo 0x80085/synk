@@ -12,7 +12,7 @@ import {
 
 import { BaseMediaComponent } from './base-media.component';
 import { YoutubeComponent, isValidYTid } from './youtube/youtube.component';
-import { Subscription } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { Html5Component } from './html5/html5.component';
 import { isTwitchChannelUrl, TwitchComponent } from './twitch/twitch.component';
 import { PlyrComponent } from './plyr/plyr.component';
@@ -43,6 +43,8 @@ export class MediaComponent {
 
   videoEndedSubscription: Subscription;
 
+  isMediaSelected = new BehaviorSubject(false);
+
   constructor(private componentFactoryResolver: ComponentFactoryResolver) { }
 
   play(url: string): void {
@@ -63,7 +65,12 @@ export class MediaComponent {
   }
 
   getCurrentUrl(): string {
-    return this.ref.instance.getCurrentUrl();
+    try {
+      return this.ref.instance.getCurrentUrl();
+    } catch (error) {
+      console.log("this.ref.instance not available - prob no player rendered.");
+      return;
+    }
   }
 
   isPlaying() {
@@ -71,8 +78,10 @@ export class MediaComponent {
   }
 
   private setupMediaPlayer(url: string) {
+    this.isMediaSelected.next(true);
+    
     const playerType = this.resolveMediaType(url);
-
+    
     this.createPlayerOfType(playerType);
     this.ref.instance.setCurrentUrl(url);
   }
@@ -108,7 +117,6 @@ export class MediaComponent {
     const isSameAsCurrentPlayer = this.ref && this.ref.componentType === type;
 
     if (isSameAsCurrentPlayer) {
-      console.log('same as current');
       return;
     }
 

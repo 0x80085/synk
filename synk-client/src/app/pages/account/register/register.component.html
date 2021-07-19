@@ -1,8 +1,6 @@
-<div nz-row nzAlign="middle">
-  <div nz-col nzOffset="8" nzSpan="8">
+<div nz-row nzJustify="center" nzAlign="middle" class="wrapper">
+  <div nz-col [nzLg]="{ span: 8, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }" [nzXs]="{ span: 24, offset: 0 }">
     <h1>Create your account</h1>
-  </div>
-  <div nz-col nzOffset="8" nzSpan="8">
     <nz-card nzTitle="Create account" *ngIf="!registerSuccess">
       <form nz-form [formGroup]="form" class="login-form" (ngSubmit)="submitForm()">
         <nz-form-item>
@@ -10,7 +8,7 @@
             <ng-template #prefixTemplateUser><i nz-icon style="color: rgb(204, 254, 253);" nzType="user"></i>
             </ng-template>
             <nz-input-group [nzPrefix]="prefixTemplateUser">
-              <input type="text" nz-input formControlName="userName" placeholder="Username" />
+              <input type="text" nz-input formControlName="username" placeholder="Username" />
             </nz-input-group>
           </nz-form-control>
         </nz-form-item>

@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Room } from '../../socket/models/room';
 import { ChannelConfig } from './ChannelConfig';
-import { User } from './User';
+import { Member } from './Member';
+import { Role } from './Role';
 
 @Entity()
 export class Channel {
@@ -27,21 +27,12 @@ export class Channel {
   @Column()
   dateCreated: Date;
 
-  @ManyToOne(type => User, user => user.channels)
-  owner: User;
+  @ManyToOne(type => Member, member => member.channels, { onDelete: 'CASCADE' })
+  owner: Member;
 
-  @OneToMany(type => ChannelConfig, config => config.channel)
+  @OneToMany(type => ChannelConfig, config => config.channel, { onDelete: 'CASCADE' })
   configs: ChannelConfig[];
 
-  static create(name: string, desc: string, owner: User): Channel {
-    const chan = new Channel();
-    chan.owner = owner;
-    chan.dateCreated = new Date();
-    chan.name = name;
-    chan.description = desc;
-    chan.isPublic = true;
-    return chan;
-  }
-
-
+  @OneToMany(type => Role, role => role.channel, { onDelete: 'CASCADE' })
+  roles: Role[];
 }

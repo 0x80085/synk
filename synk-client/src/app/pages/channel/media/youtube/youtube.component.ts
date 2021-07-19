@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { NzNotificationService } from 'ng-zorro-antd';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 import { BaseMediaComponent } from '../base-media.component';
 import { errorDictionary } from './player-errors.model';
@@ -70,8 +70,6 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
   }
 
   seek(to: number): void {
-    console.log('seeking');
-
     this.player.seekTo(to, true);
   }
 
@@ -151,7 +149,7 @@ export function isValidYTid(url: string) {
 }
 
 function sleep(timer) {
-  return new Promise(resolve => {
+  return new Promise<void>(resolve => {
     timer = timer || 2000;
     setTimeout(() => {
       resolve();

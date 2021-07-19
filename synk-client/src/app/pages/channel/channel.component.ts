@@ -1,15 +1,15 @@
-import { Component, HostListener, OnDestroy, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { NzNotificationService } from 'ng-zorro-antd';
-import { BehaviorSubject, merge, Observable, Subscription, timer } from 'rxjs';
-import { mapTo, startWith, tap, shareReplay, take, filter } from 'rxjs/operators';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { BehaviorSubject, combineLatest, merge, noop, Observable, of, Subscription, timer } from 'rxjs';
+import { mapTo, shareReplay, startWith, switchMap, take, tap } from 'rxjs/operators';
 
+import { AppStateService } from '../../app-state.service';
 import { SocketService } from '../../socket.service';
 import { ChatService } from './chat.service';
-import { MediaService } from './media.service';
+import { MediaService, PlaylistRepresentation } from './media.service';
 import { MediaComponent } from './media/media.component';
-import { MediaEvent, RoomUserDto } from './models/room.models';
-import { AppStateService } from '../../app-state.service';
+import { MediaEvent, RoomUser } from './models/room.models';
 
 @Component({
   selector: 'app-channel',
@@ -20,10 +20,8 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   @ViewChild('player', { static: false }) player: MediaComponent;
 
-  playlist: string[] = [];
-
   name: string;
-  nowPlayingUrl: string;
+
   loggedInUserIsLeader = false;
 
   activeItemSubject: BehaviorSubject<string> = new BehaviorSubject(null);
@@ -34,23 +32,11 @@ export class ChannelComponent implements OnInit, OnDestroy {
   isLoading$ = merge(
     this.socketService.reconnectionError$.pipe(mapTo(true)),
     this.isConnected$.pipe(mapTo(false)),
-  )
-    .pipe(
-      startWith(false)
-    );
+  ).pipe(startWith(false));
 
-  members$: Observable<RoomUserDto[]> = this.chatService.roomUserList$.pipe(
-    tap(ev => {
-      console.log('roomUserList update', ev);
-    })
-  );
+  members$: Observable<RoomUser[]> = this.chatService.roomUserList$;
 
-  playlist$: Observable<MediaEvent[]> = this.mediaService.roomPlaylist$.pipe(
-    tap(ev => {
-      this.playlist = ev.map(i => {
-        return i.mediaUrl;
-      });
-    }));
+  playlist$: Observable<PlaylistRepresentation> = this.mediaService.roomPlaylistUpdateEvents$;
 
   mediaUpdateTimerSubscription: Subscription = timer(1000, 2000).subscribe(val => {
     if (this.loggedInUserIsLeader && this.player) {
@@ -58,26 +44,22 @@ export class ChannelComponent implements OnInit, OnDestroy {
     }
   });
 
-  mediaSyncEventSubscription = this.mediaService.roomMediaEvent$.subscribe(ev => {
-    if (!this.loggedInUserIsLeader) {
-      this.syncPlayer(ev);
-    }
-  });
+  mediaSyncEventSubscription = this.mediaService.roomMediaEvent$.pipe(
+    switchMap((event) =>
+      this.loggedInUserIsLeader
+        ? of(noop())
+        : of(event).pipe(
+          tap((event) => this.syncPlayer(event, this.player.getCurrentUrl()))
+        )))
+    .subscribe();
 
   roomUserConfigSubscription = this.chatService.roomUserConfig$.subscribe(ev => {
     this.loggedInUserIsLeader = ev.isLeader;
-    console.log(ev);
   });
 
-  errorEventSubscription = merge(
-    this.socketService.connectionError$,
-    this.socketService.permissionError$
-  ).pipe(
+  errorEventSubscription = this.socketService.connectionError$.pipe(
     tap(x => {
-      console.log(x);
-
       this.notification.error('Hmm.. Something went wrong here', 'Maybe try logging in again?');
-
       this.mediaUpdateTimerSubscription.unsubscribe();
       this.mediaSyncEventSubscription.unsubscribe();
     })).subscribe();
@@ -102,22 +84,20 @@ export class ChannelComponent implements OnInit, OnDestroy {
   }
 
   onVideoEnded() {
-    this.activeItem$.pipe(
-      filter(it => it !== null),
-      take(1)
-    ).subscribe(it => {
-      const i = this.playlist.findIndex(url => it === url);
-      const next = this.playlist[i + 1] || this.playlist[0];
+    combineLatest([this.activeItem$, this.playlist$])
+      .pipe(take(1)) // if needed - maybe not
+      .subscribe(([nowPlayingUrl, { entries }]) => {
+        const i = entries.findIndex(entry => entry.url === nowPlayingUrl);
+        const next = entries[i + 1] || entries[0];
 
-      this.nowPlayingUrl = next;
-      this.activeItemSubject.next(this.nowPlayingUrl);
+        this.activeItemSubject.next(next.url);
 
-      this.player.play(this.nowPlayingUrl);
-    });
+        this.player.play(next.url);
+      });
   }
 
 
-  giveLeader(member: RoomUserDto) {
+  giveLeader(member: RoomUser) {
     this.chatService.giveLeader({ member, roomName: this.name });
   }
 
@@ -128,10 +108,10 @@ export class ChannelComponent implements OnInit, OnDestroy {
         // Dont update when leader paused video.
         return;
       }
-      this.nowPlayingUrl = this.player.getCurrentUrl();
-      this.activeItemSubject.next( this.nowPlayingUrl);
+      const mediaUrl = this.player.getCurrentUrl();
+      this.activeItemSubject.next(mediaUrl);
       this.mediaService.sendMediaEvent({
-        mediaUrl:  this.nowPlayingUrl,
+        mediaUrl,
         currentTime: this.player.getCurrentTime(),
         roomName: this.name
       });
@@ -141,36 +121,32 @@ export class ChannelComponent implements OnInit, OnDestroy {
     }
   }
 
-  private syncPlayer(ev: MediaEvent) {
-    if (this.shouldSyncPlayer(ev)) {
-      console.log('syncing...');
+  private syncPlayer({ currentTime, mediaUrl }: MediaEvent, nowPlayingUrl: string) {
+
+    const shouldSyncPlayer = nowPlayingUrl !== mediaUrl ||
+      this.isCurrentTimeOutOfSync(currentTime)
+
+    if (shouldSyncPlayer) {
       if (!this.player.isPlaying()) {
-        this.player.play(ev.mediaUrl);
+        this.player.play(mediaUrl);
       }
-      if (this.nowPlayingUrl !== ev.mediaUrl) {
-        this.nowPlayingUrl = ev.mediaUrl;
-        this.activeItemSubject.next(this.nowPlayingUrl);
+      if (nowPlayingUrl !== mediaUrl) {
+        this.player.play(mediaUrl)
+        this.activeItemSubject.next(mediaUrl);
       }
       try {
-        if (this.isCurrentTimeOutOfSync(ev.currentTime)) {
+        if (this.isCurrentTimeOutOfSync(currentTime)) {
           if (!this.player.isPlaying()) {
-            this.player.play(ev.mediaUrl);
+            this.player.play(mediaUrl);
             return;
           }
-          this.player.seek(ev.currentTime);
+          this.player.seek(currentTime);
         }
       } catch (error) {
         console.log('Error while syncing player - probably not ready yet');
         console.log(error);
       }
     }
-  }
-
-  private shouldSyncPlayer(ev: MediaEvent) {
-    return (
-      this.nowPlayingUrl !== ev.mediaUrl ||
-      this.isCurrentTimeOutOfSync(ev.currentTime)
-    );
   }
 
   private isCurrentTimeOutOfSync(originTime: number) {

@@ -3,10 +3,10 @@ import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 
 export interface OverviewlistItem {
-  roomName: string;
+  name: string;
   description: string;
-  memberCount: number;
-  currentlyPlaying: string;
+  connectedMemberCount: number;
+  nowPlaying: string;
 }
 
 export interface ChannelDraft {
@@ -18,15 +18,13 @@ export interface ChannelDraft {
   providedIn: 'root'
 })
 export class OverviewService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  getChannels(searchPattern?: string) {
-    const params = new HttpParams();
-    params.append('search', searchPattern);
+  getChannels() {
 
     return this.http.get<OverviewlistItem[]>(
-      `${environment.api}/public-rooms`,
-      { params, withCredentials: true }
+      `${environment.api}/channels/all`,
+      { withCredentials: true },
     );
   }
 

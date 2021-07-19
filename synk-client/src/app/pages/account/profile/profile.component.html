@@ -1,30 +1,47 @@
 <h1 nz-typography>Your stuff</h1>
 <nz-divider></nz-divider>
 <div nz-row>
-  <div nz-col nzSpan="8">
+  <div
+    nz-col
+    [nzLg]="{ span: 8, offset: 0 }"
+    [nzMd]="{ span: 12, offset: 0 }"
+    [nzXs]="{ span: 24, offset: 0 }"
+  >
     <h2 nz-typography>Info</h2>
     <nz-card [nzCover]="coverTemplate" [nzLoading]="!(me$ | async)">
       <h5 *ngIf="me$ | async">Username:</h5>
       <pre>{{ me$ | async | username }}</pre>
-      <button *ngIf="(me$ | async)" nz-button nzType="primary" (click)="onLogout()">Logout</button>
-      <div *ngIf="!(me$ | async)">
-        Please login
-      </div>
+      <button
+        *ngIf="me$ | async"
+        nz-button
+        nzType="primary"
+        (click)="onLogout()"
+      >
+        Logout
+      </button>
+      <div *ngIf="!(me$ | async)">Please login</div>
     </nz-card>
   </div>
-  <div nz-col nzSpan="16">
+  <div
+    nz-col
+    [nzLg]="{ span: 16, offset: 0 }"
+    [nzMd]="{ span: 12, offset: 0 }"
+    [nzXs]="{ span: 24, offset: 0 }"
+  >
     <app-owned-channels></app-owned-channels>
   </div>
 </div>
 <div nz-row>
-  <div nz-col nzSpan="8">
+  <div nz-col 
+  [nzLg]="{ span: 8, offset: 0 }"
+  [nzMd]="{ span: 12, offset: 0 }"
+  [nzXs]="{ span: 24, offset: 0 }">
     <h2 nz-typography>Create channel</h2>
     <nz-card [nzLoading]="!(me$ | async)">
       <app-create-room-form></app-create-room-form>
     </nz-card>
   </div>
 </div>
-
 
 <ng-template #coverTemplate>
   <img alt="example" [src]="me$ | async | placehold" />

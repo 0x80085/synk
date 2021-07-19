@@ -13,7 +13,7 @@ export class AppStateService {
   isLoggedInSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
   isLogged$ = this.isLoggedInSubject.pipe(shareReplay(1));
 
-  userSubject: BehaviorSubject<User> = new BehaviorSubject({ id: 'missingno', userName: '-----', isAdmin: false });
+  userSubject: BehaviorSubject<User> = new BehaviorSubject({ id: 'missingno', username: '-----', isAdmin: false });
   me$ = this.userSubject.pipe();
 
 
@@ -30,8 +30,3 @@ export class AppStateService {
 
   constructor(private socketService: SocketService) { }
 }
-
-const mockAdmin = (user: User) =>
-  user.userName === 'JanitorOne'
-  || user.userName === 'root';
-

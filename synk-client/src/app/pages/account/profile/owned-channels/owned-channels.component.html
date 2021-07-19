@@ -27,13 +27,21 @@
           <th>isLocked</th>
           <td>{{ channel.isLocked }}</td>
         </tr>
+        <tr>
+          <th>connectedMemberCount</th>
+          <td>{{ channel.connectedMemberCount }}</td>
+        </tr>
+        <tr>
+          <th>nowPlaying</th>
+          <td>{{ channel.nowPlaying }}</td>
+        </tr>
       </nz-table>
 
       <ng-template #actions>
-        <a nz-button nzType="link" nz-tooltip nzTitle="Go to channel" [routerLink]="['/channel', channel.name]">
+        <a nz-button nzType="link" nz-tooltip nzTooltipTitle="Go to channel" [routerLink]="['/channel', channel.name]">
           <i nz-icon nzType="login"></i>
         </a>
-        <a nz-button nzDanger nzType="link" nz-tooltip nzTitle="Delete this channel"
+        <a nz-button nzDanger nzType="link" nz-tooltip nzTooltipTitle="Delete this channel"
           (click)="deleteChannel(channel, $event)">
           <i nz-icon nzTheme="fill" nzType="delete"></i>
         </a>

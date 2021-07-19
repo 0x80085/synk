@@ -40,6 +40,9 @@ export class ChannelConfig {
   @Column()
   emojiListUrl: string;
 
+  @Column()
+  maxUsers: number;
+
   @ManyToOne(type => Channel, channel => channel.configs)
   channel: Channel;
 

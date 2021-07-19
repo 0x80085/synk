@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../auth.service';
-import { NzNotificationService } from 'ng-zorro-antd';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 @Component({
   selector: 'app-login',
@@ -22,7 +22,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      userName: [
+      username: [
         null,
         [
           Validators.required,
@@ -46,7 +46,7 @@ export class LoginComponent implements OnInit {
     }
 
     const creds = {
-      username: this.form.controls.userName.value,
+      username: this.form.controls.username.value,
       password: this.form.controls.password.value
     };
 
@@ -64,7 +64,9 @@ export class LoginComponent implements OnInit {
           'error',
           'Login failed',
           `
-          ${err.status === 404 ? 'user not found' : `Hmm... That didn't work`}
+          ${err.status === 404
+            ? 'No user with those credentials was found'
+            : `Hmm... That didn't work`}
         `
         );
         this.isSubmitting = false;

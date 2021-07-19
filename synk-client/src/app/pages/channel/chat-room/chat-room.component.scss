@@ -1,21 +1,46 @@
 .wrapper {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+  display: grid;
+  height: 75vh;
+  grid-template-columns: 1fr;
+  grid-template-rows: 0.1fr 0.75fr 0.15fr;
+  gap: 0px 1px;
+  grid-template-areas:
+    "."
+    "."
+    ".";
 
-  .feed {
-    flex: 1 0 25%;
-    overflow-y: hidden;
+  .header {
+    display: flex;
+    padding: 0.5rem;
+    justify-content: center;
+    align-items: center;
+
+    h2 {
+      margin-bottom: 0;
+    }
   }
 
-  .textbox {
-    width: 100%;
-    margin-top: 16px;
+  .feed {
+    padding: 0.5rem;
+    overflow-y: auto;
+  }
 
-    textarea {
-      min-height: 50px;
-      height: auto;
-      overflow: hidden;
+  textarea {
+    display: block;
+    margin: 1rem 0;
+    padding: 0.25rem;
+    border-radius: 8px;
+    border: 1px solid #ff694e;
+    background-color: #191919;
+    color: whitesmoke;
+    width: 100%;
+    height: 100%;
+    resize: none;
+    min-height: 100px;
+    outline: none !important;
+    ::placeholder {
+      padding: 1rem;
     }
+    overflow: auto;
   }
 }

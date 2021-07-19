@@ -14,6 +14,8 @@ export class AppComponent {
 
   isCollapsed = true;
 
+  hostName = window.location.hostname;
+
   isLoggedIn = this.state.isLoggedIn$;
   isConnected = this.socketService.isConnected$;
 

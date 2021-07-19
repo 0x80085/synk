@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NzNotificationService } from 'ng-zorro-antd';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
 
 import { AuthService, Channel } from '../../auth.service';
@@ -17,12 +17,12 @@ export class OwnedChannelsComponent {
     private notification: NzNotificationService) {
   }
 
-  channels$: Observable<Channel[]> =  this.auth.userOwnedChannels$;
+  channels$: Observable<Channel[]> = this.auth.userOwnedChannels$;
 
   deleteChannel(chan: Channel, ev: Event) {
     if (confirm(`You really want to delete ${chan.name}?`)) {
       ev.preventDefault();
-      this.auth.deleteChannel(chan.name)
+      this.auth.deleteChannel(chan.id)
         .pipe(
           tap(() => this.auth.refreshChannels()),
           take(1)
@@ -33,10 +33,6 @@ export class OwnedChannelsComponent {
         .subscribe(() => this.auth.refreshChannels());
       return false;
     }
-  }
-
-  openSettings(chan: Channel) {
-    console.log(chan);
   }
 
 }
