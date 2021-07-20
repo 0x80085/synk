@@ -7,7 +7,6 @@ import { ChatService } from '../chat.service';
 import { MediaService } from '../media.service';
 import { MediaEvent } from '../models/room.models';
 
-
 interface PlaylistItem {
   active: boolean;
   title: string;
@@ -43,12 +42,20 @@ export class PlaylistComponent implements OnDestroy {
     map(conf => conf.isLeader),
   );
 
-  errorFeedback$ = this.mediaService.addMediaErrEvent$.pipe(
+  addMediaErrorFeedback$ = this.mediaService.addMediaErrEvent$.pipe(
     tap(_ => this.notification.error('Error', `Couldnt add media to playlist...`))
   ).subscribe();
 
-  succesFeedback$ = this.mediaService.addMediaSuccessEvent$.pipe(
+  AddMediaSuccesFeedback$ = this.mediaService.addMediaSuccessEvent$.pipe(
     tap(_ => this.notification.success('Media added!', `Request to add media to playlist succeeded!`))
+  ).subscribe();
+
+  removeMediaErrorFeedback$ = this.mediaService.removeMediaErrEvent$.pipe(
+    tap(_ => this.notification.error('Failed to remove media from playlist', `Only users who have added the entry can remove it`))
+  ).subscribe();
+
+  removeMediaESuccesFeedback$ = this.mediaService.removeMediaSuccessEvent$.pipe(
+    tap(_ => this.notification.success('Success', 'Media removed from playlist'))
   ).subscribe();
 
   constructor(
@@ -67,7 +74,7 @@ export class PlaylistComponent implements OnDestroy {
       currentTime: null
     });
     this.mediaUrlInput = '';
-    this.notification.info('Request Submitted', 'The request to add media to the current list is in progress. You will be updated if the request was (un)succesful'); // we dunno if that happened
+    this.notification.info('Request Submitted', 'The request to add media to the current list is in progress. You will be updated if the request was (un)succesful');
   }
 
   onRemoveMedia(mediaUrl: string) {
@@ -77,7 +84,6 @@ export class PlaylistComponent implements OnDestroy {
         roomName: this.roomName,
         currentTime: null
       });
-      this.notification.success('Success', 'Media removed from playlist');
     }
   }
 
@@ -90,7 +96,10 @@ export class PlaylistComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.errorFeedback$.unsubscribe();
-    this.succesFeedback$.unsubscribe();
+    this.addMediaErrorFeedback$.unsubscribe();
+    this.AddMediaSuccesFeedback$.unsubscribe();
+
+    this.removeMediaESuccesFeedback$.unsubscribe();
+    this.removeMediaErrorFeedback$.unsubscribe();
   }
 }

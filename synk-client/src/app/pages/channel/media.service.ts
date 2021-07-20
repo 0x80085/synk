@@ -40,6 +40,16 @@ export class MediaService {
       map((mediaUrl) => mediaUrl)
     );
 
+    removeMediaErrEvent$ = this.socketService.exceptionEvent$
+    .pipe(
+      filter(({ message }) => message === "forbidden")
+    );
+
+    removeMediaSuccessEvent$ = this.socketService.listenForEvent<{ mediaUrl: string }>(MediaCommands.REMOVE_MEDIA_SUCCESS)
+    .pipe(
+      map((mediaUrl) => mediaUrl)
+    );
+
   constructor(private socketService: SocketService) { }
 
   sendMediaEvent(ev: MediaEvent) {

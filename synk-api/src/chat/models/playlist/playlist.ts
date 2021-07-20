@@ -29,11 +29,12 @@ export class Playlist {
 
     queue: Queue<{ media: Media, addedBy: Member }> = new Queue();
 
-    nowPlaying (): PlayingState  {
+    nowPlaying(): PlayingState {
         return {
-        media: this.selectFromQueue(this.activeEntryIndex)?.media,
-        time: this.currentTime
-    }};
+            media: this.selectFromQueue(this.activeEntryIndex)?.media,
+            time: this.currentTime
+        }
+    };
 
     constructor(name: string, createdBy: Member, createDate: Date) {
         this.id = uuid();
@@ -43,7 +44,9 @@ export class Playlist {
     }
 
     updateNowPlaying(url: string, time: number): UpdatePlayingStateCommand {
-
+        if (!this.nowPlaying()) {
+            this.setNowPlaying(url);
+        }
         if (this.nowPlaying().media.url !== url) {
             this.setNowPlaying(url);
         }
@@ -71,7 +74,7 @@ export class Playlist {
         if (alreadyAdded) {
             console.log("alreadyAdded");
             console.log(this.queue.toArray());
-            
+
             throw new Error("No duplicates allowed");
         }
         this.queue.enqueue({ media, addedBy: member });
@@ -79,7 +82,10 @@ export class Playlist {
 
     remove(media: Media) {
         const target = this.selectFromQueue(media);
-        if (target) {
+
+        if (target && this.queue.length === 1) {
+            this.queue.removeHead();
+        } else if (target) {
             this.queue.remove(target);
         }
     }
@@ -116,14 +122,14 @@ export class Playlist {
         } else if (typeof selector === "string") {
             selectedItemIndex = this.queue.toArray().findIndex(it => it.media.url === (selector as string));
         } else if (typeof selector == "number") {
-            selectedItemIndex = selector;    
+            selectedItemIndex = selector;
         }
 
         isInRange = selectedItemIndex >= 0 && this.queue.length - 1 >= selectedItemIndex;
 
         if (isInRange) {
             this.voteSkipCount = 0;
-            this.activeEntryIndex = selectedItemIndex; 
+            this.activeEntryIndex = selectedItemIndex;
         }
     }
 }

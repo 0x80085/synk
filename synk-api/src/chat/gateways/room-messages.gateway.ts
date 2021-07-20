@@ -230,7 +230,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
       tap(_ => client.emit(MessageTypes.REMOVE_MEDIA_SUCCESS, mediaUrl)),
       catchError(e => {
         if (e.message === 'Forbidden') { throw new WsException(MessageTypes.FORBIDDEN); }
-        throw new WsException(MessageTypes.REMOVE_MEDIA_FAILED);
+        throw new WsException(MessageTypes.GENERIC_ERROR);
       })
     )
   }

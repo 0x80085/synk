@@ -96,8 +96,7 @@ export class Room {
         this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.editPlaylist);
         const target = this.currentPlaylist.selectFromQueue(url);
         if (target.addedBy.id !== member.id) {
-            this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.editPlaylist);
-            throw new Error("Couldnt remove video");
+            throw new ForbiddenException();
         }
         this.currentPlaylist.remove(target.media);
     }

@@ -18,10 +18,25 @@
   </ng-template>
 
   <ng-template #giveLeaderBtn>
-    <button nz-button nzType="link" nz-tooltip nzTooltipTitle="Hand over playback control to user"
-      [hidden]="member.isLeader || (loggedInUserIsLeader$ | async)" (click)="this.giveLeader.emit(member)">
-      <i nz-icon nzType="api"></i>
-    </button>
+   <!-- is leader?  {{member.isLeader}}
+   is logged in as leader?  {{ loggedInUserIsLeader$ | async }}
+
+   <ng-container *ngIf="(loggedInUserIsLeader$ | async) as isLeader">
+     is logged in as leader2?  {{  isLeader }}
+  </ng-container> -->
+
+      <button nz-button nzType="link" nz-tooltip nzTooltipTitle="Hand over playback control to user"
+      *ngIf="(loggedInUserIsLeader$ | async) && !member.isLeader" (click)="this.giveLeader.emit(member)">
+        <i nz-icon nzType="api"></i>
+      </button>
+
+     
+      <!-- <button [hidden]="!(loggedInUserIsLeader$ | async)" nz-button nzType="link" nz-tooltip nzTooltipTitle="Hand over playback control to user"
+       (click)="this.giveLeader.emit(member)">
+        <i nz-icon nzType="api"></i>
+      </button> -->
+    
+
   </ng-template>
 
 </ng-template>
