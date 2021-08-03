@@ -28,7 +28,7 @@
       [nzDataSource]="virtualPlaylist$| async" [nzRenderItem]="item" [nzNoResult]="noItems">
       <ng-template #item let-item>
         <nz-list-item style="border-bottom: 1px solid rgb(25, 25, 25);" class="playlist-item" [class.active]="true"
-          nzSplit [nzContent]="item.title" [nzActions]="[opAction]" nzNoFlex>
+          nzSplit [nzContent]="contentTitle" [nzActions]="[opAction]">
         </nz-list-item>
         <ng-template #opAction>
           <button nz-button nzSize="small" nzType="link" (click)="playMedia.emit(item)"
@@ -39,6 +39,9 @@
           nzTooltipTitle="Remove from list">
             <i nz-icon nzType="delete"></i>
           </button>
+        </ng-template>
+        <ng-template #contentTitle>
+          <span class="media-title">{{ item.title }}</span>
         </ng-template>
       </ng-template>
     </nz-list>

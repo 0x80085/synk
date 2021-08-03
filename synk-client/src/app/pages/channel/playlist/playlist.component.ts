@@ -33,7 +33,7 @@ export class PlaylistComponent implements OnDestroy {
         .map(it => ({
           ...it,
           mediaUrl: it.url,
-          active: it.url === nowPlaying.url
+          active: nowPlaying ? it.url === nowPlaying.url : false
         }))
     ),
   );
