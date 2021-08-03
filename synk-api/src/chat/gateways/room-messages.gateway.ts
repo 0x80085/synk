@@ -178,25 +178,25 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
 
 
   @SubscribeMessage(MessageTypes.GIVE_LEADER)
-  async handleGiveLeader(requestingMemberSocket: socketio.Socket,  { to, roomName }: { to: string, roomName: string }) {
+  async handleGiveLeader(requestingMemberSocket: socketio.Socket, { to, roomName }: { to: string, roomName: string }) {
     this.logger.log('handleGiveLeader');
 
     try {
-    // TODO move this logic somewhere else model or/and service  
-    const requestingMember = await this.tracker.getMemberBySocket(requestingMemberSocket);
-    const room = this.roomService.getRoomByName(roomName);
-    
-    const newLeader = await this.roomService.giveLeader(room.id, requestingMember, to);
-    
-    const newLeaderSocket = await this.tracker.getSocketByMemberId(newLeader.id);
-    this.sendRoomConfigToMember(room, newLeader.id, newLeaderSocket);
-    this.sendRoomConfigToMember(room, requestingMember.id, requestingMemberSocket);
+      // TODO move this logic somewhere else model or/and service  
+      const requestingMember = await this.tracker.getMemberBySocket(requestingMemberSocket);
+      const room = this.roomService.getRoomByName(roomName);
 
-    this.broadcastMemberlistToRoom(room);
-      
+      const newLeader = await this.roomService.giveLeader(room.id, requestingMember, to);
+
+      const newLeaderSocket = await this.tracker.getSocketByMemberId(newLeader.id);
+      this.sendRoomConfigToMember(room, newLeader.id, newLeaderSocket);
+      this.sendRoomConfigToMember(room, requestingMember.id, requestingMemberSocket);
+
+      this.broadcastMemberlistToRoom(room);
+
     } catch (error) {
       this.logger.error(error)
-      
+
       if (error.message === "Forbidden") {
         throw new WsException(MessageTypes.FORBIDDEN)
       }
@@ -228,6 +228,22 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
       tap(({ room, member }) => room.removeMediaFromPlaylist(member, mediaUrl)),
       tap(({ room }) => this.broadcastPlaylistToRoom(room)),
       tap(_ => client.emit(MessageTypes.REMOVE_MEDIA_SUCCESS, mediaUrl)),
+      catchError(e => {
+        if (e.message === 'Forbidden') { throw new WsException(MessageTypes.FORBIDDEN); }
+        throw new WsException(MessageTypes.GENERIC_ERROR);
+      })
+    )
+  }
+
+  @SubscribeMessage(MessageTypes.CHANGE_MEDIA_POSITION_IN_LIST)
+  async handleChangeMediaPositionInList(client: socketio.Socket, { roomName, mediaUrl, newPosition }: { roomName: string, mediaUrl: string, newPosition: number }) {
+    this.logger.log('handelRemoveMedia');
+
+    return from(this.tracker.getMemberBySocket(client)).pipe(
+      map(member => ({ member, room: this.roomService.getRoomByName(roomName) })),
+      tap(({ room, member }) => room.moveMediaPositionInPlaylist(member, mediaUrl, newPosition)),
+      tap(({ room }) => this.broadcastPlaylistToRoom(room)),
+      tap(_ => client.emit(MessageTypes.REPOSITION_MEDIA_SUCCESS, mediaUrl)),
       catchError(e => {
         if (e.message === 'Forbidden') { throw new WsException(MessageTypes.FORBIDDEN); }
         throw new WsException(MessageTypes.GENERIC_ERROR);

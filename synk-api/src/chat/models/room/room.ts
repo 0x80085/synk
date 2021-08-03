@@ -75,7 +75,7 @@ export class Room {
             console.log(`[${member.username}] left [${this.name}]`);
             console.log(`${member.username} left.`);
             this.messages.post({ author: { username: '' } as Member, content: `${member.username} left.` });
-            
+
             return newLeader;
         } else {
             console.log(`LEAVE ROOM - ${member.username} not found, not removed.`);
@@ -99,6 +99,11 @@ export class Room {
             throw new ForbiddenException();
         }
         this.currentPlaylist.remove(target.media);
+    }
+
+    moveMediaPositionInPlaylist(member: Member, mediaUrl: string, newPosition: number) {
+        this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.editPlaylist);
+        this.currentPlaylist.movePositionInListByMedia(mediaUrl, newPosition)
     }
 
     makeModerator(requestingMember: Member, member: Member, level: number) {

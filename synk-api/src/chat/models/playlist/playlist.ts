@@ -96,6 +96,22 @@ export class Playlist {
         }
     }
 
+    movePositionInListByMedia(url: string, newPosition: number) {
+        const media = this.selectFromQueue(url);
+        if (!media) {
+            throw new Error("media not found")
+        }
+        const currentIndex = this.queue.toArray().findIndex(it => it.media.url === url);
+        this.movePositionInListByIndex(currentIndex,newPosition)
+    }
+
+    movePositionInListByIndex(currentPosition: number, newPosition: number) {
+        if (this.queue.length - 1 < currentPosition || this.queue.length - 1 < newPosition) {
+            throw new Error("invalid position args")
+        }
+        this.insertAndShift(this.queue.toArray(),currentPosition, newPosition);
+    }
+
     incrementVoteSkips() {
         this.voteSkipCount = this.voteSkipCount + 1;
         if (this.voteSkipCount > this.maxVoteSkipCount) {
@@ -131,5 +147,10 @@ export class Playlist {
             this.voteSkipCount = 0;
             this.activeEntryIndex = selectedItemIndex;
         }
+    }
+    
+    private insertAndShift(arr: any[], from: number, to: number) {
+        let cutOut = arr.splice(from, 1)[0]; // cut the element at index 'from'
+        arr.splice(to, 0, cutOut);            // insert it at index 'to'
     }
 }
