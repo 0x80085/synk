@@ -90,6 +90,7 @@ export class Room {
     addMediaToPlaylist(member: Member, media: Media) {
         this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.editPlaylist);
         this.currentPlaylist.add(media, member);
+        this.messages.post({ author: { username: "" } as any, content: `${member.username} added [${media.title}] to playlist` });
     }
 
     removeMediaFromPlaylist(member: Member, url: string) {
@@ -99,11 +100,14 @@ export class Room {
             throw new ForbiddenException();
         }
         this.currentPlaylist.remove(target.media);
+        this.messages.post({ author: { username: "" } as any, content: `${member.username} removed ${target.media.title} from playlist` });
     }
 
     moveMediaPositionInPlaylist(member: Member, mediaUrl: string, newPosition: number) {
         this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.editPlaylist);
-        this.currentPlaylist.movePositionInListByMedia(mediaUrl, newPosition)
+        this.currentPlaylist.movePositionInListByMedia(mediaUrl, newPosition);
+        const target = this.currentPlaylist.selectFromQueue(mediaUrl);
+        this.messages.post({ author: { username: "" } as any, content: `${member.username} moved ${target.media.title} to position ${newPosition}` });
     }
 
     makeModerator(requestingMember: Member, member: Member, level: number) {
@@ -186,6 +190,7 @@ export class Room {
 
     private assignNewLeader(member: Member) {
         this.leader = member;
+        this.messages.post({ author: { username: "" } as any, content: `${member.username} is now leader` });
     }
 
     private selectFromMembers(member: Member) {

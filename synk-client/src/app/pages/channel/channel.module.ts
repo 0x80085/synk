@@ -12,6 +12,7 @@ import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 import { ChannelComponent } from './channel.component';
 import { ChatRoomComponent } from './chat-room/chat-room.component';
@@ -63,6 +64,7 @@ import { NZ_ICONS } from 'src/app/icons';
     NzGridModule,
     NzTypographyModule,
     NzDividerModule,
+    DragDropModule,
     NzIconModule.forRoot(NZ_ICONS),
 
   ],

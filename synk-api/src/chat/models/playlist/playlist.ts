@@ -102,14 +102,16 @@ export class Playlist {
             throw new Error("media not found")
         }
         const currentIndex = this.queue.toArray().findIndex(it => it.media.url === url);
-        this.movePositionInListByIndex(currentIndex,newPosition)
+        this.movePositionInListByIndex(currentIndex, newPosition)
     }
 
     movePositionInListByIndex(currentPosition: number, newPosition: number) {
         if (this.queue.length - 1 < currentPosition || this.queue.length - 1 < newPosition) {
             throw new Error("invalid position args")
         }
-        this.insertAndShift(this.queue.toArray(),currentPosition, newPosition);
+        const newList = this.insertAndShift(this.queue.toArray(), currentPosition, newPosition);
+
+        this.queue = new Queue(...newList);
     }
 
     incrementVoteSkips() {
@@ -148,9 +150,11 @@ export class Playlist {
             this.activeEntryIndex = selectedItemIndex;
         }
     }
-    
+
     private insertAndShift(arr: any[], from: number, to: number) {
-        let cutOut = arr.splice(from, 1)[0]; // cut the element at index 'from'
-        arr.splice(to, 0, cutOut);            // insert it at index 'to'
+        const newArray = arr.map(a => ({ ...a }));
+        let cutOut = newArray.splice(from, 1)[0]; // cut the element at index 'from'
+        newArray.splice(to, 0, cutOut);            // insert it at index 'to'
+        return newArray as { media: Media, addedBy: Member }[];
     }
 }

@@ -213,6 +213,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
       map(member => ({ member, room: this.roomService.getRoomByName(roomName) })),
       switchMap(({ member, room }) =>
         from(this.commandBus.execute<AddMediaToRoomCommand>(new AddMediaToRoomCommand(mediaUrl, member, room, client, this.server))).pipe(
+          tap(({ room }) => this.broadcastGroupMessageToRoom(room)),
           catchError(e => {
             throw new WsException(e.message);
           })
@@ -227,6 +228,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
       map(member => ({ member, room: this.roomService.getRoomByName(roomName) })),
       tap(({ room, member }) => room.removeMediaFromPlaylist(member, mediaUrl)),
       tap(({ room }) => this.broadcastPlaylistToRoom(room)),
+      tap(({ room }) => this.broadcastGroupMessageToRoom(room)),
       tap(_ => client.emit(MessageTypes.REMOVE_MEDIA_SUCCESS, mediaUrl)),
       catchError(e => {
         if (e.message === 'Forbidden') { throw new WsException(MessageTypes.FORBIDDEN); }
@@ -237,12 +239,13 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
 
   @SubscribeMessage(MessageTypes.CHANGE_MEDIA_POSITION_IN_LIST)
   async handleChangeMediaPositionInList(client: socketio.Socket, { roomName, mediaUrl, newPosition }: { roomName: string, mediaUrl: string, newPosition: number }) {
-    this.logger.log('handelRemoveMedia');
+    this.logger.log('handleChangeMediaPositionInList');
 
     return from(this.tracker.getMemberBySocket(client)).pipe(
       map(member => ({ member, room: this.roomService.getRoomByName(roomName) })),
       tap(({ room, member }) => room.moveMediaPositionInPlaylist(member, mediaUrl, newPosition)),
       tap(({ room }) => this.broadcastPlaylistToRoom(room)),
+      tap(({ room }) => this.broadcastGroupMessageToRoom(room)),
       tap(_ => client.emit(MessageTypes.REPOSITION_MEDIA_SUCCESS, mediaUrl)),
       catchError(e => {
         if (e.message === 'Forbidden') { throw new WsException(MessageTypes.FORBIDDEN); }

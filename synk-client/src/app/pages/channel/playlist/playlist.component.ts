@@ -1,6 +1,7 @@
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { Observable } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 
 import { ChatService } from '../chat.service';
@@ -27,34 +28,35 @@ export class PlaylistComponent implements OnDestroy {
   mediaUrlInput: string;
   showControls: boolean;
 
-  virtualPlaylist$: Observable<PlaylistItem[]> = this.mediaService.roomPlaylistUpdateEvents$.pipe(
-    map(({ entries, nowPlaying }) =>
-      entries
-        .map(it => ({
-          ...it,
-          mediaUrl: it.url,
-          active: nowPlaying ? it.url === nowPlaying.url : false
-        }))
-    ),
-  );
+  localPlaylist: PlaylistItem[] = [];
 
   isLeader$ = this.chatService.roomUserConfig$.pipe(
     map(conf => conf.isLeader),
   );
 
-  addMediaErrorFeedback$ = this.mediaService.addMediaErrEvent$.pipe(
+  private virtualPlaylist$: Subscription = this.mediaService.roomPlaylistUpdateEvents$.pipe(
+    map(({ entries, nowPlaying }) =>
+      entries.map(entry => ({
+        ...entry,
+        mediaUrl: entry.url,
+        active: nowPlaying ? entry.url === nowPlaying.url : false
+      }))),
+    tap(ls => this.localPlaylist = ls)
+  ).subscribe();
+
+  private addMediaErrorFeedback$ = this.mediaService.addMediaErrEvent$.pipe(
     tap(_ => this.notification.error('Error', `Couldnt add media to playlist...`))
   ).subscribe();
 
-  AddMediaSuccesFeedback$ = this.mediaService.addMediaSuccessEvent$.pipe(
+  private addMediaSuccesFeedback$ = this.mediaService.addMediaSuccessEvent$.pipe(
     tap(_ => this.notification.success('Media added!', `Request to add media to playlist succeeded!`))
   ).subscribe();
 
-  removeMediaErrorFeedback$ = this.mediaService.removeMediaErrEvent$.pipe(
+  private removeMediaErrorFeedback$ = this.mediaService.removeMediaErrEvent$.pipe(
     tap(_ => this.notification.error('Failed to remove media from playlist', `Only users who have added the entry can remove it`))
   ).subscribe();
 
-  removeMediaESuccesFeedback$ = this.mediaService.removeMediaSuccessEvent$.pipe(
+  private removeMediaESuccesFeedback$ = this.mediaService.removeMediaSuccessEvent$.pipe(
     tap(_ => this.notification.success('Success', 'Media removed from playlist'))
   ).subscribe();
 
@@ -87,6 +89,20 @@ export class PlaylistComponent implements OnDestroy {
     }
   }
 
+  drop(event: CdkDragDrop<string[]>): void {
+    console.log('dropeed');
+    console.log(event);
+
+    const { currentIndex, previousIndex } = event
+    if (currentIndex === previousIndex) {
+      return
+    }
+
+    const movedMediaValue = this.localPlaylist[previousIndex];
+
+    this.mediaService.changePositionInPlaylist({ roomName: this.roomName, mediaUrl: movedMediaValue.mediaUrl, newPosition: event.currentIndex })
+  }
+
   onNext() {
     this.mediaService.playNext(this.roomName);
   }
@@ -96,8 +112,10 @@ export class PlaylistComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.virtualPlaylist$.unsubscribe();
+
     this.addMediaErrorFeedback$.unsubscribe();
-    this.AddMediaSuccesFeedback$.unsubscribe();
+    this.addMediaSuccesFeedback$.unsubscribe();
 
     this.removeMediaESuccesFeedback$.unsubscribe();
     this.removeMediaErrorFeedback$.unsubscribe();

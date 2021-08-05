@@ -24,11 +24,11 @@
   </div>
 
   <div nz-col nzSpan="24">
-    <nz-list [nzBordered]="(virtualPlaylist$ | async)" nzSize="small" [nzLoading]="!(virtualPlaylist$| async)"
-      [nzDataSource]="virtualPlaylist$| async" [nzRenderItem]="item" [nzNoResult]="noItems">
+    <nz-list [nzBordered]="localPlaylist" nzSize="small" [nzLoading]="!localPlaylist"
+      [nzDataSource]="localPlaylist" [nzRenderItem]="item" [nzNoResult]="noItems" cdkDropList  (cdkDropListDropped)="drop($event)">
       <ng-template #item let-item>
         <nz-list-item style="border-bottom: 1px solid rgb(25, 25, 25);" class="playlist-item" [class.active]="true"
-          nzSplit [nzContent]="contentTitle" [nzActions]="[opAction]">
+          nzSplit [nzContent]="contentTitle" [nzActions]="[opAction]" cdkDrag>
         </nz-list-item>
         <ng-template #opAction>
           <button nz-button nzSize="small" nzType="link" (click)="playMedia.emit(item)"
@@ -49,7 +49,7 @@
 </div>
 
 <ng-template #suffixButton>
-  <button nz-button nzType="primary" nzSearch (click)="onAddMedia()">Add</button>
+  <button nz-button nzType="primary" style="height: auto;" nzSearch (click)="onAddMedia()">Add</button>
 </ng-template>
 
 <ng-template #noItems>

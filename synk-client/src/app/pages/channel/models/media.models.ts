@@ -8,5 +8,7 @@ export enum MediaCommands {
   PLAYLIST_UPDATE = 'playlist update',
   PLAY_NEXT_MEDIA = 'play next media',
   SHUFFLE_PLAYLIST = 'shuffle playlist',
-  ADD_MEDIA_REQUEST_APPROVED = "add media request approved"
+  ADD_MEDIA_REQUEST_APPROVED = "add media request approved",
+  CHANGE_MEDIA_POSITION_IN_LIST = "change media position in list",
+  REPOSITION_MEDIA_SUCCESS = "reposition media success"
 }

@@ -71,4 +71,8 @@ export class MediaService {
   removeFromPlaylist(ev: MediaEvent) {
     this.socketService.socket.emit(MediaCommands.REMOVE_MEDIA, ev);
   }
+ 
+  changePositionInPlaylist(ev: { roomName: string, mediaUrl: string, newPosition: number }) {
+    this.socketService.socket.emit(MediaCommands.CHANGE_MEDIA_POSITION_IN_LIST, ev);
+  }
 }
