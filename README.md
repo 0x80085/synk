@@ -6,7 +6,7 @@
 
 ## Live Demo
 
-[![Website synkd.cf](https://img.shields.io/website-up-down-green-red/http/synkd.cf.svg)](https://synkd.cf/)
+[![Website synk.moe](https://img.shields.io/website-up-down-green-red/http/synk.moe.svg)](https://synk.moe/)
 
 ## Install
 
