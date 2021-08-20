@@ -269,7 +269,8 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     const lastMessages = room.messages.queue.toArray()
       .map((msg) => ({
         username: msg.author.username,
-        text: msg.displayText
+        text: msg.displayText,
+        isSystemMessage: msg.isSystemMessage
       }));
     this.server.in(room.id).emit(MessageTypes.GROUP_MESSAGE, lastMessages);
   }

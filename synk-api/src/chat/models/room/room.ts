@@ -42,7 +42,7 @@ export class Room {
         this.throwIfMemberAlreadyJoined(member);
         this.members.push(member);
         console.log(`[${member.username}] enters [${this.name}]`);
-        this.messages.post({ author: { username: "" } as any, content: `${member.username} joined` })
+        this.messages.post({ author: { username: "" } as any, content: `${member.username} joined`, isSystemMessage: true })
         if (this.members.length === 1) {
             this.leader = this.members[0]
             console.log(`[${member.username}] is leader of [${this.name}]`);
@@ -74,7 +74,7 @@ export class Room {
             this.members = this.removeMember(this.members, member);
             console.log(`[${member.username}] left [${this.name}]`);
             console.log(`${member.username} left.`);
-            this.messages.post({ author: { username: '' } as Member, content: `${member.username} left.` });
+            this.messages.post({ author: { username: '' } as Member, content: `${member.username} left.`,isSystemMessage: true });
 
             return newLeader;
         } else {
@@ -90,7 +90,7 @@ export class Room {
     addMediaToPlaylist(member: Member, media: Media) {
         this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.editPlaylist);
         this.currentPlaylist.add(media, member);
-        this.messages.post({ author: { username: "" } as any, content: `${member.username} added [${media.title}] to playlist` });
+        this.messages.post({ author: { username: "" } as any, content: `${member.username} added [${media.title}] to playlist`,isSystemMessage: true });
     }
 
     removeMediaFromPlaylist(member: Member, url: string) {
@@ -100,14 +100,14 @@ export class Room {
             throw new ForbiddenException();
         }
         this.currentPlaylist.remove(target.media);
-        this.messages.post({ author: { username: "" } as any, content: `${member.username} removed ${target.media.title} from playlist` });
+        this.messages.post({ author: { username: "" } as any, content: `${member.username} removed ${target.media.title} from playlist`,isSystemMessage: true });
     }
 
     moveMediaPositionInPlaylist(member: Member, mediaUrl: string, newPosition: number) {
         this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.editPlaylist);
         this.currentPlaylist.movePositionInListByMedia(mediaUrl, newPosition);
         const target = this.currentPlaylist.selectFromQueue(mediaUrl);
-        this.messages.post({ author: { username: "" } as any, content: `${member.username} moved ${target.media.title} to position ${newPosition}` });
+        this.messages.post({ author: { username: "" } as any, content: `${member.username} moved ${target.media.title} to position ${newPosition}`,isSystemMessage: true });
     }
 
     makeModerator(requestingMember: Member, member: Member, level: number) {
@@ -157,7 +157,7 @@ export class Room {
 
     addMessage(member: Member, content: string) {
         if (this.selectFromMembers(member)) {
-            this.messages.post({ author: member, content })
+            this.messages.post({ author: member, content, isSystemMessage: false })
         }
     }
 
@@ -190,7 +190,7 @@ export class Room {
 
     private assignNewLeader(member: Member) {
         this.leader = member;
-        this.messages.post({ author: { username: "" } as any, content: `${member.username} is now leader` });
+        this.messages.post({ author: { username: "" } as any, content: `${member.username} is now leader`,isSystemMessage: true });
     }
 
     private selectFromMembers(member: Member) {

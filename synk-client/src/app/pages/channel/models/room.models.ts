@@ -1,6 +1,7 @@
 export interface Message {
   username?: string;
   text: string;
+  isSystemMessage: boolean
 }
 
 export interface RoomMessage {

@@ -1,9 +1,10 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild, ElementRef, AfterViewChecked, HostListener } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Observable, Subject } from 'rxjs';
-import { distinctUntilChanged, debounceTime, tap, take, filter, map, mapTo, startWith } from 'rxjs/operators';
+import { filter, map, mapTo, tap } from 'rxjs/operators';
+
 import { ChatService } from '../chat.service';
 import { Message } from '../models/room.models';
-import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 @Component({
   selector: 'app-chat-room',
@@ -19,6 +20,7 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
   msgBoxValue: string;
 
   submitPressedSubject: Subject<{ ev?: KeyboardEvent, text: string }> = new Subject();
+  shouldScrollDown: boolean;
 
   sendMessageSub = this.submitPressedSubject.pipe(
     filter(({ text }) => Boolean(text)),
@@ -44,7 +46,6 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
       this.notification.error('Illegal operation', `Can't join the same room more than once!`);
     })
   );
-  shouldScrollDown: boolean;
 
   constructor(private chatServ: ChatService,
     private notification: NzNotificationService
