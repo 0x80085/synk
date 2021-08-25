@@ -43,7 +43,7 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
   roomError$ = this.chatServ.alreadyJoinedRoomError$.pipe(
     mapTo(true),
     tap(() => {
-      this.notification.error('Illegal operation', `Can't join the same room more than once!`);
+      this.notification.error('Illegal operation', `Can't join the same room more than once!`,{ nzDuration: 10000 });
     })
   );
 

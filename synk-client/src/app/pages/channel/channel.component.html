@@ -1,6 +1,12 @@
-<div
-  *ngIf="isConnected$ | async; then channelStage; else connectionState"
-></div>
+<ng-content
+  *ngIf="isConnected$ | async; then fullPageFeedbackOrChannelStage; else connectionState"
+></ng-content>
+
+<ng-template #fullPageFeedbackOrChannelStage>
+    <ng-content *ngIf="alreadyJoinedRoomError$ | async; then feedbackJoiningRoomMoreThanOnce; else channelStage">
+
+    </ng-content>
+</ng-template>
 
 <ng-template #channelStage>
   <div nz-row [nzGutter]="{ xs: 0, sm: 0, md: 24, lg: 32, xl: 32, xxl: 32 }">
@@ -49,7 +55,17 @@
   <div nz-col nzSpan="24" class="column">
     <nz-empty
       [nzNotFoundImage]="disconnectedImg"
-      [nzNotFoundContent]="disconnectedText"
+      [nzNotFoundContent]="pleaseLoginText"
+    >
+    </nz-empty>
+  </div>
+</ng-template>
+
+<ng-template #feedbackJoiningRoomMoreThanOnce>
+  <div nz-col nzSpan="24" class="column">
+    <nz-empty
+      [nzNotFoundImage]="forbiddenIcon"
+      [nzNotFoundContent]="cantJoinMoreThanOnceText"
     >
     </nz-empty>
   </div>
@@ -70,13 +86,19 @@
     nz-icon
     style="font-size: 5rem; color: rgb(204, 254, 253)"
     nzTheme="fill"
-    nzType="meh"
+    nzType="disconnect"
+    nzTheme="outline"
   ></i>
 </ng-template>
 
-<ng-template #disconnectedText>
-  <h2>Please log in to enter this room</h2>
-  <p>Only logged in users can access rooms</p>
+<ng-template #pleaseLoginText>
+  <h2>Please log in to be able to enter rooms</h2>
+  <p>Only logged in users can access rooms (for now)</p>
+</ng-template>
+
+<ng-template #cantJoinMoreThanOnceText>
+  <h2>Can't join a room more than once</h2>
+  <p>Maybe you have another browser tab open where you have already joined this room?</p>
 </ng-template>
 
 <ng-template #busyConnectingImg>
@@ -85,6 +107,15 @@
     style="font-size: 5rem; color: rgb(204, 254, 253)"
     nzType="sync"
     [nzSpin]="true"
+  ></i>
+</ng-template>
+
+<ng-template #forbiddenIcon>
+  <i
+    nz-icon
+    style="font-size: 5rem; color: rgb(204, 254, 253)"
+    nzType="stop"
+    nzTheme="outline"
   ></i>
 </ng-template>
 

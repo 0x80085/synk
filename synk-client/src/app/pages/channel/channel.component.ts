@@ -38,6 +38,8 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   playlist$: Observable<PlaylistRepresentation> = this.mediaService.roomPlaylistUpdateEvents$;
 
+
+  alreadyJoinedRoomError$ = this.chatService.alreadyJoinedRoomError$;
   mediaUpdateTimerSubscription: Subscription = timer(1000, 2000).subscribe(val => {
     if (this.loggedInUserIsLeader && this.player) {
       this.sendMediaUpdate();
