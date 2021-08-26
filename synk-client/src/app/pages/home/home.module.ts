@@ -19,6 +19,7 @@ import { NekoBannerComponent } from './banners/neko-banner/neko-banner.component
 import { OverviewItemComponent } from './overview/overview-item/overview-item.component';
 import { RouterModule } from '@angular/router';
 import { NzGridModule } from 'ng-zorro-antd/grid';
+import { NzImageModule } from 'ng-zorro-antd/image';
 import { NZ_ICONS } from 'src/app/icons';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 
@@ -37,6 +38,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
     NzButtonModule,
     NzGridModule,
     NzTypographyModule,
+    NzImageModule,
     NzIconModule.forRoot(NZ_ICONS)
   ],
   declarations: [

@@ -1,9 +1,9 @@
-<nz-list [nzDataSource]="data$ | async" [nzRenderItem]="item"
+<nz-list [nzDataSource]="data$ | async" [nzRenderItem]="channel"
   [nzGrid]="{ gutter: 16, xs: 24, sm: 12, md: 6}" [nzLoading]="!(data$ | async)" [nzNoResult]="noResults">
-  <ng-template #item let-item>
-    <nz-list-item [ngClass]="'item'" routerLink="/channel/{{ item.name }}" [nzContent]="nzContent">
+  <ng-template #channel let-channel>
+    <nz-list-item [ngClass]="'item'" routerLink="/channel/{{ channel.name }}" [nzContent]="nzContent">
       <ng-template #nzContent>
-        <app-overview-item [item]="item" #nzContent></app-overview-item>
+        <app-overview-item [channel]="channel" #nzContent></app-overview-item>
       </ng-template>
     </nz-list-item>
   </ng-template>
