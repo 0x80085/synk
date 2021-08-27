@@ -35,7 +35,7 @@ export class MediaService {
       filter(({ message }) => message === "AddMediaException")
     );
 
-  addMediaSuccessEvent$ = this.socketService.listenForEvent<{ mediaUrl: string }>(MediaCommands.ADD_MEDIA_REQUEST_APPROVED)
+  addMediaSuccessEvent$ = this.socketService.listenForEvent<{ url: string, playlistCount: number }>(MediaCommands.ADD_MEDIA_REQUEST_APPROVED)
     .pipe(
       map((mediaUrl) => mediaUrl)
     );

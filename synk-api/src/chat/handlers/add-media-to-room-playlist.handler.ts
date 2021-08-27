@@ -26,7 +26,7 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
             ),
             tap(({ room, media }) => room.addMediaToPlaylist(member, media)),
             tap(() => this.broadcastPlaylistToRoom(room, socketServer)),
-            tap(_ => socket.emit(MessageTypes.ADD_MEDIA_REQUEST_APPROVED, url)),
+            tap(_ => socket.emit(MessageTypes.ADD_MEDIA_REQUEST_APPROVED, { url, playlistCount: room.currentPlaylist.queue.length })),
             catchError(e => {
                 if (e.message === 'Unauthorized') { throw new ForbiddenException(); }
                 throw new Error("AddMediaException");

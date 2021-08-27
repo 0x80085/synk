@@ -21,7 +21,7 @@ export class Playlist {
     owner: Member;
     createDate: Date
 
-    activeEntryIndex = 0;
+    activeEntryIndex: number = null;
     currentTime = 0;
 
     maxVoteSkipCount = 10;
@@ -30,8 +30,12 @@ export class Playlist {
     queue: Queue<{ media: Media, addedBy: Member }> = new Queue();
 
     nowPlaying(): PlayingState {
+        const media = this.activeEntryIndex !== null
+            ? this.selectFromQueue(this.activeEntryIndex).media
+            : null;
+            
         return {
-            media: this.selectFromQueue(this.activeEntryIndex)?.media,
+            media,
             time: this.currentTime
         }
     };
@@ -44,15 +48,19 @@ export class Playlist {
     }
 
     updateNowPlaying(url: string, time: number): UpdatePlayingStateCommand {
-        if (!this.nowPlaying()) {
-            this.setNowPlaying(url);
-        }
-        if (this.nowPlaying().media.url !== url) {
+        const isAnyMediaPlaying = Boolean(this.nowPlaying().media && this.nowPlaying().media.url);
+        const isAlreadyPlayingRequestedMedia = this.nowPlaying().media?.url === url;
+
+        if (!isAnyMediaPlaying || !isAlreadyPlayingRequestedMedia) {
             this.setNowPlaying(url);
         }
 
         this.updateCurrentTime(time);
         return { url: this.nowPlaying().media.url, time: this.nowPlaying().time };
+    }
+
+    stopPlaying() {
+        this.activeEntryIndex = null;
     }
 
     playNext() {
@@ -72,9 +80,6 @@ export class Playlist {
     add(media: Media, member: Member) {
         const alreadyAdded = this.queue.toArray().find(it => it.media.url === media.url);
         if (alreadyAdded) {
-            console.log("alreadyAdded");
-            console.log(this.queue.toArray());
-
             throw new Error("No duplicates allowed");
         }
         this.queue.enqueue({ media, addedBy: member });
@@ -122,18 +127,22 @@ export class Playlist {
     }
 
     selectFromQueue(selector: Media | string | number) {
-        if (typeof selector === "object" && !!selector.url) {
-            return this.queue.toArray().find(it => it.media.url === selector.url);
-        } else if (typeof selector === "string") {
-            return this.queue.toArray().find(it => it.media.url === (selector as string));
-        } else if (typeof selector === "number") {
-            return this.queue.toArray()[(selector as number)];
+        switch (typeof selector) {
+            case "object":
+                if (!!selector.url)
+                    return this.queue.toArray().find(it => it.media.url === selector.url);
+                break;
+            case "string":
+                return this.queue.toArray().find(it => it.media.url === (selector as string));
+            case "number":
+                return this.queue.toArray()[(selector as number)];
+            default:
+                break;
         }
     }
 
     private setNowPlaying(selector: Media | string | number) {
         let selectedItemIndex: number;
-        let isInRange: boolean;
 
         if (typeof selector === "object" && !!selector.url) {
             selectedItemIndex = this.queue.toArray().findIndex(it => it.media.url === selector.url);
@@ -143,7 +152,7 @@ export class Playlist {
             selectedItemIndex = selector;
         }
 
-        isInRange = selectedItemIndex >= 0 && this.queue.length - 1 >= selectedItemIndex;
+        const isInRange = selectedItemIndex >= 0 && this.queue.length - 1 >= selectedItemIndex;
 
         if (isInRange) {
             this.voteSkipCount = 0;

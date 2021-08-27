@@ -17,11 +17,20 @@
   </div>
   
   <div nz-col nzSpan="24">
-    <nz-input-group [hidden]="!showControls" nzSearch nzSize="large" [nzAddOnAfter]="suffixButton"
-      style="margin-bottom: 1rem;">
-      <input type="text" nz-input placeholder="Enter url to add video" [(ngModel)]="mediaUrlInput" />
-    </nz-input-group>
+    <div [hidden]="!showControls">
+      <nz-input-group  nzSearch nzSize="large" [nzAddOnAfter]="suffixButton"
+        style="margin-bottom: 1rem;">
+        <input type="text" nz-input placeholder="Enter url to add video" [(ngModel)]="mediaUrlInput" />
+      </nz-input-group>
+      <nz-alert
+      style="margin-bottom: 1rem;"
+      nzType="info"
+      [nzDescription]="addMediaInfo"
+      nzShowIcon
+    ></nz-alert>
+    </div>
   </div>
+
 
   <div nz-col nzSpan="24">
     <nz-list [nzBordered]="localPlaylist" nzSize="small" [nzLoading]="!localPlaylist"
@@ -50,6 +59,10 @@
 
 <ng-template #suffixButton>
   <button nz-button nzType="primary" style="height: auto;" nzSearch (click)="onAddMedia()">Add</button>
+</ng-template>
+
+<ng-template #addMediaInfo>
+  <p nz-typography>Only YouTube Video URLs are supported for now. Support for other types of media will be added soon (e.g. HTML5, Vimeo). After adding, press the play icon in the playlist to start playback</p>
 </ng-template>
 
 <ng-template #noItems>

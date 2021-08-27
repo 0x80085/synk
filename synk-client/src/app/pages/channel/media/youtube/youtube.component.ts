@@ -92,14 +92,12 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
   }
 
   onPlayerStateChange = event => {
-    console.log(event);
     if (event.data === 0) {
       this.videoEnded.emit();
     }
   }
 
   onPlayerError = event => {
-    console.log(event);
     this.showPlayerErrorToast(event);
   }
 
@@ -138,7 +136,7 @@ export function YouTubeGetID(url) {
     ID = url[2].split(/[^0-9a-z_\-]/i);
     ID = ID[0];
   } else {
-    ID = url;
+    ID = null;
   }
   return ID;
 }

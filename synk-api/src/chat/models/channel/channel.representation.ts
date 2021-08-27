@@ -21,7 +21,7 @@ export interface ChannelShortRepresentation {
     name: string;
     description: string;
     connectedMemberCount: number;
-    nowPlaying: string;
+    nowPlaying: {url: string, title: string};
     isPublic: boolean;
     dateCreated: Date;
     isLocked: boolean;
@@ -53,7 +53,10 @@ export const getChannelShortRepresentation = ({
     isLocked,
     description,
     connectedMemberCount: members.length,
-    nowPlaying: currentPlaylist.nowPlaying().media?.title
+    nowPlaying: {
+        title: currentPlaylist.nowPlaying().media?.title,
+        url:  currentPlaylist.nowPlaying().media?.url
+    }
 })
 
 export function mergeChannelAndRoom({ channel, room }: { room: Room, channel: Channel }): ChannelRepresentation {

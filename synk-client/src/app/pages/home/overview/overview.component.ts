@@ -12,7 +12,6 @@ export class OverviewComponent {
 
   data$: Observable<ChannelOverviewItem[]> = this.overviewService.getChannels()
     .pipe(
-      tap(console.log),
       catchError(() => of([])
       )
     );

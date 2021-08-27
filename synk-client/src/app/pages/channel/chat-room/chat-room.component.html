@@ -1,3 +1,9 @@
+<nz-alert *ngIf="loggedInUserIsLeader$ | async"  nzBanner nzType="info"  nzIconType="interaction" nzShowIcon nzCloseable="false" [nzMessage]="youAreLeaderText"></nz-alert>
+  
+<ng-template #youAreLeaderText>
+  <span nz-typography nz-tooltip nzTooltipTitle="Being a leader means your media player state is sent to the other members of the room, enabling synchronized playback across member's devices. Everyone in the room is now hooked into your playback! Switch videos or seek in the media to try it out">You are the leader</span>
+</ng-template>
+
 <div *ngIf="roomError$ | async; then error; else chatRoom"></div>
 
 

@@ -4,9 +4,8 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Subscription } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 
-import { ChatService } from '../chat.service';
 import { MediaService } from '../media.service';
-import { MediaEvent } from '../models/room.models';
+import { YouTubeGetID } from '../media/youtube/youtube.component';
 
 interface PlaylistItem {
   active: boolean;
@@ -23,16 +22,12 @@ export class PlaylistComponent implements OnDestroy {
 
   @Input() roomName: string;
 
-  @Output() playMedia = new EventEmitter<MediaEvent>();
+  @Output() playMedia = new EventEmitter<string>();
 
   mediaUrlInput: string;
   showControls: boolean;
 
   localPlaylist: PlaylistItem[] = [];
-
-  isLeader$ = this.chatService.roomUserConfig$.pipe(
-    map(conf => conf.isLeader),
-  );
 
   private virtualPlaylist$: Subscription = this.mediaService.roomPlaylistUpdateEvents$.pipe(
     map(({ entries, nowPlaying }) =>
@@ -49,25 +44,30 @@ export class PlaylistComponent implements OnDestroy {
   ).subscribe();
 
   private addMediaSuccesFeedback$ = this.mediaService.addMediaSuccessEvent$.pipe(
-    tap(_ => this.notification.success('Media added!', `Request to add media to playlist succeeded!`))
+    tap(({ playlistCount, url }) => this.startPlaybackIfFirstItemInList(playlistCount, url)),
+    tap(_ => this.notification.success('Media added!', `Request to add media to playlist succeeded!`, { nzDuration: 5000 }))
   ).subscribe();
 
   private removeMediaErrorFeedback$ = this.mediaService.removeMediaErrEvent$.pipe(
     tap(_ => this.notification.error('Failed to remove media from playlist', `Only users who have added the entry can remove it`))
   ).subscribe();
 
-  private removeMediaESuccesFeedback$ = this.mediaService.removeMediaSuccessEvent$.pipe(
+  private removeMediaSuccesFeedback$ = this.mediaService.removeMediaSuccessEvent$.pipe(
     tap(_ => this.notification.success('Success', 'Media removed from playlist'))
   ).subscribe();
 
   constructor(
     private mediaService: MediaService,
-    private chatService: ChatService,
     private notification: NzNotificationService) { }
 
   onAddMedia() {
     if (!this.mediaUrlInput) {
       return;
+    }
+
+    if (!YouTubeGetID(this.mediaUrlInput)) {
+      this.notification.warning('Only YouTube videos are supported for now', `Add failed`)
+      return
     }
 
     this.mediaService.addToPlaylist({
@@ -90,9 +90,6 @@ export class PlaylistComponent implements OnDestroy {
   }
 
   drop(event: CdkDragDrop<string[]>): void {
-    console.log('dropeed');
-    console.log(event);
-
     const { currentIndex, previousIndex } = event
     if (currentIndex === previousIndex) {
       return
@@ -111,13 +108,19 @@ export class PlaylistComponent implements OnDestroy {
     this.mediaService.shufflePlaylist(this.roomName);
   }
 
+  private startPlaybackIfFirstItemInList(playlistCount: number, url: string){
+    if (playlistCount === 1) {
+      this.playMedia.emit(url)
+    }
+  }
+
   ngOnDestroy(): void {
     this.virtualPlaylist$.unsubscribe();
 
     this.addMediaErrorFeedback$.unsubscribe();
     this.addMediaSuccesFeedback$.unsubscribe();
 
-    this.removeMediaESuccesFeedback$.unsubscribe();
+    this.removeMediaSuccesFeedback$.unsubscribe();
     this.removeMediaErrorFeedback$.unsubscribe();
   }
 }
