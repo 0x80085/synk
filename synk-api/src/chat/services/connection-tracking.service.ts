@@ -50,19 +50,6 @@ export class ConnectionTrackingService {
         } else {
             this.createNewIPTrackingRecord(id, clientIp, client);
         }
-
-        // client.conn.on('heartbeat', () => {
-        //     console.log('heartbeat received');
-        //     const ip = this.getIpFromSocket(client);
-        //     const memberId = userData.id;
-        //     const trackingForIp = this.clients.get(ip);
-        //     const trackingForMember = trackingForIp.find(it => it.memberId === memberId);
-        //     console.log(
-        //         `heartbeat from ${ip} 
-        //          who is memberID ${trackingForMember.memberId} 
-        //          and socketid ${trackingForMember.client.id}`
-        //     );
-        // });
     }
 
     getSocketByMemberId(memberId: string): socketio.Socket {

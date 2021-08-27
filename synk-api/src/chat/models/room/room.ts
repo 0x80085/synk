@@ -41,11 +41,9 @@ export class Room {
         this.throwIfMemberIsBanned(member);
         this.throwIfMemberAlreadyJoined(member);
         this.members.push(member);
-        console.log(`[${member.username}] enters [${this.name}]`);
         this.messages.post({ author: { username: "" } as any, content: `${member.username} joined`, isSystemMessage: true })
         if (this.members.length === 1) {
-            this.leader = this.members[0]
-            console.log(`[${member.username}] is leader of [${this.name}]`);
+            this.assignNewLeader(this.members[0]) 
         }
     }
 
@@ -66,14 +64,13 @@ export class Room {
                     this.replaceLeader(elegibleMembers[0])
                 } else {
                     this.removeLeader();
-                    console.log(`[${member.username}] was removed as leader of [${this.name}]`);
                     newLeader = null;
+
+                    this.currentPlaylist.stopPlaying()
                 }
             }
 
             this.members = this.removeMember(this.members, member);
-            console.log(`[${member.username}] left [${this.name}]`);
-            console.log(`${member.username} left.`);
             this.messages.post({ author: { username: '' } as Member, content: `${member.username} left.`,isSystemMessage: true });
 
             return newLeader;
@@ -181,7 +178,6 @@ export class Room {
     private replaceLeader(member: Member) {
         this.removeLeader();
         this.assignNewLeader(member);
-        console.log(`[${member.username}] is now leader of [${this.name}]`);
     }
 
     private removeLeader() {

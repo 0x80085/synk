@@ -9,7 +9,7 @@
 
   <ng-template #leaderIcon>
     <i [hidden]="!member.isLeader" nz-icon style="color: white; font-size: 1rem;" nzType="interaction"
-      nz-tooltip nzTooltipTitle="This user currently controls the playback"></i>
+      nz-tooltip nzTooltipTitle="This member currently controls the playback"></i>
   </ng-template>
 
   <ng-template #ownerIcon>
@@ -18,7 +18,7 @@
   </ng-template>
 
   <ng-template #giveLeaderBtn>
-      <button nz-button nzType="link" nz-tooltip nzTooltipTitle="Hand over playback control to user"
+      <button nz-button nzType="link" nz-tooltip nzTooltipTitle="Hand over playback control to this member"
       *ngIf="(loggedInUserIsLeader$ | async) && !member.isLeader" (click)="this.giveLeader.emit(member)">
         <i nz-icon nzType="api"></i>
       </button>

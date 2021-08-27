@@ -82,12 +82,6 @@ export class RoomService {
             ?.leave(member);
     }
 
-    updateNowPlaying(roomId: string, member: Member, time: number, url: string) {
-        this.roomsList
-            .find(r => r.id === roomId)
-            ?.updateNowPlaying(member, { time, url });
-    }
-
     voteSkip(roomId: string, member: Member) {
         this.roomsList
             .find(r => r.id === roomId)

@@ -61,8 +61,6 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
         }[])
           .filter((conn) => conn.socketId === client.id)
           .forEach(connection => {
-            console.log(connection);
-
             this.roomService.leaveRoom(connection.roomId, member)
           }))
         .then(() => client.leaveAll())
@@ -92,7 +90,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   async handleUpdateNowPlaying(client: socketio.Socket, { roomName, currentTime: time, mediaUrl: url }: { roomName: string, mediaUrl: string, currentTime: any }) {
     const room = this.roomService.getRoomByName(roomName);
     const member = await this.tracker.getMemberBySocket(client);
-
+    
     room.updateNowPlaying(member, { time, url });
 
     this.broadcastNowPlayingToRoom(room);
@@ -106,8 +104,6 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     this.logger.log("handleJoinRoom")
 
     if (this.tracker.isClientInRoom(client, room.id)) {
-      console.log(this.tracker.memberInRoomTracker);
-
       throw new WsException(MessageTypes.ALREADY_JOINED);
     }
 
@@ -183,16 +179,19 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
 
     try {
       // TODO move this logic somewhere else model or/and service  
-      const requestingMember = await this.tracker.getMemberBySocket(requestingMemberSocket);
       const room = this.roomService.getRoomByName(roomName);
-
+      
+      const requestingMember = await this.tracker.getMemberBySocket(requestingMemberSocket);
       const newLeader = await this.roomService.giveLeader(room.id, requestingMember, to);
-
       const newLeaderSocket = await this.tracker.getSocketByMemberId(newLeader.id);
+
       this.sendRoomConfigToMember(room, newLeader.id, newLeaderSocket);
       this.sendRoomConfigToMember(room, requestingMember.id, requestingMemberSocket);
+      newLeaderSocket.emit(MessageTypes.YOU_ARE_LEADER);
+      requestingMemberSocket.emit(MessageTypes.LEADER_ROLE_PASSED_ON_SUCCESS);
 
       this.broadcastMemberlistToRoom(room);
+      this.broadcastGroupMessageToRoom(room);
 
     } catch (error) {
       this.logger.error(error)

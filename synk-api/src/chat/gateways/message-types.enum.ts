@@ -9,6 +9,8 @@ export enum MessageTypes {
   MOVE_MEDIA = 'move media',
   PURGE_ALL_MEDIA_OF_MEMBER = 'purge all media of member',
   GIVE_LEADER = 'give leader',
+  YOU_ARE_LEADER = 'you are leader',
+  LEADER_ROLE_PASSED_ON_SUCCESS = 'leader role passed on success',
   PLAY_NEXT_MEDIA = 'play next media',
   SHUFFLE_PLAYLIST = 'shuffle playlist',
   KICK_MEMBER = 'kick member',

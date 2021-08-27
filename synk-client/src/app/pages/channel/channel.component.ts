@@ -2,7 +2,7 @@ import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/
 import { ActivatedRoute } from '@angular/router';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { BehaviorSubject, combineLatest, merge, noop, Observable, of, Subscription, timer } from 'rxjs';
-import { mapTo, shareReplay, startWith, switchMap, take, tap } from 'rxjs/operators';
+import { map, mapTo, shareReplay, startWith, switchMap, take, tap } from 'rxjs/operators';
 
 import { AppStateService } from '../../app-state.service';
 import { SocketService } from '../../socket.service';
@@ -38,8 +38,12 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   playlist$: Observable<PlaylistRepresentation> = this.mediaService.roomPlaylistUpdateEvents$;
 
+  isLeader$ = this.chatService.roomUserConfig$.pipe(
+    map(conf => conf.isLeader),
+  );
 
   alreadyJoinedRoomError$ = this.chatService.alreadyJoinedRoomError$;
+
   mediaUpdateTimerSubscription: Subscription = timer(1000, 2000).subscribe(val => {
     if (this.loggedInUserIsLeader && this.player) {
       this.sendMediaUpdate();
@@ -58,6 +62,21 @@ export class ChannelComponent implements OnInit, OnDestroy {
   roomUserConfigSubscription = this.chatService.roomUserConfig$.subscribe(ev => {
     this.loggedInUserIsLeader = ev.isLeader;
   });
+
+  isUserLeaderFeedbackSubscription = merge(
+    this.chatService.userBecameLeader$.pipe(mapTo(true)),
+    this.chatService.userPassedOnLeader$.pipe(mapTo(false))
+  ).pipe(
+    tap(isLeader => {
+      const title = isLeader 
+      ? `You are now the leader of the room!` 
+      : `Leadership given up successfully!`;
+      const msg = isLeader 
+      ? `You have control over the video player of the room now. Try playing a video and others will hook into your playback time` 
+      : `You have given up control. Another user controls the playback now`;
+      this.notification.success(title, msg)
+    })
+  ).subscribe()
 
   errorEventSubscription = this.socketService.connectionError$.pipe(
     tap(x => {
@@ -187,6 +206,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
     this.mediaUpdateTimerSubscription.unsubscribe();
     this.mediaSyncEventSubscription.unsubscribe();
     this.errorEventSubscription.unsubscribe();
+    this.isUserLeaderFeedbackSubscription.unsubscribe();
     this.chatService.exit(this.name);
   }
 }

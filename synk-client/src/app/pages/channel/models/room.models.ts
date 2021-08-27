@@ -31,6 +31,8 @@ export enum RoomCommands {
   GIVE_LEADER = 'give leader',
   USER_CONFIG = 'user config',
   USER_LIST_UPDATE = 'userlist update',
+  YOU_ARE_LEADER = 'you are leader',
+  LEADER_ROLE_PASSED_ON_SUCCESS = 'leader role passed on success',
 }
 
 export enum RoomErrors {
