@@ -30,6 +30,7 @@ import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NZ_ICONS } from 'src/app/icons';
 import { NzGridModule } from 'ng-zorro-antd/grid';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 
 @NgModule({
   declarations: [
@@ -60,6 +61,7 @@ import { NzGridModule } from 'ng-zorro-antd/grid';
     NzDescriptionsModule,
     NzTypographyModule,
     NzGridModule,
+    NzToolTipModule,
     NzIconModule.forRoot(NZ_ICONS),
   ],
   providers: [

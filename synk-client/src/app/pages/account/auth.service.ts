@@ -28,6 +28,13 @@ export interface Channel {
   isLocked: boolean;
   connectedMemberCount: number;
   nowPlaying: string;
+  owner: {
+    id: string;
+    username: string;
+    isAdmin: boolean;
+    dateCreated: Date;
+    lastSeen: Date;
+  }
 }
 
 @Injectable({

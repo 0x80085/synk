@@ -108,7 +108,7 @@
     </nz-card>
   </div>
   <div nz-col nzSpan="12">
-    <h2 nz-typography>Rooms</h2>
+    <h2 nz-typography>Channels</h2>
 
     <nz-card [nzLoading]="!(channels$ | async)">
       <nz-pagination [nzPageIndex]="1" [nzTotal]="85" [nzPageSize]="20" [nzShowTotal]="rangeTemplate"
@@ -132,6 +132,23 @@
             </nz-descriptions-item>
             <nz-descriptions-item nzTitle="ID">
               <span nz-typography><code>{{ room.id }}</code></span>
+            </nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Owner name">
+              <span nz-typography><code>{{ room.owner.username }}</code></span>
+            </nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Owner ID">
+              <span nz-typography><code>{{ room.owner.id }}</code></span>
+            </nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Owner last seen">
+              <span nz-typography><code>{{ room.owner.lastSeen | date }}</code></span>
+            </nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Owner isAdmin">
+              <span nz-typography><code>{{ room.owner.isAdmin }}</code></span>
+            </nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Link to channel">
+              <a nz-button nzType="link" nz-tooltip nzTooltipTitle="Go to channel" [routerLink]="['/channel', room.name]">
+                <i nz-icon nzType="login"></i>
+              </a>
             </nz-descriptions-item>
           </nz-descriptions>
 

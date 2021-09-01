@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
-import { forkJoin, from, of, pipe } from 'rxjs';
-import { map, switchMap, tap, withLatestFrom } from 'rxjs/operators';
+import { IPaginationOptions, paginate, paginateRawAndEntities, Pagination } from 'nestjs-typeorm-paginate';
 import { ConnectionTrackingService } from 'src/chat/services/connection-tracking.service';
 import { Repository } from 'typeorm';
 
@@ -20,7 +18,7 @@ export class AdminService {
     ) { }
 
     async getPaginatedChannels(options: IPaginationOptions): Promise<Pagination<Channel>> {
-        return paginate<Channel>(this.channelRepository, options);
+        return this.getChannelsWithOwner(options);
     }
 
     async getPaginatedMembers(options: IPaginationOptions): Promise<Pagination<Member>> {
@@ -42,6 +40,26 @@ export class AdminService {
 
 
         return { clients, members }
+    }
+
+    private async getChannelsWithOwner(options: IPaginationOptions) {
+        const query = this.channelRepository
+            .createQueryBuilder("channel")
+            .leftJoinAndSelect("channel.owner", "owner");
+
+        const [pagination, rawResults] = await paginateRawAndEntities(query, options);
+        const patchedResults = pagination.items.map((item, _) => {
+            const patchedItem = { ...item };
+            const patchedOwner = { ...patchedItem.owner,  passwordHash: null } as Member;
+            patchedItem.owner = patchedOwner as Member;
+            return patchedItem
+        });
+        
+        const clone = {...pagination};
+
+        clone.items = patchedResults;
+
+        return clone;
     }
 
 }
