@@ -6,7 +6,7 @@
 
 ## Live Demo
 
-[![Website synk.moe](https://img.shields.io/website-up-down-green-red/http/synk.moe.svg)](https://synk.moe/)
+[![Website synk.moe](https://img.shields.io/website-up-down-green-red/https/synk.moe.svg?style=for-the-badge&label=synk.moe)](https://synk.moe/)
 
 ## Install
 
@@ -23,9 +23,11 @@ Run `npm i` in all folders that contain a package.json
 
 ### Run from command line
 
-Run `npm start` in the top level folder to start the Server and Client.
+Run `npm start` in the top level folder to start the Server and Client with concurrently.
 
-Getting the YT namespace error? Execute `npm i @types/youtube`.
+**...Or** to start the client and server seperately, cd into synk-api and synk-client folders and run `npm start` 
+
+Getting the YT namespace error in the client? Execute `npm i @types/youtube` in the synk-client folder.
 
 ### Run with Docker
 
@@ -60,23 +62,9 @@ Or use the shortcut in package.json:
 [![made-with-ExpressJS](https://img.shields.io/badge/ExpressJS-1f425f.svg)](https://expressjs.com/)
 [![made-with-Passport](https://img.shields.io/badge/Passport-1f425f.svg)](http://www.passportjs.org/)
 
-## Todo
 
-- More docs
-- Moderation of channel
-- Custom emoji support , gif, bot
-- Channel customization support
-- Rate limiting
-- Refactor Middleware Sockets to make it more readable
-- Playlist control
+### Contributing
 
-## Under construction at time of writing
+Join the discord channel and help with testing or developing this project
 
-- disconnect socket/ session expire tests
-- user update + config settings
-- user channels management
-- fix scroll issue on chatbox
-- admin functions
-- make sessions more stable (testing)
-- ratelimiting, manage user access, and security
-- Add html5 player
+[![Discord](https://img.shields.io/discord/732990730355867678.svg?style=for-the-badge&label=Synk&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/tMsTW9m)
