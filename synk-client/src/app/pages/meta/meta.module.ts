@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 
@@ -21,6 +22,7 @@ import { TermsOfUseComponent } from './terms-of-use/terms-of-use.component';
     NzLayoutModule,
     NzGridModule,
     NzTypographyModule,
+    NzButtonModule,
     NzIconModule.forRoot(NZ_ICONS),
   ]
 })
