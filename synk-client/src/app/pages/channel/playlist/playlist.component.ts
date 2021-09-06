@@ -1,5 +1,6 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Subscription } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
@@ -18,13 +19,14 @@ interface PlaylistItem {
   templateUrl: './playlist.component.html',
   styleUrls: ['./playlist.component.scss']
 })
-export class PlaylistComponent implements OnDestroy {
+export class PlaylistComponent implements OnDestroy, OnInit {
 
   @Input() roomName: string;
 
   @Output() playMedia = new EventEmitter<string>();
 
-  mediaUrlInput: string;
+  form: FormGroup;
+
   showControls: boolean;
 
   localPlaylist: PlaylistItem[] = [];
@@ -57,25 +59,39 @@ export class PlaylistComponent implements OnDestroy {
   ).subscribe();
 
   constructor(
+    private fb: FormBuilder,
     private mediaService: MediaService,
     private notification: NzNotificationService) { }
 
+  ngOnInit() {
+    this.form = this.fb.group({
+      mediaUrl: [
+        null,
+        [
+          Validators.required,
+          PlaylistComponent.validateIsUrl()
+        ]
+      ]
+    });
+  }
+
   onAddMedia() {
-    if (!this.mediaUrlInput) {
+    if (this.form.invalid) {
       return;
     }
 
-    if (!YouTubeGetID(this.mediaUrlInput)) {
+    if (!YouTubeGetID(this.form.controls.mediaUrl.value)) {
       this.notification.warning('Only YouTube videos are supported for now', `Add failed`)
       return
     }
 
     this.mediaService.addToPlaylist({
-      mediaUrl: this.mediaUrlInput,
+      mediaUrl: this.form.controls.mediaUrl.value,
       roomName: this.roomName,
       currentTime: null
     });
-    this.mediaUrlInput = '';
+    this.form.controls.mediaUrl.patchValue('');
+    this.form.controls.mediaUrl.reset();
     this.notification.info('Request Submitted', 'The request to add media to the current list is in progress. You will be updated if the request was (un)succesful');
   }
 
@@ -108,7 +124,7 @@ export class PlaylistComponent implements OnDestroy {
     this.mediaService.shufflePlaylist(this.roomName);
   }
 
-  private startPlaybackIfFirstItemInList(playlistCount: number, url: string){
+  private startPlaybackIfFirstItemInList(playlistCount: number, url: string) {
     if (playlistCount === 1) {
       this.playMedia.emit(url)
     }
@@ -122,5 +138,27 @@ export class PlaylistComponent implements OnDestroy {
 
     this.removeMediaSuccesFeedback$.unsubscribe();
     this.removeMediaErrorFeedback$.unsubscribe();
+  }
+
+  static validateIsUrl(): ValidatorFn {
+    return ({ value }: AbstractControl): ValidationErrors | null => {
+
+      return PlaylistComponent.isValidMediaUrl(value)
+    }
+  }
+
+  static isValidMediaUrl(value: string){
+    let validUrl = true;
+
+      try {
+        new URL(value)
+        if (!YouTubeGetID(value)) {
+          throw new Error();
+        }
+      } catch {
+        validUrl = false;
+      }
+
+      return validUrl ? null : { invalidUrl: { value: value } };
   }
 }

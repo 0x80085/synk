@@ -1,51 +1,95 @@
 <div nz-row>
-  
-  <div nz-col nzSpan="24" style="min-height: 3rem;">
+  <div nz-col nzSpan="24" style="min-height: 3rem">
     <button nz-button nzType="link" (click)="showControls = !showControls">
-      <i nz-icon nzType="video-camera-add" nzTheme="outline" nz-tooltip  nzTooltipTitle="Add media to playlist"></i>
+      <i
+        nz-icon
+        nzType="video-camera-add"
+        nzTheme="outline"
+        nz-tooltip
+        nzTooltipTitle="Add media to playlist"
+      ></i>
     </button>
-    <!-- <nz-button-group style="margin-left: 0.875rem;" [hidden]="!showControls">
-      <button nz-button nzType="default" (click)="onShuffle()">
-        <i nz-icon nzType="swap" nzTheme="outline"></i>
-        Shuffle Playlist
-      </button>
-      <button nz-button nzType="default" (click)="onNext()">
-        <i nz-icon nzType="forward" nzTheme="outline"></i>
-        Next
-      </button>
-    </nz-button-group> -->
   </div>
-  
+
   <div nz-col nzSpan="24">
     <div [hidden]="!showControls">
-      <nz-input-group  nzSearch nzSize="large" [nzAddOnAfter]="suffixButton"
-        style="margin-bottom: 1rem;">
-        <input type="text" nz-input placeholder="Enter url to add video" [(ngModel)]="mediaUrlInput" />
-      </nz-input-group>
+      <form
+        nz-form
+        [formGroup]="form"
+        (ngSubmit)="onAddMedia()"
+      >
+        <nz-form-item style="margin-bottom: .5rem;">  
+          <nz-form-control
+            nzErrorTip="Please input a valid (Youtube video) URL"
+          >
+          <nz-input-group
+            nzSearch
+            nzSize="large"
+            [nzAddOnAfter]="suffixButton"
+          >
+            <input
+              type="text"
+              nz-input
+              placeholder="Enter a link to a video"
+              formControlName="mediaUrl"
+            />
+          </nz-input-group>
+        </nz-form-control>
+        </nz-form-item>
+      </form>
       <nz-alert
-      style="margin-bottom: 1rem;"
-      nzType="info"
-      [nzDescription]="addMediaInfo"
-      nzShowIcon
-    ></nz-alert>
+        style="margin-bottom: 1rem"
+        nzType="info"
+        [nzDescription]="addMediaInfo"
+        nzShowIcon
+      ></nz-alert>
     </div>
   </div>
 
-
   <div nz-col nzSpan="24">
-    <nz-list [nzBordered]="localPlaylist" nzSize="small" [nzLoading]="!localPlaylist"
-      [nzDataSource]="localPlaylist" [nzRenderItem]="item" [nzNoResult]="noItems" cdkDropList  (cdkDropListDropped)="drop($event)">
+    <nz-list
+      [nzBordered]="localPlaylist"
+      nzSize="small"
+      [nzLoading]="!localPlaylist"
+      [nzDataSource]="localPlaylist"
+      [nzRenderItem]="item"
+      [nzNoResult]="noItems"
+      cdkDropList
+      (cdkDropListDropped)="drop($event)"
+    >
       <ng-template #item let-item>
-        <nz-list-item style="border-bottom: 1px solid rgb(25, 25, 25);" class="playlist-item" [class.active]="true"
-          nzSplit [nzContent]="contentTitle" [nzActions]="[opAction]" cdkDrag>
+        <nz-list-item
+          style="border-bottom: 1px solid rgb(25, 25, 25)"
+          [class.active]="true"
+          nzSplit
+          [nzContent]="contentTitle"
+          [nzActions]="[opAction]"
+          cdkDrag
+        >
         </nz-list-item>
         <ng-template #opAction>
-          <button nz-button nzSize="small" nzType="link" (click)="playMedia.emit(item)"
-            nz-tooltip [nzTooltipTitle]="item.active ? 'now playing' : 'start video'">
-            <i nz-icon [nzType]="item.active ? 'play-circle' : 'caret-right'"></i>
+          <button
+            nz-button
+            nzSize="small"
+            nzType="link"
+            (click)="playMedia.emit(item)"
+            nz-tooltip
+            [nzTooltipTitle]="item.active ? 'now playing' : 'start video'"
+          >
+            <i
+              nz-icon
+              [nzType]="item.active ? 'play-circle' : 'caret-right'"
+            ></i>
           </button>
-          <button nz-button nzSize="small" nzDanger nzType="link" (click)="onRemoveMedia(item.mediaUrl)" nz-tooltip
-          nzTooltipTitle="Remove from list">
+          <button
+            nz-button
+            nzSize="small"
+            nzDanger
+            nzType="link"
+            (click)="onRemoveMedia(item.mediaUrl)"
+            nz-tooltip
+            nzTooltipTitle="Remove from list"
+          >
             <i nz-icon nzType="delete"></i>
           </button>
         </ng-template>
@@ -58,18 +102,28 @@
 </div>
 
 <ng-template #suffixButton>
-  <button nz-button nzType="primary" style="height: auto;" nzSearch (click)="onAddMedia()">Add</button>
+  <button
+    nz-button
+    nzType="primary"
+    type="submit"
+    style="height: auto"
+    nzSearch
+  >
+    Add
+  </button>
 </ng-template>
 
 <ng-template #addMediaInfo>
-  <p nz-typography>Only YouTube Video URLs are supported for now. Support for other types of media will be added soon (e.g. HTML5, Vimeo). After adding, press the play icon in the playlist to start playback</p>
+  <p nz-typography>
+    Only YouTube Video URLs are supported for now. Support for other types of
+    media will be added soon (e.g. HTML5, Vimeo). After adding, press the play
+    icon in the playlist to start playback
+  </p>
 </ng-template>
 
 <ng-template #noItems>
-  <p nz-typography> 
+  <p nz-typography>
     <i nz-icon nzType="ellipsis" nzTheme="outline"></i>
   </p>
-  <p nz-typography> 
-    Nothing queued
-  </p>
+  <p nz-typography>Nothing queued</p>
 </ng-template>

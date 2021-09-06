@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { PlyrModule } from 'ngx-plyr';
 
@@ -52,6 +52,7 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     PlyrModule,
     NzListModule,
     NzDividerModule,
