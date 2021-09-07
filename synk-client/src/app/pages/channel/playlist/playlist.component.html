@@ -18,7 +18,7 @@
         [formGroup]="form"
         (ngSubmit)="onAddMedia()"
       >
-        <nz-form-item style="margin-bottom: .5rem;">  
+        <nz-form-item style="margin-bottom: 1rem;">  
           <nz-form-control
             nzErrorTip="Please input a valid (Youtube video) URL"
           >
@@ -60,7 +60,7 @@
       <ng-template #item let-item>
         <nz-list-item
           style="border-bottom: 1px solid rgb(25, 25, 25)"
-          [class.active]="true"
+          [class.active]="(nowPlaying | async)?.url === item.mediaUrl"
           nzSplit
           [nzContent]="contentTitle"
           [nzActions]="[opAction]"

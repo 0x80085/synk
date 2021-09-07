@@ -17,6 +17,7 @@ export interface User {
   username: string;
   id: string;
   isAdmin: boolean;
+  dateCreated?: Date;
 }
 
 export interface Channel {
@@ -112,6 +113,14 @@ export class AuthService {
 
   refreshChannels() {
     this.refreshChannelsSubject.next(true);
+  }
+
+  // TODO Should also be in other service tho
+  updateChannel({ id, isPublic, description }: Channel) {
+    return this.http.patch(
+      `${environment.api}/channels/${id}`,
+      { isPublic, description },
+      { withCredentials: true });
   }
 
   // TODO Should also be in other service tho

@@ -96,6 +96,12 @@
   <p>Only logged in users can access rooms (for now)</p>
 </ng-template>
 
+<ng-template #noServerConnection>
+  <!-- TODO: handle from socketio -->
+  <h2>Can't reach the server</h2>
+  <p>No server connection possible, check back later...</p>
+</ng-template>
+
 <ng-template #cantJoinMoreThanOnceText>
   <h2>Can't join a room more than once</h2>
   <p>Maybe you have another browser tab open where you have already joined this room?</p>

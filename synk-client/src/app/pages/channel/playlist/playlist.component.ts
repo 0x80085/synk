@@ -2,10 +2,10 @@ import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 
-import { MediaService } from '../media.service';
+import { MediaRepresentation, MediaService } from '../media.service';
 import { YouTubeGetID } from '../media/youtube/youtube.component';
 
 interface PlaylistItem {
@@ -25,6 +25,8 @@ export class PlaylistComponent implements OnDestroy, OnInit {
 
   @Output() playMedia = new EventEmitter<string>();
 
+  nowPlaying = new Subject<MediaRepresentation>();
+
   form: FormGroup;
 
   showControls: boolean;
@@ -32,6 +34,7 @@ export class PlaylistComponent implements OnDestroy, OnInit {
   localPlaylist: PlaylistItem[] = [];
 
   private virtualPlaylist$: Subscription = this.mediaService.roomPlaylistUpdateEvents$.pipe(
+    tap(({nowPlaying}) => this.nowPlaying.next(nowPlaying)),
     map(({ entries, nowPlaying }) =>
       entries.map(entry => ({
         ...entry,

@@ -1,51 +1,98 @@
 <h2 nz-typography>Channels</h2>
 <nz-card [nzLoading]="!(channels$ | async)">
-  <nz-empty *ngIf="(channels$ | async)?.length === 0" [nzNotFoundImage]="channelListEmpty"
-    nzNotFoundContent="It's empty in here...">
+  <nz-empty
+    *ngIf="(channels$ | async)?.length === 0"
+    [nzNotFoundImage]="channelListEmpty"
+    nzNotFoundContent="It's empty in here..."
+  >
   </nz-empty>
 
   <ng-template #channelListEmpty>
     <i nz-icon style="font-size: 4rem" nzType="small-dash"></i>
   </ng-template>
 
-  <nz-collapse *ngIf="(channels$ | async)?.length > 0">
-    <nz-collapse-panel *ngFor="let channel of channels$ | async" [nzHeader]="channel.name" [nzExtra]="actions">
-      <nz-table [nzData]="[channel]" [nzShowPagination]="false">
-        <tr>
-          <th>description</th>
-          <td>{{ channel.description }}</td>
-        </tr>
-        <tr>
-          <th>isPublic</th>
-          <td>{{ channel.isPublic }}</td>
-        </tr>
-        <tr>
-          <th>dateCreated</th>
-          <td>{{ channel.dateCreated | date }}</td>
-        </tr>
-        <tr>
-          <th>isLocked</th>
-          <td>{{ channel.isLocked }}</td>
-        </tr>
-        <tr>
-          <th>connectedMemberCount</th>
-          <td>{{ channel.connectedMemberCount }}</td>
-        </tr>
-        <tr>
-          <th>nowPlaying</th>
-          <td>{{ channel.nowPlaying }}</td>
-        </tr>
-      </nz-table>
+  <nz-collapse *ngIf="(channels$ | async)?.length > 0" [formGroup]="form">
+    <ng-container formArrayName="channels">
+      <nz-collapse-panel
+        *ngFor="let channel of channels$ | async; let i = index"
+        [nzHeader]="channel.name"
+        [nzExtra]="actions"
+      >
+        <form
+          nz-form
+          [formGroup]="channelForms.controls[i]"
+          (ngSubmit)="updateChannel(channel.id, channelForms.controls[i])"
+        >
+          <nz-table [nzData]="[channel]" [nzShowPagination]="false">
+            <tr>
+              <th>description</th>
+              <td>
+                <nz-form-item style="margin-bottom: 0;">
+                  <nz-form-control nzErrorTip="Please input a valid description">
+                    <input
+                      type="text"
+                      nz-input
+                      placeholder="description"
+                      formControlName="description"
+                    />
+                  </nz-form-control>
+                </nz-form-item>
+              </td>
+            </tr>
+            <tr>
+              <th>isPublic</th>
+              <td>
+                <nz-form-item style="margin-bottom: 0;">
+                  <nz-form-control>
+                    <nz-input-group>
+                      <label nz-checkbox formControlName="isPublic">
+                        List channel on home page?
+                      </label>
+                    </nz-input-group>
+                  </nz-form-control>
+                </nz-form-item>
+              </td>
+            </tr>
+            <tr>
+              <th>dateCreated</th>
+              <td>{{ channel.dateCreated | date }}</td>
+            </tr>
+            <tr>
+              <th>connectedMemberCount</th>
+              <td>{{ channel.connectedMemberCount }}</td>
+            </tr>
+            <tr>
+              <th>nowPlaying</th>
+              <td>{{ channel.nowPlaying?.title || "nothing playing" }}</td>
+            </tr>
+          </nz-table>
+          <button nz-button nzType="primary" type="submit" style="margin-top: 1rem;">
+            Save changes
+          </button>
+        </form>
 
-      <ng-template #actions>
-        <a nz-button nzType="link" nz-tooltip nzTooltipTitle="Go to channel" [routerLink]="['/channel', channel.name]">
-          <i nz-icon nzType="login"></i>
-        </a>
-        <a nz-button nzDanger nzType="link" nz-tooltip nzTooltipTitle="Delete this channel"
-          (click)="deleteChannel(channel, $event)">
-          <i nz-icon nzTheme="fill" nzType="delete"></i>
-        </a>
-      </ng-template>
-    </nz-collapse-panel>
+        <ng-template #actions>
+          <a
+            nz-button
+            nzType="link"
+            nz-tooltip
+            nzTooltipTitle="Go to channel"
+            [routerLink]="['/channel', channel.name]"
+          >
+            <i nz-icon nzType="login"></i>
+          </a>
+          <a
+            nz-button
+            nzDanger
+            nzType="link"
+            nz-tooltip
+            nzTooltipTitle="Delete this channel"
+            (click)="deleteChannel(channel, $event)"
+          >
+            <i nz-icon nzTheme="fill" nzType="delete"></i>
+          </a>
+        </ng-template>
+      </nz-collapse-panel>
+    </ng-container>
   </nz-collapse>
 </nz-card>

@@ -8,6 +8,7 @@ import { ChannelRepresentation, ChannelShortRepresentation } from '../models/cha
 import { CreateChannelInput } from './create-channel.input';
 import { AuthenticatedGuard } from 'src/auth/guards/authenticated.guard';
 import { SerializedUserData } from 'src/auth/local.serializer';
+import { UpdateChannelInput } from './update-channel.input';
 
 @ApiTags('Channels')
 @Controller('channels')
@@ -63,7 +64,7 @@ export class ChannelController {
     async updateRoom(
         @Req() { user }: Request,
         @Param('channelId') channelId: string,
-        @Body() input: CreateChannelInput) {
+        @Body() input: UpdateChannelInput) {
 
         const { id: ownerId } = user as SerializedUserData;
         return await this.channelService.updateChannel(channelId, ownerId, input);

@@ -25,7 +25,11 @@ export class AccountService {
     }
 
     getMemberAccount(id: string) {
-        return this.memberRepository.findOneOrFail({ where: { id } });
+        return this.memberRepository.findOneOrFail({ where: { id } })
+            .then(member => {
+                 delete member.passwordHash;
+                 return member;
+             });
     }
 
     async deleteAccount(id: string) {

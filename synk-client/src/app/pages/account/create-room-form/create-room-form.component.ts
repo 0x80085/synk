@@ -52,6 +52,7 @@ export class CreateRoomFormComponent implements OnInit {
     };
     this.service.createChannel(results).subscribe(
       () => {
+        this.notification.success("Channel registered", "You are now the proud owner of a brand new Synk channel.")
         this.auth.refreshChannels();
         this.router.navigate(['/channel', results.name]);
       },
@@ -59,15 +60,15 @@ export class CreateRoomFormComponent implements OnInit {
         if (err.status === 403) {
           this.notification.create(
             'error',
-            `Login to create a room`,
-            `Only known users may create a room.`
+            `Login to create a channel`,
+            `Only known users may create a channel.`
           );
           return;
         }
         this.notification.create(
           'error',
-          `Couldn't create room`,
-          `Something went wrong when trying to create a new room.\n Try again later.`
+          `Couldn't create channel`,
+          `Something went wrong when trying to create a new channel.\n Try again later.`
         );
       }
     );
