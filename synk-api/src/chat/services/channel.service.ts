@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { Channel, ChannelConfig, Member, Role, Roles } from '../../domain/entity';
-import { CreateChannelInput } from '../controllers/create-channel.input';
 import { UpdateChannelInput } from '../controllers/update-channel.input';
 import { ChannelRepresentation, ChannelShortRepresentation, getChannelShortRepresentation, mergeChannelAndRoom } from '../models/channel/channel.representation';
 import { getMemberSummary } from '../models/member/member.representation';
@@ -89,25 +88,17 @@ export class ChannelService {
 
     async updateChannel(channelId: string, ownerId: string, { description, isPublic, maxUsers, password }: UpdateChannelInput) {
         const owner = await this.memberRepository.findOneOrFail({ where: { id: ownerId } });
-        const channel = await this.channelRepository.findOneOrFail({ where: { owner, id: channelId }, relations: ["configs"] });
+        const channel = await this.channelRepository.findOneOrFail({ where: { owner, id: channelId } });
         const room = this.roomService.getRoomById(channel.id);
 
-        channel.description = description;
-        channel.isPublic = isPublic;
-        // channel.configs.maxUsers = maxUsers;
-        channel.password = password;
+
+        this.channelRepository.createQueryBuilder()
+            .update(Channel).set({ isPublic, description }).where("id = :id", { id: channelId })
+            .execute()
 
         room.isPublic = isPublic;
         room.maxUsers = maxUsers;
         room.password = password;
-
-        this.logger.log(`[${owner.username}] updated channel [${channel.name}] [${channel.id}] !!`);
-
-console.log(channel);
-
-
-        await this.configRepository.save(channel);
-    //        await this.configRepository.save(channelConfig);
     }
 
     getModeratorsOfChannel(channelId: string) {
