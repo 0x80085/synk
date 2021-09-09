@@ -62,7 +62,7 @@ export class LoginComponent implements OnInit {
       err => {
         this.notification.create(
           'error',
-          'Login failed',
+          'Login failed, maybe try deleting cookies and try again?',
           `
           ${err.status === 404
             ? 'No user with those credentials was found'

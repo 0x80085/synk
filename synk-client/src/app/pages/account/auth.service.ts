@@ -101,7 +101,7 @@ export class AuthService {
 
   deleteAccount() {
     return this.http
-      .delete(`${environment.api}/account`, null)
+      .delete(`${environment.api}/account`, { withCredentials: true })
       .pipe(
         tap(() => {
           this.state.isLoggedInSubject.next(false);

@@ -8,7 +8,7 @@
     [nzXs]="{ span: 24, offset: 0 }"
   >
     <h2 nz-typography>Info</h2>
-    <nz-card [nzLoading]="!(me$ | async)" [nzActions]="[logoutBtn]">
+    <nz-card [nzLoading]="!(me$ | async)" [nzActions]="[logoutBtn, deleteAccountButton]">
       <nz-card-meta
         [nzTitle]="me$ | async | username"
         [nzAvatar]="avatarTemplate"
@@ -56,5 +56,19 @@
   (click)="onLogout()"
 >
   Logout
+</button>
+</ng-template>
+
+<ng-template #deleteAccountButton>
+  <button
+  *ngIf="me$ | async"
+  nz-button
+  nzDanger
+  nzType="primary"
+  nz-tooltip
+  nzTooltipTitle="This permanently deletes your account and any channel or other relation linked to it."
+  (click)="onDeleteAccount()"
+>
+  Delete account
 </button>
 </ng-template>

@@ -3,9 +3,11 @@ import { v4 as uuid } from 'uuid';
 
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
+import { Response, Request } from 'express';
 
 import { Member } from 'src/domain/entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ConnectionTrackingService } from 'src/chat/services/connection-tracking.service';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +16,8 @@ export class AuthService {
 
     constructor(
         @InjectRepository(Member)
-        private memberRepo: Repository<Member>
+        private memberRepo: Repository<Member>,
+        private tracker: ConnectionTrackingService
     ) { }
 
     async validateUser(username: string, password: string) {
@@ -49,6 +52,13 @@ export class AuthService {
         await this.memberRepo.save(user);
     }
 
+    logout(request: Request, response: Response){
+        request.logout()
+        request.session = null
+        response.clearCookie('io')
+        response.clearCookie('connect.sid')
+    }
+
     private async throwIfUsernameTaken(username: string) {
         const alreadyExists = await this.memberRepo.findOne({ where: { username } }).then(res => !!res);
         if (alreadyExists) {
@@ -79,6 +89,17 @@ export class AuthService {
         }
         if (!validPassRgx.test(trimmedPass)) {
             throw new BadRequestException("Invalid password");
+        }
+    }
+
+    disconnectSocketConnections(req: Request) {
+        try {
+            const reqIp = this.tracker.getIpFromRequest(req);
+            const sockets = this.tracker.getSocketsByMemberIdAndIpAddress((req.user as any).id, reqIp);
+            sockets.forEach(socket => socket.disconnect(true));
+        } catch (error) {
+            this.logger.warn(`Error when trying to disconnect sockets for logged out user`);
+            this.logger.warn(error);
         }
     }
 }
