@@ -83,11 +83,6 @@ export class PlaylistComponent implements OnDestroy, OnInit {
       return;
     }
 
-    if (!YouTubeGetID(this.form.controls.mediaUrl.value)) {
-      this.notification.warning('Only YouTube videos are supported for now', `Add failed`)
-      return
-    }
-
     this.mediaService.addToPlaylist({
       mediaUrl: this.form.controls.mediaUrl.value,
       roomName: this.roomName,
