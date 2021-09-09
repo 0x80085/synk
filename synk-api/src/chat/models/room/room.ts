@@ -158,8 +158,7 @@ export class Room {
         }
     }
 
-    update(name: string, isPublic: boolean, maxUsers: number, password?: string) {
-        this.name = name;
+    update(isPublic: boolean, maxUsers: number, password?: string) {
         this.isPublic = isPublic;
         this.maxUsers = maxUsers;
         this.password = password;

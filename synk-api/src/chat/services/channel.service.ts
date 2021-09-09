@@ -91,14 +91,11 @@ export class ChannelService {
         const channel = await this.channelRepository.findOneOrFail({ where: { owner, id: channelId } });
         const room = this.roomService.getRoomById(channel.id);
 
-
         this.channelRepository.createQueryBuilder()
             .update(Channel).set({ isPublic, description }).where("id = :id", { id: channelId })
             .execute()
 
-        room.isPublic = isPublic;
-        room.maxUsers = maxUsers;
-        room.password = password;
+        this.roomService.updateRoom(channel.id, isPublic, maxUsers, null)
     }
 
     getModeratorsOfChannel(channelId: string) {

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Observable } from 'rxjs';
-import { catchError, take, tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 
 import { AuthService, Channel } from '../../auth.service';
 
@@ -64,9 +64,6 @@ export class OwnedChannelsComponent {
   }
 
   updateChannel(id: string, control: AbstractControl) {
-    console.log(id);
-    console.log(control);
-
     const formGroup = control as FormGroup;
 
     const description = formGroup.controls.description.value

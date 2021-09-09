@@ -107,10 +107,10 @@ export class RoomService {
             .find(r => r.name === name);
     }
 
-    updateRoom(roomId: string, name: string, isPublic: boolean, maxUsers: number, password?: string) {
+    updateRoom(roomId: string, isPublic: boolean, maxUsers: number, password?: string) {
         this.roomsList
             .find(r => r.id === roomId)
-            ?.update(name, isPublic, maxUsers, password);
+            ?.update(isPublic, maxUsers, password);
     }
 
 }
