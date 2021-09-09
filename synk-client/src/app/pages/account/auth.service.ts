@@ -88,7 +88,20 @@ export class AuthService {
 
   logout() {
     return this.http
-      .post(`${environment.api}/auth/logout`, null)
+      .post(`${environment.api}/auth/logout`, null, { withCredentials: true })
+      .pipe(
+        tap(() => {
+          this.state.isLoggedInSubject.next(false);
+          this.socketService.socket.close();
+          this.state.userSubject.next(null);
+          this.router.navigate(['']);
+        }),
+      );
+  }
+
+  deleteAccount() {
+    return this.http
+      .delete(`${environment.api}/account`, null)
       .pipe(
         tap(() => {
           this.state.isLoggedInSubject.next(false);

@@ -1,7 +1,8 @@
-import { Body, Controller, InternalServerErrorException, Logger, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, InternalServerErrorException, Logger, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { ConnectionTrackingService } from 'src/chat/services/connection-tracking.service';
+import { Response, Request } from 'express';
 
+import { ConnectionTrackingService } from 'src/chat/services/connection-tracking.service';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { LoginInput } from '../models/login.input';
 import { AuthService } from '../services/auth.service';
@@ -33,15 +34,18 @@ export class AuthController {
 
     @Post('/logout')
     @ApiOperation({ summary: 'Log out' })
-    async logout(
-        @Req() req: any) {
+    logout(
+        @Req() req: Request,
+        @Res() res: Response) {
         try {
-            const username = req.user.username;
-            
             this.disconnectSocketConnections(req);
-            
-            req.logOut();
-            this.logger.log(`[${username}] logged out`);
+
+            req.logout()
+            req.session = null
+            res.clearCookie('io')
+            res.clearCookie('connect.sid')
+
+            this.logger.log(`Member logged out?`);
 
         } catch (error) {
             this.logger.warn(`logout failed`);
@@ -51,13 +55,15 @@ export class AuthController {
                 throw new InternalServerErrorException();
             }
         }
+
+        res.sendStatus(204)
     }
 
     private disconnectSocketConnections(req: any) {
         try {
             const reqIp = this.tracker.getIpFromRequest(req);
             const sockets = this.tracker.getSocketsByMemberIdAndIpAddress((req.user as any).id, reqIp);
-            sockets.forEach(socket => socket.disconnect());
+            sockets.forEach(socket => socket.disconnect(true));
         } catch (error) {
             this.logger.warn(`Error when trying to disconnect sockets for logged out user`);
             this.logger.warn(error);
