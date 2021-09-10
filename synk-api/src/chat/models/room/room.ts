@@ -50,6 +50,7 @@ export class Room {
     /**
      * Let a room know that a member left so the room can correct the memberlist and assign a new leader position
      * @param member member who leaves the room
+     * @returns member who is the new leader if leaving member was the leader. null if room empty or if member wasn't leader.
      */
     leave(member: Member): Member | null {
         const toBeRemoved = this.selectFromMembers(member);
@@ -198,9 +199,9 @@ export class Room {
         }
     }
 
-    private throwIfNotPermitted({ id: requesterId }: Member, permission: Permission) {
+    private throwIfNotPermitted({ id: requesterId, isAdmin }: Member, permission: Permission) {
 
-        const requestedBySuperAdmin = false; // TODO
+        const requestedBySuperAdmin = isAdmin;
 
         const isRequestingMemberMod = this.moderators.some(m => m.member.id === requesterId);
 
