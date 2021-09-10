@@ -72,7 +72,7 @@
             nz-button
             nzSize="small"
             nzType="link"
-            (click)="playMedia.emit(item)"
+            (click)="playMedia.emit(item.url)"
             nz-tooltip
             [nzTooltipTitle]="item.active ? 'now playing' : 'start video'"
           >

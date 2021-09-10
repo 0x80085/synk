@@ -31,9 +31,9 @@ export class Playlist {
 
     nowPlaying(): PlayingState {
         const media = this.activeEntryIndex !== null
-            ? this.selectFromQueue(this.activeEntryIndex).media
+            ? this.selectFromQueue(this.activeEntryIndex)?.media
             : null;
-            
+
         return {
             media,
             time: this.currentTime
@@ -54,9 +54,10 @@ export class Playlist {
         if (!isAnyMediaPlaying || !isAlreadyPlayingRequestedMedia) {
             this.setNowPlaying(url);
         }
-
-        this.updateCurrentTime(time);
-        return { url: this.nowPlaying().media.url, time: this.nowPlaying().time };
+        if (isAnyMediaPlaying) {
+            this.updateCurrentTime(time);
+        }
+        return { url: this.nowPlaying()?.media?.url, time: this.nowPlaying().time };
     }
 
     stopPlaying() {
@@ -90,7 +91,13 @@ export class Playlist {
 
         if (target && this.queue.length === 1) {
             this.queue.removeHead();
+            if (this.nowPlaying()?.media?.url === media.url) {
+                this.activeEntryIndex = null;
+            }
         } else if (target) {
+            if (this.nowPlaying()?.media?.url === media.url) {
+                this.playNext();
+            }
             this.queue.remove(target);
         }
     }

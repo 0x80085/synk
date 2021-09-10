@@ -276,7 +276,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
 
   private broadcastNowPlayingToRoom(room: Room) {
     const mediaEvent = {
-      mediaUrl: room.currentPlaylist.nowPlaying().media.url,
+      mediaUrl: room.currentPlaylist.nowPlaying()?.media?.url,
       currentTime: room.currentPlaylist.nowPlaying().time
     }
     this.server.in(room.id).emit(MessageTypes.MEDIA_EVENT, mediaEvent);

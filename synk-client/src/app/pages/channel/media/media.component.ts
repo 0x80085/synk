@@ -89,6 +89,7 @@ export class MediaComponent {
   private resolveMediaType(url: string) {
     const isTwitch = isTwitchChannelUrl(url);
     const isYT = isValidYTid(url);
+    
     if (isTwitch) {
       return SupportedPlayers.TWITCH;
     } else if (isYT) {
