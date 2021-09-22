@@ -6,11 +6,11 @@ import { Media } from '../media/media';
 import { Playlist, UpdatePlayingStateCommand } from "../playlist/playlist";
 import { ROOM_ACTION_PERMISSIONS, Permission } from './permission';
 
+
+
 export class Room {
     id: string;
     name: string;
-
-    isPublic: boolean;
 
     leader?: Member;
     members: Member[] = [];
@@ -25,12 +25,11 @@ export class Room {
     maxUsers: number;
     password: string;
 
-    constructor(id: string, name: string, owner: Member, isPublic = true, password?: string) {
+    constructor(id: string, name: string, owner: Member, password?: string) {
         this.name = name;
         this.id = id;
         this.owner = owner;
 
-        this.isPublic = isPublic;
         this.password = password;
 
         this.currentPlaylist = new Playlist('default', owner, new Date());
@@ -160,7 +159,6 @@ export class Room {
     }
 
     update(isPublic: boolean, maxUsers: number, password?: string) {
-        this.isPublic = isPublic;
         this.maxUsers = maxUsers;
         this.password = password;
     }
