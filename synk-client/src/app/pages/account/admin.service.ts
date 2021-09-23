@@ -67,14 +67,14 @@ export interface ChannelResponse {
 
 export interface ConnectionsResponse {
   memberInRoomTrackerList: {
-      memberId: string;
-      roomId: string;
-      socketId: string;
+    memberId: string;
+    roomId: string;
+    socketId: string;
   }[];
   clientsList: {
-      roomId: string;
-      socketId: string;
-      memberId: string;
+    roomId: string;
+    socketId: string;
+    memberId: string;
   }[];
 }
 
@@ -126,6 +126,21 @@ export class AdminService {
       withCredentials: true,
     }).pipe(
     );
+  }
+  startScraper(subreddit: string) {
+    return this.http.post(`${environment.api}/admin/start-scrape-subreddit/${subreddit}`, null, { withCredentials: true })
+  }
+  stopScraper() {
+    return this.http.post(`${environment.api}/admin/ stop-scrape-subreddit`, null, { withCredentials: true })
+  }
+  startPlayback() {
+    return this.http.post(`${environment.api}/admin/start-auto-playback`, null, { withCredentials: true })
+  }
+  stopPlayback() {
+    return this.http.post(`${environment.api}/admin/stop-auto-playback`, null, { withCredentials: true })
+  }
+  clearPlaylist() {
+    return this.http.post(`${environment}/admin/clear-playlist`, null)
   }
 
 }

@@ -9,12 +9,14 @@ import {
   WebSocketServer,
   WsException
 } from '@nestjs/websockets';
-import { from } from 'rxjs';
+import { from, Subscription } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import * as socketio from 'socket.io';
 
-import { Roles } from '../../domain/entity';
+import { Member, Roles } from '../../domain/entity';
+import { AutomatedRoom } from '../models/automated-room/automated-room';
 import { AddMediaToRoomCommand } from '../models/commands/add-media-to-room.command';
+import { Media } from '../models/media/media';
 import { getMemberSummary } from '../models/member/member.representation';
 import { toRepresentation } from '../models/playlist/playlist.representation';
 import { Room } from '../models/room/room';
@@ -30,6 +32,8 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
 
   @WebSocketServer()
   server: socketio.Server;
+
+  automatedRoomSubscriptions: Subscription[];
 
   constructor(
     private roomService: RoomService,
@@ -74,23 +78,35 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
 
   afterInit(server: socketio.Server) {
     this.logger.log('WS server started');
+    this.logger.log('Now starting the automated room nowPlaying subscriptions..');
+    this.listenForAutonomousRoomUpdates();
+    this.logger.log('Automated room nowPlaying subscriptions have started.');
   }
 
   @SubscribeMessage(MessageTypes.GROUP_MESSAGE)
   async handleMessage(client: socketio.Socket, { roomName, content }: { roomName: string, content: { text: string } }) {
     const member = await this.tracker.getMemberBySocket(client);
 
-    const room = this.roomService.getRoomByName(roomName);
-    room.addMessage(member, content.text);
+    const automatedRoom = this.roomService.getAutomatedRoom(roomName);
 
-    this.broadcastGroupMessageToRoom(room);
+    if (automatedRoom) {
+      automatedRoom.addMessage(member, content.text);
+      this.broadcastGroupMessageToRoom(automatedRoom);
+
+    } else {
+
+      const room = this.roomService.getRoomByName(roomName);
+      room.addMessage(member, content.text);
+      this.broadcastGroupMessageToRoom(room);
+    }
+
   }
 
   @SubscribeMessage(MessageTypes.MEDIA_EVENT)
   async handleUpdateNowPlaying(client: socketio.Socket, { roomName, currentTime: time, mediaUrl: url }: { roomName: string, mediaUrl: string, currentTime: any }) {
     const room = this.roomService.getRoomByName(roomName);
     const member = await this.tracker.getMemberBySocket(client);
-    
+
     room.updateNowPlaying(member, { time, url });
 
     this.broadcastNowPlayingToRoom(room);
@@ -99,37 +115,51 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
 
   @SubscribeMessage(MessageTypes.JOIN_ROOM)
   async handleJoinRoom(client: socketio.Socket, name: string) {
-    const room = this.roomService.getRoomByName(name)
 
-    this.logger.log("handleJoinRoom")
+    const automatedRoom = this.roomService.getAutomatedRoom(name);
 
-    if (this.tracker.isClientInRoom(client, room.id)) {
-      throw new WsException(MessageTypes.ALREADY_JOINED);
-    }
+    if (automatedRoom) {
 
-    const member = await this.tracker.getMemberBySocket(client);
-    try {
+      this.logger.log("handleJoinRoom - Automated")
 
-      room.enter(member);
-      client.join(room.id);
+      if (this.tracker.isClientInRoom(client, automatedRoom.id)) {
+        return; // for now
+      }
 
-      this.tracker.memberJoinsRoom(client, room.id)
+      const member = await this.tracker.getMemberBySocket(client);
+      try {
 
-      this.logger.log(`${client.id} ${room.id}`);
-      this.logger.log(`${client.rooms}`);
+        this.joinAutomatedRoom(automatedRoom, member, client);
 
+      } catch (error) {
+        if (error.message === MessageTypes.ALREADY_JOINED) {
+          throw new WsException(MessageTypes.ALREADY_JOINED);
+        } else {
+          throw new WsException(MessageTypes.GENERIC_ERROR);
+        }
+      }
 
-      this.broadcastMemberlistToRoom(room);
-      this.broadcastGroupMessageToRoom(room);
+    } else {
 
-      this.sendRoomConfigToMember(room, member.id, client);
-      this.sendPlaylistToMember(room, client);
+      const room = this.roomService.getRoomByName(name)
 
-    } catch (error) {
-      if (error.message === MessageTypes.ALREADY_JOINED) {
+      this.logger.log("handleJoinRoom")
+
+      if (this.tracker.isClientInRoom(client, room.id)) {
         throw new WsException(MessageTypes.ALREADY_JOINED);
-      } else {
-        throw new WsException(MessageTypes.GENERIC_ERROR);
+      }
+
+      const member = await this.tracker.getMemberBySocket(client);
+      try {
+
+        this.joinCommunityRoom(room, member, client);
+
+      } catch (error) {
+        if (error.message === MessageTypes.ALREADY_JOINED) {
+          throw new WsException(MessageTypes.ALREADY_JOINED);
+        } else {
+          throw new WsException(MessageTypes.GENERIC_ERROR);
+        }
       }
     }
   }
@@ -139,23 +169,14 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     this.logger.log('handleLeaveRoom');
 
     const member = await this.tracker.getMemberBySocket(client)
-    const room = this.roomService.getRoomByName(name);
 
-    if (this.tracker.isClientInRoom(client, room.id)) {
-      const newLeader = room.leave(member);
-      client.leave(room.id);
+    const automatedRoom = this.roomService.getAutomatedRoom(name);
 
-      this.tracker.memberLeavesRoom(client, room.id);
+    if (automatedRoom) {
+      this.leaveAutomatedRoom(client, automatedRoom, member);
 
-      if (newLeader) {
-        this.sendRoomConfigToMember(room, newLeader.id, this.tracker.getSocketByMemberId(newLeader.id));
-      }
-
-      this.broadcastMemberlistToRoom(room);
-      this.broadcastGroupMessageToRoom(room);
-      this.logger.log(`handleLeaveRoom - client left`);
     } else {
-      this.logger.log(`handleLeaveRoom - noop no user was connected in that room`);
+      this.leaveCommunityRoom(name, client, member);
     }
   }
 
@@ -180,7 +201,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     try {
       // TODO move this logic somewhere else model or/and service  
       const room = this.roomService.getRoomByName(roomName);
-      
+
       const requestingMember = await this.tracker.getMemberBySocket(requestingMemberSocket);
       const newLeader = await this.roomService.giveLeader(room.id, requestingMember, to);
       const newLeaderSocket = await this.tracker.getSocketByMemberId(newLeader.id);
@@ -253,7 +274,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     )
   }
 
-  private broadcastMemberlistToRoom(room: Room) {
+  private broadcastMemberlistToRoom(room: Room | AutomatedRoom) {
     const list = room.members.map(m => getMemberSummary(m, room));
 
     this.server.in(room.id).emit(MessageTypes.MEMBERLIST_UPDATE, list);
@@ -264,7 +285,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     this.server.in(room.id).emit(MessageTypes.PLAYLIST_UPDATE, playlist);
   }
 
-  private broadcastGroupMessageToRoom(room: Room) {
+  private broadcastGroupMessageToRoom(room: Room | AutomatedRoom) {
     const lastMessages = room.messages.queue.toArray()
       .map((msg) => ({
         username: msg.author.username,
@@ -304,8 +325,96 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     client.emit(MessageTypes.USER_CONFIG, config);
   }
 
-  private sendPlaylistToMember(room: Room, client: socketio.Socket) {
+  private sendPlaylistToMember(room: Room | AutomatedRoom, client: socketio.Socket) {
     const playlist = toRepresentation(room.currentPlaylist);
     client.emit(MessageTypes.PLAYLIST_UPDATE, playlist);
   }
+
+  private listenForAutonomousRoomUpdates() {
+    this.automatedRoomSubscriptions = this.roomService.automatedRooms.map(room => {
+      return room.nowPlayingSubject
+        .pipe(
+          tap(update => this.broadcastNowPlayingToAutonomousRoom(room.id, update))
+          // (error) => this.logger.error("subscription did something on error", error)
+        ).subscribe()
+    })
+  }
+
+  private broadcastNowPlayingToAutonomousRoom(roomId: string, { media, time }: { media: Media; time: number; }): void {
+    const mediaEvent = {
+      mediaUrl: media.url,
+      currentTime: time
+    }
+    this.server.in(roomId).emit(MessageTypes.MEDIA_EVENT, mediaEvent);
+  }
+
+  private leaveCommunityRoom(name: string, client: socketio.Socket, member: Member) {
+    const room = this.roomService.getRoomByName(name);
+
+    if (this.tracker.isClientInRoom(client, room.id)) {
+      const newLeader = room.leave(member);
+      client.leave(room.id);
+
+      this.tracker.memberLeavesRoom(client, room.id);
+
+      if (newLeader) {
+        this.sendRoomConfigToMember(room, newLeader.id, this.tracker.getSocketByMemberId(newLeader.id));
+      }
+
+      this.broadcastMemberlistToRoom(room);
+      this.broadcastGroupMessageToRoom(room);
+      this.logger.log(`handleLeaveRoom - client left`);
+    } else {
+      this.logger.log(`handleLeaveRoom - noop no user was connected in that room`);
+    }
+  }
+
+  private leaveAutomatedRoom(client: socketio.Socket, automatedRoom: AutomatedRoom, member: Member) {
+    if (this.tracker.isClientInRoom(client, automatedRoom.id)) {
+
+      automatedRoom.leave(member);
+      client.leave(automatedRoom.id);
+      this.tracker.memberLeavesRoom(client, automatedRoom.id);
+
+      // this.broadcastMemberlistToRoom(automatedRoom);
+      this.broadcastGroupMessageToRoom(automatedRoom);
+      this.logger.log(`handleLeaveRoom - client left`);
+
+    } else {
+      this.logger.log(`handleLeaveRoom - noop no user was connected in that automated room`);
+    }
+  }
+
+  private joinCommunityRoom(room: Room, member: Member, client: socketio.Socket) {
+    room.enter(member);
+    client.join(room.id);
+
+    this.tracker.memberJoinsRoom(client, room.id);
+
+    this.logger.log(`${client.id} ${room.id}`);
+    this.logger.log(`${client.rooms}`);
+
+    this.broadcastMemberlistToRoom(room);
+    this.broadcastGroupMessageToRoom(room);
+
+    this.sendRoomConfigToMember(room, member.id, client);
+    this.sendPlaylistToMember(room, client);
+  }
+
+  private joinAutomatedRoom(automatedRoom: AutomatedRoom, member: Member, client: socketio.Socket) {
+    automatedRoom.enter(member);
+    client.join(automatedRoom.id);
+
+    this.tracker.memberJoinsRoom(client, automatedRoom.id);
+
+    this.logger.log(`${client.id} ${automatedRoom.id}`);
+    this.logger.log(`${client.rooms}`);
+
+    this.broadcastMemberlistToRoom(automatedRoom);
+    this.broadcastGroupMessageToRoom(automatedRoom);
+
+    //    this.sendRoomConfigToMember(automatedRoom, member.id, client);
+    this.sendPlaylistToMember(automatedRoom, client);
+  }
+
 }

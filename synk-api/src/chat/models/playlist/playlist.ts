@@ -40,6 +40,10 @@ export class Playlist {
         }
     };
 
+    length() {
+        return this.queue.length;
+    }
+
     constructor(name: string, createdBy: Member, createDate: Date) {
         this.id = uuid();
         this.name = name;
@@ -81,7 +85,7 @@ export class Playlist {
     add(media: Media, member: Member) {
         const alreadyAdded = this.queue.toArray().find(it => it.media.url === media.url);
         if (alreadyAdded) {
-            throw new Error("No duplicates allowed");
+            return;
         }
         this.queue.enqueue({ media, addedBy: member });
     }
@@ -100,6 +104,10 @@ export class Playlist {
             }
             this.queue.remove(target);
         }
+    }
+
+    clear() {
+        this.queue = new Queue();
     }
 
     updateCurrentTime(value: number) {

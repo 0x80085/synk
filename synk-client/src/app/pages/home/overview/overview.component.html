@@ -1,13 +1,40 @@
-<nz-list [nzDataSource]="data$ | async" [nzRenderItem]="channel"
-  [nzGrid]="{ gutter: 16, xs: 24, sm: 12, md: 6}" [nzLoading]="!(data$ | async)" [nzNoResult]="noResults">
-  <ng-template #channel let-channel>
-    <nz-list-item [ngClass]="'item'" routerLink="/channel/{{ channel.name }}" [nzContent]="nzContent">
-      <ng-template #nzContent>
-        <app-overview-item [channel]="channel" #nzContent></app-overview-item>
+<div nz-row [nzGutter]="[25, 25]">
+  <div nz-col nzSpan="24">
+    <h1 nz-typography>Channel Directory</h1>
+  </div>
+  <div nz-col nzSpan="24" style="text-align: center">
+    <p nz-typography><strong>Automated channels</strong></p>
+  </div>
+  <div nz-col nzSpan="24">
+    <nz-list [nzDataSource]="automatedRooms$ | async" [nzRenderItem]="channel"
+      [nzGrid]="{ gutter: 16, xs: 24, sm: 12, md: 6}" [nzLoading]="!(automatedRooms$ | async)" [nzNoResult]="noResults">
+      <ng-template #channel let-channel>
+        <nz-list-item [ngClass]="'item'" routerLink="/channel/{{ channel.name }}" [nzContent]="nzContent">
+          <ng-template #nzContent>
+            <app-overview-item [channel]="channel" #nzContent></app-overview-item>
+          </ng-template>
+        </nz-list-item>
       </ng-template>
-    </nz-list-item>
-  </ng-template>
-</nz-list>
+    </nz-list>
+  </div>
+  <div nz-col nzSpan="24" style="text-align: center">
+    <p nz-typography><strong>Community channels</strong></p>
+  </div>
+  <div nz-col nzSpan="24">
+    <nz-list [nzDataSource]="communityRooms$ | async" [nzRenderItem]="channel"
+      [nzGrid]="{ gutter: 16, xs: 24, sm: 12, md: 6}" [nzLoading]="!(communityRooms$ | async)" [nzNoResult]="noResults">
+      <ng-template #channel let-channel>
+        <nz-list-item [ngClass]="'item'" routerLink="/channel/{{ channel.name }}" [nzContent]="nzContent">
+          <ng-template #nzContent>
+            <app-overview-item [channel]="channel" #nzContent></app-overview-item>
+          </ng-template>
+        </nz-list-item>
+      </ng-template>
+    </nz-list>
+  </div>
+</div>
+
+
 
 <ng-template #noResults>
   <nz-empty></nz-empty>

@@ -9,16 +9,13 @@ export class RedditCrawlerService {
     constructor(private httpService: HttpService) { }
 
     scrapeYTurlsFromSubreddit(subredditName: string, category = 'all') {
-        console.log('filtering URL::' + subredditName);
-
         return this.httpService.get(this.buildSubredditUrl(subredditName, category)).pipe(
             this.filterForMedia(),
-            tap(result => console.log(result)),
             catchError(err => { console.error(err); return of(["Error fetching"]) })
         );
     }
 
-    filterForMedia(): OperatorFunction<any, string[]> {
+    private filterForMedia(): OperatorFunction<any, string[]> {
         return (source) => source.pipe(
             map(response => response.data.data.children),
             map(data => data.filter(ch => ch.data.media !== null)),

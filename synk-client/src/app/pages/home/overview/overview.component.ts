@@ -9,8 +9,14 @@ import { catchError, tap } from 'rxjs/operators';
   styleUrls: ['overview.component.scss']
 })
 export class OverviewComponent {
+  
+  communityRooms$: Observable<ChannelOverviewItem[]> = this.overviewService.getChannels()
+    .pipe(
+      catchError(() => of([])
+      )
+    );
 
-  data$: Observable<ChannelOverviewItem[]> = this.overviewService.getChannels()
+  automatedRooms$: Observable<ChannelOverviewItem[]> = this.overviewService.getAutomatedChannels()
     .pipe(
       catchError(() => of([])
       )

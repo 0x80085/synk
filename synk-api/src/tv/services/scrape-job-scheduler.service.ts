@@ -35,8 +35,8 @@ export class ScrapeJobSchedulerService {
         const jobUrl = `http://localhost:3000/scapeddit/${jobId}`;
 
         const operation = () => this.redditScraper.scrapeYTurlsFromSubreddit(subreddit);
-        const seconds = 60;
-        const timeout = setTimeout(operation, seconds);
+        const oneMinute = 1000 * 60;
+        const timeout = setTimeout(operation, oneMinute);
         this.scheduler.addTimeout(jobId, timeout);
 
         return {

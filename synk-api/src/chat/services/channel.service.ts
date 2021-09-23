@@ -69,6 +69,16 @@ export class ChannelService {
             .then((entries) => entries.sort((a, b) => b.connectedMemberCount - a.connectedMemberCount));
     }
 
+    getAutomatedRooms(): ChannelShortRepresentation[] {
+        return this.roomService.automatedRooms.map(({ id, name, members, currentPlaylist }) => ({
+            id,
+            name,
+            connectedMemberCount: members.length,
+            nowPlaying: { url: currentPlaylist.nowPlaying()?.media?.url, title: currentPlaylist.nowPlaying()?.media?.title },
+            description: "Daily content collected from internet hubs"
+        } as ChannelShortRepresentation))
+    }
+
     async getById(id: string): Promise<ChannelRepresentation> {
         const moderators = await this.getModeratorsOfChannel(id);
         return this.getChannelAndRoom(id)

@@ -1,5 +1,5 @@
-import { Controller, Delete, Get, InternalServerErrorException, Param, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Delete, Get, InternalServerErrorException, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { SerializedUserData } from 'src/auth/local.serializer';
 import { ChannelService } from 'src/chat/services/channel.service';
@@ -77,6 +77,47 @@ export class AdminController {
     getConnections(
     ) {
         return this.adminService.getConnections();
+    }
+
+    @Post('/start-scrape-subreddit/:subreddit')
+    @UseGuards(AdminGuard)
+    @ApiOperation({ summary: 'Start Video Scrape Run' })
+    @ApiParam({ name: 'subreddit' })
+    startScrape(@Param('subreddit') subreddit: string) {
+
+        this.roomService.automatedRooms[0].startSubredditScraperRun(subreddit)
+    }
+
+    @Post('/stop-scrape-subreddit/')
+    @UseGuards(AdminGuard)
+    @ApiOperation({ summary: 'Stop Video Scrape Run' })
+    stopScrape(
+    ) {
+        this.roomService.automatedRooms[0].stopSubredditScraperRun()
+    }
+
+    @Post('/start-auto-playback/')
+    @UseGuards(AdminGuard)
+    @ApiOperation({ summary: 'Start automated room playback' })
+    startAutomatedRoomPlayback() {
+
+        this.roomService.automatedRooms[0].startPlaying()
+    }
+
+    @Post('/stop-auto-playback/')
+    @UseGuards(AdminGuard)
+    @ApiOperation({ summary: 'Stop automated room playback' })
+    stopAutomatedRoomPlayback(
+    ) {
+        this.roomService.automatedRooms[0].stopPlaying()
+    }
+
+    @Post('/stop-auto-playback/')
+    @UseGuards(AdminGuard)
+    @ApiOperation({ summary: 'Stop automated room playback' })
+    clearAutomatedRoomPlaylist(
+    ) {
+        this.roomService.automatedRooms[0].currentPlaylist.clear()
     }
 
 }

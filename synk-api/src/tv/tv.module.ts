@@ -28,6 +28,7 @@ export const QueryCommandHandlers = [CrawlSubredditHandler];
     ],
     exports: [
         YoutubeV3Service,
+        RedditCrawlerService
     ]
 })
 export class TvModule { }

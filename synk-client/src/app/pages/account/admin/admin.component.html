@@ -2,6 +2,23 @@
 <nz-divider></nz-divider>
 <div nz-row [nzGutter]="25">
   <div nz-col nzSpan="12">
+
+    <nz-card >
+      <input
+        type="text"
+        nz-input
+        placeholder="subreddit to scrape videos from"
+        [(ngModel)]="subreddit"
+      />
+      <button nz-button nzType="default" (click)="startScraper()">Start scrape run</button>
+      <button nz-button nzType="default" style=" margin-left: 0.5rem;" (click)="stopScraper()">Stop scrape run</button>
+      <button nz-button nzType="default" style=" margin-left: 0.5rem;" (click)="startPlayback()">Start auto-playback</button>
+      <button nz-button nzType="default" style=" margin-left: 0.5rem;" (click)="stopPlayback()">Stop auto-playback</button>
+      <button nz-button nzType="default" style=" margin-left: 0.5rem;" nzDanger (click)="clearPlaylist()">Clear playlist</button>
+      
+
+    </nz-card>
+
     <h2 nz-typography>Users</h2>
     <nz-card [nzLoading]="!(users$ | async)">
       <nz-pagination [nzPageIndex]="1" [nzTotal]="85" [nzPageSize]="20" [nzShowTotal]="rangeTemplate"
@@ -168,37 +185,11 @@
     
     <nz-card [nzLoading]="!(connections$ | async)">
       
-
-
         <pre> {{ connections$ | async | json  }} </pre>
 
-        <!-- <nz-collapse-panel *ngFor="let connection of (connections$ | async)" [nzHeader]="room.name"
-          [nzExpandedIcon]="expandIcon">
-          <ng-template #expandIcon>
-            <i nz-icon style="margin-right: 20px;" nzType="video-camera"></i>
-          </ng-template>
-
-          <nz-descriptions nzTitle="User Info" nzLayout="vertical">
-            <nz-descriptions-item nzTitle="Name">
-              <span nz-typography><code>{{ room.name }}</code></span>
-            </nz-descriptions-item>
-            <nz-descriptions-item nzTitle="ID">
-              <span nz-typography><code>{{ room.id }}</code></span>
-            </nz-descriptions-item>
-          </nz-descriptions>
-
-          <nz-divider></nz-divider>
-
-          <p nz-typography><strong>Permission actions</strong></p>
-          <p>
-            <button nz-button nzType="default">Change global permission level</button>
-            <button nz-button nzType="default" style=" margin-left: 0.5rem;">Change permission level in room...</button>
-            <button nz-button nzType="default" nzDanger style=" margin-left: 0.5rem;"
-              (click)="deleteRoom(room.id, room.name)">Delete room</button>
-          </p>
-        </nz-collapse-panel> -->
-
     </nz-card>
+    
+    <h2 nz-typography>Autmated Room Controls</h2>
 
   </div>
 </div>

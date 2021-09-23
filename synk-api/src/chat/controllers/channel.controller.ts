@@ -17,10 +17,18 @@ export class ChannelController {
     constructor(private channelService: ChannelService) { }
 
     @Get('/all')
-    @ApiOperation({ summary: 'Get all public channel' })
+    @ApiOperation({ summary: 'Get all public channels' })
     async getPublicRooms(): Promise<ChannelShortRepresentation[]> {
 
         return await this.channelService.getPubliclyListed();
+
+    }
+
+    @Get('/automated')
+    @ApiOperation({ summary: 'Get all automated channels' })
+    async getAutomatedRooms(): Promise<ChannelShortRepresentation[]> {
+
+        return await this.channelService.getAutomatedRooms();
 
     }
     

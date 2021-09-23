@@ -63,7 +63,7 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
     NzTypographyModule,
     NzGridModule,
     NzToolTipModule,
-    NzAvatarModule,
+    NzAvatarModule,    
     NzIconModule.forRoot(NZ_ICONS),
   ],
   providers: [

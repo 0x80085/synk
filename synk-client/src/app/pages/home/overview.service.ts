@@ -13,12 +13,21 @@ export interface ChannelOverviewItem {
   providedIn: 'root'
 })
 export class OverviewService {
+
   constructor(private http: HttpClient) { }
 
   getChannels() {
 
     return this.http.get<ChannelOverviewItem[]>(
       `${environment.api}/channels/all`,
+      { withCredentials: true },
+    );
+  }
+
+  getAutomatedChannels() {
+    
+    return this.http.get<ChannelOverviewItem[]>(
+      `${environment.api}/channels/automated`,
       { withCredentials: true },
     );
   }
