@@ -2,7 +2,7 @@
 <nz-divider></nz-divider>
 <div nz-row [nzGutter]="25">
   <div nz-col nzSpan="12">
-
+    <h2 nz-typography>Autmated Room Controls</h2>
     <nz-card >
       <input
         type="text"
@@ -15,27 +15,21 @@
       <button nz-button nzType="default" style=" margin-left: 0.5rem;" (click)="startPlayback()">Start auto-playback</button>
       <button nz-button nzType="default" style=" margin-left: 0.5rem;" (click)="stopPlayback()">Stop auto-playback</button>
       <button nz-button nzType="default" style=" margin-left: 0.5rem;" nzDanger (click)="clearPlaylist()">Clear playlist</button>
-      
-
     </nz-card>
-
     <h2 nz-typography>Users</h2>
     <nz-card [nzLoading]="!(users$ | async)">
       <nz-pagination [nzPageIndex]="1" [nzTotal]="85" [nzPageSize]="20" [nzShowTotal]="rangeTemplate"
         style="margin-bottom: 1rem;">
       </nz-pagination>
-
       <ng-template #rangeTemplate let-range="range" let-total>
         {{ range[0] }}-{{ range[1] }} of {{ total }} items
       </ng-template>
-
       <nz-collapse *ngIf="(accounts$ | async)?.length > 0">
         <nz-collapse-panel *ngFor="let user of accounts$ | async" [nzHeader]="user.username"
           [nzExpandedIcon]="expandIcon">
           <ng-template #expandIcon>
             <i nz-icon style="margin-right: 20px;" nzType="user"></i>
           </ng-template>
-
           <nz-descriptions nzTitle="User Info" nzLayout="vertical">
             <nz-descriptions-item nzTitle="UserName">
               <span nz-typography><code>{{ user.username }}</code></span>
@@ -80,9 +74,7 @@
               <span nz-typography><code>Coming soon</code></span>
             </nz-descriptions-item>
           </nz-descriptions>
-
           <nz-divider></nz-divider>
-
           <p nz-typography><strong>Permission actions</strong></p>
           <p>
             <button nz-button nzType="default">Change global permission level</button>
@@ -98,7 +90,6 @@
             <button nz-button nzType="primary">Account ban globally</button>
             <button nz-button nzType="primary" style="margin-left: 0.5rem;">IP ban globally</button>
           </p>
-
           <nz-list nzBordered nzSize="small">
             <nz-list-header>Ban history</nz-list-header>
             <nz-list-item>
@@ -121,28 +112,23 @@
           </nz-list>
         </nz-collapse-panel>
       </nz-collapse>
-
     </nz-card>
   </div>
   <div nz-col nzSpan="12">
     <h2 nz-typography>Channels</h2>
-
     <nz-card [nzLoading]="!(channels$ | async)">
       <nz-pagination [nzPageIndex]="1" [nzTotal]="85" [nzPageSize]="20" [nzShowTotal]="rangeTemplate"
         style="margin-bottom: 1rem;">
       </nz-pagination>
-
       <ng-template #rangeTemplate let-range="range" let-total>
         {{ range[0] }}-{{ range[1] }} of {{ total }} items
       </ng-template>
-
       <nz-collapse *ngIf="(channels$ | async)?.length > 0">
         <nz-collapse-panel *ngFor="let room of (channels$ | async)" [nzHeader]="room.name"
           [nzExpandedIcon]="expandIcon">
           <ng-template #expandIcon>
             <i nz-icon style="margin-right: 20px;" nzType="video-camera"></i>
           </ng-template>
-
           <nz-descriptions nzTitle="User Info" nzLayout="vertical">
             <nz-descriptions-item nzTitle="Name">
               <span nz-typography><code>{{ room.name }}</code></span>
@@ -168,9 +154,7 @@
               </a>
             </nz-descriptions-item>
           </nz-descriptions>
-
           <nz-divider></nz-divider>
-
           <p nz-typography><strong>Permission actions</strong></p>
           <p>
             <button nz-button nzType="default">Change global permission level</button>
@@ -180,16 +164,9 @@
           </p>
         </nz-collapse-panel>
       </nz-collapse>
-
     </nz-card>
-    
     <nz-card [nzLoading]="!(connections$ | async)">
-      
         <pre> {{ connections$ | async | json  }} </pre>
-
     </nz-card>
-    
-    <h2 nz-typography>Autmated Room Controls</h2>
-
   </div>
 </div>
