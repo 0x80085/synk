@@ -66,15 +66,17 @@ export interface ChannelResponse {
 }
 
 export interface ConnectionsResponse {
-  memberInRoomTrackerList: {
-    memberId: string;
-    roomId: string;
+  clients: {
+    ip: string;
     socketId: string;
+    memberId: string;
   }[];
-  clientsList: {
-    roomId: string;
-    socketId: string;
+  members: {
     memberId: string;
+    roomConnections: {
+      roomId: string;
+      socketId: string;
+    }[];
   }[];
 }
 

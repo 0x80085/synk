@@ -68,13 +68,25 @@ export class ChannelComponent implements OnInit, OnDestroy {
     this.chatService.userPassedOnLeader$.pipe(mapTo(false))
   ).pipe(
     tap(isLeader => {
-      const title = isLeader 
-      ? `You are now the leader of the room!` 
-      : `Leadership given up successfully!`;
-      const msg = isLeader 
-      ? `You have control over the video player of the room now. Try playing a video and others will hook into your playback time` 
-      : `You have given up control. Another user controls the playback now`;
-      this.notification.success(title, msg)
+      const msgs = {
+        forNewLeader: {
+          title: `You are now the leader of the room!`,
+          body: `You have control over the video player of the room now. Try playing a video and others will hook into your playback time`
+        },
+        forExLeader: {
+          title: `Leadership given up successfully!`,
+          body: `You have given up control. Another user controls the playback now`
+        }
+      }
+
+      this.notification.success(
+        isLeader
+          ? msgs.forNewLeader.title
+          : msgs.forExLeader.title,
+        isLeader
+          ? msgs.forNewLeader.body
+          : msgs.forExLeader.body,
+      )
     })
   ).subscribe()
 

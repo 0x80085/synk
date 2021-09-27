@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IPaginationOptions, paginate, paginateRawAndEntities, Pagination } from 'nestjs-typeorm-paginate';
+import { IPaginationOptions, paginateRawAndEntities, Pagination } from 'nestjs-typeorm-paginate';
 import { ConnectionTrackingService } from 'src/chat/services/connection-tracking.service';
 import { Repository } from 'typeorm';
 
@@ -22,7 +22,7 @@ export class AdminService {
     }
 
     async getPaginatedMembers(options: IPaginationOptions): Promise<Pagination<Member>> {
-        return paginate<Member>(this.memberRepository, options);
+        return this.getMembersWithChannels(options)
     }
 
     public getConnections() {
@@ -50,12 +50,31 @@ export class AdminService {
         const [pagination, rawResults] = await paginateRawAndEntities(query, options);
         const patchedResults = pagination.items.map((item, _) => {
             const patchedItem = { ...item };
-            const patchedOwner = { ...patchedItem.owner,  passwordHash: null } as Member;
+            const patchedOwner = { ...patchedItem.owner, passwordHash: null } as Member;
             patchedItem.owner = patchedOwner as Member;
             return patchedItem
         });
-        
-        const clone = {...pagination};
+
+        const clone = { ...pagination };
+
+        clone.items = patchedResults;
+
+        return clone;
+    }
+
+    private async getMembersWithChannels(options: IPaginationOptions) {
+        const query = this.memberRepository
+            .createQueryBuilder("member")
+            .leftJoinAndSelect("member.channels", "channels");
+
+        const [pagination, rawResults] = await paginateRawAndEntities(query, options);
+        const patchedResults = pagination.items.map((item, _) => {
+            const patchedItem = { ...item };
+            delete patchedItem.passwordHash
+            return patchedItem
+        });
+
+        const clone = { ...pagination };
 
         clone.items = patchedResults;
 

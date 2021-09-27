@@ -17,7 +17,11 @@
         *ngFor="let channel of channels$ | async; let i = index"
         [nzHeader]="channel.name"
         [nzExtra]="actions"
+        [nzExpandedIcon]="expandIcon"
       >
+      <ng-template #expandIcon>
+        <i nz-icon style="margin-right: 20px;" nzType="video-camera"></i>
+      </ng-template>
         <form
           nz-form
           [formGroup]="channelForms.controls[i]"
