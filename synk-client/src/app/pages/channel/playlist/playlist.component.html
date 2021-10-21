@@ -94,7 +94,10 @@
           </button>
         </ng-template>
         <ng-template #contentTitle>
-          <span class="media-title">{{ item.title }}</span>
+          <div class="content">
+            <span class="media-title">{{ item.title }}</span>
+            <span class="media-duration">{{ item.length }}</span>
+          </div>
         </ng-template>
       </ng-template>
     </nz-list>

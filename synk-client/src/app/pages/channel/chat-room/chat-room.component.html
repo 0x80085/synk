@@ -11,37 +11,36 @@
 
   <div class="wrapper">
     <div class="header">
-      <h2 nz-typography>
+      <h5 nz-typography>
         {{ name }}
-      </h2>
+      </h5>
     </div>
     <div class="feed"  #feed> 
       <div *ngFor="let message of messages$ | async; last as isLast;">
 
-        <ng-template #username>
-          <span nz-typography><code>{{ message.username }}</code></span>
-        </ng-template>
 
-        <ng-template #system>
-          <span nz-typography><code><i nz-icon nzType="robot" nzTheme="outline" nz-tooltip nzTooltipTitle="Message from server"></i></code></span>
-        </ng-template>
-
-        <p nz-typography>
+        <p nz-typography class="message">
           <ng-container *ngIf="!message.isSystemMessage; then username; else system;"></ng-container>
+          <ng-container *ngIf="!message.isSystemMessage; else systemMessage;">
+            {{ message.text }}
+          </ng-container>          
 
           <ng-template #systemMessage>
             <span nz-typography><code>{{ message.text }}</code></span>
           </ng-template>
 
-          <ng-container *ngIf="!message.isSystemMessage; else systemMessage;">
-            {{ message.text }}
-          </ng-container>
+          <ng-template #username>
+            <span nz-typography><code>{{ message.username }}</code></span>
+          </ng-template>
+
+          <ng-template #system>
+            <span nz-typography><code><i nz-icon nzType="robot" nzTheme="outline" nz-tooltip nzTooltipTitle="Message from server"></i></code></span>
+          </ng-template>
         </p>
-        <nz-divider *ngIf="!isLast"></nz-divider>
       </div>
     </div>
     <div class="input">
-      <textarea placeholder="Type something..." [(ngModel)]="msgBoxValue" name="textarea"
+      <textarea placeholder="Send a message..." [(ngModel)]="msgBoxValue" name="textarea"
         (keyup.enter)="submitPressedSubject.next({ text:msgBoxValue, ev: $event })">
         </textarea>
     </div>

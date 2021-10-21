@@ -1,8 +1,22 @@
-.media-title {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  display: inline-block;
+.content {
+  display: grid;
+
+  width: 100%;
+  grid-template-columns: 1.6fr 0.4fr;
+  grid-template-rows: 1fr;
+  gap: 0px 1px;
+
+  .media-title {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: inline-block;
+  }
+  
+  .media-duration {
+    display: inline-block;
+    text-align: right;
+  }
 }
 
 .ant-list-item {
@@ -10,11 +24,10 @@
     background-color: #191919;
     transform: translateY(-5px);
     transition: all 0.2s ease-in;
+    border-radius: 4px;
   }
-  &:focus {
-    background-color: #191919;
-    transform: translateY(-5px);
-    transform: rotate(5deg);
-    transition: all 0.2s ease-in;
+
+  ul {
+    margin-left: 0;
   }
 }

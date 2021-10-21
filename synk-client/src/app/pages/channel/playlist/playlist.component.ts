@@ -12,6 +12,7 @@ interface PlaylistItem {
   active: boolean;
   title: string;
   mediaUrl: string;
+  length: string;
 }
 
 @Component({
@@ -39,7 +40,8 @@ export class PlaylistComponent implements OnDestroy, OnInit {
       entries.map(entry => ({
         ...entry,
         mediaUrl: entry.url,
-        active: nowPlaying ? entry.url === nowPlaying.url : false
+        active: nowPlaying ? entry.url === nowPlaying.url : false,
+        length: new Date(entry.length * 1000).toISOString().substr(11, 8)
       }))),
     tap(ls => this.localPlaylist = ls)
   ).subscribe();

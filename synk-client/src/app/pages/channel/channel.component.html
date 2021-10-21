@@ -9,33 +9,37 @@
 </ng-template>
 
 <ng-template #channelStage>
-  <div nz-row [nzGutter]="{ xs: 0, sm: 0, md: 24, lg: 32, xl: 32, xxl: 32 }">
+  <div nz-row [nzGutter]="{ xs: 0, sm: 0, md: 0, lg: 0, xl: 0, xxl: 0  }">
     <div
       nz-col
       [nzLg]="{ span: 6, offset: 0 }"
       [nzMd]="{ span: 6, offset: 0 }"
       [nzXs]="{ span: 24, offset: 0 }"
     >
-      <app-chat-room [name]="name" class="hide-on-mobile"></app-chat-room>
+      <app-chat-room [name]="name" class=""></app-chat-room>
     </div>
 
-    <div nz-col nzSpan="18">
+    <div nz-col
+      [nzLg]="{ span: 18, offset: 0 }"
+      [nzMd]="{ span: 32, offset: 0 }"
+      [nzXs]="{ span: 32, offset: 0 }">
       <app-media
         *ngIf="playlist$ | async"
         #player
-        (mediaEndedEvent)="onVideoEnded()"
+        (mediaEndedEvent)="onMediaEnded()"
+        (mediaNotPlayble)="onMediaNotPlayble($event)"
       ></app-media>
     </div>
   </div>
 
   <div nz-row [nzGutter]="{ xs: 0, sm: 0, md: 24, lg: 32, xl: 32, xxl: 32 }">
-    <div nz-col nzSpan="6" class="mt-1 hide-on-mobile">
+    <div nz-col nzSpan="6" class="mt-1">
       <app-connected-members
         (giveLeader)="giveLeader($event)"
       ></app-connected-members>
     </div>
 
-    <div nz-col nzSpan="18" class="mt-1 hide-on-mobile">
+    <div nz-col nzSpan="18" class="mt-1">
       <app-playlist
         [roomName]="name"
         (playMedia)="player.play($event)"

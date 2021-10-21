@@ -1,17 +1,18 @@
-<div nz-row [nzGutter]="[25, 25]">
-  <div nz-col nzSpan="24">
-    <nz-carousel nzEffect="scrollx" nzAutoPlay>
-      <div nz-carousel-content style="display: flex">
-        <app-sushi-banner></app-sushi-banner>
-      </div>
-      <div nz-carousel-content style="display: flex">
-        <app-popcorn-banner></app-popcorn-banner>
-      </div>
-      <div nz-carousel-content style="display: flex">
-        <app-neko-banner></app-neko-banner>
-      </div>
-    </nz-carousel>
+<div class="content-wrapper">
+  <div nz-row [nzGutter]="[25, 25]">
+    <div nz-col nzSpan="24">
+      <nz-carousel nzEffect="scrollx" nzAutoPlay>
+        <div nz-carousel-content style="display: flex">
+          <app-sushi-banner></app-sushi-banner>
+        </div>
+        <div nz-carousel-content style="display: flex">
+          <app-popcorn-banner></app-popcorn-banner>
+        </div>
+        <div nz-carousel-content style="display: flex">
+          <app-neko-banner></app-neko-banner>
+        </div>
+      </nz-carousel>
+    </div>
   </div>
+  <app-overview></app-overview>
 </div>
-
-<app-overview></app-overview>
