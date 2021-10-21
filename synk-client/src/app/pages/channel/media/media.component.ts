@@ -16,6 +16,7 @@ import { BehaviorSubject, Subscription } from 'rxjs';
 import { Html5Component } from './html5/html5.component';
 import { isTwitchChannelUrl, TwitchComponent } from './twitch/twitch.component';
 import { PlyrComponent } from './plyr/plyr.component';
+import { debugLog } from 'src/app/utils/custom.operators';
 
 export enum SupportedPlayers {
   YT = 'YT',
@@ -36,12 +37,16 @@ export class MediaHostDirective {
 })
 export class MediaComponent {
   @Output() mediaEndedEvent: EventEmitter<any> = new EventEmitter();
+  
+  @Output() mediaNotPlayble: EventEmitter<string> = new EventEmitter();
 
   @ViewChild(MediaHostDirective, { static: true }) host: MediaHostDirective;
 
   ref: ComponentRef<BaseMediaComponent>;
 
-  videoEndedSubscription: Subscription;
+  mediaEndedSubscription: Subscription;
+
+  mediaNotPlayableSubscription: Subscription;
 
   isMediaSelected = new BehaviorSubject(false);
 
@@ -68,7 +73,7 @@ export class MediaComponent {
     try {
       return this.ref.instance.getCurrentUrl();
     } catch (error) {
-      console.log("this.ref.instance not available - prob no player rendered.");
+      debugLog("this.ref.instance not available - prob no player rendered.", error, true);
       return;
     }
   }
@@ -128,15 +133,21 @@ export class MediaComponent {
       type
     );
     this.ref = viewContainerRef.createComponent(componentFactory);
-    this.resetVideoEndedSubscription();
+    this.resetMediaEndedSubscription();
+    this.resetMediaNotPlaybleSubscription();
   }
 
-  private resetVideoEndedSubscription() {
-    if (this.videoEndedSubscription) { this.videoEndedSubscription.unsubscribe(); }
-    this.videoEndedSubscription = this.ref.instance.videoEnded.subscribe(ev => {
+  private resetMediaEndedSubscription() {
+    if (this.mediaEndedSubscription) { this.mediaEndedSubscription.unsubscribe(); }
+    this.mediaEndedSubscription = this.ref.instance.mediaEnded.subscribe(ev => {
       this.mediaEndedEvent.emit();
     });
   }
 
-
+  private resetMediaNotPlaybleSubscription() {
+    if (this.mediaNotPlayableSubscription) { this.mediaNotPlayableSubscription.unsubscribe(); }
+    this.mediaNotPlayableSubscription = this.ref.instance.mediaNotPlayable.subscribe((url: string) => {
+      this.mediaNotPlayble.emit(url);
+    });
+  }
 }

@@ -40,7 +40,7 @@ export class AdminComponent {
   }
 
   startScraper() {
-    if (this.subreddit.trim() == "") {
+    if (!this.subreddit || this.subreddit.trim() == "") {
       return
     }
     this.adminService.startScraper(this.subreddit)
@@ -75,6 +75,14 @@ export class AdminComponent {
     this.adminService.clearPlaylist()
     .pipe(
       tap(() => this.notification.success('Success', `Cleared playlist`))
+    )
+    .subscribe()
+  }
+
+  playNext() {
+    this.adminService.playNext()
+    .pipe(
+      tap(() => this.notification.success('Success', `Playing next video`))
     )
     .subscribe()
   }

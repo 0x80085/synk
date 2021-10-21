@@ -33,7 +33,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   @WebSocketServer()
   server: socketio.Server;
 
-  automatedRoomSubscriptions: Subscription[];
+  broadcastToAutomatedRoomSubscriptions: Subscription[];
 
   constructor(
     private roomService: RoomService,
@@ -79,7 +79,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   afterInit(server: socketio.Server) {
     this.logger.log('WS server started');
     this.logger.log('Now starting the automated room nowPlaying subscriptions..');
-    this.listenForAutonomousRoomUpdates();
+    this.listenForAutomatedRoomUpdates();
     this.logger.log('Automated room nowPlaying subscriptions have started.');
   }
 
@@ -274,13 +274,48 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     )
   }
 
+  @SubscribeMessage(MessageTypes.MEDIA_NOT_PLAYBLE)
+  async handleVideoNotPlayable(client: socketio.Socket, { roomName, mediaUrl }: { roomName: string, mediaUrl: string }) {
+    this.logger.log('handleVideoNotPlayable');
+
+    return from(this.tracker.getMemberBySocket(client)).pipe(
+      map(member => (
+        {
+          member,
+          room: this.roomService.getRoomByName(roomName),
+          automatedroom: this.roomService.getAutomatedRoom(roomName)
+        })),
+      map(({ room, automatedroom }) => ({
+        target: room
+          ? room.currentPlaylist?.selectFromQueue(mediaUrl)
+          : automatedroom?.currentPlaylist?.selectFromQueue(mediaUrl),
+        room,
+        automatedroom
+      })),
+      tap(({ target: { media }, room, automatedroom }) =>
+      // todo community room should tell it's leader to play diff video
+        room
+          ? room.currentPlaylist?.remove(media)
+          : automatedroom?.handleUnplayableMedia(media)),
+      tap(({ room, automatedroom }) =>
+        room
+          ? this.broadcastPlaylistToRoom(room)
+          : this.broadcastPlaylistToRoom(automatedroom)),
+      tap(_ => client.emit(MessageTypes.REMOVE_MEDIA_SUCCESS, mediaUrl)),
+      catchError(e => {
+        if (e.message === 'Forbidden') { throw new WsException(MessageTypes.FORBIDDEN); }
+        throw new WsException(MessageTypes.GENERIC_ERROR);
+      })
+    )
+  }
+
   private broadcastMemberlistToRoom(room: Room | AutomatedRoom) {
     const list = room.members.map(m => getMemberSummary(m, room));
 
     this.server.in(room.id).emit(MessageTypes.MEMBERLIST_UPDATE, list);
   }
 
-  private broadcastPlaylistToRoom(room: Room) {
+  private broadcastPlaylistToRoom(room: Room | AutomatedRoom) {
     const playlist = toRepresentation(room.currentPlaylist);
     this.server.in(room.id).emit(MessageTypes.PLAYLIST_UPDATE, playlist);
   }
@@ -330,12 +365,11 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     client.emit(MessageTypes.PLAYLIST_UPDATE, playlist);
   }
 
-  private listenForAutonomousRoomUpdates() {
-    this.automatedRoomSubscriptions = this.roomService.automatedRooms.map(room => {
+  private listenForAutomatedRoomUpdates() {
+    this.broadcastToAutomatedRoomSubscriptions = this.roomService.automatedRooms.map(room => {
       return room.nowPlayingSubject
         .pipe(
           tap(update => this.broadcastNowPlayingToAutonomousRoom(room.id, update))
-          // (error) => this.logger.error("subscription did something on error", error)
         ).subscribe()
     })
   }

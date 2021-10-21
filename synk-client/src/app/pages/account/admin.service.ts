@@ -142,7 +142,10 @@ export class AdminService {
     return this.http.post(`${environment.api}/admin/stop-auto-playback`, null, { withCredentials: true })
   }
   clearPlaylist() {
-    return this.http.post(`${environment}/admin/clear-playlist`, null)
+    return this.http.post(`${environment.api}/admin/clear-playlist`, null, { withCredentials: true })
+  }
+  playNext() {
+    return this.http.post(`${environment.api}/admin/play-next-auto-playback`, null, { withCredentials: true })
   }
 
 }

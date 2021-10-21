@@ -1,5 +1,5 @@
-import { of, Subject, Subscription, timer } from "rxjs";
-import { catchError, filter, map, mergeAll, mergeMap, take, tap, toArray } from "rxjs/operators";
+import { BehaviorSubject, merge, Observable, of, ReplaySubject, Subject, Subscription, timer } from "rxjs";
+import { catchError, exhaustMap, filter, finalize, map, mapTo, mergeAll, mergeMap, repeatWhen, switchMap, take, takeUntil, tap, toArray, withLatestFrom } from "rxjs/operators";
 
 import { Member } from "src/domain/entity/Member";
 import { RedditCrawlerService } from "src/tv/crawlers/reddit.crawler.service";
@@ -7,6 +7,27 @@ import { YouTubeGetID, YoutubeV3Service } from "src/tv/crawlers/youtube-v3.servi
 import { Feed } from "../feed/feed";
 import { Media } from "../media/media";
 import { Playlist, UpdatePlayingStateCommand } from "../playlist/playlist";
+
+const oneSecond = 1000;
+
+interface LoopState {
+    currentTime: number
+    media: Media
+    isPlaying: boolean
+}
+
+enum LoopActions {
+    play,
+    stop,
+    seek,
+    timer,
+}
+
+interface LoopEffect {
+    action: LoopActions,
+    seekTo?: number
+    media?: Media
+}
 
 export class AutomatedRoom {
 
@@ -20,26 +41,130 @@ export class AutomatedRoom {
     owner = null
     moderators = []
 
-    timer = timer(0, 1000);
-    timerSubscription: Subscription = null;
+    readonly _playMediaSubject = new Subject<Media>();
+    readonly _stopPlayingSubject = new Subject<void>();
+    readonly _seekSubject = new Subject<number>(); // yet unused
 
     nowPlayingSubject = new Subject<{ media: Media, time: number }>();
+
+    loopStateSubject: BehaviorSubject<LoopState> = new BehaviorSubject({ currentTime: 0, media: null, isPlaying: false } as LoopState);
+
+    broadcastLoopSubscription = merge(
+        timer(0, oneSecond).pipe(mapTo(
+            ({ action: LoopActions.timer } as LoopEffect))),
+        this._playMediaSubject.pipe(map((media) =>
+            ({ action: LoopActions.play, media: media } as LoopEffect))),
+        this._stopPlayingSubject.pipe(mapTo(
+            ({ action: LoopActions.stop } as LoopEffect))),
+        this._seekSubject.pipe(map((seconds) =>
+            ({ action: LoopActions.seek, seekTo: seconds } as LoopEffect))),
+    ).pipe(
+        withLatestFrom(this.loopStateSubject),
+        // tap(([effect, currentState]) => console.log(effect, currentState)),
+        map(([effect, currentState]) => {
+
+            const { isPlaying } = currentState;
+            const { media: nowPlayingMedia, time: nowPlayingTime } = this.currentPlaylist.nowPlaying();
+            const { action, seekTo: effectSeekTo, media: effectMedia } = effect;
+
+            let newState = { ...currentState } as LoopState;
+
+            // console.log('old state:');
+            // console.log(currentState);
+            console.log('----');
+            console.log('effect', effect.action);
+            // console.log('this.currentPlaylist.nowPlaying()');
+            // console.log(this.currentPlaylist.nowPlaying());
+
+            switch (action) {
+                case LoopActions.play:
+                    this.currentPlaylist.updateNowPlaying(effectMedia.url, 0);
+
+                    newState.isPlaying = true;
+
+                    newState.currentTime = 0
+                    newState.media = effectMedia
+                    break;
+
+                case LoopActions.stop:
+                    this.currentPlaylist.stopPlaying();
+
+                    newState.isPlaying = false;
+
+                    newState.currentTime = 0
+                    newState.media = null
+                    break;
+
+                case LoopActions.seek:
+
+                    if (effectSeekTo <= nowPlayingMedia.length) {
+                        this.currentPlaylist.updateCurrentTime(effectSeekTo);
+
+                        newState.currentTime = effectSeekTo
+                    }
+                    break;
+
+                case LoopActions.timer:
+                    if (isPlaying) {
+                        // update time
+                        this.currentPlaylist.updateCurrentTime(nowPlayingTime + 1);
+
+                        newState.currentTime = currentState.currentTime + 1
+
+                        if (nowPlayingTime + 1 >= nowPlayingMedia.length) {
+                            // play next and reset time
+                            this.currentPlaylist.playNext()
+
+                            const { media } = this.currentPlaylist.nowPlaying()
+
+                            newState.currentTime = 0;
+                            newState.media = media;
+                        }
+                    }
+                    break;
+                default:
+                    console.log('invalid action', action);
+                    break;
+            }
+
+            // console.log('updated state:');
+            // console.log(newState);
+            console.log('now playing:');
+            console.log(this.currentPlaylist.nowPlaying().media?.title, this.currentPlaylist.nowPlaying().time, this.currentPlaylist.nowPlaying().media?.length, newState.isPlaying);
+
+            this.loopStateSubject.next(newState);
+
+            return newState;
+        }),
+        tap(({ isPlaying,/* currentTime, media */ }) => {
+            if (isPlaying) {
+                this.nowPlayingSubject.next(this.currentPlaylist.nowPlaying())
+            }
+        }),
+    ).subscribe();
+
     scraperSubscriptions: Subscription[];
 
-    constructor(name: string, private redditScraper: RedditCrawlerService, private ytService: YoutubeV3Service) {
+    constructor(
+        name: string,
+        private redditScraper: RedditCrawlerService,
+        private ytService: YoutubeV3Service
+    ) {
         this.name = name
         this.id = name
     }
 
     startPlaying() {
         if (this.currentPlaylist.length() > 0) {
-            this.currentPlaylist.activeEntryIndex = 1;
-            this.startTimer();
+            if (!this.currentPlaylist.nowPlaying()?.media) {
+                this.currentPlaylist.activeEntryIndex = 0;
+                this._playMediaSubject.next(this.currentPlaylist.nowPlaying().media);
+            }
         }
     }
 
     stopPlaying() {
-        this.stopTimer();
+        this._stopPlayingSubject.next();
     }
 
     enter(member: Member) {
@@ -71,20 +196,30 @@ export class AutomatedRoom {
         return this.currentPlaylist.updateNowPlaying(url, time);
     }
 
+    playNext(): void {
+        this.currentPlaylist.playNext();
+    }
+
     clearPlaylist() {
-        this.currentPlaylist.clear()
+        this.currentPlaylist.clear();
     }
 
     addBulkToPlaylist(bulk: Media[]) {
-        bulk.forEach(media => this.currentPlaylist.add(media, null))
+        bulk.forEach(media => this.currentPlaylist.add(media, null));
     }
 
     startSubredditScraperRun(subreddit: string) {
         this.startScrapeSubscriptions([subreddit]);
     }
-    
+
     stopSubredditScraperRun() {
         this.stopScrapeSubscriptions();
+    }
+
+    handleUnplayableMedia(media: Media): void {
+        this.stopPlaying();
+        this.currentPlaylist.remove(media);
+        this.startPlaying();
     }
 
     private removeMember(member: Member) {
@@ -99,27 +234,9 @@ export class AutomatedRoom {
         return this.members.find(m => m.id === member.id);
     }
 
-    private startTimer() {
-        this.stopTimer();
-
-        const { time, media } = this.currentPlaylist.nowPlaying();
-
-        this.timerSubscription = this.timer.pipe(
-            tap((seconds) => this.updateNowPlaying({ url: media.url, time: seconds })),
-            tap(() => this.nowPlayingSubject.next(this.currentPlaylist.nowPlaying())),
-            take(media.length)
-        ).subscribe()
-    }
-
-    private stopTimer() {
-        if (this.timerSubscription != null) {
-            this.timerSubscription.unsubscribe();
-        }
-    }
-
     private startScrapeSubscriptions(subreddits: string[]) {
         this.scraperSubscriptions = subreddits.map(subreddit =>
-            this.redditScraper.scrapeYTurlsFromSubreddit(subreddit, "new").pipe(
+            this.redditScraper.scrapeYTurlsFromSubreddit(subreddit).pipe(
                 // todo save the origin and datefound somewhere
                 map(urls => urls.map(url => YouTubeGetID(url))),
                 mergeMap(ids => ids.map(id =>

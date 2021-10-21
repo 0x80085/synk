@@ -40,12 +40,12 @@ export class MediaService {
       map((mediaUrl) => mediaUrl)
     );
 
-    removeMediaErrEvent$ = this.socketService.exceptionEvent$
+  removeMediaErrEvent$ = this.socketService.exceptionEvent$
     .pipe(
       filter(({ message }) => message === "forbidden")
     );
 
-    removeMediaSuccessEvent$ = this.socketService.listenForEvent<{ mediaUrl: string }>(MediaCommands.REMOVE_MEDIA_SUCCESS)
+  removeMediaSuccessEvent$ = this.socketService.listenForEvent<{ mediaUrl: string }>(MediaCommands.REMOVE_MEDIA_SUCCESS)
     .pipe(
       map((mediaUrl) => mediaUrl)
     );
@@ -71,8 +71,12 @@ export class MediaService {
   removeFromPlaylist(ev: MediaEvent) {
     this.socketService.socket.emit(MediaCommands.REMOVE_MEDIA, ev);
   }
- 
+
   changePositionInPlaylist(ev: { roomName: string, mediaUrl: string, newPosition: number }) {
     this.socketService.socket.emit(MediaCommands.CHANGE_MEDIA_POSITION_IN_LIST, ev);
+  }
+
+  reportMediaNotPlayable(ev: { roomName: string, mediaUrl: string }) {
+    this.socketService.socket.emit(MediaCommands.MEDIA_NOT_PLAYBLE, ev);
   }
 }

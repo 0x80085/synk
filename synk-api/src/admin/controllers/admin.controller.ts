@@ -120,6 +120,14 @@ export class AdminController {
         this.roomService.automatedRooms[0].currentPlaylist.clear()
     }
 
+    @Post('/play-next-auto-playback/')
+    @UseGuards(AdminGuard)
+    @ApiOperation({ summary: 'Stop automated room playback' })
+    playNextAutomatedRoomPlaylist(
+    ) {
+        this.roomService.automatedRooms[0].playNext()
+    }
+
 }
 
 function getLimit(limit: number) {

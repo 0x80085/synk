@@ -56,6 +56,14 @@
       >
         Clear playlist
       </button>
+        <button
+          nz-button
+          nzType="default"
+          style="margin: 0.2rem"
+          (click)="playNext()"
+        >
+          Play next
+        </button>
     </nz-card>
     <h2 nz-typography>Users</h2>
     <nz-card [nzLoading]="!(users$ | async)">

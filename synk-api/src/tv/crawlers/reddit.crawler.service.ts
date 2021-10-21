@@ -8,7 +8,7 @@ export class RedditCrawlerService {
 
     constructor(private httpService: HttpService) { }
 
-    scrapeYTurlsFromSubreddit(subredditName: string, category = 'all') {
+    scrapeYTurlsFromSubreddit(subredditName: string, category: 'all' | 'new' = 'all') {
         return this.httpService.get(this.buildSubredditUrl(subredditName, category)).pipe(
             this.filterForMedia(),
             catchError(err => { console.error(err); return of(["Error fetching"]) })

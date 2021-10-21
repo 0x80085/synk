@@ -65,21 +65,28 @@ export class Playlist {
     }
 
     stopPlaying() {
+        this.currentTime = 0;
         this.activeEntryIndex = null;
     }
 
     playNext() {
-        const nxt = this.activeEntryIndex + 1;
-        this.setNowPlaying(nxt);
+        let next = this.activeEntryIndex + 1 > this.length()
+            ? 0
+            : this.activeEntryIndex + 1;
+        this.setNowPlaying(next);
+        this.currentTime = 0;
     }
 
     playPrevious() {
-        const nxt = this.activeEntryIndex + 1;
-        this.setNowPlaying(nxt);
+        let previous = this.activeEntryIndex - 1 >= 0
+        ? this.activeEntryIndex - 1
+        : 0;
+        this.setNowPlaying(previous);
     }
 
     skipTo(to: number) {
         this.setNowPlaying(to);
+        this.currentTime = 0;
     }
 
     add(media: Media, member: Member) {
@@ -92,12 +99,13 @@ export class Playlist {
 
     remove(media: Media) {
         const target = this.selectFromQueue(media);
+        const isOnlyEntry = target && this.queue.length === 1;
 
-        if (target && this.queue.length === 1) {
-            this.queue.removeHead();
+        if (isOnlyEntry) {
             if (this.nowPlaying()?.media?.url === media.url) {
                 this.activeEntryIndex = null;
             }
+            this.queue.removeHead();
         } else if (target) {
             if (this.nowPlaying()?.media?.url === media.url) {
                 this.playNext();
@@ -110,9 +118,9 @@ export class Playlist {
         this.queue = new Queue();
     }
 
-    updateCurrentTime(value: number) {
-        if (value > 0 && value < this.nowPlaying().media.length) {
-            this.currentTime = value;
+    updateCurrentTime(seconds: number) {
+        if (seconds >= 0 && seconds < this.nowPlaying().media.length) {
+            this.currentTime = seconds;
         }
     }
 

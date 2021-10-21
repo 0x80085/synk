@@ -116,7 +116,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
     this.name = this.route.snapshot.paramMap.get('name');
   }
 
-  onVideoEnded() {
+  onMediaEnded() {
     combineLatest([this.activeItem$, this.playlist$])
       .pipe(take(1)) // if needed - maybe not
       .subscribe(([nowPlayingUrl, { entries }]) => {
@@ -127,6 +127,10 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
         this.player.play(next.url);
       });
+  }
+
+  onMediaNotPlayble(url: string) {
+    this.mediaService.reportMediaNotPlayable({ roomName: this.name, mediaUrl: url })
   }
 
 

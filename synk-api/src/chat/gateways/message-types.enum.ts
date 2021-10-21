@@ -27,5 +27,6 @@ export enum MessageTypes {
   INTERNAL_SERVER_ERROR = 'InternalServerErrorException',
   GENERIC_ERROR = 'error',
   CHANGE_MEDIA_POSITION_IN_LIST = "change media position in list",
-  REPOSITION_MEDIA_SUCCESS = "reposition media success"
+  REPOSITION_MEDIA_SUCCESS = "reposition media success",
+  MEDIA_NOT_PLAYBLE = "media not playble"
 }

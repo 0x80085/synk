@@ -1,4 +1,4 @@
-import { Component, ViewChild, EventEmitter } from '@angular/core';
+import { Component, ViewChild, EventEmitter, Output } from '@angular/core';
 import { BaseMediaComponent } from '../base-media.component';
 
 import { PlyrComponent as PlyrComp } from "ngx-plyr";
@@ -16,7 +16,11 @@ export class PlyrComponent implements BaseMediaComponent {
   src: string;
   videoSources: Plyr.Source[] = [];
 
-  videoEnded: EventEmitter<unknown> = new EventEmitter();
+  @Output()
+  mediaEnded: EventEmitter<unknown> = new EventEmitter();
+
+  @Output()
+  mediaNotPlayable: EventEmitter<unknown>;
 
   constructor() { }
 

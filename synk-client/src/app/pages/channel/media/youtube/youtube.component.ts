@@ -2,7 +2,7 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 import { BaseMediaComponent } from '../base-media.component';
-import { errorDictionary } from './player-errors.model';
+import { errorDictionary, PlayerError } from './player-errors.model';
 
 @Component({
   selector: 'app-youtube',
@@ -12,7 +12,10 @@ import { errorDictionary } from './player-errors.model';
 export class YoutubeComponent implements BaseMediaComponent, OnInit {
 
   @Output()
-  videoEnded = new EventEmitter();
+  mediaEnded = new EventEmitter();
+  
+  @Output()
+  mediaNotPlayable = new EventEmitter();
 
   isReady = false;
   player: YT.Player;
@@ -81,7 +84,7 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
     return this.current;
   }
 
-  setCurrentUrl(url:string){
+  setCurrentUrl(url: string) {
     this.current = url;
   }
 
@@ -93,11 +96,14 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
 
   onPlayerStateChange = event => {
     if (event.data === 0) {
-      this.videoEnded.emit();
+      this.mediaEnded.emit();
     }
   }
 
   onPlayerError = event => {
+    if (event.data === PlayerError.EmbeddingNotAllowed || event.data === PlayerError.EmbeddingNotAllowed2) {
+      this.mediaNotPlayable.emit(this.current)
+    }
     this.showPlayerErrorToast(event);
   }
 
