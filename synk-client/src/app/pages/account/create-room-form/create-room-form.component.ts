@@ -28,13 +28,12 @@ export class CreateRoomFormComponent implements OnInit {
         [
           Validators.required,
           Validators.maxLength(25),
-          Validators.minLength(3),
-          Validators.pattern(/^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/)
+          Validators.minLength(3)
         ]
       ],
       description: [
         null,
-        [Validators.required, Validators.maxLength(250), Validators.minLength(5)]
+        [Validators.maxLength(250)]
       ],
       isPublic: true
     });
@@ -46,8 +45,8 @@ export class CreateRoomFormComponent implements OnInit {
     }
 
     const results: ChannelDraft = {
-      name: this.form.controls.name.value,
-      description: this.form.controls.description.value,
+      name: this.form.controls.name.value.trim(),
+      description: this.form.controls.description.value.trim(),
       isPublic: this.form.controls.isPublic.value,
     };
     this.service.createChannel(results).subscribe(

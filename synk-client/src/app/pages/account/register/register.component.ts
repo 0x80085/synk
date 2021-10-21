@@ -47,8 +47,8 @@ export class RegisterComponent implements OnInit {
     }
 
     const creds = {
-      username: this.form.controls.username.value,
-      password: this.form.controls.password.value
+      username: this.form.controls.username.value.trim(),
+      password: this.form.controls.password.value.trim()
     };
 
     this.isSubmitting = true;
@@ -59,11 +59,12 @@ export class RegisterComponent implements OnInit {
         this.isSubmitting = false;
       },
       err => {
+        console.error(err);
         this.notification.create(
           'error',
           'Registration failed',
           `
-          AAaaaaah
+          Something went wrong... (???)
         `
         );
         this.isSubmitting = false;
