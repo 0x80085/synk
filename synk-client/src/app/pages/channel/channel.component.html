@@ -21,8 +21,8 @@
 
     <div nz-col
       [nzLg]="{ span: 18, offset: 0 }"
-      [nzMd]="{ span: 32, offset: 0 }"
-      [nzXs]="{ span: 32, offset: 0 }">
+      [nzMd]="{ span: 18, offset: 0 }"
+      [nzXs]="{ span: 24, offset: 0 }">
       <app-media
         *ngIf="playlist$ | async"
         #player
@@ -32,7 +32,7 @@
     </div>
   </div>
 
-  <div nz-row [nzGutter]="{ xs: 0, sm: 0, md: 24, lg: 32, xl: 32, xxl: 32 }">
+  <div nz-row [nzGutter]="{ xs: 0, sm: 0, md: 24, lg: 24, xl: 24, xxl: 24 }">
     <div nz-col nzSpan="6" class="mt-1">
       <app-connected-members
         (giveLeader)="giveLeader($event)"
@@ -52,6 +52,7 @@
 <ng-template #connectionState>
   <div
     *ngIf="isLoading$ | async; then busyConnecting; else errorConnecting"
+    class="connectionstate"
   ></div>
 </ng-template>
 

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { HttpModule, Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm/dist';
 import { AuthModule } from 'src/auth/auth.module';
@@ -35,6 +35,7 @@ export const EventHandlers = [
     CqrsModule,
     AuthModule,
     TvModule,
+    HttpModule,
   ],
   controllers: [
     ChannelController

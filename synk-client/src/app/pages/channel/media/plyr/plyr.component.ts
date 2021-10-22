@@ -20,7 +20,7 @@ export class PlyrComponent implements BaseMediaComponent {
   mediaEnded: EventEmitter<unknown> = new EventEmitter();
 
   @Output()
-  mediaNotPlayable: EventEmitter<unknown>;
+  mediaNotPlayable: EventEmitter<unknown>  = new EventEmitter();
 
   constructor() { }
 

@@ -15,6 +15,19 @@ interface PlaylistItem {
   length: string;
 }
 
+const SUPPORTED_MEDIA_HOSTS = [
+  'www.youtu.be',
+  'www.youtube.com',
+  'www.soundcloud.com',
+  'www.twitch.tv',
+  'www.vimeo.com',
+  'www.archive.org',
+  // 'dailymotion.com',
+  // 'twitter.com',
+  // 'reddit.com',
+  // 'vk.ru',
+]
+
 @Component({
   selector: 'app-playlist',
   templateUrl: './playlist.component.html',
@@ -34,8 +47,10 @@ export class PlaylistComponent implements OnDestroy, OnInit {
 
   localPlaylist: PlaylistItem[] = [];
 
+  supportedMediaHosts = SUPPORTED_MEDIA_HOSTS;
+
   private virtualPlaylist$: Subscription = this.mediaService.roomPlaylistUpdateEvents$.pipe(
-    tap(({nowPlaying}) => this.nowPlaying.next(nowPlaying)),
+    tap(({ nowPlaying }) => this.nowPlaying.next(nowPlaying)),
     map(({ entries, nowPlaying }) =>
       entries.map(entry => ({
         ...entry,
@@ -147,18 +162,23 @@ export class PlaylistComponent implements OnDestroy, OnInit {
     }
   }
 
-  static isValidMediaUrl(value: string){
+  static isValidMediaUrl(value: string) {
     let validUrl = true;
 
-      try {
-        new URL(value)
-        if (!YouTubeGetID(value)) {
-          throw new Error();
-        }
-      } catch {
-        validUrl = false;
+    try {
+      const { host } = new URL(value)
+
+      if (SUPPORTED_MEDIA_HOSTS.indexOf(host) === -1) {
+        throw new Error();
       }
 
-      return validUrl ? null : { invalidUrl: { value: value } };
+      // if (!YouTubeGetID(value)) {
+      //   throw new Error();
+      // }
+    } catch {
+      validUrl = false;
+    }
+
+    return validUrl ? null : { invalidUrl: { value: value } };
   }
 }

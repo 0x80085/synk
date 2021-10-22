@@ -5,9 +5,7 @@
     style="text-align: center"
     [hidden]="isMediaSelected | async"
   >
-    <p nz-typography>Nothing playing!</p>
-    <p nz-typography>Queue up media and start the synchronized playback</p>
-    <p nz-typography>Other members in the room will hook into your media source and current playback time</p>
+    <p nz-typography>Nothing playing</p>
   </div>
 
   <div nz-col nzSpan="24"  [nzFlex]="'auto'" class="media" [hidden]="!(isMediaSelected | async)">

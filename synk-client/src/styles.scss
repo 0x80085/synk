@@ -78,6 +78,10 @@ $font-family-heading: 'Raleway', -apple-system, BlinkMacSystemFont, 'Segoe UI',
   padding-top: 5px;
 }
 
-.ant-avatar.ant-avatar-icon>.anticon{
+.ant-avatar.ant-avatar-icon > .anticon {
   padding-top: 5px;
+}
+
+.ant-form-item-explain {
+  margin-top: 5px;
 }

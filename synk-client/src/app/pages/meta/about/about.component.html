@@ -1,5 +1,8 @@
 <div nz-row>
-  <div nz-col nzSpan="12" nzOffset="6">
+  <div nz-col  nz-col
+      [nzLg]="{ span: 12, offset: 6 }"
+      [nzMd]="{ span: 12, offset: 6 }"
+      [nzXs]="{ span: 22, offset: 1 }">
     <h1 nz-typography>About Synk</h1>
 
     <ng-template #loading><i nz-icon [nzType]="'loading'"></i></ng-template>
