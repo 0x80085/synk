@@ -32,7 +32,7 @@
     </div>
   </div>
 
-  <div nz-row [nzGutter]="{ xs: 0, sm: 0, md: 24, lg: 24, xl: 24, xxl: 24 }">
+  <div nz-row>
     <div nz-col nzSpan="6" class="mt-1">
       <app-connected-members
         (giveLeader)="giveLeader($event)"
@@ -50,14 +50,15 @@
 </ng-template>
 
 <ng-template #connectionState>
-  <div
-    *ngIf="isLoading$ | async; then busyConnecting; else errorConnecting"
-    class="connectionstate"
-  ></div>
+  <div class="connectionstate">
+    <ng-container
+      *ngIf="isLoading$ | async; then busyConnecting; else errorConnecting"
+    ></ng-container>
+  </div>
 </ng-template>
 
 <ng-template #errorConnecting>
-  <div nz-col nzSpan="24" class="column">
+  <div nz-col nzSpan="24">
     <nz-empty
       [nzNotFoundImage]="disconnectedImg"
       [nzNotFoundContent]="pleaseLoginText"
@@ -67,7 +68,7 @@
 </ng-template>
 
 <ng-template #feedbackJoiningRoomMoreThanOnce>
-  <div nz-col nzSpan="24" class="column">
+  <div nz-col nzSpan="24">
     <nz-empty
       [nzNotFoundImage]="forbiddenIcon"
       [nzNotFoundContent]="cantJoinMoreThanOnceText"
@@ -77,7 +78,7 @@
 </ng-template>
 
 <ng-template #busyConnecting>
-  <div nz-col nzSpan="24" class="column">
+  <div nz-col nzSpan="24">
     <nz-empty
       [nzNotFoundImage]="busyConnectingImg"
       [nzNotFoundContent]="busyConnectingText"

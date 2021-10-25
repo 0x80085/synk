@@ -2,14 +2,11 @@
   display: block;
   height: 100%;
   width: 100%;
+  padding:  0rem 0.5rem 0rem;
 }
 
 .container {
   height: 80%;
-}
-
-.column {
-  height: calc(100vh - 250px);
 }
 
 .mt-1 {
