@@ -35,7 +35,9 @@ export class TwitchComponent implements BaseMediaComponent {
   play(url?: string): void {
     if (url) {
       this.setCurrentUrl(url);
-      this.createPlayer(this.channel);
+      if (!this.player) {
+        this.createPlayer(this.channel);
+      }
     }
     if (this.player && url) {
       this.player.setChannel(this.extractChannelNameFromUrl(url));
