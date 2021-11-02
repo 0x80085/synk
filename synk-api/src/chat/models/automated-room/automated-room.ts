@@ -60,7 +60,6 @@ export class AutomatedRoom {
             ({ action: LoopActions.seek, seekTo: seconds } as LoopEffect))),
     ).pipe(
         withLatestFrom(this.loopStateSubject),
-        // tap(([effect, currentState]) => console.log(effect, currentState)),
         map(([effect, currentState]) => {
 
             const { isPlaying } = currentState;
@@ -68,13 +67,6 @@ export class AutomatedRoom {
             const { action, seekTo: effectSeekTo, media: effectMedia } = effect;
 
             let newState = { ...currentState } as LoopState;
-
-            // console.log('old state:');
-            // console.log(currentState);
-            console.log('----');
-            console.log('effect', effect.action);
-            // console.log('this.currentPlaylist.nowPlaying()');
-            // console.log(this.currentPlaylist.nowPlaying());
 
             switch (action) {
                 case LoopActions.play:
@@ -126,11 +118,6 @@ export class AutomatedRoom {
                     console.log('invalid action', action);
                     break;
             }
-
-            // console.log('updated state:');
-            // console.log(newState);
-            console.log('now playing:');
-            console.log(this.currentPlaylist.nowPlaying().media?.title, this.currentPlaylist.nowPlaying().time, this.currentPlaylist.nowPlaying().media?.length, newState.isPlaying);
 
             this.loopStateSubject.next(newState);
 
