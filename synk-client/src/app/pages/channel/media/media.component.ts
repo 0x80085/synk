@@ -15,13 +15,15 @@ import { YoutubeComponent, isValidYTid } from './youtube/youtube.component';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { Html5Component } from './html5/html5.component';
 import { isTwitchChannelUrl, TwitchComponent } from './twitch/twitch.component';
-import { PlyrComponent } from './plyr/plyr.component';
+import { isVimeoUrl, PlyrComponent } from './plyr/plyr.component';
 import { debugLog } from 'src/app/utils/custom.operators';
+
 
 export enum SupportedPlayers {
   YT = 'YT',
   HTML5 = 'HTML5',
   TWITCH = 'TWITCH',
+  VIMEO = "VIMEO"
 }
 
 // tslint:disable-next-line: directive-selector
@@ -37,7 +39,7 @@ export class MediaHostDirective {
 })
 export class MediaComponent {
   @Output() mediaEndedEvent: EventEmitter<any> = new EventEmitter();
-  
+
   @Output() mediaNotPlayble: EventEmitter<string> = new EventEmitter();
 
   @ViewChild(MediaHostDirective, { static: true }) host: MediaHostDirective;
@@ -84,21 +86,24 @@ export class MediaComponent {
 
   private setupMediaPlayer(url: string) {
     this.isMediaSelected.next(true);
-    
+
     const playerType = this.resolveMediaType(url);
-    
+
     this.createPlayerOfType(playerType);
     this.ref.instance.setCurrentUrl(url);
   }
 
   private resolveMediaType(url: string) {
     const isTwitch = isTwitchChannelUrl(url);
+    const isVimeo = isVimeoUrl(url);
     const isYT = isValidYTid(url);
-    
+
     if (isTwitch) {
       return SupportedPlayers.TWITCH;
     } else if (isYT) {
       return SupportedPlayers.YT;
+    } else if (isVimeo) {
+      return SupportedPlayers.VIMEO;
     } else {
       return SupportedPlayers.HTML5;
     }
@@ -111,6 +116,9 @@ export class MediaComponent {
         break;
       case SupportedPlayers.TWITCH:
         this.assemblePlayer(TwitchComponent);
+        break;
+      case SupportedPlayers.VIMEO:
+        this.assemblePlayer(PlyrComponent);
         break;
       default:
         this.assemblePlayer(PlyrComponent);

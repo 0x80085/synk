@@ -16,12 +16,12 @@ interface PlaylistItem {
 }
 
 const SUPPORTED_MEDIA_HOSTS = [
-  'www.youtu.be',
-  'www.youtube.com',
-  'www.soundcloud.com',
-  'www.twitch.tv',
-  'www.vimeo.com',
-  'www.archive.org',
+  'youtu.be',
+  'youtube.com',
+  //'soundcloud.com',
+  //'twitch.tv',
+  //'vimeo.com',
+  //'archive.org',
   // 'dailymotion.com',
   // 'twitter.com',
   // 'reddit.com',
@@ -36,6 +36,8 @@ const SUPPORTED_MEDIA_HOSTS = [
 export class PlaylistComponent implements OnDestroy, OnInit {
 
   @Input() roomName: string;
+
+  @Input() showPlaylistItemActions: boolean;
 
   @Output() playMedia = new EventEmitter<string>();
 
@@ -168,9 +170,9 @@ export class PlaylistComponent implements OnDestroy, OnInit {
     try {
       const { host } = new URL(value)
 
-      if (SUPPORTED_MEDIA_HOSTS.indexOf(host) === -1) {
-        throw new Error();
-      }
+      // if (SUPPORTED_MEDIA_HOSTS.indexOf(host) === -1) {
+      //   throw new Error();
+      // }
 
       // if (!YouTubeGetID(value)) {
       //   throw new Error();
