@@ -1,24 +1,25 @@
 <div nz-row>
-  <div nz-col nzSpan="24" style="min-height: 3rem">
-    <button nz-button nzType="link" (click)="showControls = !showControls">
-      <i nz-icon nzType="video-camera-add" nzTheme="outline" nz-tooltip nzTooltipTitle="Add media to playlist"></i>
-    </button>
-  </div>
-
-  <div nz-col nzSpan="24">
-    <div [hidden]="!showControls">
-      <form nz-form [formGroup]="form" (ngSubmit)="onAddMedia()">
-        <nz-form-item style="margin-bottom: 1rem;">
-          <nz-form-control nzErrorTip="Please input a valid media URL">
-            <nz-input-group nzSearch nzSize="large" [nzAddOnAfter]="suffixButton">
-              <input type="text" nz-input placeholder="Enter a link to a video" formControlName="mediaUrl" />
-            </nz-input-group>
-          </nz-form-control>
-        </nz-form-item>
-      </form>
-      <nz-alert style="margin-bottom: 1rem" nzType="info" [nzDescription]="addMediaInfo" nzShowIcon></nz-alert>
+  <ng-container *ngIf="showPlaylistItemActions">
+    <div nz-col nzSpan="24" style="min-height: 3rem">
+      <button nz-button nzType="link" (click)="showControls = !showControls">
+        <i nz-icon nzType="video-camera-add" nzTheme="outline" nz-tooltip nzTooltipTitle="Add media to playlist"></i>
+      </button>
     </div>
-  </div>
+    <div nz-col nzSpan="24">
+      <div [hidden]="!showControls">
+        <form nz-form [formGroup]="form" (ngSubmit)="onAddMedia()">
+          <nz-form-item style="margin-bottom: 1rem;">
+            <nz-form-control nzErrorTip="Please input a valid media URL">
+              <nz-input-group nzSearch nzSize="large" [nzAddOnAfter]="suffixButton">
+                <input type="text" nz-input placeholder="Enter a link to a video" formControlName="mediaUrl" />
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+        </form>
+        <nz-alert style="margin-bottom: 1rem" nzType="info" [nzDescription]="addMediaInfo" nzShowIcon></nz-alert>
+      </div>
+    </div>
+  </ng-container>
 
   <div nz-col nzSpan="24">
     <nz-list [nzBordered]="localPlaylist" nzSize="small" [nzLoading]="!localPlaylist" [nzDataSource]="localPlaylist"
@@ -29,7 +30,7 @@
           [nzActions]="[opAction]" cdkDrag>
         </nz-list-item>
         <ng-template #opAction>
-          
+          <ng-container *ngIf="showPlaylistItemActions">
             <a
               nz-button
               nzType="link"
@@ -40,14 +41,15 @@
             >
               <i nz-icon nzType="link"></i>
             </a>
-          <button nz-button nzSize="small" nzType="link" (click)="playMedia.emit(item.url)" nz-tooltip
-            [nzTooltipTitle]="item.active ? 'now playing' : 'start video'">
-            <i nz-icon [nzType]="item.active ? 'play-circle' : 'caret-right'"></i>
-          </button>
-          <button nz-button nzSize="small" nzDanger nzType="link" (click)="onRemoveMedia(item.mediaUrl)" nz-tooltip
-            nzTooltipTitle="Remove from list">
-            <i nz-icon nzType="delete"></i>
-          </button>
+            <button nz-button nzSize="small" nzType="link" (click)="playMedia.emit(item.url)" nz-tooltip
+              [nzTooltipTitle]="item.active ? 'now playing' : 'start video'">
+              <i nz-icon [nzType]="item.active ? 'play-circle' : 'caret-right'"></i>
+            </button>
+            <button nz-button nzSize="small" nzDanger nzType="link" (click)="onRemoveMedia(item.mediaUrl)" nz-tooltip
+              nzTooltipTitle="Remove from list">
+              <i nz-icon nzType="delete"></i>
+            </button>
+          </ng-container>
         </ng-template>
         <ng-template #contentTitle>
           <div class="content">
@@ -71,7 +73,7 @@
     Only media from the following urls are supported: {{supportedMediaHosts | json }} <br /> 
   Support for other types of media can be requested via the Github repo or Discord chat.<br /> 
   <strong>If you are currently the leader,</strong>
-  press the <i nz-icon [nzType]="'caret-right'"></i> on a playlist item to play it an other members' media player will
+  press the <i nz-icon [nzType]="'caret-right'"></i> on a playlist item to play it and other members' media player will
   sync with your playback state.
   </p>
 
