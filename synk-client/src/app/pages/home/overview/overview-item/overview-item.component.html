@@ -12,10 +12,10 @@
 </nz-card>
 
 <ng-template #nowPlaying>
-  <p nz-typography nzType="link" nzParagraph nzEllipsis nzEllipsisRows="3">
+  <p nz-typography nzType="link" nzParagraph nzEllipsis nzEllipsisRows="3" nzType="secondary">
     <i nz-icon nzType="play-circle" nzTheme="outline"></i> Now playing:
-    <span nz-typography
-      ><code>{{ channel.nowPlaying.title }}</code></span
+    <span nz-typography 
+      >{{ channel.nowPlaying.title }}</span
     >
   </p>
 </ng-template>

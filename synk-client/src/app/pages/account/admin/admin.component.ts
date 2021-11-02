@@ -17,7 +17,13 @@ export class AdminComponent {
 
   users$: Observable<UserInfo> = this.adminService.getUsers().pipe(shareReplay(1));
   channels$: Observable<Channel[]> = this.adminService.getChannels().pipe(shareReplay(1));
-  connections$ = this.adminService.getConnections().pipe(shareReplay(1));
+  connections$ = this.adminService.getConnections().pipe(
+    map(v => {
+      v.clients.map(client => client.ip = "hidden");
+      return v;
+    }),
+    shareReplay(1)
+    );
 
   accounts$: Observable<UserAccountInfo[]> = this.users$.pipe(map(it => it.items));
 
