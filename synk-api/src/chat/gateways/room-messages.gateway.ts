@@ -410,7 +410,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
       client.leave(automatedRoom.id);
       this.tracker.memberLeavesRoom(client, automatedRoom.id);
 
-      // this.broadcastMemberlistToRoom(automatedRoom);
+      this.broadcastMemberlistToRoom(automatedRoom);
       this.broadcastGroupMessageToRoom(automatedRoom);
       this.logger.log(`handleLeaveRoom - client left`);
 
