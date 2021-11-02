@@ -70,7 +70,7 @@ export class Playlist {
     }
 
     playNext() {
-        let next = this.activeEntryIndex + 1 > this.length()
+        let next = this.activeEntryIndex + 2 > this.length()
             ? 0
             : this.activeEntryIndex + 1;
         this.setNowPlaying(next);
@@ -79,8 +79,8 @@ export class Playlist {
 
     playPrevious() {
         let previous = this.activeEntryIndex - 1 >= 0
-        ? this.activeEntryIndex - 1
-        : 0;
+            ? this.activeEntryIndex - 1
+            : 0;
         this.setNowPlaying(previous);
     }
 
