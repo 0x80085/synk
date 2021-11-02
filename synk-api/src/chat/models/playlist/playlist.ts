@@ -116,6 +116,7 @@ export class Playlist {
 
     clear() {
         this.queue = new Queue();
+        this.stopPlaying();
     }
 
     updateCurrentTime(seconds: number) {
