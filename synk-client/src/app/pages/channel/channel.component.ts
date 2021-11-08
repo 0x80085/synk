@@ -141,11 +141,11 @@ export class ChannelComponent implements OnInit, OnDestroy {
   private sendMediaUpdate() {
     try {
       const isPaused = !this.player.isPlaying();
-      if (isPaused) {
+      const mediaUrl = this.player.getCurrentUrl();
+      if (isPaused || !mediaUrl) {
         // Dont update when leader paused video.
         return;
       }
-      const mediaUrl = this.player.getCurrentUrl();
       this.activeItemSubject.next(mediaUrl);
       this.mediaService.sendMediaEvent({
         mediaUrl,

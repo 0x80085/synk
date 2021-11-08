@@ -93,6 +93,9 @@ export class Room {
     removeMediaFromPlaylist(member: Member, url: string) {
         this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.editPlaylist);
         const target = this.currentPlaylist.selectFromQueue(url);
+        if (!target) {
+            return
+        }
         if (target.addedBy.id !== member.id) {
             throw new ForbiddenException();
         }

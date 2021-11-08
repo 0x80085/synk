@@ -204,9 +204,8 @@ export class AutomatedRoom {
     }
 
     handleUnplayableMedia(media: Media): void {
-        this.stopPlaying();
+        this.playNext();
         this.currentPlaylist.remove(media);
-        this.startPlaying();
     }
 
     private removeMember(member: Member) {
