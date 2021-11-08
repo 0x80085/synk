@@ -39,7 +39,6 @@ export class OwnedChannelsComponent {
           Validators.required,
           Validators.maxLength(25),
           Validators.minLength(3),
-          Validators.pattern(/^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/)
         ]
       ],
       isPublic: [channel.isPublic, Validators.required]
