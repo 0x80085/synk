@@ -26,7 +26,7 @@
       [nzRenderItem]="item" [nzNoResult]="noItems" cdkDropList (cdkDropListDropped)="drop($event)">
       <ng-template #item let-item>
         <nz-list-item style="border-bottom: 1px solid rgb(25, 25, 25)"
-          [class.active]="(nowPlaying | async)?.url === item.mediaUrl" nzSplit [nzContent]="contentTitle"
+          [class.active]="item.active" nzSplit [nzContent]="contentTitle"
           [nzActions]="[opAction]" cdkDrag>
         </nz-list-item>
         <ng-template #opAction>

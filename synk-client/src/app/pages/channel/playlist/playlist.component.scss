@@ -27,6 +27,10 @@
     border-radius: 4px;
   }
 
+  &.active {
+    background-color: #191919;
+  }
+
   ul {
     margin-left: 0;
   }
