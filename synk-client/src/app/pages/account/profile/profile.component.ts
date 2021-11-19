@@ -48,7 +48,7 @@ export class ProfileComponent {
         catchError(err => {
           console.log(err);
           
-          this.notification.error("Account NOT deleted...", err.message || "Something went wrong")
+          this.notification.error("Account NOT deleted...", err.error.message || "Something went wrong")
           return of(err)
         })
       )

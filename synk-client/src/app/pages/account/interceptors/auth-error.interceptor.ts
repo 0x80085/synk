@@ -3,9 +3,14 @@ import { Injectable } from '@angular/core';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { AppStateService } from '../../../app-state.service';
-import { SocketService } from '../../../socket.service';
 import { AuthService } from '../auth.service';
+
+export class ApiError {
+  error: string
+  message: string
+  statusCode: number
+  status: number
+}
 
 @Injectable()
 export class RequestLogInterceptor implements HttpInterceptor {
@@ -22,8 +27,10 @@ export class RequestLogInterceptor implements HttpInterceptor {
       catchError((error: any) =>
         of(error).pipe(
           tap(err => {
-
-            switch (err.status) {
+            
+            const apiError = err as ApiError;
+            console.log(err);
+            switch (apiError.status) {
               case 401:
                 this.notification.error(`Please login`, `You need to be logged in to access this part`);
                 this.authService.logout().subscribe()

@@ -1,5 +1,5 @@
 
-import { Body, Controller, Delete, Get, Patch, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, ForbiddenException, Get, Patch, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { AuthService } from 'src/auth/services/auth.service';
@@ -52,6 +52,10 @@ export class AccountController {
         const { user } = req;
         const { id } = user as SerializedUserData;
         
+        if ((user as SerializedUserData).isAdmin) {
+            throw new ForbiddenException("Cannot delete an admin account");
+        }
+
         this.authService.disconnectSocketConnections(req);
         await this.accountService.deleteAccount(id);
 
