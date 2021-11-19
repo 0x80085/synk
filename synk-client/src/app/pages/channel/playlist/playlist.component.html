@@ -53,7 +53,7 @@
         </ng-template>
         <ng-template #contentTitle>
           <div class="content">
-            <span class="media-title">{{ item.title }}</span>
+            <span nz-tooltip [nzTooltipTitle]="item.title" class="media-title">{{ item.title }}</span>
             <span class="media-duration">{{ item.length }}</span>
           </div>
         </ng-template>
@@ -76,7 +76,6 @@
   press the <i nz-icon [nzType]="'caret-right'"></i> on a playlist item to play it and other members' media player will
   sync with your playback state.
   </p>
-
 </ng-template>
 
 <ng-template #noItems>
