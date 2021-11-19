@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { filter, map, shareReplay } from 'rxjs/operators';
+import { filter, map, share, shareReplay } from 'rxjs/operators';
 
 import { SocketService } from '../../socket.service';
 import { MediaEvent } from './models/room.models';
@@ -28,7 +28,11 @@ export class MediaService {
       shareReplay(1)
     );
 
-  roomMediaEvent$ = this.socketService.listenForEvent<MediaEvent>(MediaCommands.MEDIA_EVENT);
+  roomMediaEvent$ = this.socketService
+    .listenForEvent<MediaEvent>(MediaCommands.MEDIA_EVENT)
+    .pipe(
+      share()
+    );
 
   addMediaErrEvent$ = this.socketService.exceptionEvent$
     .pipe(

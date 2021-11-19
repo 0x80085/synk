@@ -2,8 +2,8 @@ import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { Subject, Subscription } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { combineLatest, Subject, Subscription } from 'rxjs';
+import { distinctUntilChanged, map, startWith, tap } from 'rxjs/operators';
 
 import { MediaRepresentation, MediaService } from '../media.service';
 import { YouTubeGetID } from '../media/youtube/youtube.component';
@@ -41,7 +41,11 @@ export class PlaylistComponent implements OnDestroy, OnInit {
 
   @Output() playMedia = new EventEmitter<string>();
 
-  nowPlaying = new Subject<MediaRepresentation>();
+  nowPlaying$ = this.mediaService.roomMediaEvent$.pipe(
+    startWith({mediaUrl: null}),
+    map(it => it.mediaUrl),
+    distinctUntilChanged(),
+  );
 
   form: FormGroup;
 
@@ -51,13 +55,16 @@ export class PlaylistComponent implements OnDestroy, OnInit {
 
   supportedMediaHosts = SUPPORTED_MEDIA_HOSTS;
 
-  private virtualPlaylist$: Subscription = this.mediaService.roomPlaylistUpdateEvents$.pipe(
-    tap(({ nowPlaying }) => this.nowPlaying.next(nowPlaying)),
-    map(({ entries, nowPlaying }) =>
+  private virtualPlaylist$: Subscription = combineLatest(
+    [this.nowPlaying$,
+    this.mediaService.roomPlaylistUpdateEvents$]
+  ).pipe(
+    tap(console.log ),
+    map(([nowPlayingUrl, { entries },]) =>
       entries.map(entry => ({
         ...entry,
         mediaUrl: entry.url,
-        active: nowPlaying ? entry.url === nowPlaying.url : false,
+        active: nowPlayingUrl && entry.url === nowPlayingUrl,
         length: new Date(entry.length * 1000).toISOString().substr(11, 8)
       }))),
     tap(ls => this.localPlaylist = ls)

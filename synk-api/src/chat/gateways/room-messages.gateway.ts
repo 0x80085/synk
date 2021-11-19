@@ -110,7 +110,6 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     room.updateNowPlaying(member, { time, url });
 
     this.broadcastNowPlayingToRoom(room);
-    this.broadcastPlaylistToRoom(room);
   }
 
   @SubscribeMessage(MessageTypes.JOIN_ROOM)
