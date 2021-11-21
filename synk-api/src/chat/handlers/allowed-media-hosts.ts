@@ -1,8 +1,8 @@
 export const allowedMediaSourceHosts = [
     'youtu.be',
     'youtube.com',
+    'twitch.tv',
     //'soundcloud.com',
-    //'twitch.tv',
     //'vimeo.com',
     //'archive.org',
     // 'dailymotion.com',

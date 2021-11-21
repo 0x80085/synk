@@ -1,4 +1,5 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Playlist } from '.';
 import { ChannelConfig } from './ChannelConfig';
 import { Member } from './Member';
 import { Role } from './Role';
@@ -21,6 +22,9 @@ export class Channel {
   @Column({ default: false })
   isPublic: boolean;
 
+  @Column({ default: false })
+  isAutomated: boolean;
+
   @Column({ default: null, nullable: true })
   password: string;
 
@@ -32,6 +36,13 @@ export class Channel {
 
   @OneToMany(type => ChannelConfig, config => config.channel, { onDelete: 'CASCADE' })
   configs: ChannelConfig[];
+
+  @OneToMany(type => Playlist, playlist => playlist.channel, { onDelete: 'CASCADE' })
+  playlists: Playlist[];
+
+  @OneToOne(type => Playlist)
+  @JoinColumn()
+  activePlaylist: Playlist;
 
   @OneToMany(type => Role, role => role.channel, { onDelete: 'CASCADE' })
   roles: Role[];

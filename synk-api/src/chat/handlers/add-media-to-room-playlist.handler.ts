@@ -1,39 +1,66 @@
 import { BadRequestException, ForbiddenException, HttpService } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
+import { InjectRepository } from "@nestjs/typeorm";
 import { of } from "rxjs";
 import { catchError, map, mapTo, switchMap, tap } from "rxjs/operators";
+import { Channel, Video } from "src/domain/entity";
 
 import { YouTubeGetID, YoutubeV3Service } from "src/tv/crawlers/youtube-v3.service";
+import { Repository } from "typeorm";
 import { MessageTypes } from "../gateways/message-types.enum";
 import { AddMediaToRoomCommand } from "../models/commands/add-media-to-room.command";
 import { Media } from "../models/media/media";
 import { toRepresentation } from "../models/playlist/playlist.representation";
 import { Room } from "../models/room/room";
-import { allowedMediaSourceHosts } from "./allowed-media-hosts";
+import { allowedMediaSourceHosts as supportedMediaSourceHosts } from "./allowed-media-hosts";
 
 @CommandHandler(AddMediaToRoomCommand)
 export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomCommand> {
-    constructor(private ytService: YoutubeV3Service, private httpService: HttpService) { }
+    constructor(
+        private ytService: YoutubeV3Service,
+        private httpService: HttpService,
+        @InjectRepository(Channel)
+        private channelRepository: Repository<Channel>,
+        @InjectRepository(Video)
+        private videoRepository: Repository<Video>,
+    ) { }
 
     async execute({ url, room, member, socket, socketServer }: AddMediaToRoomCommand) {
 
         try {
-            // if (this.isMediaSourceSupported(url)) {
-            //     console.log("Host not allowed");
-            //     throw new Error("Host not allowed");
-            // }
+            const trimmedUrl = url.trim();
 
-            const ytVideoId = YouTubeGetID(url)
+            if (this.isMediaSourceSupported(trimmedUrl)) {
+                console.log("Host not allowed");
+                throw new BadRequestException("Host not allowed");
+            }
+
+            const ytVideoId = YouTubeGetID(trimmedUrl)
 
             return of({ room, ytVideoId }).pipe(
                 switchMap(({ room, ytVideoId }) =>
                     !Boolean(ytVideoId)
-                        ? this.getMetadataFromElsewhere(url).pipe(map(media => ({ media, room })))
+                        ? this.getMetadataFromElsewhere(trimmedUrl).pipe(map(media => ({ media, room })))
                         : this.getMetadataFromYoutubeApi(ytVideoId).pipe(map(media => ({ media, room })))
                 ),
                 tap(({ room, media }) => room.addMediaToPlaylist(member, media)),
+                tap(async ({ room, media }) => {
+                    const channel = await this.channelRepository.createQueryBuilder("channel")
+                        .leftJoinAndSelect("channel.activePlaylist", "activePlaylist")
+                        .leftJoinAndSelect("activePlaylist.videos", "videos")
+                        .where("channel.id = :channelId", { channelId: room.id })
+                        .getOneOrFail();
+
+                    this.videoRepository.create({
+                        playlist: channel.activePlaylist,
+                        dateAdded: new Date(),
+                        addedBy: member,
+                        positionInList: channel.activePlaylist.videos.length,
+                        url: media.url
+                    })
+                }),
                 tap(() => this.broadcastPlaylistToRoom(room, socketServer)),
-                tap(_ => socket.emit(MessageTypes.ADD_MEDIA_REQUEST_APPROVED, { url, playlistCount: room.currentPlaylist.queue.length })),
+                tap(_ => socket.emit(MessageTypes.ADD_MEDIA_REQUEST_APPROVED, { url: trimmedUrl, playlistCount: room.currentPlaylist.queue.length })),
                 catchError(e => {
                     if (e.message === 'Unauthorized') { throw new ForbiddenException(); }
                     console.log('AddMediaException');
@@ -93,9 +120,9 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
     }
 
     private isSupportedMediaType(contentType: any): boolean {
-        return contentType === "video/mp4" 
-        || contentType === "video/webm"
-        || contentType === "video/ogg";
+        return contentType === "video/mp4"
+            || contentType === "video/webm"
+            || contentType === "video/ogg";
     }
 
     private broadcastPlaylistToRoom(room: Room, server: SocketIO.Server) {
@@ -114,7 +141,7 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
         try {
             const domain = getDomain(url)
             console.log(domain);
-            return allowedMediaSourceHosts.indexOf(domain) != -1;
+            return supportedMediaSourceHosts.indexOf(domain) != -1;
         } catch (error) {
             return false
         }
