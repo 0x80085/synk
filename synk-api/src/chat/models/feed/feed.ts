@@ -26,7 +26,7 @@ export class Feed {
 
     clearSystemMessagesSubscription$ = timer(1000, 10000).pipe(
         tap(_=>  this.clearSystemMessages())
-    )
+    ).subscribe()
 
     post({ author, content, isSystemMessage }: RawMessage) {
         this.queue.enqueue({ author, displayText: content, originalText: content, isSystemMessage });

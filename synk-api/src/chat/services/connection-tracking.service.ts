@@ -127,8 +127,7 @@ export class ConnectionTrackingService {
         if (this.isClientInRoom(client, roomId)) {
             const updatedRoomList = roomsOfMember.filter(mem => mem.roomId !== roomId && mem.socketId !== socketId);
             this.memberInRoomTracker.set(memberId, updatedRoomList);
-            this.logger.log("memberLeavesRoom updatedMemberList")
-            this.logger.log(this.memberInRoomTracker)
+            this.logger.log("memberLeavesRoom, updated MemberList")
         }
     }
 

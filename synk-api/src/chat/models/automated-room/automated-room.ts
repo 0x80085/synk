@@ -1,5 +1,6 @@
-import { BehaviorSubject, merge, Observable, of, ReplaySubject, Subject, Subscription, timer } from "rxjs";
-import { catchError, exhaustMap, filter, finalize, map, mapTo, mergeAll, mergeMap, repeatWhen, switchMap, take, takeUntil, tap, toArray, withLatestFrom } from "rxjs/operators";
+import { Logger } from "@nestjs/common";
+import { BehaviorSubject, merge, of, Subject, Subscription, timer } from "rxjs";
+import { catchError, filter, map, mapTo, mergeAll, mergeMap, tap, toArray, withLatestFrom } from "rxjs/operators";
 
 import { Member } from "src/domain/entity/Member";
 import { RedditCrawlerService } from "src/tv/crawlers/reddit.crawler.service";
@@ -48,6 +49,18 @@ export class AutomatedRoom {
     nowPlayingSubject = new Subject<{ media: Media, time: number }>();
 
     loopStateSubject: BehaviorSubject<LoopState> = new BehaviorSubject({ currentTime: 0, media: null, isPlaying: false } as LoopState);
+
+    scrapeResultsSubscription = this.redditScraper.scrapeSubredditsJobSubject.pipe(
+        tap(() => this.stopPlaying()),
+        tap(() => this.currentPlaylist.clear()),
+        tap(results => this.addBulkToPlaylist(results)),
+        tap(() => this.startPlaying()),
+    ).subscribe(
+        res => this.logger.log(`${res.length} URLs found by scrape`),
+        err => this.logger.error("scrape job error occured!", err),
+    )
+
+    private readonly logger = new Logger(AutomatedRoom.name);
 
     broadcastLoopSubscription = merge(
         timer(0, oneSecond).pipe(mapTo(
@@ -185,10 +198,6 @@ export class AutomatedRoom {
 
     playNext(): void {
         this.currentPlaylist.playNext();
-    }
-
-    clearPlaylist() {
-        this.currentPlaylist.clear();
     }
 
     addBulkToPlaylist(bulk: Media[]) {

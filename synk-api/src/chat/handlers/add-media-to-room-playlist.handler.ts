@@ -19,10 +19,10 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
     constructor(
         private ytService: YoutubeV3Service,
         private httpService: HttpService,
-        @InjectRepository(Channel)
-        private channelRepository: Repository<Channel>,
-        @InjectRepository(Video)
-        private videoRepository: Repository<Video>,
+        // @InjectRepository(Channel)
+        // private channelRepository: Repository<Channel>,
+        // @InjectRepository(Video)
+        // private videoRepository: Repository<Video>,
     ) { }
 
     async execute({ url, room, member, socket, socketServer }: AddMediaToRoomCommand) {
@@ -44,21 +44,21 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
                         : this.getMetadataFromYoutubeApi(ytVideoId).pipe(map(media => ({ media, room })))
                 ),
                 tap(({ room, media }) => room.addMediaToPlaylist(member, media)),
-                tap(async ({ room, media }) => {
-                    const channel = await this.channelRepository.createQueryBuilder("channel")
-                        .leftJoinAndSelect("channel.activePlaylist", "activePlaylist")
-                        .leftJoinAndSelect("activePlaylist.videos", "videos")
-                        .where("channel.id = :channelId", { channelId: room.id })
-                        .getOneOrFail();
+                // tap(async ({ room, media }) => {
+                //     const channel = await this.channelRepository.createQueryBuilder("channel")
+                //         .leftJoinAndSelect("channel.activePlaylist", "activePlaylist")
+                //         .leftJoinAndSelect("activePlaylist.videos", "videos")
+                //         .where("channel.id = :channelId", { channelId: room.id })
+                //         .getOneOrFail();
 
-                    this.videoRepository.create({
-                        playlist: channel.activePlaylist,
-                        dateAdded: new Date(),
-                        addedBy: member,
-                        positionInList: channel.activePlaylist.videos.length,
-                        url: media.url
-                    })
-                }),
+                //     this.videoRepository.create({
+                //         playlist: channel.activePlaylist,
+                //         dateAdded: new Date(),
+                //         addedBy: member,
+                //         positionInList: channel.activePlaylist.videos.length,
+                //         url: media.url
+                //     })
+                // }),
                 tap(() => this.broadcastPlaylistToRoom(room, socketServer)),
                 tap(_ => socket.emit(MessageTypes.ADD_MEDIA_REQUEST_APPROVED, { url: trimmedUrl, playlistCount: room.currentPlaylist.queue.length })),
                 catchError(e => {
