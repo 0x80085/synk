@@ -6,6 +6,9 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { Media } from 'src/chat/models/media/media';
 import { YouTubeGetID, YoutubeV3Service } from './youtube-v3.service';
 
+const MAX_CONCURRENT_SCRAPES = 5;
+const ONE_HOUR = 60000;
+
 @Injectable()
 export class RedditCrawlerService {
 
@@ -24,7 +27,6 @@ export class RedditCrawlerService {
             catchError(err => { console.error(err); return of(["Error fetching"]) })
         );
     }
-    // @Cron(CronExpression.EVERY_12_HOURS, { name: 'bidaily_scraper' })
 
     @Cron(CronExpression.EVERY_12_HOURS, { name: 'bidaily_scraper' })
     scrapeSubredditsJob() {
@@ -59,10 +61,10 @@ export class RedditCrawlerService {
                 ), 10),
                 mergeAll(),
                 toArray(),
+                map(mediaList => mediaList.filter(media => media.length < ONE_HOUR))
             )
         );
 
-        const MAX_CONCURRENT_SCRAPES = 5;
         let allResults: Media[] = [];
 
         from(scrapeWorkers).pipe(
