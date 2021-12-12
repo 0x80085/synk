@@ -6,7 +6,11 @@ import { catchError, tap } from 'rxjs/operators';
 import { AuthService } from '../auth.service';
 
 export class ApiError {
-  error: string
+  error: {
+    error: string
+    message: string
+    statusCode: number
+  }
   message: string
   statusCode: number
   status: number
@@ -27,10 +31,10 @@ export class RequestLogInterceptor implements HttpInterceptor {
       catchError((error: any) =>
         of(error).pipe(
           tap(err => {
-            
+
             const apiError = err as ApiError;
             console.log(err);
-            switch (apiError.status) {
+            switch (apiError.error.statusCode) {
               case 401:
                 this.notification.error(`Please login`, `You need to be logged in to access this part`);
                 this.authService.logout().subscribe()
@@ -42,6 +46,7 @@ export class RequestLogInterceptor implements HttpInterceptor {
                 this.notification.error(`Something went wrong...`, `Here's some tea 🍵`);
                 break;
               default:
+                this.notification.error( apiError.error.error, apiError.error.message,)
                 break;
             }
 

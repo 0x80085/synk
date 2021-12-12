@@ -12,6 +12,7 @@ import { AccountService, ChannelDraft } from '../account.service';
 })
 export class CreateRoomFormComponent implements OnInit {
   form: FormGroup;
+  isSubmitting: boolean;
 
   constructor(
     private service: AccountService,
@@ -40,10 +41,10 @@ export class CreateRoomFormComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.form.invalid) {
+    if (this.form.invalid || this.isSubmitting) {
       return;
     }
-
+    this.isSubmitting = true;
     const results: ChannelDraft = {
       name: this.form.controls.name.value.trim(),
       description: this.form.controls.description.value.trim(),
@@ -54,21 +55,23 @@ export class CreateRoomFormComponent implements OnInit {
         this.notification.success("Channel registered", "You are now the proud owner of a brand new Synk channel.")
         this.auth.refreshChannels();
         this.router.navigate(['/channel', results.name]);
+       this.isSubmitting = false
       },
       err => {
-        if (err.status === 403) {
-          this.notification.create(
-            'error',
-            `Login to create a channel`,
-            `Only known users may create a channel.`
-          );
-          return;
-        }
-        this.notification.create(
-          'error',
-          `Couldn't create channel`,
-          `Something went wrong when trying to create a new channel.\n Try again later.`
-        );
+        // if (err.status === 403) {
+        //   this.notification.create(
+        //     'error',
+        //     `Login to create a channel`,
+        //     `Only known users may create a channel.`
+        //   );
+        //   return;
+        // }
+        // this.notification.create(
+        //   'error',
+        //   `Couldn't create channel`,
+        //   `Something went wrong when trying to create a new channel.\n Try again later.`
+        // );
+       this.isSubmitting = false
       }
     );
   }

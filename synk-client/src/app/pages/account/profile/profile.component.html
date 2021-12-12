@@ -15,6 +15,10 @@
           <span nz-typography><code>{{ (me$ | async)?.dateCreated | date }}</code></span>
         </p>
       </nz-card>
+      <h2 nz-typography style="margin-top: 1rem;">Create channel</h2>
+      <nz-card [nzLoading]="!(me$ | async)">
+        <app-create-room-form></app-create-room-form>
+      </nz-card>
     </div>
     <div nz-col [nzLg]="{ span: 16, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }" [nzXs]="{ span: 24, offset: 0 }">
       <app-owned-channels></app-owned-channels>
@@ -22,10 +26,7 @@
   </div>
   <div nz-row>
     <div nz-col [nzLg]="{ span: 8, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }" [nzXs]="{ span: 24, offset: 0 }">
-      <h2 nz-typography>Create channel</h2>
-      <nz-card [nzLoading]="!(me$ | async)">
-        <app-create-room-form></app-create-room-form>
-      </nz-card>
+
     </div>
   </div>
 </div>

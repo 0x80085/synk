@@ -30,7 +30,7 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
         try {
             const trimmedUrl = url.trim();
 
-            if (this.isMediaSourceSupported(trimmedUrl)) {
+            if (!this.isMediaSourceSupported(trimmedUrl)) {
                 console.log("Host not allowed");
                 throw new BadRequestException("Host not allowed");
             }
