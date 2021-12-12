@@ -12,6 +12,7 @@ import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
+import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
 import { ChannelComponent } from './channel.component';
@@ -67,6 +68,7 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
     NzTypographyModule,
     NzDividerModule,
     NzAlertModule,
+    NzTabsModule ,
     DragDropModule,
     NzIconModule.forRoot(NZ_ICONS),
 

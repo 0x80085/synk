@@ -1,64 +1,89 @@
-<div nz-row>
-  <ng-container *ngIf="showPlaylistItemActions">
-    <div nz-col nzSpan="24" style="min-height: 3rem">
-      <button nz-button nzType="link" (click)="showControls = !showControls">
-        <i nz-icon nzType="video-camera-add" nzTheme="outline" nz-tooltip nzTooltipTitle="Add media to playlist"></i>
-      </button>
-    </div>
-    <div nz-col nzSpan="24">
-      <div [hidden]="!showControls">
-        <form nz-form [formGroup]="form" (ngSubmit)="onAddMedia()">
-          <nz-form-item style="margin-bottom: 1rem;">
-            <nz-form-control nzErrorTip="Please input a valid media URL">
-              <nz-input-group nzSearch nzSize="large" [nzAddOnAfter]="suffixButton">
-                <input type="text" nz-input placeholder="Enter a link to a video" formControlName="mediaUrl" />
-              </nz-input-group>
-            </nz-form-control>
-          </nz-form-item>
-        </form>
-        <nz-alert style="margin-bottom: 1rem" nzType="info" [nzDescription]="addMediaInfo" nzShowIcon></nz-alert>
-      </div>
-    </div>
-  </ng-container>
+<div nz-row [nzGutter]="25">
 
   <div nz-col nzSpan="24">
-    <nz-list [nzBordered]="localPlaylist" nzSize="small" [nzLoading]="!localPlaylist" [nzDataSource]="localPlaylist"
-      [nzRenderItem]="item" [nzNoResult]="noItems" cdkDropList (cdkDropListDropped)="drop($event)">
-      <ng-template #item let-item>
-        <nz-list-item style="border-bottom: 1px solid rgb(25, 25, 25)"
-          [class.active]="item.active" nzSplit [nzContent]="contentTitle"
-          [nzActions]="[opAction]" cdkDrag>
-        </nz-list-item>
-        <ng-template #opAction>
+    <div nz-col nzSpan="24">
+      <ng-container *ngIf="nowPlaying$ | async as nowPlayingMedia;">
+        <p nz-typography *ngIf="nowPlayingMedia">
+          <span nz-typography nzType="secondary"> 
+            <i nz-icon [nzType]="'play-circle'"></i>
+            Now playing: 
+          </span>
+          <span nz-tooltip [nzTooltipTitle]="nowPlayingMedia?.title" class="media-title">{{ nowPlayingMedia?.title }}</span>
+          <span class="media-duration">{{ nowPlayingMedia?.length }}</span>
           <a
-            nz-button
-            nzType="link"
-            nz-tooltip
-            [nzTooltipTitle]="'Open media link in new tab'"
-            [href]="item.url"
-            target="blank"
-          >
-            <i nz-icon nzType="link"></i>
-          </a>
-          <button nz-button nzSize="small" nzType="link" (click)="playMedia.emit(item.url)" nz-tooltip
-            [nzTooltipTitle]="item.active ? 'now playing' : showPlaylistItemActions ? 'start video' : ''">
-            <i nz-icon [nzType]="item.active ? 'play-circle' : 'caret-right'"></i>
-          </button>
-          <ng-container *ngIf="showPlaylistItemActions">
-            <button nz-button nzSize="small" nzDanger nzType="link" (click)="onRemoveMedia(item.mediaUrl)" nz-tooltip
-              nzTooltipTitle="Remove from list">
-              <i nz-icon nzType="delete"></i>
-            </button>
-          </ng-container>
-        </ng-template>
-        <ng-template #contentTitle>
-          <div class="content">
-            <span nz-tooltip [nzTooltipTitle]="item.title" class="media-title">{{ item.title }}</span>
-            <span class="media-duration">{{ item.length }}</span>
-          </div>
-        </ng-template>
-      </ng-template>
-    </nz-list>
+          nz-button
+          nzType="link"
+          nz-tooltip
+          [nzTooltipTitle]="'Open media link in new tab'"
+          [href]="nowPlayingMedia?.mediaUrl"
+          target="blank"
+        >
+          <i nz-icon nzType="link"></i>
+        </a>
+      </p>        
+      </ng-container>
+
+      <nz-tabset>
+        <nz-tab nzTitle="Playlist">
+        
+          <nz-list [nzBordered]="localPlaylist" nzSize="small" [nzLoading]="!localPlaylist" [nzDataSource]="localPlaylist"
+          [nzRenderItem]="item" [nzNoResult]="noItems" cdkDropList (cdkDropListDropped)="drop($event)">
+          <ng-template #item let-item>
+            <nz-list-item style="border-bottom: 1px solid rgb(25, 25, 25)"
+              [class.active]="item.active" nzSplit [nzContent]="contentTitle"
+              [nzActions]="[opAction]" cdkDrag>
+            </nz-list-item>
+            <ng-template #opAction>
+              <a
+                nz-button
+                nzType="link"
+                nz-tooltip
+                [nzTooltipTitle]="'Open media link in new tab'"
+                [href]="item.url"
+                target="blank"
+              >
+                <i nz-icon nzType="link"></i>
+              </a>
+              <button nz-button nzSize="small" nzType="link" (click)="playMedia.emit(item.url)" nz-tooltip
+                [nzTooltipTitle]="item.active ? 'now playing' : showPlaylistItemActions ? 'start video' : ''">
+                <i nz-icon [nzType]="item.active ? 'play-circle' : 'caret-right'"></i>
+              </button>
+              <ng-container *ngIf="showPlaylistItemActions">
+                <button nz-button nzSize="small" nzDanger nzType="link" (click)="onRemoveMedia(item.mediaUrl)" nz-tooltip
+                  nzTooltipTitle="Remove from list">
+                  <i nz-icon nzType="delete"></i>
+                </button>
+              </ng-container>
+            </ng-template>
+            <ng-template #contentTitle>
+              <div class="content">
+                <span nz-tooltip [nzTooltipTitle]="item.title" class="media-title">{{ item.title }}</span>
+                <span class="media-duration">{{ item.length }}</span>
+              </div>
+            </ng-template>
+          </ng-template>
+        </nz-list>
+      </nz-tab>
+
+        <nz-tab nzTitle="Add media" [nzDisabled]="!showPlaylistItemActions">
+<!-- todo add voteskip, conditionally displayed actions for leader/mod/owner -->
+          <div nz-col nzSpan="24">
+              <form nz-form [formGroup]="form" (ngSubmit)="onAddMedia()">
+                <nz-form-item style="margin-bottom: 1rem;">
+                  <nz-form-control nzErrorTip="Please input a valid media URL">
+                    <nz-input-group nzSearch nzSize="large" [nzAddOnAfter]="suffixButton">
+                      <input type="text" nz-input placeholder="Enter a link to a video" formControlName="mediaUrl" />
+                    </nz-input-group>
+                  </nz-form-control>
+                </nz-form-item>
+              </form>
+              <nz-alert style="margin-bottom: 1rem" nzType="info" [nzDescription]="addMediaInfo" nzShowIcon></nz-alert>
+            </div>
+        </nz-tab>
+
+      </nz-tabset>
+     
+    </div>
   </div>
 </div>
 

@@ -19,6 +19,7 @@ export class AppStateService {
 
   isAdmin$ = this.userSubject.pipe(
     map(user => user.isAdmin),
+    shareReplay(1),
     catchError(() => of(false))
   );
 

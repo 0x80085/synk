@@ -42,7 +42,7 @@
     <div nz-col nzSpan="18" class="mt-1">
       <app-playlist
         [roomName]="name"
-        [showPlaylistItemActions]="name !== 'The Daily Scraper'"
+        [showPlaylistItemActions]="name !== 'The Daily Scraper' || (isSuperAdmin$ | async)"
         (playMedia)="player.play($event)"
       >
       </app-playlist>

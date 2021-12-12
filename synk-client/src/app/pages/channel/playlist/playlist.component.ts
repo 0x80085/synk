@@ -19,7 +19,7 @@ const SUPPORTED_MEDIA_HOSTS = [
   'youtu.be',
   'youtube.com',
   //'soundcloud.com',
-  //'twitch.tv',
+  'twitch.tv',
   //'vimeo.com',
   //'archive.org',
   // 'dailymotion.com',
@@ -43,7 +43,7 @@ export class PlaylistComponent implements OnDestroy, OnInit {
 
   nowPlaying$ = this.mediaService.roomMediaEvent$.pipe(
     startWith({mediaUrl: null}),
-    map(it => it.mediaUrl),
+    map(it => this.localPlaylist.find(item =>  item.mediaUrl == it?.mediaUrl)),
     distinctUntilChanged(),
   );
 
@@ -59,12 +59,11 @@ export class PlaylistComponent implements OnDestroy, OnInit {
     [this.nowPlaying$,
     this.mediaService.roomPlaylistUpdateEvents$]
   ).pipe(
-    tap(console.log ),
-    map(([nowPlayingUrl, { entries },]) =>
+    map(([nowPlaying, { entries },]) =>
       entries.map(entry => ({
         ...entry,
         mediaUrl: entry.url,
-        active: nowPlayingUrl && entry.url === nowPlayingUrl,
+        active: nowPlaying && entry.url === nowPlaying.mediaUrl,
         length: new Date(entry.length * 1000).toISOString().substr(11, 8)
       }))),
     tap(ls => this.localPlaylist = ls)

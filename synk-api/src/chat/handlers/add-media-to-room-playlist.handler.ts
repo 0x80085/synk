@@ -104,6 +104,10 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
         //     })
         // )
 
+        if (new URL(url).host === 'www.twitch.tv' || new URL(url).host === 'twitch.tv') {
+            return of(new Media(url, url, 100));
+        }
+
         // Do request only to check media type is smth playable
         return this.httpService.get(url, { headers: { 'Range': 'bytes=0-16' } })
             .pipe(
@@ -112,8 +116,10 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
                 map(headers => headers["content-type"]),
                 tap(console.log),
                 map(contentType => this.isSupportedMediaType(contentType)),
-                mapTo(new Media(url, "no title was given", 100))
+                mapTo(new Media(url, "no title was given", 0))
             )
+
+
         // }
 
         return of(new Media(url, "no title was given", 100));

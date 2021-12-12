@@ -28,6 +28,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   activeItem$ = this.activeItemSubject.pipe(shareReplay(1));
 
   isConnected$ = merge(this.socketService.isConnected$, this.state.isLoggedIn$);
+  isSuperAdmin$ = this.state.isAdmin$;
 
   isLoading$ = merge(
     this.socketService.reconnectionError$.pipe(mapTo(true)),

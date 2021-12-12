@@ -6,8 +6,8 @@
     [hidden]="isMediaSelected | async"
   >
     <p nz-typography>Nothing playing</p>
-    <p nz-typography>Add media using the <i nz-icon nzType="video-camera-add" nzTheme="outline"></i> icon!</p>
-    <p nz-typography>Then start playing media from the playlist <i nz-icon nzType="caret-right" nzTheme="outline"></i> icon!</p>
+    <p nz-typography>Add media using the form below!</p>
+    <p nz-typography>(in case you are the leader) click the <i nz-icon nzType="caret-right" nzTheme="outline"></i> icon in the playlist to play the media!</p>
   </div>
 
   <div nz-col nzSpan="24"  [nzFlex]="'auto'" class="media" [hidden]="!(isMediaSelected | async)">
