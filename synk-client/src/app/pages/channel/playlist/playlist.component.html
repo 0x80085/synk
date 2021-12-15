@@ -3,8 +3,30 @@
   <div nz-col nzSpan="24">
     <div nz-col nzSpan="24">
       <ng-container *ngIf="nowPlaying$ | async as nowPlayingMedia;">
+
+        <!--  -->
+        <nz-descriptions [nzColumn]="{ xxl: 4, xl: 3, lg: 3, md: 3, sm: 2, xs: 1 }">
+          <nz-descriptions-item nzTitle="Title">{{nowPlayingMedia?.title}}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Link">
+            <a
+              nz-button
+              nzType="link"
+              nz-tooltip
+              [nzTooltipTitle]="'Open media link in new tab'"
+              [href]="nowPlayingMedia?.mediaUrl"
+              target="blank"
+            >
+              <i nz-icon nzType="link"></i>
+            </a> 
+          </nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Duration">
+           {{ nowPlayingMedia?.length}}
+          </nz-descriptions-item>
+        </nz-descriptions>
+        <!--  -->
+
         <p nz-typography *ngIf="nowPlayingMedia">
-          <span nz-typography nzType="secondary"> 
+          <!-- <span nz-typography nzType="secondary"> 
             <i nz-icon [nzType]="'play-circle'"></i>
             Now playing: 
           </span>
@@ -18,8 +40,9 @@
           [href]="nowPlayingMedia?.mediaUrl"
           target="blank"
         >
+          Open link
           <i nz-icon nzType="link"></i>
-        </a>
+        </a> -->
       </p>        
       </ng-container>
 
