@@ -12,8 +12,8 @@
 </nz-card>
 
 <ng-template #nowPlaying>
-  <p nz-typography nzType="link" nzParagraph nzEllipsis nzEllipsisRows="3" nzType="secondary">
-    <i nz-icon nzType="play-circle" nzTheme="outline"></i> Now playing:
+  <p nz-typography  nzParagraph nzEllipsis nzEllipsisRows="3">
+    <span nz-typography  nzType="secondary"><i nz-icon nzType="play-circle" nzTheme="outline"></i> Now playing:</span>  
     <span nz-typography 
       nz-tooltip
       [nzTooltipTitle]="channel.nowPlaying.title"

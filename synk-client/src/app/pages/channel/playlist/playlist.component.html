@@ -1,10 +1,7 @@
-<div nz-row [nzGutter]="25">
+<div nz-row>
 
   <div nz-col nzSpan="24">
-    <div nz-col nzSpan="24">
       <ng-container *ngIf="nowPlaying$ | async as nowPlayingMedia;">
-
-        <!--  -->
         <nz-descriptions [nzColumn]="{ xxl: 4, xl: 3, lg: 3, md: 3, sm: 2, xs: 1 }">
           <nz-descriptions-item nzTitle="Title">{{nowPlayingMedia?.title}}</nz-descriptions-item>
           <nz-descriptions-item nzTitle="Link">
@@ -23,27 +20,6 @@
            {{ nowPlayingMedia?.length}}
           </nz-descriptions-item>
         </nz-descriptions>
-        <!--  -->
-
-        <p nz-typography *ngIf="nowPlayingMedia">
-          <!-- <span nz-typography nzType="secondary"> 
-            <i nz-icon [nzType]="'play-circle'"></i>
-            Now playing: 
-          </span>
-          <span nz-tooltip [nzTooltipTitle]="nowPlayingMedia?.title" class="media-title">{{ nowPlayingMedia?.title }}</span>
-          <span class="media-duration">{{ nowPlayingMedia?.length }}</span>
-          <a
-          nz-button
-          nzType="link"
-          nz-tooltip
-          [nzTooltipTitle]="'Open media link in new tab'"
-          [href]="nowPlayingMedia?.mediaUrl"
-          target="blank"
-        >
-          Open link
-          <i nz-icon nzType="link"></i>
-        </a> -->
-      </p>        
       </ng-container>
 
       <nz-tabset>
@@ -90,7 +66,6 @@
 
         <nz-tab nzTitle="Add media" [nzDisabled]="!showPlaylistItemActions">
 <!-- todo add voteskip, conditionally displayed actions for leader/mod/owner -->
-          <div nz-col nzSpan="24">
               <form nz-form [formGroup]="form" (ngSubmit)="onAddMedia()">
                 <nz-form-item style="margin-bottom: 1rem;">
                   <nz-form-control nzErrorTip="Please input a valid media URL">
@@ -101,13 +76,11 @@
                 </nz-form-item>
               </form>
               <nz-alert style="margin-bottom: 1rem" nzType="info" [nzDescription]="addMediaInfo" nzShowIcon></nz-alert>
-            </div>
         </nz-tab>
 
       </nz-tabset>
      
     </div>
-  </div>
 </div>
 
 <ng-template #suffixButton>
