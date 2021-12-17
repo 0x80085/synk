@@ -62,6 +62,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   roomUserConfigSubscription = this.chatService.roomUserConfig$.subscribe(ev => {
     this.loggedInUserIsLeader = ev.isLeader;
+    this.showIsLeaderNotification(ev.isLeader)
   });
 
   isUserLeaderFeedbackSubscription = merge(
@@ -69,25 +70,8 @@ export class ChannelComponent implements OnInit, OnDestroy {
     this.chatService.userPassedOnLeader$.pipe(mapTo(false))
   ).pipe(
     tap(isLeader => {
-      const msgs = {
-        forNewLeader: {
-          title: `You are now the leader of the room!`,
-          body: `You have control over the video player of the room now. Try playing a video and others will hook into your playback time`
-        },
-        forExLeader: {
-          title: `Leadership given up successfully!`,
-          body: `You have given up control. Another user controls the playback now`
-        }
-      }
-
-      this.notification.success(
-        isLeader
-          ? msgs.forNewLeader.title
-          : msgs.forExLeader.title,
-        isLeader
-          ? msgs.forNewLeader.body
-          : msgs.forExLeader.body,
-      )
+      this.loggedInUserIsLeader = isLeader;
+      this.showIsLeaderNotification(isLeader, true)
     })
   ).subscribe()
 
@@ -217,6 +201,32 @@ export class ChannelComponent implements OnInit, OnDestroy {
       console.log(error.toString && error.toString());
       return false;
     }
+  }
+  private showIsLeaderNotification(isLeader: boolean, showWhenIsNotLeader = false) {
+    const msgs = {
+      forNewLeader: {
+        title: `You are now the leader of the room!`,
+        body: `You have control over the video player of the room now. Try playing a video and others will hook into your playback time`
+      },
+      forExLeader: {
+        title: `Leadership given up successfully!`,
+        body: `You have given up control. Another user controls the playback now`
+      }
+    }
+
+    if (!showWhenIsNotLeader && !isLeader) {
+      return;
+    }
+
+
+    this.notification.success(
+      isLeader
+        ? msgs.forNewLeader.title
+        : msgs.forExLeader.title,
+      isLeader
+        ? msgs.forNewLeader.body
+        : msgs.forExLeader.body,
+    )
   }
 
   ngOnDestroy(): void {

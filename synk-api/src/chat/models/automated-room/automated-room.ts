@@ -204,6 +204,16 @@ export class AutomatedRoom {
         bulk.forEach(media => this.currentPlaylist.add(media, null));
     }
 
+    removeMediaFromPlaylist(member: Member, url: string) {
+        if (this.selectFromMembers(member)?.isAdmin) {
+            const target = this.currentPlaylist.selectFromQueue(url);
+            if (!target) {
+                return
+            }
+            this.currentPlaylist.remove(target.media);
+        }
+    }
+
     startSubredditScraperRun(subreddit: string) {
         this.startScrapeSubscriptions([subreddit]);
     }

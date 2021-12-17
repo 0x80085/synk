@@ -244,7 +244,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     this.logger.log('handelRemoveMedia');
 
     return from(this.tracker.getMemberBySocket(client)).pipe(
-      map(member => ({ member, room: this.roomService.getRoomByName(roomName) })),
+      map(member => ({ member, room: this.roomService.getAutomatedRoom(roomName) || this.roomService.getRoomByName(roomName) })),
       tap(({ room, member }) => room.removeMediaFromPlaylist(member, mediaUrl)),
       tap(({ room }) => this.broadcastPlaylistToRoom(room)),
       tap(({ room }) => this.broadcastGroupMessageToRoom(room)),
