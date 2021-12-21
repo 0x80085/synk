@@ -1,28 +1,62 @@
-<nz-list [nzBordered]="(members$  | async)" nzSize="small" [nzLoading]="!(members$  | async)"
-[nzDataSource]="members$ | async" [nzRenderItem]="member" [nzNoResult]="'No items'">
+is leader : {{ (loggedInUserIsLeader$ | async) }}
 
-<ng-template #member let-member>
-  <nz-list-item [nzActions]="[giveLeaderBtn, ownerIcon, leaderIcon]">
-    <nz-list-item-meta [nzTitle]="member.username">
-    </nz-list-item-meta>
-  </nz-list-item>
+<ng-container *ngIf="(loggedInUserIsLeader$ | async) as loggedInUserIsLeader; then isLeader; else notIsLeader; ">
+</ng-container>
 
-  <ng-template #leaderIcon>
-    <i [hidden]="!member.isLeader" nz-icon style="color: white; font-size: 1rem;" nzType="interaction"
-      nz-tooltip nzTooltipTitle="This member currently controls the playback"></i>
+<ng-template #notIsLeader>
+
+  <nz-list [nzBordered]="(members$  | async)" nzSize="small" [nzLoading]="!(members$  | async)"
+  [nzDataSource]="members$ | async" [nzRenderItem]="member" [nzNoResult]="'No items'">
+  
+  <ng-template #member let-member>
+    <nz-list-item [nzActions]="[ownerIcon, leaderIcon]">
+      <nz-list-item-meta [nzTitle]="member.username">
+      </nz-list-item-meta>
+    </nz-list-item>
+  
+    <ng-template #leaderIcon>
+      <i [hidden]="!member.isLeader" nz-icon style="color: white; font-size: 1rem;" nzType="interaction"
+        nz-tooltip nzTooltipTitle="This member currently controls the playback"></i>
+    </ng-template>
+  
+    <ng-template #ownerIcon>
+      <i [hidden]="!member.isOwner" nz-icon style="color: white; font-size: 1rem;" nzType="shop" nz-tooltip
+      nzTooltipTitle="Owner of this channel"></i>
+    </ng-template>
+  
   </ng-template>
-
-  <ng-template #ownerIcon>
-    <i [hidden]="!member.isOwner" nz-icon style="color: white; font-size: 1rem;" nzType="shop" nz-tooltip
-    nzTooltipTitle="Owner of this channel"></i>
-  </ng-template>
-
-  <ng-template #giveLeaderBtn>
-      <button nz-button nzType="link" nz-tooltip nzTooltipTitle="Hand over playback control to this member"
-      *ngIf="(loggedInUserIsLeader$ | async) && !member.isLeader" (click)="this.giveLeader.emit(member)">
-        <i nz-icon nzType="api"></i>
-      </button>
-  </ng-template>
-
+  </nz-list>
 </ng-template>
-</nz-list>
+
+<ng-template #isLeader>
+
+  <nz-list [nzBordered]="(members$  | async)" nzSize="small" [nzLoading]="!(members$  | async)"
+  [nzDataSource]="members$ | async" [nzRenderItem]="member" [nzNoResult]="'No items'">
+  
+  <ng-template #member let-member>
+    <nz-list-item [nzActions]="[giveLeaderBtn, ownerIcon, leaderIcon]">
+      <nz-list-item-meta [nzTitle]="member.username">
+      </nz-list-item-meta>
+    </nz-list-item>
+  
+    <ng-template #leaderIcon>
+      <i [hidden]="!member.isLeader" nz-icon style="color: white; font-size: 1rem;" nzType="interaction"
+        nz-tooltip nzTooltipTitle="This member currently controls the playback"></i>
+    </ng-template>
+  
+    <ng-template #ownerIcon>
+      <i [hidden]="!member.isOwner" nz-icon style="color: white; font-size: 1rem;" nzType="shop" nz-tooltip
+      nzTooltipTitle="Owner of this channel"></i>
+    </ng-template>
+  
+    <ng-template #giveLeaderBtn>
+        <button nz-button nzType="link" nz-tooltip nzTooltipTitle="Hand over playback control to this member"
+        [hidden]="member.isLeader" (click)="this.giveLeader.emit(member)">
+          <i nz-icon nzType="api"></i>
+        </button>
+    </ng-template>
+  
+  </ng-template>
+  </nz-list>
+</ng-template>
+

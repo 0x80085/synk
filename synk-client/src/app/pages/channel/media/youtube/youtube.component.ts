@@ -23,7 +23,9 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
   current: string;
 
   isPlaying = () =>
-    this.player && this.player.getPlayerState() === YT.PlayerState.PLAYING
+    this.player 
+    && this.player.getPlayerState 
+    && this.player.getPlayerState() === YT.PlayerState.PLAYING
 
   constructor(private notification: NzNotificationService) { }
 

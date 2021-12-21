@@ -3,10 +3,10 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { combineLatest, Subject, Subscription } from 'rxjs';
-import { distinctUntilChanged, map, startWith, tap } from 'rxjs/operators';
+import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { doLog } from 'src/app/utils/custom.operators';
+import { MediaService } from '../media.service';
 
-import { MediaRepresentation, MediaService } from '../media.service';
-import { YouTubeGetID } from '../media/youtube/youtube.component';
 
 interface PlaylistItem {
   active: boolean;
@@ -41,12 +41,6 @@ export class PlaylistComponent implements OnDestroy, OnInit {
 
   @Output() playMedia = new EventEmitter<string>();
 
-  nowPlaying$ = this.mediaService.roomMediaEvent$.pipe(
-    startWith({mediaUrl: null}),
-    map(it => this.localPlaylist.find(item =>  item.mediaUrl == it?.mediaUrl)),
-    distinctUntilChanged(),
-  );
-
   form: FormGroup;
 
   showControls: boolean;
@@ -55,34 +49,50 @@ export class PlaylistComponent implements OnDestroy, OnInit {
 
   supportedMediaHosts = SUPPORTED_MEDIA_HOSTS;
 
-  private virtualPlaylist$: Subscription = combineLatest(
-    [this.nowPlaying$,
-    this.mediaService.roomPlaylistUpdateEvents$]
-  ).pipe(
-    map(([nowPlaying, { entries },]) =>
+  nowPlayingLabelSubject: Subject<PlaylistItem> = new Subject()
+
+  nowPlayingChangeEvent$ = this.mediaService.roomMediaEvent$.pipe(
+    doLog('nowPlayingChangeEvent$', true),
+    distinctUntilChanged((one, two) => one.mediaUrl === two.mediaUrl),
+    // shareReplay(1)
+  );
+
+  private playlistUpdateEvent$ = combineLatest([
+    this.mediaService.roomPlaylistUpdateEvents$,
+    this.nowPlayingChangeEvent$
+  ]).pipe(
+    map(([{ entries }, nowPlaying]) =>
       entries.map(entry => ({
         ...entry,
         mediaUrl: entry.url,
         active: nowPlaying && entry.url === nowPlaying.mediaUrl,
         length: new Date(entry.length * 1000).toISOString().substr(11, 8)
       }))),
-    tap(ls => this.localPlaylist = ls)
-  ).subscribe();
+    tap(ls => ls.find(it => it.active == true)
+      ? this.nowPlayingLabelSubject.next(ls.find(it => it.active == true))
+      : null)
+  );
 
-  private addMediaErrorFeedback$ = this.mediaService.addMediaErrEvent$.pipe(
+  private playlistUpdateSubscription: Subscription = this.playlistUpdateEvent$
+    .pipe(
+      tap(ls => this.localPlaylist = ls),
+      tap(ls => console.log('ls update'))
+    ).subscribe();
+
+  private addMediaErrorFeedbackSubscription = this.mediaService.addMediaErrEvent$.pipe(
     tap(_ => this.notification.error('Error', `Couldnt add media to playlist...`))
   ).subscribe();
 
-  private addMediaSuccesFeedback$ = this.mediaService.addMediaSuccessEvent$.pipe(
+  private addMediaSuccesFeedbackSubscription = this.mediaService.addMediaSuccessEvent$.pipe(
     tap(({ playlistCount, url }) => this.startPlaybackIfFirstItemInList(playlistCount, url)),
     tap(_ => this.notification.success('Media added!', `Request to add media to playlist succeeded!`, { nzDuration: 5000 }))
   ).subscribe();
 
-  private removeMediaErrorFeedback$ = this.mediaService.removeMediaErrEvent$.pipe(
+  private removeMediaErrorFeedbackSubscription = this.mediaService.removeMediaErrEvent$.pipe(
     tap(_ => this.notification.error('Failed to remove media from playlist', `Only users who have added the entry can remove it`))
   ).subscribe();
 
-  private removeMediaSuccesFeedback$ = this.mediaService.removeMediaSuccessEvent$.pipe(
+  private removeMediaSuccesFeedbackSubscription = this.mediaService.removeMediaSuccessEvent$.pipe(
     tap(_ => this.notification.success('Success', 'Media removed from playlist'))
   ).subscribe();
 
@@ -154,13 +164,13 @@ export class PlaylistComponent implements OnDestroy, OnInit {
   }
 
   ngOnDestroy(): void {
-    this.virtualPlaylist$.unsubscribe();
+    this.playlistUpdateSubscription.unsubscribe();
 
-    this.addMediaErrorFeedback$.unsubscribe();
-    this.addMediaSuccesFeedback$.unsubscribe();
+    this.addMediaErrorFeedbackSubscription.unsubscribe();
+    this.addMediaSuccesFeedbackSubscription.unsubscribe();
 
-    this.removeMediaSuccesFeedback$.unsubscribe();
-    this.removeMediaErrorFeedback$.unsubscribe();
+    this.removeMediaSuccesFeedbackSubscription.unsubscribe();
+    this.removeMediaErrorFeedbackSubscription.unsubscribe();
   }
 
   static validateIsUrl(): ValidatorFn {

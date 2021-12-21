@@ -2,6 +2,7 @@ import { AfterViewChecked, Component, ElementRef, HostListener, Input, OnDestroy
 import { Observable, Subject } from 'rxjs';
 import { filter, map, mapTo, shareReplay, tap } from 'rxjs/operators';
 
+import { doLog } from 'src/app/utils/custom.operators';
 import { ChatService } from '../chat.service';
 import { Message } from '../models/room.models';
 
@@ -33,9 +34,11 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
     this.chatService.sendMessageToRoom(),
   ).subscribe();
 
-  loggedInUserIsLeader$ = this.chatService.roomUserConfig$.pipe(
-    map(ev => (ev.isLeader)), 
-    shareReplay(1)
+  config$ = this.chatService.roomUserConfig$
+
+  loggedInUserIsLeader$ = this.config$.pipe(
+    map(ev => (ev.isLeader)),
+    doLog('chatrom isleader', true), 
   );
 
   messages$: Observable<Message[]> = this.chatService.roomMessages$;

@@ -67,4 +67,4 @@ Or use the shortcut in package.json:
 
 Join the discord channel and help with testing or developing this project
 
-[![Discord](https://img.shields.io/discord/732990730355867678.svg?style=for-the-badge&label=Synk&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/tMsTW9m)
+[![Discord](https://img.shields.io/discord/732990730355867678.svg?style=for-the-badge&label=Synk&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/EaYUq7Ws8m)

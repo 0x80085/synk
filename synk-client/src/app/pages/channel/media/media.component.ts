@@ -68,7 +68,12 @@ export class MediaComponent {
   }
 
   getCurrentTime() {
-    return this.ref.instance.getCurrentTime();
+    try {
+      return this.ref.instance.getCurrentTime();
+    } catch (error) {
+      debugLog("this.ref.instance not available - prob no player rendered.", error, true);
+      return null;
+    }
   }
 
   getCurrentUrl(): string {
@@ -76,7 +81,7 @@ export class MediaComponent {
       return this.ref.instance.getCurrentUrl();
     } catch (error) {
       debugLog("this.ref.instance not available - prob no player rendered.", error, true);
-      return;
+      return null;
     }
   }
 

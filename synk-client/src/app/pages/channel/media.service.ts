@@ -31,7 +31,7 @@ export class MediaService {
   roomMediaEvent$ = this.socketService
     .listenForEvent<MediaEvent>(MediaCommands.MEDIA_EVENT)
     .pipe(
-      share()
+      shareReplay(1)
     );
 
   addMediaErrEvent$ = this.socketService.exceptionEvent$
