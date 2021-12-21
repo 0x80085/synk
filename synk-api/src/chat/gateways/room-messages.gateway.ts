@@ -424,14 +424,13 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
 
     this.tracker.memberJoinsRoom(client, room.id);
 
-    this.logger.log(`${client.id} ${room.id}`);
-    this.logger.log(`${client.rooms}`);
-
     this.broadcastMemberlistToRoom(room);
     this.broadcastGroupMessageToRoom(room);
 
     this.sendRoomConfigToMember(room, member.id, client);
     this.sendPlaylistToMember(room, client);
+
+    this.logger.log(`[${member.username}] joined [${room.name}]`)
   }
 
   private joinAutomatedRoom(automatedRoom: AutomatedRoom, member: Member, client: socketio.Socket) {

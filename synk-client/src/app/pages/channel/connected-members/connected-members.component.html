@@ -1,5 +1,3 @@
-is leader : {{ (loggedInUserIsLeader$ | async) }}
-
 <ng-container *ngIf="(loggedInUserIsLeader$ | async) as loggedInUserIsLeader; then isLeader; else notIsLeader; ">
 </ng-container>
 
