@@ -3,7 +3,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { combineLatest, Subject, Subscription } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { distinctUntilChanged, map, startWith, tap, withLatestFrom } from 'rxjs/operators';
 import { doLog } from 'src/app/utils/custom.operators';
 import { MediaService } from '../media.service';
 
@@ -54,18 +54,18 @@ export class PlaylistComponent implements OnDestroy, OnInit {
   nowPlayingChangeEvent$ = this.mediaService.roomMediaEvent$.pipe(
     doLog('nowPlayingChangeEvent$', true),
     distinctUntilChanged((one, two) => one.mediaUrl === two.mediaUrl),
-    // shareReplay(1)
   );
 
   private playlistUpdateEvent$ = combineLatest([
     this.mediaService.roomPlaylistUpdateEvents$,
-    this.nowPlayingChangeEvent$
+    this.nowPlayingChangeEvent$.pipe(startWith(null))
   ]).pipe(
+    doLog(' playlistUpdateEvent$', true),
     map(([{ entries }, nowPlaying]) =>
       entries.map(entry => ({
         ...entry,
         mediaUrl: entry.url,
-        active: nowPlaying && entry.url === nowPlaying.mediaUrl,
+        active: entry.url === nowPlaying?.mediaUrl,
         length: new Date(entry.length * 1000).toISOString().substr(11, 8)
       }))),
     tap(ls => ls.find(it => it.active == true)
@@ -76,7 +76,7 @@ export class PlaylistComponent implements OnDestroy, OnInit {
   private playlistUpdateSubscription: Subscription = this.playlistUpdateEvent$
     .pipe(
       tap(ls => this.localPlaylist = ls),
-      tap(ls => console.log('ls update'))
+      doLog('playlistUpdateSubscription', true),
     ).subscribe();
 
   private addMediaErrorFeedbackSubscription = this.mediaService.addMediaErrEvent$.pipe(

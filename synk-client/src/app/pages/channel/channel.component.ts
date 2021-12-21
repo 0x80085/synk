@@ -70,7 +70,10 @@ export class ChannelComponent implements OnInit, OnDestroy {
   ).pipe(
     tap(isLeader => {
       this.loggedInUserIsLeader = isLeader;
-      this.showIsLeaderNotification(isLeader, true)
+
+      if (!isLeader) {
+        this.showIsLeaderNotification(isLeader, true)
+      }
     })
   ).subscribe()
 
@@ -179,7 +182,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
     } catch (error) {
       this.timeOfLatestAttemptAtPlayerLaunch = new Date();
       didSync = false;
-      debugLog('Error while syncing player - probably not ready yet', error, true);
+      debugLog('Error while syncing player - probably not ready yet', error);
     }
 
     debugLog(`did sync? ..${didSync}`);
