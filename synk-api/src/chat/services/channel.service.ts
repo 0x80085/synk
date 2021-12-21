@@ -74,7 +74,12 @@ export class ChannelService {
             id,
             name,
             connectedMemberCount: members.length,
-            nowPlaying: { url: currentPlaylist.nowPlaying()?.media?.url, title: currentPlaylist.nowPlaying()?.media?.title },
+            nowPlaying: {
+                url: currentPlaylist.nowPlaying()?.media?.url,
+                title: currentPlaylist.nowPlaying()?.media?.title,
+                currentTime: currentPlaylist.nowPlaying().time,
+                length: currentPlaylist.nowPlaying().media?.length
+            },
             description: "Daily content collected from internet hubs"
         } as ChannelShortRepresentation))
     }

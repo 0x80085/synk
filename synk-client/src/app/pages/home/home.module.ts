@@ -8,6 +8,7 @@ import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzProgressModule } from 'ng-zorro-antd/progress';
 
 import { HomeComponent } from './home.component';
 import { OverviewComponent } from './overview/overview.component';
@@ -39,6 +40,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
     NzGridModule,
     NzTypographyModule,
     NzImageModule,
+    NzProgressModule,
     NzIconModule.forRoot(NZ_ICONS)
   ],
   declarations: [

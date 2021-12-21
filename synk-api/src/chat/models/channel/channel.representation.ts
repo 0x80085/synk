@@ -21,7 +21,12 @@ export interface ChannelShortRepresentation {
     name: string;
     description: string;
     connectedMemberCount: number;
-    nowPlaying: {url: string, title: string};
+    nowPlaying: {
+        url: string,
+        title: string
+        length:number
+        currentTime:number
+    };
     isPublic: boolean;
     dateCreated: Date;
     isLocked: boolean;
@@ -55,7 +60,9 @@ export const getChannelShortRepresentation = ({
     connectedMemberCount: members.length,
     nowPlaying: {
         title: currentPlaylist.nowPlaying().media?.title,
-        url:  currentPlaylist.nowPlaying().media?.url
+        currentTime: currentPlaylist.nowPlaying().time,
+        length: currentPlaylist.nowPlaying().media?.length,
+        url: currentPlaylist.nowPlaying().media?.url
     }
 })
 

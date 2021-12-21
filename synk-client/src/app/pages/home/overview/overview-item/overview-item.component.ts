@@ -21,4 +21,14 @@ export class OverviewItemComponent {
     return id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : null;
   }
 
+  getMediaProgressInPercentage(): number {
+    if (!this.channel.nowPlaying.url
+      || !this.channel.nowPlaying.length
+      || this.channel.nowPlaying.length == 0) {
+      return null
+    }
+
+    return (this.channel.nowPlaying.currentTime / this.channel.nowPlaying.length) * 100;
+  }
+
 }

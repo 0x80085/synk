@@ -6,7 +6,12 @@ export interface ChannelOverviewItem {
   name: string;
   description: string;
   connectedMemberCount: number;
-  nowPlaying: { url: string, title: string };
+  nowPlaying: {
+    url: string,
+    title: string
+    length:number
+    currentTime:number
+};
 }
 
 @Injectable({

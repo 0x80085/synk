@@ -447,6 +447,8 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
 
     //    this.sendRoomConfigToMember(automatedRoom, member.id, client);
     this.sendPlaylistToMember(automatedRoom, client);
+
+    this.logger.log(`[${member.username}] joined [${automatedRoom.name}]`)
   }
 
 }

@@ -9,9 +9,9 @@
     }
   }
 
-    img {
-      width: 100%;
-    }
+  img {
+    width: 100%;
+  }
 
   .inner-cover {
     padding: 0 24px;
@@ -28,4 +28,9 @@
       }
     }
   }
+}
+
+nz-progress {
+  position: relative;
+  top: -10px;
 }
