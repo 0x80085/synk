@@ -61,6 +61,7 @@ Or use the shortcut in package.json:
 [![made-with-TypeORM](https://img.shields.io/badge/TypeORM-1f425f.svg)](https://github.com/typeorm/typeorm)
 [![made-with-ExpressJS](https://img.shields.io/badge/ExpressJS-1f425f.svg)](https://expressjs.com/)
 [![made-with-Passport](https://img.shields.io/badge/Passport-1f425f.svg)](http://www.passportjs.org/)
+[![made-with-NestJS](https://img.shields.io/badge/NestJS-1f425f.svg)](https://nestjs.com/)
 
 
 ### Contributing
