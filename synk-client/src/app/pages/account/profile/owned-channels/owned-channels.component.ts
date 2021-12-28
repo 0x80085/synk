@@ -37,7 +37,7 @@ export class OwnedChannelsComponent {
         channel.description,
         [
           Validators.required,
-          Validators.maxLength(25),
+          Validators.maxLength(250),
           Validators.minLength(3),
         ]
       ],
