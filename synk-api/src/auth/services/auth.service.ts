@@ -12,7 +12,7 @@ import { ConnectionTrackingService } from 'src/chat/services/connection-tracking
 export const VALIDNAME_RGX = new RegExp(/^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/);
 
 export function isValidPassword(trimmedPass: string) {
-    return trimmedPass.length <= 5 || trimmedPass.length >= 28;
+    return trimmedPass.length >= 5 && trimmedPass.length <= 28;
 }
 
 @Injectable()
