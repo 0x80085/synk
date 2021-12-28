@@ -1,5 +1,5 @@
 
-import { Body, Controller, Delete, ForbiddenException, Get, Patch, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, ForbiddenException, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { AuthService } from 'src/auth/services/auth.service';
@@ -7,6 +7,7 @@ import { AuthService } from 'src/auth/services/auth.service';
 import { AuthenticatedGuard } from '../../auth/guards/authenticated.guard';
 import { SerializedUserData } from '../../auth/local.serializer';
 import { Member } from '../../domain/entity';
+import { ChangePasswordInput } from '../models/change-password.input';
 import { UpdateAccountInput } from '../models/update-account.input';
 import { AccountService } from '../services/account.service';
 
@@ -41,6 +42,19 @@ export class AccountController {
 
     }
 
+    @Post('/change-password')
+    @UseGuards(AuthenticatedGuard)
+    @ApiOperation({ summary: 'Update member account info' })
+    async updatePassword(
+        @Req() { user }: Request,
+        @Body() { newPassword, oldPassword }: ChangePasswordInput
+    ) {
+
+        const { id } = user as SerializedUserData;
+        return await this.accountService.changePassword(id, oldPassword, newPassword);
+
+    }
+
     @Delete('')
     @UseGuards(AuthenticatedGuard)
     @ApiOperation({ summary: 'Delete member account' })
@@ -51,7 +65,7 @@ export class AccountController {
 
         const { user } = req;
         const { id } = user as SerializedUserData;
-        
+
         if ((user as SerializedUserData).isAdmin) {
             throw new ForbiddenException("Cannot delete an admin account");
         }

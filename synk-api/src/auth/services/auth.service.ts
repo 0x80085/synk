@@ -71,9 +71,8 @@ export class AuthService {
             throw new BadRequestException();
         }
 
-        const trimmedName = password.trim();
-        const trimmedPass = username.trim();
-        
+        const trimmedName = username.trim();
+        const trimmedPass = password.trim();
         const maxCharCountName = 25;
         const minCharCountPass = 5;
         const maxCharCountPass = 28;
