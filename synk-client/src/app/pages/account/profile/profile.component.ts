@@ -1,10 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 
 import { AuthService, User } from '../auth.service';
 import { Observable, of } from 'rxjs';
 import { Router } from '@angular/router';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { catchError, tap } from 'rxjs/operators';
+import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-profile',
@@ -13,10 +15,19 @@ import { catchError, tap } from 'rxjs/operators';
 })
 export class ProfileComponent {
 
+  changePasswordForm: FormGroup;
+
+  @ViewChild('changePasswordFormTemplate', { read: TemplateRef }) changePasswordFormRef:TemplateRef<any>;
+
   constructor(
+    private router: Router,
+    private fb: FormBuilder,
     private auth: AuthService,
+    private modal: NzModalService,
+    private viewContainerRef: ViewContainerRef,
     private notification: NzNotificationService,
-    private router: Router) {
+
+  ) {
   }
 
   me$: Observable<User> = this.auth.getUser();
@@ -29,13 +40,80 @@ export class ProfileComponent {
       }),
       catchError((e) => {
         console.log(e);
-        
-        this.notification.error("Nott logged out...", e.message || "Something went wrong")
+
+        this.notification.error("Not logged out...", e.message || "Something went wrong")
         return of(e)
       })
 
     )
       .subscribe();
+  }
+
+  onClickChangePassword() {
+
+    if (!this.changePasswordForm) {
+      this.changePasswordForm = this.fb.group({
+        oldPassword: [
+          null, 
+          [
+            Validators.required,
+            Validators.maxLength(20),
+            Validators.minLength(5)]
+        ],
+        newPassword: [
+          null,
+          [
+            Validators.required,
+            Validators.maxLength(20),
+            Validators.minLength(5)]
+        ]
+      });
+    }
+
+    const authServiceRef = this.auth;
+    const formRef = this.changePasswordForm;
+    const toastServiceRef = this.notification;
+
+    const modal: NzModalRef = this.modal.create({
+      nzTitle: 'Change password',
+      nzContent: this.changePasswordFormRef,
+      nzFooter: [
+        {
+          label: 'Cancel',
+          onClick: () => modal.destroy()
+        },
+        {
+          label: 'Submit',
+          type: 'primary',
+          danger: true,
+          loading: false,
+          onClick() {
+            this.loading = true;
+            
+            if (formRef.invalid) {
+              console.log('invalid form');
+              setTimeout(() => (this.loading = false), 200);
+              toastServiceRef.warning('Check your input', 'Invalid password')
+              return
+            }
+
+            const oldPassword = formRef.controls.oldPassword.value;
+            const newPassword = formRef.controls.newPassword.value;
+            
+            authServiceRef.changePassword(oldPassword, newPassword).pipe(
+              tap(() => {
+                toastServiceRef.success('Changed password succesfully', 'Save it somewhere secure, there\'s no reset!');
+                this.loading = false;
+                formRef.controls.oldPassword.patchValue('');
+              })
+            ).subscribe();
+          }
+        }
+      ]
+    });
+
+
+
   }
 
   onDeleteAccount() {
@@ -47,7 +125,7 @@ export class ProfileComponent {
         }),
         catchError(err => {
           console.log(err);
-          
+
           this.notification.error("Account NOT deleted...", err.error.message || "Something went wrong")
           return of(err)
         })

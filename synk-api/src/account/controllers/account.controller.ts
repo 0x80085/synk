@@ -44,7 +44,7 @@ export class AccountController {
 
     @Post('/change-password')
     @UseGuards(AuthenticatedGuard)
-    @ApiOperation({ summary: 'Update member account info' })
+    @ApiOperation({ summary: 'Change member password' })
     async updatePassword(
         @Req() { user }: Request,
         @Body() { newPassword, oldPassword }: ChangePasswordInput

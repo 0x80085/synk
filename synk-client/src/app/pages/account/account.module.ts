@@ -16,6 +16,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzDescriptionsModule } from 'ng-zorro-antd/descriptions';
+import { NzModalModule } from 'ng-zorro-antd/modal';
 
 import { AdminComponent } from './admin/admin.component';
 import { OwnedChannelsComponent } from './profile/owned-channels/owned-channels.component';
@@ -63,7 +64,8 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
     NzTypographyModule,
     NzGridModule,
     NzToolTipModule,
-    NzAvatarModule,    
+    NzAvatarModule,
+    NzModalModule,
     NzIconModule.forRoot(NZ_ICONS),
   ],
   providers: [

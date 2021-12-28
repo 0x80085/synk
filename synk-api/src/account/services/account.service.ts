@@ -2,11 +2,11 @@ import * as bcrypt from 'bcrypt';
 
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { VALIDPASS_RGX } from 'src/auth/services/auth.service';
 import { Member } from 'src/domain/entity';
 import { Repository } from 'typeorm';
 
 import { UpdateAccountInput } from '../models/update-account.input';
+import { isValidPassword } from 'src/auth/services/auth.service';
 
 @Injectable()
 export class AccountService {
@@ -38,7 +38,7 @@ export class AccountService {
             throw new BadRequestException("Invalid old password");
         }
         
-        if (!VALIDPASS_RGX.test(trimmedNewPassword)) {
+        if (!isValidPassword(trimmedNewPassword)) {
             throw new BadRequestException("Invalid new password");
         }
 

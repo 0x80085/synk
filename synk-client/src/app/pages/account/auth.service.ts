@@ -8,6 +8,7 @@ import { environment } from '../../../environments/environment';
 import { AppStateService } from '../../app-state.service';
 import { SocketService } from '../../socket.service';
 
+export const VALIDNAME_RGX = new RegExp(/^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/);
 interface LoginInfo {
   username: string;
   password: string;
@@ -110,6 +111,16 @@ export class AuthService {
           this.router.navigate(['']);
         }),
       );
+  }
+
+  changePassword(oldPassword: string, newPassword: string) {
+    return this.http
+      .post(`${environment.api}/account/change-password`,
+        {
+          oldPassword,
+          newPassword
+        },
+        { withCredentials: true });
   }
 
   getUser() {

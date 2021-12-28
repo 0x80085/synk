@@ -9,6 +9,12 @@ import { Member } from 'src/domain/entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConnectionTrackingService } from 'src/chat/services/connection-tracking.service';
 
+export const VALIDNAME_RGX = new RegExp(/^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/);
+
+export function isValidPassword(trimmedPass: string) {
+    return trimmedPass.length <= 5 || trimmedPass.length >= 28;
+}
+
 @Injectable()
 export class AuthService {
     
@@ -73,20 +79,12 @@ export class AuthService {
 
         const trimmedName = username.trim();
         const trimmedPass = password.trim();
-        const maxCharCountName = 25;
-        const minCharCountPass = 5;
-        const maxCharCountPass = 28;
 
-        // const validNameRgx = new RegExp(`^(?!.*\\.\\.)(?!.*\\.$)[^\\W][\\w.]{0,${maxCharCountName}}$`, "igm");
-        // const validPassRgx = new RegExp(`^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{${minCharCountPass},${maxCharCountPass}}$`, "gm");
-
-        const validNameRgx = new RegExp(`^(?!.*\\.\\.)(?!.*\\.$)[^\\W][\\w.]{0,${maxCharCountName}}$`, "igm");
-        const validPassRgx = new RegExp(`^(?!.*\\.\\.)(?!.*\\.$)[^\\W][\\w.]{0,${maxCharCountName}}$`, "igm"); // todo revert when deploy 
-
-        if (!validNameRgx.test(trimmedName)) {
+    
+        if (!VALIDNAME_RGX.test(trimmedName)) {
             throw new BadRequestException("Invalid username");
         }
-        if (!validPassRgx.test(trimmedPass)) {
+        if (isValidPassword(trimmedPass)) {
             throw new BadRequestException("Invalid password");
         }
     }

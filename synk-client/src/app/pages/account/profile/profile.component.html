@@ -14,6 +14,10 @@
           date created:
           <span nz-typography><code>{{ (me$ | async)?.dateCreated | date }}</code></span>
         </p>
+        <button *ngIf="me$ | async" nz-button nzDanger nzType="primary"
+          (click)="onClickChangePassword()">
+          Change password
+        </button>
       </nz-card>
       <h2 nz-typography style="margin-top: 1rem;">Create channel</h2>
       <nz-card [nzLoading]="!(me$ | async)">
@@ -32,15 +36,41 @@
 </div>
 
 <ng-template #logoutBtn>
-  <button *ngIf="me$ | async" nz-button nzType="primary" (click)="onLogout()">
+  <button *ngIf="me$ | async" nz-button  nzType="link" (click)="onLogout()">
     Logout
   </button>
 </ng-template>
 
 <ng-template #deleteAccountButton>
-  <button *ngIf="me$ | async" nz-button nzDanger nzType="primary" nz-tooltip
-    nzTooltipTitle="This permanently deletes your account and any channel or other relation linked to it."
+  <button *ngIf="me$ | async" nz-button nzDanger  nzType="link" nz-tooltip
+    nzTooltipTitle="This permanently deletes your account. This will not work if you have channels, delete those first."
     (click)="onDeleteAccount()">
     Delete account
   </button>
+</ng-template>
+
+
+<ng-template #changePasswordFormTemplate>
+  <form nz-form [formGroup]="changePasswordForm">
+    <nz-form-item>
+      <nz-form-control nzErrorTip="Please enter a valid password">
+          <input
+            type="text"
+            nz-input
+            formControlName="oldPassword"
+            placeholder="Old password"
+          />
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-control nzErrorTip="Please enter a valid password">
+          <input
+            type="text"
+            nz-input
+            formControlName="newPassword"
+            placeholder="New password"
+          />
+      </nz-form-control>
+    </nz-form-item>
+  </form>
 </ng-template>

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from '../auth.service';
+import { AuthService, VALIDNAME_RGX } from '../auth.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 @Component({
@@ -28,12 +28,15 @@ export class RegisterComponent implements OnInit {
           Validators.required,
           Validators.maxLength(15),
           Validators.minLength(3),
-          Validators.pattern(/^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/)
+          Validators.pattern(VALIDNAME_RGX)
         ]
       ],
       password: [
         null,
-        [Validators.required, Validators.maxLength(20), Validators.minLength(5)]
+        [
+          Validators.required,
+          Validators.maxLength(20),
+          Validators.minLength(5)]
       ]
     });
   }
