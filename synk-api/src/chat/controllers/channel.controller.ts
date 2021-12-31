@@ -9,16 +9,20 @@ import { CreateChannelInput } from './create-channel.input';
 import { AuthenticatedGuard } from 'src/auth/guards/authenticated.guard';
 import { SerializedUserData } from 'src/auth/local.serializer';
 import { UpdateChannelInput } from './update-channel.input';
+import { RoomService } from '../services/room.service';
 
 @ApiTags('Channels')
 @Controller('channels')
 export class ChannelController {
 
-    constructor(private channelService: ChannelService) { }
+    constructor(
+        private channelService: ChannelService,
+        private roomService: RoomService
+        ) { }
 
     @Get('/all')
     @ApiOperation({ summary: 'Get all public channels' })
-    async getPublicRooms(): Promise<ChannelShortRepresentation[]> {
+    async getPublicChannels(): Promise<ChannelShortRepresentation[]> {
 
         return await this.channelService.getPubliclyListed();
 
@@ -26,16 +30,27 @@ export class ChannelController {
 
     @Get('/automated')
     @ApiOperation({ summary: 'Get all automated channels' })
-    async getAutomatedRooms(): Promise<ChannelShortRepresentation[]> {
+    async getAutomatedChannels(): Promise<ChannelShortRepresentation[]> {
 
-        return await this.channelService.getAutomatedRooms();
+        return this.roomService.automatedRooms.map(({ id, name, members, currentPlaylist }) => ({
+            id,
+            name,
+            connectedMemberCount: members.length,
+            nowPlaying: {
+                url: currentPlaylist.nowPlaying()?.media?.url,
+                title: currentPlaylist.nowPlaying()?.media?.title,
+                currentTime: currentPlaylist.nowPlaying().time,
+                length: currentPlaylist.nowPlaying().media?.length
+            },
+            description: "Daily content collected from internet hubs"
+        } as ChannelShortRepresentation))
 
     }
     
     @Get('/mine')
     @UseGuards(AuthenticatedGuard)
     @ApiOperation({ summary: 'Get owned channels of logged in user' })
-    async getOwnRooms(
+    async getOwnChannels(
         @Req() { user }: Express.Request,
     ) {
 
@@ -56,7 +71,7 @@ export class ChannelController {
     @Post('')
     @UseGuards(AuthenticatedGuard)
     @ApiOperation({ summary: 'Create a channel' })
-    async createRoom(
+    async createChannel(
         @Req() { user }: Request,
         @Body() { description, name, isPublic }: CreateChannelInput) {
 
@@ -69,7 +84,7 @@ export class ChannelController {
     @UseGuards(AuthenticatedGuard)
     @ApiParam({ name: 'channelId' })
     @ApiOperation({ summary: 'Update a channel' })
-    async updateRoom(
+    async updateChannel(
         @Req() { user }: Request,
         @Param('channelId') channelId: string,
         @Body() input: UpdateChannelInput) {
