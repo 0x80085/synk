@@ -4,7 +4,7 @@ import { AuthService, User } from '../auth.service';
 import { Observable, of } from 'rxjs';
 import { Router } from '@angular/router';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, finalize, tap } from 'rxjs/operators';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
@@ -17,7 +17,7 @@ export class ProfileComponent {
 
   changePasswordForm: FormGroup;
 
-  @ViewChild('changePasswordFormTemplate', { read: TemplateRef }) changePasswordFormRef:TemplateRef<any>;
+  @ViewChild('changePasswordFormTemplate', { read: TemplateRef }) changePasswordFormRef: TemplateRef<any>;
 
   constructor(
     private router: Router,
@@ -54,7 +54,7 @@ export class ProfileComponent {
     if (!this.changePasswordForm) {
       this.changePasswordForm = this.fb.group({
         oldPassword: [
-          null, 
+          null,
           [
             Validators.required,
             Validators.maxLength(20),
@@ -89,7 +89,7 @@ export class ProfileComponent {
           loading: false,
           onClick() {
             this.loading = true;
-            
+
             if (formRef.invalid) {
               console.log('invalid form');
               setTimeout(() => (this.loading = false), 200);
@@ -99,13 +99,19 @@ export class ProfileComponent {
 
             const oldPassword = formRef.controls.oldPassword.value;
             const newPassword = formRef.controls.newPassword.value;
-            
+
             authServiceRef.changePassword(oldPassword, newPassword).pipe(
               tap(() => {
                 toastServiceRef.success('Changed password succesfully', 'Save it somewhere secure, there\'s no reset!');
-                this.loading = false;
                 formRef.controls.oldPassword.patchValue('');
-              })
+              }),
+              catchError((e) => {
+                console.log(e);
+        
+                this.notification.error("Password not changed..", e.error.message || "Something went wrong")
+                return of(e)
+              }),
+              finalize(() => this.loading = false)
             ).subscribe();
           }
         }
