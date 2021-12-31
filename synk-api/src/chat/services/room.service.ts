@@ -31,8 +31,12 @@ export class RoomService {
         // private configRepository: Repository<ChannelConfig>,
     ) {
         // TODO load automated rooms from DB and start them
-        this.automatedRooms = [new AutomatedRoom("The Daily Scraper", redditScraper, ytService)];
-        this.logger.log(`Created Automated Channel`)
+        this.automatedRooms = [
+            new AutomatedRoom("The Daily Scraper", redditScraper, ytService, ['videos', 'anime', 'publicfreakout', 'mealtimevideos',]),
+            new AutomatedRoom("the_wired", redditScraper, ytService, ['gaming', 'btc', 'bitcoin', 'cryptocurrencies', 'nintendo', 'ps5'])
+        ];
+
+        this.logger.log(`Created ${this.automatedRooms.length} Automated Channels`)
 
         this.logger.log(`Querying DB for Channels to create room objects from...`)
 

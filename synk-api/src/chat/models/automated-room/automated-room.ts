@@ -42,15 +42,17 @@ export class AutomatedRoom {
     owner = null
     moderators = []
 
-    readonly _playMediaSubject = new Subject<Media>();
-    readonly _stopPlayingSubject = new Subject<void>();
-    readonly _seekSubject = new Subject<number>(); // yet unused
+    private readonly _playMediaSubject = new Subject<Media>();
+    private readonly _stopPlayingSubject = new Subject<void>();
+    private readonly _seekSubject = new Subject<number>(); // yet unused
 
     nowPlayingSubject = new Subject<{ media: Media, time: number }>();
 
     loopStateSubject: BehaviorSubject<LoopState> = new BehaviorSubject({ currentTime: 0, media: null, isPlaying: false } as LoopState);
 
-    scrapeResultsSubscription = this.redditScraper.scrapeSubredditsJobSubject.pipe(
+    scrapeResultsSubscription = this.redditScraper.crawlResultsSubject.pipe(
+        filter(it => it.channelName === this.name),
+        map(it => it.results),
         tap(() => this.stopPlaying()),
         tap(() => this.currentPlaylist.clear()),
         tap(results => this.addBulkToPlaylist(results)),
@@ -148,10 +150,13 @@ export class AutomatedRoom {
     constructor(
         name: string,
         private redditScraper: RedditCrawlerService,
-        private ytService: YoutubeV3Service
+        private ytService: YoutubeV3Service,
+        subredditsToScrape: string[]
     ) {
         this.name = name
         this.id = name
+
+        this.redditScraper.registerTargetsForChannel(this.name, subredditsToScrape);
     }
 
     startPlaying() {

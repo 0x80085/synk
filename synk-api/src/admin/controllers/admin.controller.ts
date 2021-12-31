@@ -101,7 +101,9 @@ export class AdminController {
     @ApiOperation({ summary: 'Start automated room playback' })
     startAutomatedRoomPlayback() {
 
-        this.roomService.automatedRooms[0].startPlaying()
+        this.roomService.automatedRooms.forEach(room => room.startPlaying())
+
+        //this.roomService.automatedRooms[0].startPlaying()
     }
 
     @Post('/stop-auto-playback/')
@@ -109,7 +111,7 @@ export class AdminController {
     @ApiOperation({ summary: 'Stop automated room playback' })
     stopAutomatedRoomPlayback(
     ) {
-        this.roomService.automatedRooms[0].stopPlaying()
+        this.roomService.automatedRooms.forEach(room => room.stopPlaying())
     }
 
     @Post('/play-next-auto-playback/')
@@ -119,7 +121,7 @@ export class AdminController {
     ) {
         this.roomService.automatedRooms[0].playNext()
     }
-   
+
     @Post('/clear-playlist/')
     @UseGuards(AdminGuard)
     @ApiOperation({ summary: 'Clear playlist and stop automated room playback' })

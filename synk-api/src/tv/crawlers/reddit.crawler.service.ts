@@ -12,14 +12,42 @@ const ONE_HOUR = 60000;
 @Injectable()
 export class RedditCrawlerService {
 
-    scrapeSubredditsJobSubject = new Subject<Media[]>()
+    crawlResultsSubject = new Subject<{ channelName: string, results: Media[] }>()
 
     private readonly logger = new Logger(RedditCrawlerService.name);
+
+    private crawlTargetsPerChannel: { channelName: string, subreddits: string[] }[] = [
+        {
+            channelName: 'The Daily Scraper',
+            subreddits: [
+                'anime',
+            ]
+        }
+    ];
 
     constructor(
         private httpService: HttpService,
         private ytService: YoutubeV3Service
     ) { }
+
+    registerTargetsForChannel(channelName: string, subreddits: string[]) {
+        let registeredEntry = this.crawlTargetsPerChannel
+            .find(target => target.channelName === channelName)
+
+        if (registeredEntry) {
+            registeredEntry.subreddits = [...new Set([...registeredEntry.subreddits, ...subreddits])];
+        } else {
+            this.crawlTargetsPerChannel.push({
+                channelName,
+                subreddits
+            })
+            registeredEntry = this.crawlTargetsPerChannel
+            .find(target => target.channelName === channelName)
+        }
+
+        this.logger.log(`Registered targets for ${channelName} (${registeredEntry.subreddits.length}):\n ${registeredEntry.subreddits.toString()} `)
+
+    }
 
     scrapeYTurlsFromSubreddit(subredditName: string, category: 'all' | 'new' = 'all') {
         return this.httpService.get(this.buildSubredditUrl(subredditName, category)).pipe(
@@ -28,44 +56,34 @@ export class RedditCrawlerService {
         );
     }
 
-    @Cron(CronExpression.EVERY_12_HOURS, { name: 'bidaily_scraper' })
+    @Cron(CronExpression.EVERY_30_SECONDS, { name: 'bidaily_scraper' })
     scrapeSubredditsJob() {
 
         this.logger.debug('Starting scrapers');
 
-        const subreddits = [
-            'videos',
-            'btc',
-            'bitcoin',
-            'cryptocurrencies',
-            'anime',
-            'ps5',
-            'nintendo',
-            'publicfreakout',
-            'mealtimevideos',
-        ];
+        const subreddits = this.crawlTargetsPerChannel.reduce((it, it2) => it.concat(it2.subreddits), [] as string[])
+        const uniqSubreddits = [...new Set([...subreddits])]
 
-        const scrapeWorkers = subreddits.map(subreddit =>
+        const scrapeWorkers = uniqSubreddits.map(subreddit =>
             this.scrapeYTurlsFromSubreddit(subreddit).pipe(
                 // todo save the origin and datefound somewhere
                 map(urls => urls.map(url => YouTubeGetID(url))),
                 mergeMap(ids => ids.map(id =>
                     this.ytService.getVideoMetaData(id).pipe(
                         map((data) => ({ url: `https://www.youtube.com/watch?v=${id}`, ...data })),
-                        map(({ url, title, duration }) => new Media(url, title, duration)),
+                        map(({ url, title, duration }) => ({ origin: subreddit, media: new Media(url, title, duration) })),
                         catchError(() => of(null))
                     ).pipe(
                         filter((response) => !!response),
-                        map(media => media as Media)
+                        map(entry => entry as { origin: string, media: Media })
                     )
                 ), 10),
                 mergeAll(),
                 toArray(),
-                map(mediaList => mediaList.filter(media => media.length < ONE_HOUR))
-            )
-        );
+                map(entries => entries.filter(entry => entry.media.length < ONE_HOUR)
+                )));
 
-        let allResults: Media[] = [];
+        let allResults: { origin: string, media: Media }[] = [];
 
         from(scrapeWorkers).pipe(
             mergeAll(MAX_CONCURRENT_SCRAPES),
@@ -82,8 +100,16 @@ export class RedditCrawlerService {
                 this.logger.error('err while scraping ..', err)
             },
             () => {
-                this.logger.log(allResults.length + ' URLs found (allResults)')
-                this.scrapeSubredditsJobSubject.next(allResults);
+                this.crawlTargetsPerChannel.forEach(({ channelName, subreddits }) => {
+                    const results = allResults
+                        .filter(res => subreddits.includes(res.origin))
+                        .reduce((mediaList, originAndMedia) => mediaList.concat(originAndMedia.media), [] as Media[]);
+                    
+                    this.logger.log(`ScrapeJob for ${channelName} found ${results.length} results`)
+
+                    this.crawlResultsSubject.next({ channelName, results });
+                })
+
             }
         );
     }

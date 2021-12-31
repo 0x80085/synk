@@ -292,7 +292,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
         automatedroom
       })),
       tap(({ target: { media }, room, automatedroom }) =>
-      // todo community room should tell it's leader to play diff video
+        // todo community room should tell it's leader to play diff video
         room
           ? room.currentPlaylist?.remove(media)
           : automatedroom?.handleUnplayableMedia(media)),
@@ -341,22 +341,35 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     this.server.in(room.id).emit(MessageTypes.VOTE_SKIP, room.currentPlaylist.voteSkipCount);
   }
 
-  private sendRoomConfigToMember(room: Room, memberId: string, client: socketio.Socket) {
-    const moderator = room.moderators.find(mod => mod.member.id === memberId);
-    const role = !!moderator
-      ? Roles.moderator
-      : room.owner.id === memberId
-        ? Roles.admin
-        : Roles.member
+  private sendRoomConfigToMember(room: Room | AutomatedRoom, memberId: string, client: socketio.Socket, isAutomatedChannel: boolean = false) {
 
-    const config = {
-      isLeader: room.leader.id === memberId,
-      isOwner: room.owner.id === memberId,
-      permissionLevel: moderator?.level || 0,
-      role
-    };
+    if (isAutomatedChannel) {
+      client.emit(MessageTypes.USER_CONFIG, {
+        isLeader: false,
+        isOwner: false,
+        permissionLevel: 0,
+        role: Roles.member,
+        isAutomatedChannel: true
+      });
+    } else {
+      const moderator = room.moderators.find(mod => mod.member.id === memberId);
+      const role = !!moderator
+        ? Roles.moderator
+        : room.owner.id === memberId
+          ? Roles.admin
+          : Roles.member
 
-    client.emit(MessageTypes.USER_CONFIG, config);
+      const config = {
+        isLeader: room.leader.id === memberId,
+        isOwner: room.owner.id === memberId,
+        permissionLevel: moderator?.level || 0,
+        role,
+        isAutomatedChannel: false
+      };
+
+      client.emit(MessageTypes.USER_CONFIG, config);
+    }
+
   }
 
   private sendPlaylistToMember(room: Room | AutomatedRoom, client: socketio.Socket) {
@@ -445,7 +458,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     this.broadcastMemberlistToRoom(automatedRoom);
     this.broadcastGroupMessageToRoom(automatedRoom);
 
-    //    this.sendRoomConfigToMember(automatedRoom, member.id, client);
+    this.sendRoomConfigToMember(automatedRoom, member.id, client, true);
     this.sendPlaylistToMember(automatedRoom, client);
 
     this.logger.log(`[${member.username}] joined [${automatedRoom.name}]`)

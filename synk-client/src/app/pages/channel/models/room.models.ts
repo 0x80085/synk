@@ -49,4 +49,5 @@ export interface RoomUserConfig {
   role: Roles;
   isLeader: boolean;
   isOwner: boolean;
+  isAutomatedChannel: boolean;
 }

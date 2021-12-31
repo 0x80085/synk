@@ -29,11 +29,14 @@ export class ChannelService {
     async createChannel(name: string, ownerId: string, description: string, isPublic: boolean) {
         const member = await this.memberRepository.findOneOrFail({ where: { id: ownerId } })
 
-        await this.throwIfChannelCannotBeCreated(name, member);
+        const trimmedName = name.trim();
+        const trimmedDescription = description.trim();
+
+        await this.throwIfChannelCannotBeCreated(trimmedName, member);
 
         const channel = this.channelRepository.create({
-            name,
-            description,
+            name: trimmedName,
+            description: trimmedDescription,
             isPublic,
             owner: member,
             id: uuid(),
@@ -158,11 +161,13 @@ export class ChannelService {
         const maxRooms = 200;
         const maxChannelsOwnedByUser = 5;
 
-        const isDupelicateName = await this.channelRepository.count({ where: { name } }).then(count => count > 0);
+        const isDupelicateCommunityChannelName = await this.channelRepository.count({ where: { name } }).then(count => count > 0);
         const hasMaxRoomsBeenReached = await this.channelRepository.count().then(count => count >= maxRooms);
         const hasMaxRoomsBeenReachedForUser = await this.channelRepository.count({ where: { owner: member } }).then(count => count >= maxChannelsOwnedByUser);
 
-        if (isDupelicateName) {
+        const isDupelicateAutomatedChannelName = this.roomService.automatedRooms.some(room => room.name === name);
+
+        if (isDupelicateCommunityChannelName || isDupelicateAutomatedChannelName) {
             throw new ConflictException("A channel's name must be unique");
         }
         if (hasMaxRoomsBeenReached) {
