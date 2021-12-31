@@ -4,7 +4,7 @@ import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn,
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { combineLatest, Subject, Subscription } from 'rxjs';
 import { distinctUntilChanged, map, startWith, tap, withLatestFrom } from 'rxjs/operators';
-import { doLog } from 'src/app/utils/custom.operators';
+import { debugLog, doLog } from 'src/app/utils/custom.operators';
 import { MediaService } from '../media.service';
 
 
@@ -159,7 +159,10 @@ export class PlaylistComponent implements OnDestroy, OnInit {
 
   private startPlaybackIfFirstItemInList(playlistCount: number, url: string) {
     if (playlistCount === 1) {
-      this.playMedia.emit(url)
+      setTimeout(() => {
+          debugLog('startPlaybackIfFirstItemInList .. ' + url, this.localPlaylist)
+        this.playMedia.emit(this.localPlaylist[0].mediaUrl)
+      }, 500)
     }
   }
 

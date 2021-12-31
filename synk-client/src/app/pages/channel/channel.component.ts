@@ -5,6 +5,7 @@ import { BehaviorSubject, combineLatest, merge, noop, Observable, of, Subscripti
 import { map, mapTo, shareReplay, startWith, switchMap, take, tap } from 'rxjs/operators';
 import { debugLog } from 'src/app/utils/custom.operators';
 
+
 import { AppStateService } from '../../app-state.service';
 import { SocketService } from '../../socket.service';
 import { ChatService } from './chat.service';
@@ -45,7 +46,9 @@ export class ChannelComponent implements OnInit, OnDestroy {
   alreadyJoinedRoomError$ = this.chatService.alreadyJoinedRoomError$;
 
   mediaUpdateTimerSubscription: Subscription = timer(1000, 2000).subscribe(val => {
+    debugLog(`hasplayer? ${!!this.player?.ref}` ,)
     if (this.loggedInUserIsLeader && this.player?.ref) {
+      debugLog('mediaUpdateTimerSubscription going to sendMediaUpdate')
       this.sendMediaUpdate();
     }
   });

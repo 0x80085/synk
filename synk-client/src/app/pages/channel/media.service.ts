@@ -4,6 +4,7 @@ import { filter, map, share, shareReplay } from 'rxjs/operators';
 import { SocketService } from '../../socket.service';
 import { MediaEvent } from './models/room.models';
 import { MediaCommands } from './models/media.models';
+import { debugLog } from 'src/app/utils/custom.operators';
 
 export interface PlaylistRepresentation {
   id: string;
@@ -57,6 +58,7 @@ export class MediaService {
   constructor(private socketService: SocketService) { }
 
   sendMediaEvent(ev: MediaEvent) {
+    debugLog('sendMediaEvent', ev, true)
     this.socketService.socket.emit(MediaCommands.MEDIA_EVENT, ev);
   }
 
