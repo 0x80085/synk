@@ -32,8 +32,8 @@ export class RoomService {
     ) {
         // TODO load automated rooms from DB and start them
         this.automatedRooms = [
-            new AutomatedRoom("The Daily Scraper", redditScraper, ytService, ['videos', 'anime', 'publicfreakout', 'mealtimevideos',]),
-            new AutomatedRoom("the_wired", redditScraper, ytService, ['gaming', 'btc', 'bitcoin', 'cryptocurrencies', 'nintendo', 'ps5'])
+            new AutomatedRoom("The Daily Scraper","Random content collected from internet hubs", redditScraper, ytService, ['videos', 'anime', 'publicfreakout', 'mealtimevideos',]),
+            new AutomatedRoom("the_wired","Popular tech videos around the web" ,redditScraper, ytService, ['gaming', 'btc', 'bitcoin', 'cryptocurrencies', 'nintendo', 'ps5'])
         ];
 
         this.logger.log(`Created ${this.automatedRooms.length} Automated Channels`)
@@ -94,12 +94,6 @@ export class RoomService {
         this.communityRooms
             .find(r => r.id === roomId)
             ?.leave(member);
-    }
-
-    voteSkip(roomId: string, member: Member) {
-        this.communityRooms
-            .find(r => r.id === roomId)
-            ?.voteSkip(member);
     }
 
     async giveLeader(roomId: string, requestingMember: Member, newLeaderName: string) {

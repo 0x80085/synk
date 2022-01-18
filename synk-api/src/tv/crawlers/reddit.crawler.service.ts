@@ -56,7 +56,7 @@ export class RedditCrawlerService {
         );
     }
 
-    @Cron(CronExpression.EVERY_30_SECONDS, { name: 'bidaily_scraper' })
+    @Cron(CronExpression.EVERY_6_HOURS, { name: 'bidaily_scraper' })
     scrapeSubredditsJob() {
 
         this.logger.debug('Starting scrapers');

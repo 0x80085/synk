@@ -34,6 +34,7 @@ export class AutomatedRoom {
 
     id: string;
     name: string;
+    description: string;
     members: Member[] = [];
     messages: Feed = new Feed();
     currentPlaylist: Playlist = new Playlist('default', null, new Date());
@@ -149,11 +150,13 @@ export class AutomatedRoom {
 
     constructor(
         name: string,
+        description: string,
         private redditScraper: RedditCrawlerService,
         private ytService: YoutubeV3Service,
         subredditsToScrape: string[]
     ) {
         this.name = name
+        this.description = description
         this.id = name
 
         this.redditScraper.registerTargetsForChannel(this.name, subredditsToScrape);
@@ -203,6 +206,10 @@ export class AutomatedRoom {
 
     playNext(): void {
         this.currentPlaylist.playNext();
+    }
+    
+    voteSkip(member: Member) {
+        this.currentPlaylist.incrementVoteSkips(member.id)
     }
 
     addBulkToPlaylist(bulk: Media[]) {
