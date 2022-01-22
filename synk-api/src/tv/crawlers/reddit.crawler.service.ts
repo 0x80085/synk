@@ -7,7 +7,7 @@ import { Media } from 'src/chat/models/media/media';
 import { YouTubeGetID, YoutubeV3Service } from './youtube-v3.service';
 
 const MAX_CONCURRENT_SCRAPES = 5;
-const ONE_HOUR = 60000;
+const ONE_HOUR = 3600;
 
 @Injectable()
 export class RedditCrawlerService {
