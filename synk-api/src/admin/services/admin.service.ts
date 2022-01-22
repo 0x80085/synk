@@ -45,7 +45,8 @@ export class AdminService {
     private async getChannelsWithOwner(options: IPaginationOptions) {
         const query = this.channelRepository
             .createQueryBuilder("channel")
-            .leftJoinAndSelect("channel.owner", "owner");
+            .leftJoinAndSelect("channel.owner", "owner")
+            .orderBy('channel.dateCreated', 'DESC');
 
         const [pagination, rawResults] = await paginateRawAndEntities(query, options);
         const patchedResults = pagination.items.map((item, _) => {
@@ -65,7 +66,8 @@ export class AdminService {
     private async getMembersWithChannels(options: IPaginationOptions) {
         const query = this.memberRepository
             .createQueryBuilder("member")
-            .leftJoinAndSelect("member.channels", "channels");
+            .leftJoinAndSelect("member.channels", "channels")
+            .orderBy('member.lastSeen', 'DESC');
 
         const [pagination, rawResults] = await paginateRawAndEntities(query, options);
         const patchedResults = pagination.items.map((item, _) => {
