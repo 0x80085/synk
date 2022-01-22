@@ -24,8 +24,9 @@ export class Playlist {
     activeEntryIndex: number = null;
     currentTime = 0;
 
-    maxVoteSkipCount = 10;
+    maxVoteSkipCount = 0;
     voteSkipCount = 0;
+    voterIds: string[] = [];
 
     queue: Queue<{ media: Media, addedBy: Member }> = new Queue();
 
@@ -143,9 +144,17 @@ export class Playlist {
         this.queue = new Queue(...newList);
     }
 
-    incrementVoteSkips() {
+    updateMaxVoteSkipCount(amount: number) {
+        this.maxVoteSkipCount = amount;
+    }
+
+    incrementVoteSkips(voterId: string) {
+        if (this.voterIds.some(id => id === voterId)) {
+            return;
+        }
+        this.voterIds.push(voterId);
         this.voteSkipCount = this.voteSkipCount + 1;
-        if (this.voteSkipCount > this.maxVoteSkipCount) {
+        if (this.voteSkipCount >= this.maxVoteSkipCount) {
             this.playNext();
         }
     }
@@ -180,6 +189,7 @@ export class Playlist {
 
         if (isInRange) {
             this.voteSkipCount = 0;
+            this.voterIds = [];
             this.activeEntryIndex = selectedItemIndex;
         }
     }

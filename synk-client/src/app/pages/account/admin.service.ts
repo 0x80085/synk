@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map, shareReplay } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 import { environment } from '../../../environments/environment';
 import { Channel } from './auth.service';
@@ -11,6 +11,18 @@ interface ChannelSummary {
   description: string;
   memberCount?: number;
   currentlyPlaying?: string;
+}
+
+export interface ChannelOverviewItem {
+  name: string;
+  description: string;
+  connectedMemberCount: number;
+  nowPlaying: {
+    url: string,
+    title: string
+    length:number
+    currentTime:number
+};
 }
 
 export interface RoomDto {
@@ -102,9 +114,7 @@ export class AdminService {
     return this.http.get<UserInfo>(`${environment.api}/admin/members`, {
       withCredentials: true,
       params
-    }).pipe(
-      shareReplay(1)
-    );
+    });
   }
 
   getChannels(query?: string, page?: number, limit?: number): Observable<Channel[]> {
@@ -118,8 +128,14 @@ export class AdminService {
       withCredentials: true,
       params
     }).pipe(
-      map(data => data.items),
-      shareReplay(1)
+      map(data => data.items)
+    );
+  }
+
+  getAutomatedChannels() {    
+    return this.http.get<ChannelOverviewItem[]>(
+      `${environment.api}/channels/automated`,
+      { withCredentials: true },
     );
   }
 
@@ -129,23 +145,23 @@ export class AdminService {
     }).pipe(
     );
   }
-  startScraper(subreddit: string) {
-    return this.http.post(`${environment.api}/admin/start-scrape-subreddit/${subreddit}`, null, { withCredentials: true })
+  startScraper(channelName: string, subreddit: string) {
+    return this.http.post(`${environment.api}/admin/start-scrape-subreddit/${channelName}/${subreddit}`, null, { withCredentials: true })
   }
   stopScraper() {
     return this.http.post(`${environment.api}/admin/ stop-scrape-subreddit`, null, { withCredentials: true })
   }
-  startPlayback() {
-    return this.http.post(`${environment.api}/admin/start-auto-playback`, null, { withCredentials: true })
+  startPlayback(name: string) {
+    return this.http.post(`${environment.api}/admin/start-auto-playback/${name}`, null, { withCredentials: true })
   }
-  stopPlayback() {
-    return this.http.post(`${environment.api}/admin/stop-auto-playback`, null, { withCredentials: true })
+  stopPlayback(name: string) {
+    return this.http.post(`${environment.api}/admin/stop-auto-playback/${name}`, null, { withCredentials: true })
   }
-  clearPlaylist() {
-    return this.http.post(`${environment.api}/admin/clear-playlist`, null, { withCredentials: true })
+  clearPlaylist(name: string) {
+    return this.http.post(`${environment.api}/admin/clear-playlist/${name}`, null, { withCredentials: true })
   }
-  playNext() {
-    return this.http.post(`${environment.api}/admin/play-next-auto-playback`, null, { withCredentials: true })
+  playNext(name: string) {
+    return this.http.post(`${environment.api}/admin/play-next-auto-playback/${name}`, null, { withCredentials: true })
   }
 
 }

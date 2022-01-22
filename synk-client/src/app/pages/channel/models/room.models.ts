@@ -36,7 +36,8 @@ export enum RoomCommands {
 }
 
 export enum RoomErrors {
-  ALREADY_JOINED = 'already joined'
+  ALREADY_JOINED = 'already joined',
+  REFUSE_JOIN_ROOM_FULL = 'refuse join room full'
 }
 
 export interface RoomUser {

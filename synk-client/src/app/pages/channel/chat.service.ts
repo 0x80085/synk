@@ -23,6 +23,10 @@ export class ChatService {
     filter(({ message }) => message === RoomErrors.ALREADY_JOINED)
   );
 
+  roomMaxMemberLimitReachedError$ = this.socketService.exceptionEvent$.pipe(
+    filter(({ message }) => message === RoomErrors.REFUSE_JOIN_ROOM_FULL)
+  );
+
   roomUserConfig$ = this.socketService.listenForEvent<RoomUserConfig>(RoomCommands.USER_CONFIG)
     .pipe(
       doLog('chat svc roomUserConfig', true),

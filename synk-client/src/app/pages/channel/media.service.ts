@@ -55,6 +55,8 @@ export class MediaService {
       map((mediaUrl) => mediaUrl)
     );
 
+  onVoteSkipCountEvent$ = this.socketService.listenForEvent<{ count: number, max: number }>(MediaCommands.VOTE_SKIP_COUNT);
+
   constructor(private socketService: SocketService) { }
 
   sendMediaEvent(ev: MediaEvent) {
@@ -76,6 +78,14 @@ export class MediaService {
 
   removeFromPlaylist(ev: MediaEvent) {
     this.socketService.socket.emit(MediaCommands.REMOVE_MEDIA, ev);
+  }
+
+  voteSkip(roomName: string) {
+    this.socketService.socket.emit(MediaCommands.VOTE_SKIP, roomName);
+  }
+
+  updateVoteSkipRatio(name: string, ratio: number) {
+    this.socketService.socket.emit(MediaCommands.UPDATE_VOTE_SKIP_RATIO, { name, ratio });
   }
 
   changePositionInPlaylist(ev: { roomName: string, mediaUrl: string, newPosition: number }) {

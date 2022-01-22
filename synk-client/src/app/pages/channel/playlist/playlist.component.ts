@@ -2,7 +2,7 @@ import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { combineLatest, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, combineLatest, Subject, Subscription } from 'rxjs';
 import { distinctUntilChanged, map, startWith, tap, withLatestFrom } from 'rxjs/operators';
 import { debugLog, doLog } from 'src/app/utils/custom.operators';
 import { MediaService } from '../media.service';
@@ -41,9 +41,14 @@ export class PlaylistComponent implements OnDestroy, OnInit {
 
   @Output() playMedia = new EventEmitter<string>();
 
-  form: FormGroup;
+  addMediaform: FormGroup;
+  updateSkipRatioForm: FormGroup;
 
   showControls: boolean;
+
+  voteSkips = new BehaviorSubject(0);
+  maxVoteSkips = new BehaviorSubject(0);
+  votedForSkip = false;
 
   localPlaylist: PlaylistItem[] = [];
 
@@ -70,7 +75,8 @@ export class PlaylistComponent implements OnDestroy, OnInit {
       }))),
     tap(ls => ls.find(it => it.active == true)
       ? this.nowPlayingLabelSubject.next(ls.find(it => it.active == true))
-      : null)
+      : null),
+    tap(_ => this.votedForSkip = false)
   );
 
   private playlistUpdateSubscription: Subscription = this.playlistUpdateEvent$
@@ -92,6 +98,12 @@ export class PlaylistComponent implements OnDestroy, OnInit {
     tap(_ => this.notification.error('Failed to remove media from playlist', `Only users who have added the entry can remove it`))
   ).subscribe();
 
+  private voteSkipCountUpdateSubscription = this.mediaService.onVoteSkipCountEvent$.pipe(
+    doLog("voteSkipCountUpdateSubscription", true),
+    tap(({ count }) => this.voteSkips.next(count)),
+    tap(({ max }) => this.maxVoteSkips.next(max))
+  ).subscribe();
+
   private removeMediaSuccesFeedbackSubscription = this.mediaService.removeMediaSuccessEvent$.pipe(
     tap(_ => this.notification.success('Success', 'Media removed from playlist'))
   ).subscribe();
@@ -102,7 +114,7 @@ export class PlaylistComponent implements OnDestroy, OnInit {
     private notification: NzNotificationService) { }
 
   ngOnInit() {
-    this.form = this.fb.group({
+    this.addMediaform = this.fb.group({
       mediaUrl: [
         null,
         [
@@ -114,17 +126,17 @@ export class PlaylistComponent implements OnDestroy, OnInit {
   }
 
   onAddMedia() {
-    if (this.form.invalid) {
+    if (this.addMediaform.invalid) {
       return;
     }
 
     this.mediaService.addToPlaylist({
-      mediaUrl: this.form.controls.mediaUrl.value,
+      mediaUrl: this.addMediaform.controls.mediaUrl.value,
       roomName: this.roomName,
       currentTime: null
     });
-    this.form.controls.mediaUrl.patchValue('');
-    this.form.controls.mediaUrl.reset();
+    this.addMediaform.controls.mediaUrl.patchValue('');
+    this.addMediaform.controls.mediaUrl.reset();
     this.notification.info('Request Submitted', 'The request to add media to the current list is in progress. You will be updated if the request was (un)succesful');
   }
 
@@ -136,6 +148,27 @@ export class PlaylistComponent implements OnDestroy, OnInit {
         currentTime: null
       });
     }
+  }
+
+  onVoteSkip() {
+    if (!this.votedForSkip) {
+      this.mediaService.voteSkip(this.roomName);
+      this.votedForSkip = true;
+    }
+  }
+
+  onUpdateVoteSkipRatio() {
+    if (this.updateSkipRatioForm.invalid) {
+      return;
+    }
+    const ratio = this.updateSkipRatioForm.controls.ratio.value;
+
+    this.updateSkipRatioForm.controls.ratio.patchValue('');
+    this.updateSkipRatioForm.controls.ratio.reset();
+    
+    console.log(ratio);
+    this.mediaService.updateVoteSkipRatio(this.roomName, ratio);
+    
   }
 
   drop(event: CdkDragDrop<string[]>): void {
@@ -160,7 +193,7 @@ export class PlaylistComponent implements OnDestroy, OnInit {
   private startPlaybackIfFirstItemInList(playlistCount: number, url: string) {
     if (playlistCount === 1) {
       setTimeout(() => {
-          debugLog('startPlaybackIfFirstItemInList .. ' + url, this.localPlaylist)
+        debugLog('startPlaybackIfFirstItemInList .. ' + url, this.localPlaylist)
         this.playMedia.emit(this.localPlaylist[0].mediaUrl)
       }, 500)
     }
@@ -174,6 +207,8 @@ export class PlaylistComponent implements OnDestroy, OnInit {
 
     this.removeMediaSuccesFeedbackSubscription.unsubscribe();
     this.removeMediaErrorFeedbackSubscription.unsubscribe();
+    
+    this.voteSkipCountUpdateSubscription.unsubscribe();
   }
 
   static validateIsUrl(): ValidatorFn {

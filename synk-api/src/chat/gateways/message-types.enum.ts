@@ -4,6 +4,7 @@ export enum MessageTypes {
   GROUP_MESSAGE = 'group message',
   MEDIA_EVENT = 'media event',
   VOTE_SKIP = 'vote skip',
+  VOTE_SKIP_COUNT = 'vote skip count',
   ADD_MEDIA = 'add media',
   REMOVE_MEDIA = 'remove media',
   MOVE_MEDIA = 'move media',
@@ -28,5 +29,7 @@ export enum MessageTypes {
   GENERIC_ERROR = 'error',
   CHANGE_MEDIA_POSITION_IN_LIST = "change media position in list",
   REPOSITION_MEDIA_SUCCESS = "reposition media success",
-  MEDIA_NOT_PLAYBLE = "media not playble"
+  MEDIA_NOT_PLAYBLE = "media not playble",
+  REFUSE_JOIN_ROOM_FULL = "refuse join room full",
+  UPDATE_VOTE_SKIP_RATIO = "update vote skip ratio"
 }

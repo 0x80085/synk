@@ -98,7 +98,7 @@ export class ChannelService {
             .update(Channel).set({ isPublic, description }).where("id = :id", { id: channelId })
             .execute()
 
-        this.roomService.updateRoom(channel.id, isPublic, maxUsers, null)
+        this.roomService.updateRoom(channel.id, maxUsers, null)
     }
 
     getModeratorsOfChannel(channelId: string) {

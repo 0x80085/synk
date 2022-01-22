@@ -44,6 +44,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   roomUserConfig$: Observable<RoomUserConfig> = this.chatService.roomUserConfig$.pipe(shareReplay(1))
 
   alreadyJoinedRoomError$ = this.chatService.alreadyJoinedRoomError$;
+  roomFullRoomError$ = this.chatService.roomMaxMemberLimitReachedError$; // todo show feedback in HTML, user wont be joined, i hope
 
   mediaUpdateTimerSubscription: Subscription = timer(1000, 2000).subscribe(val => {
     debugLog(`hasplayer? ${!!this.player?.ref}` ,)

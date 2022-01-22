@@ -184,14 +184,39 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     this.logger.log('handleVoteSkip');
 
     const member = await this.tracker.getMemberBySocket(client);
-    const room = this.roomService.getRoomByName(name);
 
-    if (room.members.indexOf(member) != -1) {
+    const automatedRoom = this.roomService.getAutomatedRoom(name);
+    const room = this.roomService.getAutomatedRoom(name)
+      ?? this.roomService.getRoomByName(name);
+
+    if (automatedRoom) {
+      automatedRoom.voteSkip(member);
+      this.broadcastVoteSkipResultsToRoom(automatedRoom);
+    } else if (room) {
       room.voteSkip(member);
       this.broadcastVoteSkipResultsToRoom(room);
+
     }
   }
 
+  @SubscribeMessage(MessageTypes.UPDATE_VOTE_SKIP_RATIO)
+  async handleUpdateVoteSkipRatio(client: socketio.Socket, { name, ratio }: { name: string, ratio: number }) {
+    this.logger.log('handleUpdateVoteSkipRatio');
+    
+    const member = await this.tracker.getMemberBySocket(client);
+
+    const automatedRoom = this.roomService.getAutomatedRoom(name);
+    const room = this.roomService.getAutomatedRoom(name)
+      ?? this.roomService.getRoomByName(name);
+
+    if (automatedRoom) {
+      // todo
+    } else if (room as Room) {
+      (room as Room).updateVoteSkipRatio(member, ratio);
+      this.broadcastVoteSkipResultsToRoom(room);
+
+    }
+  }
 
   @SubscribeMessage(MessageTypes.GIVE_LEADER)
   async handleGiveLeader(requestingMemberSocket: socketio.Socket, { to, roomName }: { to: string, roomName: string }) {
@@ -337,8 +362,8 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     this.server.in(room.id).emit(MessageTypes.MEDIA_EVENT, mediaEvent);
   }
 
-  private broadcastVoteSkipResultsToRoom(room: Room) {
-    this.server.in(room.id).emit(MessageTypes.VOTE_SKIP, room.currentPlaylist.voteSkipCount);
+  private broadcastVoteSkipResultsToRoom(room: Room | AutomatedRoom) {
+    this.server.in(room.id).emit(MessageTypes.VOTE_SKIP_COUNT, { count: room.currentPlaylist.voteSkipCount, max: room.currentPlaylist.maxVoteSkipCount });
   }
 
   private sendRoomConfigToMember(room: Room | AutomatedRoom, memberId: string, client: socketio.Socket, isAutomatedChannel: boolean = false) {
@@ -409,6 +434,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
 
       this.broadcastMemberlistToRoom(room);
       this.broadcastGroupMessageToRoom(room);
+      this.broadcastVoteSkipResultsToRoom(room);
       this.logger.log(`handleLeaveRoom - client left`);
     } else {
       this.logger.log(`handleLeaveRoom - noop no user was connected in that room`);
@@ -424,6 +450,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
 
       this.broadcastMemberlistToRoom(automatedRoom);
       this.broadcastGroupMessageToRoom(automatedRoom);
+      this.broadcastVoteSkipResultsToRoom(automatedRoom);
       this.logger.log(`handleLeaveRoom - client left`);
 
     } else {
@@ -439,6 +466,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
 
     this.broadcastMemberlistToRoom(room);
     this.broadcastGroupMessageToRoom(room);
+    this.broadcastVoteSkipResultsToRoom(room);
 
     this.sendRoomConfigToMember(room, member.id, client);
     this.sendPlaylistToMember(room, client);
@@ -452,11 +480,9 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
 
     this.tracker.memberJoinsRoom(client, automatedRoom.id);
 
-    this.logger.log(`${client.id} ${automatedRoom.id}`);
-    this.logger.log(`${client.rooms}`);
-
     this.broadcastMemberlistToRoom(automatedRoom);
     this.broadcastGroupMessageToRoom(automatedRoom);
+    this.broadcastVoteSkipResultsToRoom(automatedRoom);
 
     this.sendRoomConfigToMember(automatedRoom, member.id, client, true);
     this.sendPlaylistToMember(automatedRoom, client);

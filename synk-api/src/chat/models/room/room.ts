@@ -6,8 +6,6 @@ import { Media } from '../media/media';
 import { Playlist, UpdatePlayingStateCommand } from "../playlist/playlist";
 import { ROOM_ACTION_PERMISSIONS, Permission } from './permission';
 
-
-
 export class Room {
     id: string;
     name: string;
@@ -17,13 +15,24 @@ export class Room {
     moderators: { member: Member, level: number }[] = [];
     owner: Member;
     bannedMemberIds: { id: string, reason: string, date: Date }[] = [];
+    maxUsers: number;
+    password: string;
 
     messages: Feed = new Feed();
 
+
     playlists: Playlist[] = [];
     currentPlaylist: Playlist;
-    maxUsers: number;
-    password: string;
+
+    private votesNeededForSkip: number = 0;
+
+    /**
+     * Can be decimal between 0 & 1. 
+     * Used to calculate the amount of members to voteskip before next media plays.
+     * 
+     * Example: `0.4` being 40%
+     */
+    private minRequiredPercentageOfVoteSkippers: number = 1;
 
     constructor(id: string, name: string, owner: Member, password?: string) {
         this.name = name;
@@ -37,12 +46,16 @@ export class Room {
     }
 
     enter(member: Member) {
+        this.throwIfMaxConnectedMemberLimitReached();
         this.throwIfMemberIsBanned(member);
         this.throwIfMemberAlreadyJoined(member);
+
+        this.updateMaxVoteskip();
         this.members.push(member);
         this.messages.post({ author: { username: "" } as any, content: `${member.username} joined`, isSystemMessage: true })
+
         if (this.members.length === 1) {
-            this.assignNewLeader(this.members[0]) 
+            this.assignNewLeader(this.members[0])
         }
     }
 
@@ -69,9 +82,11 @@ export class Room {
                     this.currentPlaylist.stopPlaying()
                 }
             }
-
-            this.members = this.removeMember(this.members, member);
-            this.messages.post({ author: { username: '' } as Member, content: `${member.username} left.`,isSystemMessage: true });
+            
+            this.removeMemberSkipVote(member);
+            this.members = this.filterOutMember(this.members, member);
+            
+            this.messages.post({ author: { username: '' } as Member, content: `${member.username} left.`, isSystemMessage: true });
 
             return newLeader;
         } else {
@@ -87,7 +102,7 @@ export class Room {
     addMediaToPlaylist(member: Member, media: Media) {
         this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.editPlaylist);
         this.currentPlaylist.add(media, member);
-        this.messages.post({ author: { username: "" } as any, content: `${member.username} added [${media.title}] to playlist`,isSystemMessage: true });
+        this.messages.post({ author: { username: "" } as any, content: `${member.username} added [${media.title}] to playlist`, isSystemMessage: true });
     }
 
     removeMediaFromPlaylist(member: Member, url: string) {
@@ -100,18 +115,20 @@ export class Room {
             throw new ForbiddenException();
         }
         this.currentPlaylist.remove(target.media);
-        this.messages.post({ author: { username: "" } as any, content: `${member.username} removed ${target.media.title} from playlist`,isSystemMessage: true });
+        this.messages.post({ author: { username: "" } as any, content: `${member.username} removed ${target.media.title} from playlist`, isSystemMessage: true });
     }
 
     moveMediaPositionInPlaylist(member: Member, mediaUrl: string, newPosition: number) {
         this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.editPlaylist);
+
         this.currentPlaylist.movePositionInListByMedia(mediaUrl, newPosition);
         const target = this.currentPlaylist.selectFromQueue(mediaUrl);
-        this.messages.post({ author: { username: "" } as any, content: `${member.username} moved ${target.media.title} to position ${newPosition}`,isSystemMessage: true });
+        this.messages.post({ author: { username: "" } as any, content: `${member.username} moved ${target.media.title} to position ${newPosition}`, isSystemMessage: true });
     }
 
     makeModerator(requestingMember: Member, member: Member, level: number) {
         this.throwIfNotPermitted(requestingMember, ROOM_ACTION_PERMISSIONS.editMods);
+
         const isAlreadyModerator = this.moderators.filter(mod => mod.member.id === member.id).length > 0;
         if (!isAlreadyModerator) {
             this.moderators.push({ member, level });
@@ -120,6 +137,7 @@ export class Room {
 
     changeModeratorLevel(requestingMember: Member, member: Member, level: number) {
         this.throwIfNotPermitted(requestingMember, ROOM_ACTION_PERMISSIONS.editMods);
+
         const mod = this.moderators.find(mod => mod.member.id === member.id);
         if (mod) {
             mod.level = level;
@@ -128,6 +146,7 @@ export class Room {
 
     removeModerator(requestingMember: Member, moderator: Member) {
         this.throwIfNotPermitted(requestingMember, ROOM_ACTION_PERMISSIONS.editMods);
+
         const isModerator = this.moderators.filter(mod => mod.member.id === moderator.id).length > 0;
         if (isModerator) {
             this.moderators.filter(mod => mod.member.id !== moderator.id);
@@ -136,6 +155,7 @@ export class Room {
 
     banMember({ id }: Member, by: Member, reason: string) {
         this.throwIfNotPermitted(by, ROOM_ACTION_PERMISSIONS.banHammer);
+
         this.bannedMemberIds.push({ id, date: new Date(), reason });
     }
 
@@ -152,7 +172,17 @@ export class Room {
     }
 
     voteSkip(member: Member) {
-        this.currentPlaylist.incrementVoteSkips();
+        this.currentPlaylist.incrementVoteSkips(member.id);
+    }
+   
+    updateVoteSkipRatio(member: Member, newRatio: number) {
+        this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.editPlaylistSettings);
+
+        if (newRatio < 0 || newRatio > 1) {
+            throw new Error("Invalid ratio");
+        }
+
+        this.minRequiredPercentageOfVoteSkippers = newRatio;
     }
 
     addMessage(member: Member, content: string) {
@@ -161,12 +191,24 @@ export class Room {
         }
     }
 
-    update(isPublic: boolean, maxUsers: number, password?: string) {
+    update(maxUsers: number, password?: string) {
         this.maxUsers = maxUsers;
         this.password = password;
     }
 
-    private removeMember(members: Member[], member: Member) {
+    private updateMaxVoteskip() {
+        this.votesNeededForSkip = this.members.length * this.minRequiredPercentageOfVoteSkippers;
+        this.currentPlaylist.maxVoteSkipCount = this.votesNeededForSkip;
+    }
+
+    private removeMemberSkipVote(member: Member) {
+        if (this.currentPlaylist.voterIds.includes(member.id)) {
+            this.updateMaxVoteskip();
+            this.currentPlaylist.voterIds = this.currentPlaylist.voterIds.filter(id => id != member.id);
+        }
+    }
+
+    private filterOutMember(members: Member[], member: Member) {
         var index = members.findIndex(m => m.id === member.id);
 
         if (index > -1) {
@@ -187,7 +229,7 @@ export class Room {
 
     private assignNewLeader(member: Member) {
         this.leader = member;
-        this.messages.post({ author: { username: "" } as any, content: `${member.username} is now leader`,isSystemMessage: true });
+        this.messages.post({ author: { username: "" } as any, content: `${member.username} is now leader`, isSystemMessage: true });
     }
 
     private selectFromMembers(member: Member) {
@@ -233,6 +275,12 @@ export class Room {
         const found = this.members.find(m => member.id === m.id)
         if (found) {
             throw new Error(MessageTypes.ALREADY_JOINED);
+        }
+    }
+
+    private throwIfMaxConnectedMemberLimitReached() {
+        if (this.members.length == this.maxUsers) {
+            throw new Error(MessageTypes.REFUSE_JOIN_ROOM_FULL);
         }
     }
 }
