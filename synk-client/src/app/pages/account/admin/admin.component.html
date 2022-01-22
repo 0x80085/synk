@@ -2,112 +2,88 @@
   <h1 nz-typography>Administrational dept. of Synk Services</h1>
   <nz-divider></nz-divider>
   <div nz-row [nzGutter]="25">
-    <div
-      nz-col
-      [nzLg]="{ span: 12, offset: 0 }"
-      [nzMd]="{ span: 12, offset: 0 }"
-      [nzXs]="{ span: 24, offset: 0 }"
-    >
+    <div nz-col [nzLg]="{ span: 12, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }" [nzXs]="{ span: 24, offset: 0 }">
       <h2 nz-typography>Autmated Room Controls</h2>
       <nz-card>
-        <input
-          type="text"
-          nz-input
-          placeholder="subreddit to scrape videos from"
-          [(ngModel)]="subreddit"
-        />
-        <button
-          nz-button
-          nzType="default"
-          style="margin: 0.2rem"
-          (click)="startScraper()"
-        >
-          Start scrape run
-        </button>
-        <button
-          nz-button
-          nzType="default"
-          style="margin: 0.2rem"
-          (click)="stopScraper()"
-        >
-          Stop scrape run
-        </button>
-        <button
-          nz-button
-          nzType="default"
-          style="margin: 0.2rem"
-          (click)="startPlayback()"
-        >
-          Start auto-playback
-        </button>
-        <button
-          nz-button
-          nzType="default"
-          style="margin: 0.2rem"
-          (click)="stopPlayback()"
-        >
-          Stop auto-playback
-        </button>
-        <button
-          nz-button
-          nzType="default"
-          style="margin: 0.2rem"
-          nzDanger
-          (click)="clearPlaylist()"
-        >
-          Clear playlist
-        </button>
-        <button
-          nz-button
-          nzType="default"
-          style="margin: 0.2rem"
-          (click)="playNext()"
-        >
-          Play next
-        </button>
+        <nz-collapse *ngIf="(automatedChannels$ | async)?.length > 0">
+          <nz-collapse-panel *ngFor="let channel of automatedChannels$ | async;let i = index" [nzHeader]="channel.name"
+            [nzExpandedIcon]="expandIcon">
+            <ng-template #expandIcon>
+              <i nz-icon style="margin-right: 20px" nzType="video-camera"></i>
+            </ng-template>
+            <nz-table [nzData]="[channel]" [nzShowPagination]="false">
+              <tr>
+                <th>Actions</th>
+                <td>
+                  <form nz-form [formGroup]="automatedChannelForms.controls[i]"
+                    (ngSubmit)="startScraper(channel.name, automatedChannelForms.controls[i])">
+                    <nz-form-item style="margin-bottom: 0;">
+                      <nz-form-control>
+                        <input type="text" placeholder="subreddit to scrape videos from" nz-input
+                          formControlName="subredditName" />
+                        <button nz-button nzType="default" style="margin: 0.2rem" type="submit">
+                          Start scrape run
+                        </button>
+                      </nz-form-control>
+                    </nz-form-item>
+                  </form>
+                  <button nz-button nzType="default" style="margin: 0.2rem" (click)="startPlayback(channel.name)">
+                    Start auto-playback
+                  </button>
+                  <button nz-button nzType="default" style="margin: 0.2rem" (click)="stopPlayback(channel.name)">
+                    Stop auto-playback
+                  </button>
+                  <button nz-button nzType="default" style="margin: 0.2rem" nzDanger
+                    (click)="clearPlaylist(channel.name)">
+                    Clear playlist
+                  </button>
+                  <button nz-button nzType="default" style="margin: 0.2rem" (click)="playNext(channel.name)">
+                    Play next
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <th>dateCreated</th>
+                <td>{{ channel.dateCreated | date }}</td>
+              </tr>
+              <tr>
+                <th>connectedMemberCount</th>
+                <td>{{ channel.connectedMemberCount }}</td>
+              </tr>
+              <tr>
+                <th>nowPlaying</th>
+                <td>{{ channel.nowPlaying?.title || "nothing playing" }}</td>
+              </tr>
+            </nz-table>
+          </nz-collapse-panel>
+        </nz-collapse>
       </nz-card>
       <h2 nz-typography>Users</h2>
       <nz-card [nzLoading]="!(users$ | async)">
-        <nz-pagination
-          [nzPageIndex]="1"
-          [nzTotal]="85"
-          [nzPageSize]="20"
-          [nzShowTotal]="rangeTemplate"
-          style="margin-bottom: 1rem"
-        >
+        <nz-pagination [nzPageIndex]="1" [nzTotal]="85" [nzPageSize]="20" [nzShowTotal]="rangeTemplate"
+          style="margin-bottom: 1rem">
         </nz-pagination>
         <ng-template #rangeTemplate let-range="range" let-total>
           {{ range[0] }}-{{ range[1] }} of {{ total }} items
         </ng-template>
         <nz-collapse *ngIf="(accounts$ | async)?.length > 0">
-          <nz-collapse-panel
-            *ngFor="let user of accounts$ | async"
-            [nzHeader]="user.username"
-            [nzExpandedIcon]="expandIcon"
-          >
+          <nz-collapse-panel *ngFor="let user of accounts$ | async" [nzHeader]="user.username"
+            [nzExpandedIcon]="expandIcon">
             <ng-template #expandIcon>
               <i nz-icon style="margin-right: 20px" nzType="user"></i>
             </ng-template>
             <nz-descriptions nzTitle="User Info" nzLayout="vertical">
               <nz-descriptions-item nzTitle="UserName">
-                <span nz-typography
-                  ><code>{{ user.username }}</code></span
-                >
+                <span nz-typography><code>{{ user.username }}</code></span>
               </nz-descriptions-item>
               <nz-descriptions-item nzTitle="ID">
-                <span nz-typography
-                  ><code>{{ user.id }}</code></span
-                >
+                <span nz-typography><code>{{ user.id }}</code></span>
               </nz-descriptions-item>
               <nz-descriptions-item nzTitle="Date created">
-                <span nz-typography
-                  ><code>{{ user.dateCreated | date }}</code></span
-                >
+                <span nz-typography><code>{{ user.dateCreated | date }}</code></span>
               </nz-descriptions-item>
               <nz-descriptions-item nzTitle="Last seen">
-                <span nz-typography
-                  ><code>{{ user.lastSeen | date }}</code></span
-                >
+                <span nz-typography><code>{{ user.lastSeen | date }}</code></span>
               </nz-descriptions-item>
               <nz-descriptions-item nzTitle="Owner of rooms">
                 <span nz-typography>
@@ -125,73 +101,43 @@
         </nz-collapse>
       </nz-card>
     </div>
-    <div
-      nz-col
-      [nzLg]="{ span: 12, offset: 0 }"
-      [nzMd]="{ span: 12, offset: 0 }"
-      [nzXs]="{ span: 24, offset: 0 }"
-    >
+    <div nz-col [nzLg]="{ span: 12, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }" [nzXs]="{ span: 24, offset: 0 }">
       <h2 nz-typography>Channels</h2>
       <nz-card [nzLoading]="!(channels$ | async)">
-        <nz-pagination
-          [nzPageIndex]="1"
-          [nzTotal]="85"
-          [nzPageSize]="20"
-          [nzShowTotal]="rangeTemplate"
-          style="margin-bottom: 1rem"
-        >
+        <nz-pagination [nzPageIndex]="1" [nzTotal]="85" [nzPageSize]="20" [nzShowTotal]="rangeTemplate"
+          style="margin-bottom: 1rem">
         </nz-pagination>
         <ng-template #rangeTemplate let-range="range" let-total>
           {{ range[0] }}-{{ range[1] }} of {{ total }} items
         </ng-template>
         <nz-collapse *ngIf="(channels$ | async)?.length > 0">
-          <nz-collapse-panel
-            *ngFor="let room of channels$ | async"
-            [nzHeader]="room.name"
-            [nzExpandedIcon]="expandIcon"
-          >
+          <nz-collapse-panel *ngFor="let room of channels$ | async" [nzHeader]="room.name"
+            [nzExpandedIcon]="expandIcon">
             <ng-template #expandIcon>
               <i nz-icon style="margin-right: 20px" nzType="video-camera"></i>
             </ng-template>
             <nz-descriptions nzTitle="User Info" nzLayout="vertical">
               <nz-descriptions-item nzTitle="Name">
-                <span nz-typography
-                  ><code>{{ room.name }}</code></span
-                >
+                <span nz-typography><code>{{ room.name }}</code></span>
               </nz-descriptions-item>
               <nz-descriptions-item nzTitle="ID">
-                <span nz-typography
-                  ><code>{{ room.id }}</code></span
-                >
+                <span nz-typography><code>{{ room.id }}</code></span>
               </nz-descriptions-item>
               <nz-descriptions-item nzTitle="Owner name">
-                <span nz-typography
-                  ><code>{{ room.owner.username }}</code></span
-                >
+                <span nz-typography><code>{{ room.owner.username }}</code></span>
               </nz-descriptions-item>
               <nz-descriptions-item nzTitle="Owner ID">
-                <span nz-typography
-                  ><code>{{ room.owner.id }}</code></span
-                >
+                <span nz-typography><code>{{ room.owner.id }}</code></span>
               </nz-descriptions-item>
               <nz-descriptions-item nzTitle="Owner last seen">
-                <span nz-typography
-                  ><code>{{ room.owner.lastSeen | date }}</code></span
-                >
+                <span nz-typography><code>{{ room.owner.lastSeen | date }}</code></span>
               </nz-descriptions-item>
               <nz-descriptions-item nzTitle="Owner isAdmin">
-                <span nz-typography
-                  ><code>{{ room.owner.isAdmin }}</code></span
-                >
+                <span nz-typography><code>{{ room.owner.isAdmin }}</code></span>
               </nz-descriptions-item>
               <nz-descriptions-item nzTitle="Link to channel">
-                <a
-                  nz-button
-                  nzType="link"
-                  nz-tooltip
-                  nzTooltipTitle="Go to channel"
-                  [routerLink]="['/channel', room.name]"
-                >
+                <a nz-button nzType="link" nz-tooltip nzTooltipTitle="Go to channel"
+                  [routerLink]="['/channel', room.name]">
                   <i nz-icon nzType="login"></i>
                 </a>
               </nz-descriptions-item>
@@ -199,13 +145,8 @@
             <nz-divider></nz-divider>
             <p nz-typography><strong>Channel actions</strong></p>
             <p>
-              <button
-                nz-button
-                nzType="default"
-                nzDanger
-                style="margin-left: 0.5rem"
-                (click)="deleteRoom(room.id, room.name)"
-              >
+              <button nz-button nzType="default" nzDanger style="margin-left: 0.5rem"
+                (click)="deleteRoom(room.id, room.name)">
                 Delete channel
               </button>
             </p>

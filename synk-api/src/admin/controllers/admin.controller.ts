@@ -79,56 +79,52 @@ export class AdminController {
         return this.adminService.getConnections();
     }
 
-    @Post('/start-scrape-subreddit/:subreddit')
+    @Post('/start-scrape-subreddit/:channelName/:subreddit')
     @UseGuards(AdminGuard)
     @ApiOperation({ summary: 'Start Video Scrape Run' })
     @ApiParam({ name: 'subreddit' })
-    startScrape(@Param('subreddit') subreddit: string) {
-
-        this.roomService.automatedRooms[0].startSubredditScraperRun(subreddit)
-    }
-
-    @Post('/stop-scrape-subreddit/')
-    @UseGuards(AdminGuard)
-    @ApiOperation({ summary: 'Stop Video Scrape Run' })
-    stopScrape(
+    @ApiParam({ name: 'channelName' })
+    startScrape(
+        @Param('subreddit') subreddit: string,
+        @Param('channelName') channelName: string
     ) {
-        this.roomService.automatedRooms[0].stopSubredditScraperRun()
+
+        this.roomService.automatedRooms.find(it => it.name === channelName)?.startSubredditScraperRun(subreddit);
     }
 
-    @Post('/start-auto-playback/')
+    @Post('/start-auto-playback/:name')
     @UseGuards(AdminGuard)
-    @ApiOperation({ summary: 'Start automated room playback' })
-    startAutomatedRoomPlayback() {
+    @ApiOperation({ summary: 'Start automated room playback for given automated channel' })
+    @ApiParam({ name: 'name' })
+    startAutomatedRoomPlayback(@Param('name') name: string) {
 
-        this.roomService.automatedRooms.forEach(room => room.startPlaying())
-
-        //this.roomService.automatedRooms[0].startPlaying()
+        this.roomService.automatedRooms.find(it => it.name === name)?.startPlaying();
     }
 
-    @Post('/stop-auto-playback/')
+    @Post('/stop-auto-playback/:name')
     @UseGuards(AdminGuard)
-    @ApiOperation({ summary: 'Stop automated room playback' })
-    stopAutomatedRoomPlayback(
-    ) {
-        this.roomService.automatedRooms.forEach(room => room.stopPlaying())
+    @ApiParam({ name: 'name' })
+    @ApiOperation({ summary: 'Stop automated room playback for given automated channel' })
+    stopAutomatedRoomPlayback(@Param('name') name: string) {
+
+        this.roomService.automatedRooms.find(it => it.name === name)?.stopPlaying();
     }
 
-    @Post('/play-next-auto-playback/')
+    @Post('/play-next-auto-playback/:name')
     @UseGuards(AdminGuard)
-    @ApiOperation({ summary: 'Play next' })
-    playNextAutomatedRoomPlaylist(
-    ) {
-        this.roomService.automatedRooms[0].playNext()
+    @ApiParam({ name: 'name' })
+    @ApiOperation({ summary: 'Play next media for given automated channel' })
+    playNextAutomatedRoomPlaylist(@Param('name') name: string) {
+        this.roomService.automatedRooms.find(it => it.name === name)?.playNext()
     }
 
-    @Post('/clear-playlist/')
+    @Post('/clear-playlist/:name')
     @UseGuards(AdminGuard)
-    @ApiOperation({ summary: 'Clear playlist and stop automated room playback' })
-    clearAutomatedRoomPlaylist(
-    ) {
-        this.roomService.automatedRooms[0].stopPlaying();
-        this.roomService.automatedRooms[0].currentPlaylist.clear();
+    @ApiParam({ name: 'name' })
+    @ApiOperation({ summary: 'Clear playlist and stop automated room playback for given automated channel' })
+    clearAutomatedRoomPlaylist(@Param('name') name: string) {
+        this.roomService.automatedRooms.find(it => it.name === name)?.stopPlaying();
+        this.roomService.automatedRooms.find(it => it.name === name)?.currentPlaylist.clear();
     }
 
 }
