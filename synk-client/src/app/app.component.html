@@ -50,16 +50,11 @@
       style="position: absolute; bottom: 10px; right:20px;">?</button>
   </nz-sider>
   <nz-layout>
-    <nz-alert  nzBanner nzType="info"  nzIconType="experiment" nzShowIcon nzCloseable [nzMessage]="underConstructionBanner"></nz-alert>
     <nz-content>
       <router-outlet></router-outlet>
     </nz-content>
   </nz-layout>
 </nz-layout>
-
-<ng-template #underConstructionBanner> 
- <span nz-typography>This website is under active development. <a routerLink="/about">Check the about page</a> for more info. </span>
-</ng-template>
 
 <ng-template #logo>
   <ng-container *ngIf="isLoggedIn | async; then userLoggedIn; else userNotLoggedIn">

@@ -1,3 +1,7 @@
+<nz-alert  nzBanner nzType="info"  nzIconType="experiment" nzShowIcon nzCloseable [nzMessage]="underConstructionBanner"></nz-alert>
+<ng-template #underConstructionBanner> 
+ <span nz-typography>Welcome, this website is in early development stage<a routerLink="/about">Check the about page</a> for more info. </span>
+</ng-template>
 <div class="content-wrapper">
   <div nz-row [nzGutter]="[25, 25]">
     <!-- <div nz-col nzSpan="24">

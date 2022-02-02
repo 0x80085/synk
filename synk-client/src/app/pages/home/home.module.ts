@@ -23,6 +23,7 @@ import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzImageModule } from 'ng-zorro-antd/image';
 import { NZ_ICONS } from 'src/app/icons';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
 
 @NgModule({
   imports: [
@@ -30,6 +31,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    NzAlertModule,
     NzCarouselModule,
     NzDividerModule,
     NzListModule,
