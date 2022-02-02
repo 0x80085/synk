@@ -50,8 +50,8 @@ export class Room {
         this.throwIfMemberIsBanned(member);
         this.throwIfMemberAlreadyJoined(member);
 
-        this.updateMaxVoteskip();
         this.members.push(member);
+        this.updateMaxVoteskip();
         this.messages.post({ author: { username: "" } as any, content: `${member.username} joined`, isSystemMessage: true })
 
         if (this.members.length === 1) {
@@ -197,8 +197,8 @@ export class Room {
     }
 
     private updateMaxVoteskip() {
-        this.votesNeededForSkip = this.members.length * this.minRequiredPercentageOfVoteSkippers;
-        this.currentPlaylist.maxVoteSkipCount = this.votesNeededForSkip;
+        this.votesNeededForSkip = Math.round(this.members.length * this.minRequiredPercentageOfVoteSkippers);
+        this.currentPlaylist.maxVoteSkipCount = this.votesNeededForSkip;        
     }
 
     private removeMemberSkipVote(member: Member) {
