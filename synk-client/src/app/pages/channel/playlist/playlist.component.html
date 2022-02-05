@@ -1,10 +1,9 @@
-<div nz-row>
-
-  <div nz-col nzSpan="24">
+<div>
+  <div nz-col nzSpan="24" >
       <ng-container *ngIf="nowPlayingLabelSubject | async as nowPlayingMedia;">
-        <nz-descriptions [nzColumn]="{ xxl: 4, xl: 3, lg: 3, md: 3, sm: 2, xs: 1 }">
-          <nz-descriptions-item nzTitle="Title">{{nowPlayingMedia?.title}}</nz-descriptions-item>
-          <nz-descriptions-item nzTitle="Actions">
+        <div nz-row nz-row [nzGutter]="[6, 12]">
+          <div nz-col [nzXs]="{ span: 24 }" [nzLg]="{ span: 12 }">
+            <span nz-typography nzType="secondary"><i nz-icon nzType="play-circle"></i></span> {{nowPlayingMedia?.title}}
             <a
               nz-button
               nzType="link"
@@ -14,7 +13,9 @@
               target="blank"
             >
               <i nz-icon nzType="link"></i>
-            </a> 
+            </a>
+          </div>
+          <div nz-col [nzXs]="{ span: 12 }" [nzLg]="{ span: 8 }">
             <nz-button-group>
               <button nz-button [disabled]="votedForSkip" nzDanger (click)="onVoteSkip()">
                 <i nz-icon nzType="forward"></i>
@@ -24,11 +25,12 @@
                 {{ voteSkips | async }} / {{ maxVoteSkips | async }}
               </button>
             </nz-button-group>
-          </nz-descriptions-item>
-          <nz-descriptions-item nzTitle="Duration">
-           {{ nowPlayingMedia?.length}}
-          </nz-descriptions-item>
-        </nz-descriptions>
+          </div>
+          <div nz-col [nzXs]="{ span: 12 }" [nzLg]="{ span: 4 }">
+            <i nz-icon nzType="clock"></i>Duration: {{ nowPlayingMedia?.length}}
+          </div>
+        </div>
+        <nz-divider></nz-divider>
       </ng-container>
 
       <nz-tabset>

@@ -5,7 +5,7 @@ import {
     CrownOutline, DashboardOutline, DeleteOutline, DeleteFill,
     EllipsisOutline, ExperimentFill, ForwardOutline, FrownOutline, InteractionOutline, LinkOutline, LoadingOutline, LockOutline, LoginOutline, MehFill, MenuOutline, NotificationFill, PlayCircleOutline, RightOutline, ShopOutline, SmileFill,
     SmileOutline, SwapOutline, SyncOutline, TagFill, TagOutline, TeamOutline, UserOutline, VideoCameraOutline, VideoCameraAddOutline, RobotOutline, PauseCircleOutline, DisconnectOutline, StopOutline,
-    FlagFill, InteractionFill, GithubOutline, SmallDashOutline
+    FlagFill, InteractionFill, GithubOutline, SmallDashOutline, ClockCircleOutline
 } from '@ant-design/icons-angular/icons';
 
 
@@ -52,4 +52,5 @@ export const NZ_ICONS: IconDefinition[] = [
     GithubOutline,
     SmallDashOutline,
     LinkOutline,
+    ClockCircleOutline
 ];

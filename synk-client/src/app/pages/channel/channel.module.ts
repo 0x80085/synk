@@ -32,7 +32,6 @@ import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NZ_ICONS } from 'src/app/icons';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
-import { NzDescriptionsModule } from 'ng-zorro-antd/descriptions';
 
 @NgModule({
   entryComponents: [
@@ -71,7 +70,6 @@ import { NzDescriptionsModule } from 'ng-zorro-antd/descriptions';
     NzAlertModule,
     NzTabsModule ,
     DragDropModule,
-    NzDescriptionsModule,
     NzIconModule.forRoot(NZ_ICONS),
   ],
   providers: [ChatService]
