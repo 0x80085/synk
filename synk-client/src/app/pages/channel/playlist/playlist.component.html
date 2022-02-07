@@ -76,7 +76,6 @@
       </nz-tab>
 
         <nz-tab nzTitle="Add media" [nzDisabled]="!showPlaylistItemActions">
-<!-- todo add voteskip, conditionally displayed actions for leader/mod/owner -->
               <form nz-form [formGroup]="addMediaform" (ngSubmit)="onAddMedia()">
                 <nz-form-item style="margin-bottom: 1rem;">
                   <nz-form-control nzErrorTip="Please input a valid media URL">
@@ -89,7 +88,7 @@
               <nz-alert style="margin-bottom: 1rem" nzType="info" [nzDescription]="addMediaInfo" nzShowIcon></nz-alert>
         </nz-tab>
 
-        <nz-tab nzTitle="Settings" [hidden]="!showPlaylistItemActions">
+        <nz-tab nzTitle="Settings" [nzDisabled]="!showPlaylistItemActions">
               <form nz-form [formGroup]="updateSkipRatioForm" (ngSubmit)="onUpdateVoteSkipRatio()">
                 <nz-form-item style="margin-bottom: 1rem;">
                   <nz-form-control nzErrorTip="Please input a valid ratio">

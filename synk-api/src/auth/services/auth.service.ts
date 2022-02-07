@@ -84,7 +84,7 @@ export class AuthService {
         if (!VALIDNAME_RGX.test(trimmedName)) {
             throw new BadRequestException("Invalid username");
         }
-        if (isValidPassword(trimmedPass)) {
+        if (!isValidPassword(trimmedPass)) {
             throw new BadRequestException("Invalid password");
         }
     }
