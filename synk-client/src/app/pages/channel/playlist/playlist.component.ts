@@ -44,8 +44,6 @@ export class PlaylistComponent implements OnDestroy, OnInit {
   addMediaform: FormGroup;
   updateSkipRatioForm: FormGroup;
 
-  showControls: boolean;
-
   voteSkips = new BehaviorSubject(0);
   maxVoteSkips = new BehaviorSubject(0);
   votedForSkip = false;

@@ -79,7 +79,6 @@ export class AuthService {
 
         const trimmedName = username.trim();
         const trimmedPass = password.trim();
-
     
         if (!VALIDNAME_RGX.test(trimmedName)) {
             throw new BadRequestException("Invalid username");

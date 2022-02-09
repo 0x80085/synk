@@ -199,24 +199,24 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     }
   }
 
-  @SubscribeMessage(MessageTypes.UPDATE_VOTE_SKIP_RATIO)
-  async handleUpdateVoteSkipRatio(client: socketio.Socket, { name, ratio }: { name: string, ratio: number }) {
-    this.logger.log('handleUpdateVoteSkipRatio');
+  // @SubscribeMessage(MessageTypes.UPDATE_VOTE_SKIP_RATIO)
+  // async handleUpdateVoteSkipRatio(client: socketio.Socket, { name, ratio }: { name: string, ratio: number }) {
+  //   this.logger.log('handleUpdateVoteSkipRatio');
     
-    const member = await this.tracker.getMemberBySocket(client);
+  //   const member = await this.tracker.getMemberBySocket(client);
 
-    const automatedRoom = this.roomService.getAutomatedRoom(name);
-    const room = this.roomService.getAutomatedRoom(name)
-      ?? this.roomService.getRoomByName(name);
+  //   const automatedRoom = this.roomService.getAutomatedRoom(name);
+  //   const room = this.roomService.getAutomatedRoom(name)
+  //     ?? this.roomService.getRoomByName(name);
 
-    if (automatedRoom) {
-      // todo
-    } else if (room as Room) {
-      (room as Room).updateVoteSkipRatio(member, ratio);
-      this.broadcastVoteSkipResultsToRoom(room);
+  //   if (automatedRoom) {
+  //     throw new WsException(MessageTypes.GENERIC_ERROR);
+  //   } else if (room as Room) {
+  //     (room as Room).updateVoteSkipRatio(member, ratio);
+  //     this.broadcastVoteSkipResultsToRoom(room);
 
-    }
-  }
+  //   }
+  // }
 
   @SubscribeMessage(MessageTypes.GIVE_LEADER)
   async handleGiveLeader(requestingMemberSocket: socketio.Socket, { to, roomName }: { to: string, roomName: string }) {
