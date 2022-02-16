@@ -24,10 +24,6 @@ export class Playlist {
     activeEntryIndex: number = null;
     currentTime = 0;
 
-    maxVoteSkipCount = 0;
-    voteSkipCount = 0;
-    voterIds: string[] = [];
-
     queue: Queue<{ media: Media, addedBy: Member }> = new Queue();
 
     nowPlaying(): PlayingState {
@@ -85,11 +81,6 @@ export class Playlist {
         this.setNowPlaying(previous);
     }
 
-    skipTo(to: number) {
-        this.setNowPlaying(to);
-        this.currentTime = 0;
-    }
-
     add(media: Media, member: Member) {
         const alreadyAdded = this.queue.toArray().find(it => it.media.url === media.url);
         if (alreadyAdded) {
@@ -144,21 +135,6 @@ export class Playlist {
         this.queue = new Queue(...newList);
     }
 
-    updateMaxVoteSkipCount(amount: number) {
-        this.maxVoteSkipCount = amount;
-    }
-
-    incrementVoteSkips(voterId: string) {
-        if (this.voterIds.some(id => id === voterId)) {
-            return;
-        }
-        this.voterIds.push(voterId);
-        this.voteSkipCount = this.voteSkipCount + 1;
-        if (this.voteSkipCount >= this.maxVoteSkipCount) {
-            this.playNext();
-        }
-    }
-
     selectFromQueue(selector: Media | string | number) {
         switch (typeof selector) {
             case "object":
@@ -188,8 +164,6 @@ export class Playlist {
         const isInRange = selectedItemIndex >= 0 && this.queue.length - 1 >= selectedItemIndex;
 
         if (isInRange) {
-            this.voteSkipCount = 0;
-            this.voterIds = [];
             this.activeEntryIndex = selectedItemIndex;
         }
     }

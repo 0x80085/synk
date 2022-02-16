@@ -32,7 +32,19 @@ export class Room {
      * 
      * Example: `0.4` being 40%
      */
-    private minRequiredPercentageOfVoteSkippers: number = 1;
+    
+    private minRequiredPercentageOfVoteSkippers = 0.5;
+    private customMaxVoteSkipRatio = null;
+
+    public get maxVoteSkipCount() : number {
+        return Math.round(this.customMaxVoteSkipRatio || this.minRequiredPercentageOfVoteSkippers)
+    }
+    public set maxVoteSkipCount(v : number) {
+        this.customMaxVoteSkipRatio = v;
+    }
+    
+    voteSkipCount = 0;
+    voterIds: string[] = [];
 
     constructor(id: string, name: string, owner: Member, password?: string) {
         this.name = name;
@@ -96,6 +108,13 @@ export class Room {
 
     updateNowPlaying(member: Member, { url, time }: UpdatePlayingStateCommand): UpdatePlayingStateCommand {
         this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.updateNowPlaying);
+
+        const isMediaUrlDifferentFromNowPlaying = this.currentPlaylist.nowPlaying().media?.url !== url;
+
+        if (isMediaUrlDifferentFromNowPlaying) {
+            this.voteSkipCount = 0;
+            this.voterIds = [];    
+        }
         return this.currentPlaylist.updateNowPlaying(url, time);
     }
 
@@ -172,7 +191,14 @@ export class Room {
     }
 
     voteSkip(member: Member) {
-        this.currentPlaylist.incrementVoteSkips(member.id);
+
+        if (this.voterIds.some(id => id === member.id)) {
+            return;
+        }
+
+        this.voterIds.push(member.id);
+        this.voteSkipCount = this.voteSkipCount + 1;
+
     }
    
     updateVoteSkipRatio(member: Member, newRatio: number) {
@@ -198,13 +224,13 @@ export class Room {
 
     private updateMaxVoteskip() {
         this.votesNeededForSkip = Math.round(this.members.length * this.minRequiredPercentageOfVoteSkippers);
-        this.currentPlaylist.maxVoteSkipCount = this.votesNeededForSkip;        
+        this.maxVoteSkipCount = this.votesNeededForSkip;        
     }
 
     private removeMemberSkipVote(member: Member) {
-        if (this.currentPlaylist.voterIds.includes(member.id)) {
+        if (this.voterIds.includes(member.id)) {
             this.updateMaxVoteskip();
-            this.currentPlaylist.voterIds = this.currentPlaylist.voterIds.filter(id => id != member.id);
+            this.voterIds = this.voterIds.filter(id => id != member.id);
         }
     }
 

@@ -39,6 +39,8 @@ export class PlaylistComponent implements OnDestroy, OnInit {
 
   @Input() showPlaylistItemActions: boolean;
 
+  @Input() isLeader: boolean;
+
   @Output() playMedia = new EventEmitter<string>();
 
   addMediaform: FormGroup;
@@ -52,11 +54,11 @@ export class PlaylistComponent implements OnDestroy, OnInit {
 
   supportedMediaHosts = SUPPORTED_MEDIA_HOSTS;
 
-  nowPlayingLabelSubject: Subject<PlaylistItem> = new Subject()
+  nowPlayingSubject: Subject<PlaylistItem> = new Subject()
 
   nowPlayingChangeEvent$ = this.mediaService.roomMediaEvent$.pipe(
     doLog('nowPlayingChangeEvent$', true),
-    distinctUntilChanged((one, two) => one.mediaUrl === two.mediaUrl),
+    distinctUntilChanged((current, next) => current.mediaUrl === next.mediaUrl),
   );
 
   private playlistUpdateEvent$ = combineLatest([
@@ -71,9 +73,12 @@ export class PlaylistComponent implements OnDestroy, OnInit {
         active: entry.url === nowPlaying?.mediaUrl,
         length: new Date(entry.length * 1000).toISOString().substr(11, 8)
       }))),
-    tap(ls => ls.find(it => it.active == true)
-      ? this.nowPlayingLabelSubject.next(ls.find(it => it.active == true))
-      : null),
+    tap(ls => {
+      const nowPlaying = ls.find(it => it.active === true)
+      if (!!nowPlaying) {
+        this.nowPlayingSubject.next(nowPlaying)
+      }
+    }),
     tap(_ => this.votedForSkip = false)
   );
 
@@ -99,7 +104,14 @@ export class PlaylistComponent implements OnDestroy, OnInit {
   private voteSkipCountUpdateSubscription = this.mediaService.onVoteSkipCountEvent$.pipe(
     doLog("voteSkipCountUpdateSubscription", true),
     tap(({ count }) => this.voteSkips.next(count)),
-    tap(({ max }) => this.maxVoteSkips.next(max))
+    tap(({ max }) => this.maxVoteSkips.next(max)),
+    tap(({ count, max }) => {
+      if (count >= max) {
+        console.log('maxvoteskips reached, trying to play next');
+        
+        this.skipToNextAsLeader();
+      }
+    })
   ).subscribe();
 
   private removeMediaSuccesFeedbackSubscription = this.mediaService.removeMediaSuccessEvent$.pipe(
@@ -110,6 +122,27 @@ export class PlaylistComponent implements OnDestroy, OnInit {
     private fb: FormBuilder,
     private mediaService: MediaService,
     private notification: NzNotificationService) { }
+
+  private skipToNextAsLeader() {
+    console.log('is leader ' + this.isLeader);
+    
+    if (this.isLeader) {
+      
+      const hasNextUp = this.localPlaylist.length > 1;
+      
+      if (hasNextUp) {
+        const activeItemIndex = this.localPlaylist.findIndex(it => it.active);
+        const playlistLastPosition = this.localPlaylist.length - 1;
+        const startFromTop = activeItemIndex === playlistLastPosition;
+        const nextUpIndex = startFromTop
+          ? 0
+          : activeItemIndex + 1;
+        
+        console.log("skipping to " + this.localPlaylist[nextUpIndex].mediaUrl);
+        this.playMedia.emit(this.localPlaylist[nextUpIndex].mediaUrl);
+      }
+    }
+  }
 
   ngOnInit() {
     this.addMediaform = this.fb.group({
@@ -163,10 +196,10 @@ export class PlaylistComponent implements OnDestroy, OnInit {
 
     this.updateSkipRatioForm.controls.ratio.patchValue('');
     this.updateSkipRatioForm.controls.ratio.reset();
-    
+
     console.log(ratio);
     this.mediaService.updateVoteSkipRatio(this.roomName, ratio);
-    
+
   }
 
   drop(event: CdkDragDrop<string[]>): void {
@@ -180,16 +213,12 @@ export class PlaylistComponent implements OnDestroy, OnInit {
     this.mediaService.changePositionInPlaylist({ roomName: this.roomName, mediaUrl: movedMediaValue.mediaUrl, newPosition: event.currentIndex })
   }
 
-  onNext() {
-    this.mediaService.playNext(this.roomName);
-  }
-
   onShuffle() {
     this.mediaService.shufflePlaylist(this.roomName);
   }
 
   private startPlaybackIfFirstItemInList(playlistCount: number, url: string) {
-    if (playlistCount === 1) {
+    if (playlistCount === 1 && this.isLeader) {
       setTimeout(() => {
         debugLog('startPlaybackIfFirstItemInList .. ' + url, this.localPlaylist)
         this.playMedia.emit(this.localPlaylist[0].mediaUrl)
@@ -205,7 +234,7 @@ export class PlaylistComponent implements OnDestroy, OnInit {
 
     this.removeMediaSuccesFeedbackSubscription.unsubscribe();
     this.removeMediaErrorFeedbackSubscription.unsubscribe();
-    
+
     this.voteSkipCountUpdateSubscription.unsubscribe();
   }
 

@@ -1,6 +1,6 @@
 <div>
   <div nz-col nzSpan="24" >
-      <ng-container *ngIf="nowPlayingLabelSubject | async as nowPlayingMedia;">
+      <ng-container *ngIf="nowPlayingSubject | async as nowPlayingMedia;">
         <div nz-row nz-row [nzGutter]="[6, 12]">
           <div nz-col [nzXs]="{ span: 24 }" [nzLg]="{ span: 12 }">
             <span nz-typography nzType="secondary"><i nz-icon nzType="play-circle"></i></span> {{nowPlayingMedia?.title}}

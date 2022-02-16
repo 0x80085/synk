@@ -148,6 +148,21 @@ export class AutomatedRoom {
 
     scraperSubscriptions: Subscription[];
 
+    private votesNeededForSkip: number = 0;
+
+    /**
+     * Can be decimal between 0 & 1. 
+     * Used to calculate the amount of members to voteskip before next media plays.
+     * 
+     * Example: `0.4` being 40%
+     */
+
+    private minRequiredPercentageOfVoteSkippers = 0.5;
+    public maxVoteSkipCount = Math.round(this.members.length * this.minRequiredPercentageOfVoteSkippers)
+
+    voteSkipCount = 0;
+    voterIds: string[] = [];
+
     constructor(
         name: string,
         description: string,
@@ -207,9 +222,27 @@ export class AutomatedRoom {
     playNext(): void {
         this.currentPlaylist.playNext();
     }
-    
+
     voteSkip(member: Member) {
-        this.currentPlaylist.incrementVoteSkips(member.id)
+
+        if (this.voterIds.some(id => id === member.id)) {
+            return;
+        }
+
+        this.voterIds.push(member.id);
+        this.voteSkipCount = this.voteSkipCount + 1;
+
+        console.log(this.voteSkipCount);
+        console.log(this.voterIds);
+        console.log(this.minRequiredPercentageOfVoteSkippers);
+        console.log(this.maxVoteSkipCount);
+
+        if (this.voteSkipCount >= this.maxVoteSkipCount) {
+            console.log('skipping to next ');
+            this.playNext();
+            this.voterIds = [];
+            this.voteSkipCount = 0;
+        }
     }
 
     addBulkToPlaylist(bulk: Media[]) {

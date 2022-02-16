@@ -43,6 +43,7 @@
       <app-playlist
         [roomName]="name"
         [showPlaylistItemActions]="!(roomUserConfig$ | async)?.isAutomatedChannel ||(isSuperAdmin$ | async)"
+        [isLeader]="loggedInUserIsLeader"
         (playMedia)="player.play($event)"
       >
       </app-playlist>
