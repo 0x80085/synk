@@ -33,10 +33,10 @@ export class ChatService {
      share()
     );
 
-  userBecameLeader$ = this.socketService.listenForEvent<{}>(RoomCommands.YOU_ARE_LEADER).pipe(shareReplay(1));
-  userPassedOnLeader$ = this.socketService.listenForEvent<{}>(RoomCommands.LEADER_ROLE_PASSED_ON_SUCCESS).pipe(shareReplay(1));
+  userBecameLeader$ = this.socketService.listenForEvent<{}>(RoomCommands.YOU_ARE_LEADER);
+  userPassedOnLeader$ = this.socketService.listenForEvent<{}>(RoomCommands.LEADER_ROLE_PASSED_ON_SUCCESS);
 
-  roomUserList$ = this.socketService.listenForEvent<RoomUser[]>(RoomCommands.USER_LIST_UPDATE).pipe(shareReplay(1));
+  roomUserList$ = this.socketService.listenForEvent<RoomUser[]>(RoomCommands.USER_LIST_UPDATE);
 
   constructor(private socketService: SocketService) { }
 
