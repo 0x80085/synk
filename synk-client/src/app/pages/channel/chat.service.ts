@@ -36,7 +36,7 @@ export class ChatService {
   userBecameLeader$ = this.socketService.listenForEvent<{}>(RoomCommands.YOU_ARE_LEADER);
   userPassedOnLeader$ = this.socketService.listenForEvent<{}>(RoomCommands.LEADER_ROLE_PASSED_ON_SUCCESS);
 
-  roomUserList$ = this.socketService.listenForEvent<RoomUser[]>(RoomCommands.USER_LIST_UPDATE);
+  roomUserList$ = this.socketService.listenForEvent<RoomUser[]>(RoomCommands.USER_LIST_UPDATE).pipe(shareReplay(1));
 
   constructor(private socketService: SocketService) { }
 
