@@ -41,6 +41,10 @@ export class PlaylistComponent implements OnDestroy, OnInit {
 
   @Input() isLeader: boolean;
 
+  @Input() isOwner: boolean;
+
+  @Input() isSuperAdmin: boolean;
+
   @Output() playMedia = new EventEmitter<string>();
 
   addMediaform: FormGroup;
@@ -55,12 +59,12 @@ export class PlaylistComponent implements OnDestroy, OnInit {
   supportedMediaHosts = SUPPORTED_MEDIA_HOSTS;
 
   nowPlayingSubject: Subject<PlaylistItem> = new Subject()
-
+  
   nowPlayingChangeEvent$ = this.mediaService.roomMediaEvent$.pipe(
     doLog('nowPlayingChangeEvent$', true),
     distinctUntilChanged((current, next) => current.mediaUrl === next.mediaUrl),
-  );
-
+    );
+    
   private playlistUpdateEvent$ = combineLatest([
     this.mediaService.roomPlaylistUpdateEvents$,
     this.nowPlayingChangeEvent$.pipe(startWith(null))

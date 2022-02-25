@@ -44,6 +44,8 @@
         [roomName]="name"
         [showPlaylistItemActions]="!(roomUserConfig$ | async)?.isAutomatedChannel ||(isSuperAdmin$ | async)"
         [isLeader]="loggedInUserIsLeader"
+        [isOwner]="(roomUserConfig$ | async)?.isOwner"
+        [isSuperAdmin]="isSuperAdmin$ | async"
         (playMedia)="player.play($event)"
       >
       </app-playlist>
