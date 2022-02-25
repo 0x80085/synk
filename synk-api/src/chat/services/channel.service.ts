@@ -28,11 +28,14 @@ export class ChannelService {
     ) { }
 
     async createChannel(name: string, ownerId: string, description: string, isPublic: boolean) {
+        
+        const trimmedName = name.trim();
+        this.throwIfInvalidChannelName(name);
+
         const member = await this.memberRepository.findOneOrFail({ where: { id: ownerId } })
 
-        const trimmedName = name.trim();
         const trimmedDescription = description.trim();
-
+        
         await this.throwIfChannelCannotBeCreated(trimmedName, member);
 
         const channel = this.channelRepository.create({
@@ -158,9 +161,6 @@ export class ChannelService {
     }
 
     private async throwIfChannelCannotBeCreated(name: string, member: Member) {
-        if (!VALID_CHANNELNAME_RGX.test(name)) {
-            throw new BadRequestException("A channel's name must only contain letters, number and dashes or underscores.");
-        }
 
         const maxRooms = 200;
         const maxChannelsOwnedByUser = 5;
@@ -179,6 +179,12 @@ export class ChannelService {
         }
         if (hasMaxRoomsBeenReachedForUser) {
             throw new ConflictException("User max channel quota reached");
+        }
+    }
+
+    private throwIfInvalidChannelName(name: string) {
+        if (!VALID_CHANNELNAME_RGX.test(name)) {
+            throw new BadRequestException("A channel's name must only contain letters, number and dashes or underscores.");
         }
     }
 }
