@@ -5,6 +5,8 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { AuthService } from '../../account/auth.service';
 import { AccountService, ChannelDraft } from '../account.service';
 
+export const VALID_CHANNELNAME_RGX = new RegExp(/^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/);
+
 @Component({
   selector: 'app-create-room-form',
   templateUrl: './create-room-form.component.html',
@@ -29,7 +31,8 @@ export class CreateRoomFormComponent implements OnInit {
         [
           Validators.required,
           Validators.maxLength(25),
-          Validators.minLength(3)
+          Validators.minLength(3),
+          Validators.pattern(VALID_CHANNELNAME_RGX)
         ]
       ],
       description: [

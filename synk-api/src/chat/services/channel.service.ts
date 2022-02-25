@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
@@ -9,6 +9,7 @@ import { getMemberSummary } from '../models/member/member.representation';
 import { Room } from '../models/room/room';
 import { DEFAULT_MAX_USER_COUNT, RoomService } from './room.service';
 
+export const VALID_CHANNELNAME_RGX = new RegExp(/^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/);
 @Injectable()
 export class ChannelService {
 
@@ -157,6 +158,9 @@ export class ChannelService {
     }
 
     private async throwIfChannelCannotBeCreated(name: string, member: Member) {
+        if (!VALID_CHANNELNAME_RGX.test(name)) {
+            throw new BadRequestException("A channel's name must only contain letters, number and dashes or underscores.");
+        }
 
         const maxRooms = 200;
         const maxChannelsOwnedByUser = 5;
