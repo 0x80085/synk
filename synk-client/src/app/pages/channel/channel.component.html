@@ -42,7 +42,7 @@
     <div nz-col nzSpan="18" class="mt-1">
       <app-playlist
         [roomName]="name"
-        [showPlaylistItemActions]="!(roomUserConfig$ | async)?.isAutomatedChannel ||(isSuperAdmin$ | async)"
+        [isAutomatedRoom]="(roomUserConfig$ | async)?.isAutomatedChannel"
         [isLeader]="loggedInUserIsLeader"
         [isOwner]="(roomUserConfig$ | async)?.isOwner"
         [isSuperAdmin]="isSuperAdmin$ | async"

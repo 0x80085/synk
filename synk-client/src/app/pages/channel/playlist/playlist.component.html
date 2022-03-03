@@ -16,12 +16,12 @@
             </a>
           </div>
           <div nz-col [nzXs]="{ span: 12 }" [nzLg]="{ span: 8 }">
-            <nz-button-group *ngIf="showPlaylistItemActions">
-              <button nz-button [disabled]="votedForSkip" nzDanger (click)="onVoteSkip()">
+            <nz-button-group>
+              <button nz-button [disabled]="votedForSkip || isLeader" nzDanger (click)="onVoteSkip()">
                 <i nz-icon nzType="forward"></i>
                 Voteskip
               </button>
-              <button nz-button nzGhost [disabled]="votedForSkip" nzType="primary">
+              <button nz-button nzDanger nzGhost [disabled]="votedForSkip || isLeader" nzType="primary">
                 {{ voteSkips | async }} / {{ maxVoteSkips | async }}
               </button>
             </nz-button-group>
@@ -36,7 +36,7 @@
       <nz-tabset>
         <nz-tab nzTitle="Playlist">
 
-          <ng-container *ngIf="isOwner || isLeader || isSuperAdmin ; then dragToOrderPlaylist; else staticPlaylist;">
+          <ng-container *ngIf="isOwner || isSuperAdmin || isLeader ; then dragToOrderPlaylist; else staticPlaylist;">
           </ng-container>
 
           <ng-template #dragToOrderPlaylist>
@@ -59,10 +59,10 @@
                   <i nz-icon nzType="link"></i>
                 </a>
                 <button nz-button nzSize="small" nzType="link" *ngIf="isLeader" (click)="playMedia.emit(item.url)" nz-tooltip
-                  [nzTooltipTitle]="item.active ? 'now playing' : showPlaylistItemActions ? 'start video' : ''">
+                  [nzTooltipTitle]="item.active ? 'now playing' : isLeader ? 'start video' : ''">
                   <i nz-icon [nzType]="item.active ? 'play-circle' : 'caret-right'"></i>
                 </button>
-                <ng-container *ngIf="showPlaylistItemActions">
+                <ng-container *ngIf="!item.active">
                   <button nz-button nzSize="small" nzDanger nzType="link" (click)="onRemoveMedia(item.mediaUrl)" nz-tooltip
                     nzTooltipTitle="Remove from list">
                     <i nz-icon nzType="delete"></i>
@@ -99,10 +99,10 @@
                   <i nz-icon nzType="link"></i>
                 </a>
                 <button nz-button nzSize="small" nzType="link" *ngIf="isLeader" (click)="playMedia.emit(item.url)" nz-tooltip
-                  [nzTooltipTitle]="item.active ? 'now playing' : showPlaylistItemActions ? 'start video' : ''">
+                  [nzTooltipTitle]="item.active ? 'now playing' : isLeader ? 'start video' : ''">
                   <i nz-icon [nzType]="item.active ? 'play-circle' : 'caret-right'"></i>
                 </button>
-                <ng-container *ngIf="showPlaylistItemActions">
+                <ng-container *ngIf="!item.active">
                   <button nz-button nzSize="small" nzDanger nzType="link" (click)="onRemoveMedia(item.mediaUrl)" nz-tooltip
                     nzTooltipTitle="Remove from list">
                     <i nz-icon nzType="delete"></i>
@@ -122,7 +122,7 @@
 
       </nz-tab>
 
-        <nz-tab nzTitle="Add media" [nzDisabled]="!showPlaylistItemActions">
+        <nz-tab nzTitle="Add media" [nzDisabled]="isAutomatedRoom">
               <form nz-form [formGroup]="addMediaform" (ngSubmit)="onAddMedia()">
                 <nz-form-item style="margin-bottom: 1rem;">
                   <nz-form-control nzErrorTip="Please input a valid media URL">

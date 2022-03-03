@@ -37,7 +37,7 @@ export class PlaylistComponent implements OnDestroy, OnInit {
 
   @Input() roomName: string;
 
-  @Input() showPlaylistItemActions: boolean;
+  @Input() isAutomatedRoom: boolean;
 
   @Input() isLeader: boolean;
 
@@ -128,7 +128,6 @@ export class PlaylistComponent implements OnDestroy, OnInit {
     private notification: NzNotificationService) { }
 
   private skipToNextAsLeader() {
-    console.log('is leader ' + this.isLeader);
     
     if (this.isLeader) {
       
