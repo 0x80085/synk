@@ -5,6 +5,7 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { BehaviorSubject, combineLatest, Subject, Subscription } from 'rxjs';
 import { distinctUntilChanged, map, startWith, tap, withLatestFrom } from 'rxjs/operators';
 import { debugLog, doLog } from 'src/app/utils/custom.operators';
+import { AuthService } from '../../account/auth.service';
 import { MediaService } from '../media.service';
 
 
@@ -65,6 +66,10 @@ export class PlaylistComponent implements OnDestroy, OnInit {
     doLog('nowPlayingChangeEvent$', true),
     distinctUntilChanged((current, next) => current.mediaUrl === next.mediaUrl),
   );
+
+  loggedInUserId$ = this.auth.getUser().pipe(
+    map(({ id }) => id)
+  )
 
   private playlistUpdateEvent$ = combineLatest([
     this.mediaService.roomPlaylistUpdateEvents$,
@@ -127,7 +132,8 @@ export class PlaylistComponent implements OnDestroy, OnInit {
   constructor(
     private fb: FormBuilder,
     private mediaService: MediaService,
-    private notification: NzNotificationService) { }
+    private notification: NzNotificationService,
+    private auth: AuthService) { }
 
   private skipToNextAsLeader() {
 
