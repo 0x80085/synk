@@ -30,10 +30,12 @@ export class RoomService {
         // @InjectRepository(ChannelConfig)
         // private configRepository: Repository<ChannelConfig>,
     ) {
+        const subredditsGeneralInterest = ['videos', 'anime', 'publicfreakout', 'mealtimevideos', 'Documentaries', 'television', 'Whatcouldgowrong', 'gardening', 'instant_regret'];
+        const subredditsTechInterest = ['gaming', 'btc', 'bitcoin', 'cryptocurrency', 'nintendo', 'ps5', 'nintendo switch', 'dataisbeautiful', 'InternetIsBeautiful', 'technology', 'PS4', 'programming', 'xbox', 'e3', 'technews'];
         // TODO load automated rooms from DB and start them
         this.automatedRooms = [
-            new AutomatedRoom("The Daily Scraper","Random content collected from internet hubs", redditScraper, ytService, ['videos', 'anime', 'publicfreakout', 'mealtimevideos',]),
-            new AutomatedRoom("the_wired","Popular tech videos around the web" ,redditScraper, ytService, ['gaming', 'btc', 'bitcoin', 'cryptocurrencies', 'nintendo', 'ps5'])
+            new AutomatedRoom("The Daily Scraper", "Random content collected from internet hubs", redditScraper, ytService, subredditsGeneralInterest),
+            new AutomatedRoom("the_wired", "Popular tech videos around the web", redditScraper, ytService, subredditsTechInterest)
         ];
 
         this.logger.log(`Created ${this.automatedRooms.length} Automated Channels`)
