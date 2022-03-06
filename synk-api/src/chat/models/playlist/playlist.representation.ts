@@ -12,7 +12,7 @@ export function toRepresentation(list: Playlist): PlaylistRepresentation {
     return {
         id: list.id,
         name: list.name,
-        entries: list.queue.toArray().map(it => it.media.toRepresentation()),
+        entries: list.queue.toArray().map(it => it.media.toRepresentation(it.addedBy)),
         nowPlaying: list.nowPlaying().media
     }
 }

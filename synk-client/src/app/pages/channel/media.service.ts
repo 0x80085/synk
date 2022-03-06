@@ -17,6 +17,7 @@ export class MediaRepresentation {
   title: string;
   url: string;
   length: number;
+  addedBy: { userId: string, username: string }
 }
 
 @Injectable({

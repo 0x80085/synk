@@ -13,6 +13,7 @@ interface PlaylistItem {
   title: string;
   mediaUrl: string;
   length: string;
+  addedBy?: { userId: string, username: string };
 }
 
 const SUPPORTED_MEDIA_HOSTS = [
@@ -59,12 +60,12 @@ export class PlaylistComponent implements OnDestroy, OnInit {
   supportedMediaHosts = SUPPORTED_MEDIA_HOSTS;
 
   nowPlayingSubject: Subject<PlaylistItem> = new Subject()
-  
+
   nowPlayingChangeEvent$ = this.mediaService.roomMediaEvent$.pipe(
     doLog('nowPlayingChangeEvent$', true),
     distinctUntilChanged((current, next) => current.mediaUrl === next.mediaUrl),
-    );
-    
+  );
+
   private playlistUpdateEvent$ = combineLatest([
     this.mediaService.roomPlaylistUpdateEvents$,
     this.nowPlayingChangeEvent$.pipe(startWith(null))
@@ -77,6 +78,7 @@ export class PlaylistComponent implements OnDestroy, OnInit {
         active: entry.url === nowPlaying?.mediaUrl,
         length: new Date(entry.length * 1000).toISOString().substr(11, 8)
       }))),
+    doLog('playlist update', true),
     tap(ls => {
       const nowPlaying = ls.find(it => it.active === true)
       if (!!nowPlaying) {
@@ -112,7 +114,7 @@ export class PlaylistComponent implements OnDestroy, OnInit {
     tap(({ count, max }) => {
       if (count >= max) {
         console.log('maxvoteskips reached, trying to play next');
-        
+
         this.skipToNextAsLeader();
       }
     })
@@ -128,11 +130,11 @@ export class PlaylistComponent implements OnDestroy, OnInit {
     private notification: NzNotificationService) { }
 
   private skipToNextAsLeader() {
-    
+
     if (this.isLeader) {
-      
+
       const hasNextUp = this.localPlaylist.length > 1;
-      
+
       if (hasNextUp) {
         const activeItemIndex = this.localPlaylist.findIndex(it => it.active);
         const playlistLastPosition = this.localPlaylist.length - 1;
@@ -140,7 +142,7 @@ export class PlaylistComponent implements OnDestroy, OnInit {
         const nextUpIndex = startFromTop
           ? 0
           : activeItemIndex + 1;
-        
+
         console.log("skipping to " + this.localPlaylist[nextUpIndex].mediaUrl);
         this.playMedia.emit(this.localPlaylist[nextUpIndex].mediaUrl);
       }

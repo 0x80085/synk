@@ -48,6 +48,9 @@
                 [nzActions]="[opAction]" cdkDrag>
               </nz-list-item>
               <ng-template #opAction>
+                <button nz-button nzSize="small" nzType="link"  nz-tooltip [nzTooltipTitle]="'Added by: ' + item.addedBy.username" *ngIf="item.addedBy">
+                  <i nz-icon nzType="user"></i>
+                </button>
                 <a
                   nz-button
                   nzType="link"
@@ -88,6 +91,9 @@
                 [nzActions]="[opAction]">
               </nz-list-item>
               <ng-template #opAction>
+                <button nz-button nzSize="small" nzType="link"  nz-tooltip [nzTooltipTitle]="'Added by: ' + item.addedBy.username" *ngIf="item.addedBy">
+                  <i nz-icon nzType="user"></i>
+                </button>
                 <a
                   nz-button
                   nzType="link"
