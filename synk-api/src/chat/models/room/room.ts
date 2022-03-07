@@ -126,13 +126,23 @@ export class Room {
 
     removeMediaFromPlaylist(member: Member, url: string) {
         this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.editPlaylist);
+        
         const target = this.currentPlaylist.selectFromQueue(url);
         if (!target) {
-            return
+            return;
         }
-        if (target.addedBy.id !== member.id) {
+        
+        // admin, mod, superadmin or member who added it can remove media
+        const isOwner = this.owner.id === member.id;
+        const isSubmitterOfVideo = target.addedBy.id === member.id;
+        const isSuperAdmin = member.isAdmin;
+
+        const hasRightsToRemove = isOwner || isSuperAdmin || isSubmitterOfVideo;
+
+        if (!hasRightsToRemove) {
             throw new ForbiddenException();
         }
+        
         this.currentPlaylist.remove(target.media);
         this.messages.post({ author: { username: "" } as any, content: `${member.username} removed ${target.media.title} from playlist`, isSystemMessage: true });
     }
@@ -199,6 +209,13 @@ export class Room {
         this.voterIds.push(member.id);
         this.voteSkipCount = this.voteSkipCount + 1;
 
+        // console.log(this.voteSkipCount);
+        // console.log(this.voterIds);
+        // console.log(this.minRequiredPercentageOfVoteSkippers);
+        // console.log(this.maxVoteSkipCount);
+        
+        // // Note: playNext() is handled on leader client side
+        // // not sure if there's a  way to even move it serverside for community channels
     }
    
     updateVoteSkipRatio(member: Member, newRatio: number) {
