@@ -119,7 +119,7 @@ export class Room {
     }
 
     addMediaToPlaylist(member: Member, media: Media) {
-        this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.editPlaylist);
+        this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.addToPlaylist);
         this.currentPlaylist.add(media, member);
         this.messages.post({ author: { username: "" } as any, content: `${member.username} added [${media.title}] to playlist`, isSystemMessage: true });
     }
@@ -131,20 +131,21 @@ export class Room {
      * @returns void
      */
     removeMediaFromPlaylist(member: Member, url: string) {
-        this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.editPlaylist);
         const target = this.currentPlaylist.selectFromQueue(url);
         if (!target) {
             return;
         }
-        if (this.currentPlaylist.nowPlaying()?.media?.url === target.media.url) {
-            throw new ForbiddenException("Removing a playlist item is only when its is not currently playing");
-        }
+
         const isOwner = this.owner.id === member.id;
         const isSubmitterOfVideo = target.addedBy.id === member.id;
         const isSuperAdmin = member.isAdmin;
         const hasRightsToRemove = isOwner || isSuperAdmin || isSubmitterOfVideo;
+        
         if (!hasRightsToRemove) {
             throw new ForbiddenException("Removing a playlist item is only allowed for channel owner, mods or member who submitted it.");
+        }
+        if (this.currentPlaylist.nowPlaying()?.media?.url === target.media.url) {
+            throw new ForbiddenException("Removing a playlist item is only when its is not currently playing");
         }
         
         this.currentPlaylist.remove(target.media);
@@ -152,7 +153,7 @@ export class Room {
     }
 
     moveMediaPositionInPlaylist(member: Member, mediaUrl: string, newPosition: number) {
-        this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.editPlaylist);
+        this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.reorderPlaylist);
 
         this.currentPlaylist.movePositionInListByMedia(mediaUrl, newPosition);
         const target = this.currentPlaylist.selectFromQueue(mediaUrl);

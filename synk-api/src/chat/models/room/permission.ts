@@ -8,7 +8,8 @@ export const ROOM_ACTION_PERMISSIONS = {
     updateNowPlaying: { isLeaderFeature: true, minimumRequiredRole: Roles.member } as Permission,
     changeLeader: { isLeaderFeature: true, minimumRequiredRole: Roles.moderator } as Permission,
     
-    editPlaylist: { isLeaderFeature: false, minimumRequiredRole: Roles.member } as Permission,
+    addToPlaylist: { isLeaderFeature: false, minimumRequiredRole: Roles.member } as Permission,
+    reorderPlaylist: { isLeaderFeature: true, minimumRequiredRole: Roles.moderator } as Permission,
     editMods: { isLeaderFeature: false, minimumRequiredRole: Roles.admin } as Permission,
     editChannelSettings: { isLeaderFeature: false, minimumRequiredRole: Roles.admin } as Permission,
     editPlaylistSettings: { isLeaderFeature: false, minimumRequiredRole: Roles.admin } as Permission,
