@@ -124,23 +124,27 @@ export class Room {
         this.messages.post({ author: { username: "" } as any, content: `${member.username} added [${media.title}] to playlist`, isSystemMessage: true });
     }
 
+    /**
+     * Removes an item from playlist. Only channel owner, mod, superadmin or member who added it can remove media
+     * @param member 
+     * @param url 
+     * @returns void
+     */
     removeMediaFromPlaylist(member: Member, url: string) {
         this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.editPlaylist);
-        
         const target = this.currentPlaylist.selectFromQueue(url);
         if (!target) {
             return;
         }
-        
-        // admin, mod, superadmin or member who added it can remove media
+        if (this.currentPlaylist.nowPlaying()?.media?.url === target.media.url) {
+            throw new ForbiddenException("Removing a playlist item is only when its is not currently playing");
+        }
         const isOwner = this.owner.id === member.id;
         const isSubmitterOfVideo = target.addedBy.id === member.id;
         const isSuperAdmin = member.isAdmin;
-
         const hasRightsToRemove = isOwner || isSuperAdmin || isSubmitterOfVideo;
-
         if (!hasRightsToRemove) {
-            throw new ForbiddenException();
+            throw new ForbiddenException("Removing a playlist item is only allowed for channel owner, mods or member who submitted it.");
         }
         
         this.currentPlaylist.remove(target.media);
