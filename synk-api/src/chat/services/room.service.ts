@@ -31,7 +31,7 @@ export class RoomService {
         // private configRepository: Repository<ChannelConfig>,
     ) {
         const subredditsGeneralInterest = ['videos', 'anime', 'publicfreakout', 'mealtimevideos', 'Documentaries', 'television', 'Whatcouldgowrong', 'gardening', 'instant_regret'];
-        const subredditsTechInterest = ['gaming', 'btc', 'bitcoin', 'cryptocurrency', 'nintendo', 'ps5', 'nintendo switch', 'dataisbeautiful', 'InternetIsBeautiful', 'technology', 'PS4', 'programming', 'xbox', 'e3', 'technews'];
+        const subredditsTechInterest = ['gaming', 'btc', 'bitcoin', 'cryptocurrency', 'nintendo', 'ps5', 'nintendo switch', 'dataisbeautiful', 'InternetIsBeautiful', 'technology', 'PS4', 'programming', 'xbox', 'technews'];
         // TODO load automated rooms from DB and start them
         this.automatedRooms = [
             new AutomatedRoom("The Daily Scraper", "Random content collected from internet hubs", redditScraper, ytService, subredditsGeneralInterest),
