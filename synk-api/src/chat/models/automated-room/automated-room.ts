@@ -148,17 +148,18 @@ export class AutomatedRoom {
 
     scraperSubscriptions: Subscription[];
 
-    private votesNeededForSkip: number = 0;
-
+    
     /**
      * Can be decimal between 0 & 1. 
      * Used to calculate the amount of members to voteskip before next media plays.
      * 
      * Example: `0.4` being 40%
      */
-
     private minRequiredPercentageOfVoteSkippers = 0.5;
-    public maxVoteSkipCount = Math.round(this.members.length * this.minRequiredPercentageOfVoteSkippers)
+
+    public get votesNeededForSkip() : number {
+        return Math.round(this.members.length * this.minRequiredPercentageOfVoteSkippers);
+    }
 
     voteSkipCount = 0;
     voterIds: string[] = [];
@@ -203,6 +204,7 @@ export class AutomatedRoom {
 
         if (toBeRemoved) {
 
+            this.removeMemberSkipVote(member);
             this.removeMember(member);
             this.messages.post({ author: { username: '' } as Member, content: `${member.username} left.`, isSystemMessage: true });
 
@@ -235,9 +237,9 @@ export class AutomatedRoom {
         console.log(this.voteSkipCount);
         console.log(this.voterIds);
         console.log(this.minRequiredPercentageOfVoteSkippers);
-        console.log(this.maxVoteSkipCount);
+        console.log(this.votesNeededForSkip);
 
-        if (this.voteSkipCount >= this.maxVoteSkipCount) {
+        if (this.voteSkipCount >= this.votesNeededForSkip) {
             console.log('skipping to next ');
             this.playNext();
             this.voterIds = [];
@@ -277,6 +279,12 @@ export class AutomatedRoom {
 
         if (index > -1) {
             this.members = [...this.members.slice(0, index), ...this.members.slice(index + 1)];
+        }
+    }
+
+    private removeMemberSkipVote(member: Member) {
+        if (this.voterIds.includes(member.id)) {
+            this.voterIds = this.voterIds.filter(id => id != member.id);
         }
     }
 

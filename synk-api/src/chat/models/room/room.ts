@@ -24,8 +24,6 @@ export class Room {
     playlists: Playlist[] = [];
     currentPlaylist: Playlist;
 
-    private votesNeededForSkip: number = 0;
-
     /**
      * Can be decimal between 0 & 1. 
      * Used to calculate the amount of members to voteskip before next media plays.
@@ -36,11 +34,8 @@ export class Room {
     private minRequiredPercentageOfVoteSkippers = 0.5;
     private customMaxVoteSkipRatio = null;
 
-    public get maxVoteSkipCount() : number {
+    public get votesNeededForSkip() : number {
         return Math.round(this.customMaxVoteSkipRatio || this.minRequiredPercentageOfVoteSkippers)
-    }
-    public set maxVoteSkipCount(v : number) {
-        this.customMaxVoteSkipRatio = v;
     }
     
     voteSkipCount = 0;
@@ -63,7 +58,6 @@ export class Room {
         this.throwIfMemberAlreadyJoined(member);
 
         this.members.push(member);
-        this.updateMaxVoteskip();
         this.messages.post({ author: { username: "" } as any, content: `${member.username} joined`, isSystemMessage: true })
 
         if (this.members.length === 1) {
@@ -244,14 +238,8 @@ export class Room {
         this.password = password;
     }
 
-    private updateMaxVoteskip() {
-        this.votesNeededForSkip = Math.round(this.members.length * this.minRequiredPercentageOfVoteSkippers);
-        this.maxVoteSkipCount = this.votesNeededForSkip;        
-    }
-
     private removeMemberSkipVote(member: Member) {
         if (this.voterIds.includes(member.id)) {
-            this.updateMaxVoteskip();
             this.voterIds = this.voterIds.filter(id => id != member.id);
         }
     }

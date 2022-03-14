@@ -363,7 +363,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   private broadcastVoteSkipResultsToRoom(room: Room | AutomatedRoom) {
-    this.server.in(room.id).emit(MessageTypes.VOTE_SKIP_COUNT, { count: room.voteSkipCount, max: room.maxVoteSkipCount });
+    this.server.in(room.id).emit(MessageTypes.VOTE_SKIP_COUNT, { count: room.voteSkipCount, max: room.votesNeededForSkip });
   }
 
   private sendRoomConfigToMember(room: Room | AutomatedRoom, memberId: string, client: socketio.Socket, isAutomatedChannel: boolean = false) {
