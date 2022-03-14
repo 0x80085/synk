@@ -107,9 +107,14 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     const room = this.roomService.getRoomByName(roomName);
     const member = await this.tracker.getMemberBySocket(client);
 
-    room.updateNowPlaying(member, { time, url });
+    var { hasChangedMediaUrl } = room.updateNowPlaying(member, { time, url });
 
+    if (hasChangedMediaUrl) {
+      
+      this.broadcastVoteSkipResultsToRoom(room);
+    }
     this.broadcastNowPlayingToRoom(room);
+
   }
 
   @SubscribeMessage(MessageTypes.JOIN_ROOM)
@@ -202,7 +207,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   // @SubscribeMessage(MessageTypes.UPDATE_VOTE_SKIP_RATIO)
   // async handleUpdateVoteSkipRatio(client: socketio.Socket, { name, ratio }: { name: string, ratio: number }) {
   //   this.logger.log('handleUpdateVoteSkipRatio');
-    
+
   //   const member = await this.tracker.getMemberBySocket(client);
 
   //   const automatedRoom = this.roomService.getAutomatedRoom(name);

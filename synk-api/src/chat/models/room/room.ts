@@ -30,14 +30,13 @@ export class Room {
      * 
      * Example: `0.4` being 40%
      */
-    
     private minRequiredPercentageOfVoteSkippers = 0.5;
     private customMaxVoteSkipRatio = null;
 
-    public get votesNeededForSkip() : number {
+    public get votesNeededForSkip(): number {
         return Math.round(this.customMaxVoteSkipRatio || this.minRequiredPercentageOfVoteSkippers)
     }
-    
+
     voteSkipCount = 0;
     voterIds: string[] = [];
 
@@ -88,10 +87,10 @@ export class Room {
                     this.currentPlaylist.stopPlaying()
                 }
             }
-            
+
             this.removeMemberSkipVote(member);
             this.members = this.filterOutMember(this.members, member);
-            
+
             this.messages.post({ author: { username: '' } as Member, content: `${member.username} left.`, isSystemMessage: true });
 
             return newLeader;
@@ -100,16 +99,19 @@ export class Room {
         }
     }
 
-    updateNowPlaying(member: Member, { url, time }: UpdatePlayingStateCommand): UpdatePlayingStateCommand {
+    updateNowPlaying(member: Member, { url, time }: UpdatePlayingStateCommand): {nowPlaying: UpdatePlayingStateCommand,hasChangedMediaUrl: boolean} {
         this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.updateNowPlaying);
 
         const isMediaUrlDifferentFromNowPlaying = this.currentPlaylist.nowPlaying().media?.url !== url;
 
         if (isMediaUrlDifferentFromNowPlaying) {
             this.voteSkipCount = 0;
-            this.voterIds = [];    
+            this.voterIds = [];
         }
-        return this.currentPlaylist.updateNowPlaying(url, time);
+        return {
+            nowPlaying : this.currentPlaylist.updateNowPlaying(url, time),
+            hasChangedMediaUrl: isMediaUrlDifferentFromNowPlaying
+         };
     }
 
     addMediaToPlaylist(member: Member, media: Media) {
@@ -134,14 +136,14 @@ export class Room {
         const isSubmitterOfVideo = target.addedBy.id === member.id;
         const isSuperAdmin = member.isAdmin;
         const hasRightsToRemove = isOwner || isSuperAdmin || isSubmitterOfVideo;
-        
+
         if (!hasRightsToRemove) {
             throw new ForbiddenException("Removing a playlist item is only allowed for channel owner, mods or member who submitted it.");
         }
         if (this.currentPlaylist.nowPlaying()?.media?.url === target.media.url) {
-            throw new ForbiddenException("Removing a playlist item is only when its is not currently playing");
+            throw new ForbiddenException("Removing a playlist item is only allowed when its is not currently playing");
         }
-        
+
         this.currentPlaylist.remove(target.media);
         this.messages.post({ author: { username: "" } as any, content: `${member.username} removed ${target.media.title} from playlist`, isSystemMessage: true });
     }
@@ -212,11 +214,11 @@ export class Room {
         // console.log(this.voterIds);
         // console.log(this.minRequiredPercentageOfVoteSkippers);
         // console.log(this.maxVoteSkipCount);
-        
+
         // // Note: playNext() is handled on leader client side
         // // not sure if there's a  way to even move it serverside for community channels
     }
-   
+
     updateVoteSkipRatio(member: Member, newRatio: number) {
         this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.editPlaylistSettings);
 
