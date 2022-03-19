@@ -33,6 +33,7 @@
     "@nestjs/platform-ws": "^7.5.4",
     "@nestjs/schedule": "^0.4.1",
     "@nestjs/swagger": "^4.7.5",
+    "@nestjs/throttler": "^2.0.1",
     "@nestjs/typeorm": "^7.1.5",
     "@nestjs/websockets": "^7.5.4",
     "bcrypt": "^5.0.0",
