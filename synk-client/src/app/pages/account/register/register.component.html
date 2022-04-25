@@ -22,7 +22,15 @@
           </nz-form-control>
         </nz-form-item>
         <nz-form-item>
-          <button nz-button class="login-form-button" [nzType]="'primary'" [nzLoading]="isSubmitting">
+          <label nz-checkbox formControlName="agreesToTermsAndConditions">
+            Agree to <a [routerLink]="['/terms-of-use']">Terms and Conditions and Site Policies</a>
+          </label>
+        </nz-form-item>
+        <nz-form-item>
+          <button nz-button class="login-form-button" 
+            nzType="primary" 
+            [nzLoading]="isSubmitting" 
+            [disabled]="!agreesToTermsandConds">
             Create
           </button>
         </nz-form-item>
@@ -30,7 +38,7 @@
     </nz-card>
     <nz-card *ngIf="registerSuccess" nzTitle="Account created" [nzCover]="coverTemplate" [nzExtra]="extraTemplate"
       [nzActions]="[successActions]">
-      <nz-card-meta nzTitle="Ahoy matey! welcome aboard!"
+      <nz-card-meta nzTitle="Ahoy matey! Welcome aboard!"
         nzDescription="You're almost there. Log in to access the channels">
       </nz-card-meta>
     </nz-card>

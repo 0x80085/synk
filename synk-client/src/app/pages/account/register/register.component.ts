@@ -14,6 +14,12 @@ export class RegisterComponent implements OnInit {
   registerSuccess = false;
   isSubmitting = false;
 
+  
+  public get agreesToTermsandConds() : boolean {
+    return this.form.controls['agreesToTermsAndConditions'].value
+  }
+  
+
   constructor(
     private fb: FormBuilder,
     private service: AuthService,
@@ -37,6 +43,12 @@ export class RegisterComponent implements OnInit {
           Validators.required,
           Validators.maxLength(20),
           Validators.minLength(5)]
+      ],
+      agreesToTermsAndConditions: [
+        false,
+        [
+          Validators.required
+        ]
       ]
     });
   }
