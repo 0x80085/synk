@@ -64,11 +64,11 @@ export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDest
 
   ngAfterViewInit(): void {
     this.video.nativeElement.onended = () => {
-      this.mediaEnded.next();
+      this.mediaEnded.next(true);
     };
     this.video.nativeElement.onerror = (event: any) => {
       console.log(event);
-      this.mediaEnded.next();
+      this.mediaEnded.next(true);
     };
     this.video.nativeElement.onloadeddata = () => {
       this.videoLoaded = true;
