@@ -4,6 +4,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { of } from "rxjs";
 import { catchError, map, mapTo, switchMap, tap } from "rxjs/operators";
 import { Channel, Video } from "src/domain/entity";
+import { Server } from 'socket.io';
 
 import { YouTubeGetID, YoutubeV3Service } from "src/tv/crawlers/youtube-v3.service";
 import { Repository } from "typeorm";
@@ -131,7 +132,7 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
             || contentType === "video/ogg";
     }
 
-    private broadcastPlaylistToRoom(room: Room, server: SocketIO.Server) {
+    private broadcastPlaylistToRoom(room: Room, server: Server) {
         const playlist = toRepresentation(room.currentPlaylist);
         server.in(room.id).emit(MessageTypes.PLAYLIST_UPDATE, playlist);
     }

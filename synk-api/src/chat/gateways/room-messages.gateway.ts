@@ -11,7 +11,7 @@ import {
 } from '@nestjs/websockets';
 import { from, Subscription } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
-import * as socketio from 'socket.io';
+import { Socket, Server } from 'socket.io';
 
 import { Member, Roles } from '../../domain/entity';
 import { AutomatedRoom } from '../models/automated-room/automated-room';
@@ -31,7 +31,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   private readonly logger = new Logger(RoomMessagesGateway.name);
 
   @WebSocketServer()
-  server: socketio.Server;
+  server: Server;
 
   broadcastToAutomatedRoomSubscriptions: Subscription[];
 
@@ -41,7 +41,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     private commandBus: CommandBus,
   ) { }
 
-  handleConnection(client: socketio.Socket) {
+  handleConnection(client:  Socket) {
     try {
       this.tracker.trackMemberConnection(client);
     } catch (error) {
@@ -51,7 +51,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     }
   }
 
-  handleDisconnect(client: socketio.Socket) {
+  handleDisconnect(client:  Socket) {
     try {
       console.log('handleDisconnect for ' + client.handshake.address);
       const memberId = (client.handshake as any).session.passport.user.id;
@@ -67,7 +67,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
           .forEach(connection => {
             this.roomService.leaveRoom(connection.roomId, member)
           }))
-        .then(() => client.leaveAll())
+        .then(() => Object.keys(client.rooms).forEach(roomId => client.leave(roomId))) // todo: test change from leaveAll()
         .then(() => this.tracker.memberDisconnects(client))
         .catch(console.log)
 
@@ -76,7 +76,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     }
   }
 
-  afterInit(server: socketio.Server) {
+  afterInit(server:  Server) {
     this.logger.log('WS server started');
     this.logger.log('Now starting the automated room nowPlaying subscriptions..');
     this.listenForAutomatedRoomUpdates();
@@ -84,7 +84,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   @SubscribeMessage(MessageTypes.GROUP_MESSAGE)
-  async handleMessage(client: socketio.Socket, { roomName, content }: { roomName: string, content: { text: string } }) {
+  async handleMessage(client: Socket, { roomName, content }: { roomName: string, content: { text: string } }) {
     const member = await this.tracker.getMemberBySocket(client);
 
     const automatedRoom = this.roomService.getAutomatedRoom(roomName);
@@ -103,7 +103,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   @SubscribeMessage(MessageTypes.MEDIA_EVENT)
-  async handleUpdateNowPlaying(client: socketio.Socket, { roomName, currentTime: time, mediaUrl: url }: { roomName: string, mediaUrl: string, currentTime: any }) {
+  async handleUpdateNowPlaying(client:  Socket, { roomName, currentTime: time, mediaUrl: url }: { roomName: string, mediaUrl: string, currentTime: any }) {
     const room = this.roomService.getRoomByName(roomName);
     const member = await this.tracker.getMemberBySocket(client);
 
@@ -118,7 +118,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   @SubscribeMessage(MessageTypes.JOIN_ROOM)
-  async handleJoinRoom(client: socketio.Socket, name: string) {
+  async handleJoinRoom(client:  Socket, name: string) {
 
     const automatedRoom = this.roomService.getAutomatedRoom(name);
 
@@ -169,7 +169,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   @SubscribeMessage(MessageTypes.EXIT_ROOM)
-  async handleLeaveRoom(client: socketio.Socket, name: string) {
+  async handleLeaveRoom(client:  Socket, name: string) {
     this.logger.log('handleLeaveRoom');
 
     const member = await this.tracker.getMemberBySocket(client)
@@ -185,7 +185,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   @SubscribeMessage(MessageTypes.VOTE_SKIP)
-  async handleVoteSkip(client: socketio.Socket, name: string) {
+  async handleVoteSkip(client:  Socket, name: string) {
     this.logger.log('handleVoteSkip');
 
     const member = await this.tracker.getMemberBySocket(client);
@@ -205,7 +205,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   // @SubscribeMessage(MessageTypes.UPDATE_VOTE_SKIP_RATIO)
-  // async handleUpdateVoteSkipRatio(client: socketio.Socket, { name, ratio }: { name: string, ratio: number }) {
+  // async handleUpdateVoteSkipRatio(client: Socket, { name, ratio }: { name: string, ratio: number }) {
   //   this.logger.log('handleUpdateVoteSkipRatio');
 
   //   const member = await this.tracker.getMemberBySocket(client);
@@ -224,7 +224,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   // }
 
   @SubscribeMessage(MessageTypes.GIVE_LEADER)
-  async handleGiveLeader(requestingMemberSocket: socketio.Socket, { to, roomName }: { to: string, roomName: string }) {
+  async handleGiveLeader(requestingMemberSocket:  Socket, { to, roomName }: { to: string, roomName: string }) {
     this.logger.log('handleGiveLeader');
 
     try {
@@ -255,7 +255,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   @SubscribeMessage(MessageTypes.ADD_MEDIA)
-  handleAddMedia(client: socketio.Socket, { roomName, mediaUrl }: { roomName: string, mediaUrl: string }) {
+  handleAddMedia(client:  Socket, { roomName, mediaUrl }: { roomName: string, mediaUrl: string }) {
     this.logger.log('handleAddMedia');
 
     return from(this.tracker.getMemberBySocket(client)).pipe(
@@ -270,7 +270,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   @SubscribeMessage(MessageTypes.REMOVE_MEDIA)
-  async handleRemoveMedia(client: socketio.Socket, { roomName, mediaUrl }: { roomName: string, mediaUrl: string }) {
+  async handleRemoveMedia(client:  Socket, { roomName, mediaUrl }: { roomName: string, mediaUrl: string }) {
     this.logger.log('handelRemoveMedia');
 
     return from(this.tracker.getMemberBySocket(client)).pipe(
@@ -287,7 +287,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   @SubscribeMessage(MessageTypes.CHANGE_MEDIA_POSITION_IN_LIST)
-  async handleChangeMediaPositionInList(client: socketio.Socket, { roomName, mediaUrl, newPosition }: { roomName: string, mediaUrl: string, newPosition: number }) {
+  async handleChangeMediaPositionInList(client:  Socket, { roomName, mediaUrl, newPosition }: { roomName: string, mediaUrl: string, newPosition: number }) {
     this.logger.log('handleChangeMediaPositionInList');
 
     return from(this.tracker.getMemberBySocket(client)).pipe(
@@ -304,7 +304,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   @SubscribeMessage(MessageTypes.MEDIA_NOT_PLAYBLE)
-  async handleVideoNotPlayable(client: socketio.Socket, { roomName, mediaUrl }: { roomName: string, mediaUrl: string }) {
+  async handleVideoNotPlayable(client:  Socket, { roomName, mediaUrl }: { roomName: string, mediaUrl: string }) {
     this.logger.log('handleVideoNotPlayable');
 
     return from(this.tracker.getMemberBySocket(client)).pipe(
@@ -371,7 +371,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     this.server.in(room.id).emit(MessageTypes.VOTE_SKIP_COUNT, { count: room.voteSkipCount, max: room.votesNeededForSkip });
   }
 
-  private sendRoomConfigToMember(room: Room | AutomatedRoom, memberId: string, client: socketio.Socket, isAutomatedChannel: boolean = false) {
+  private sendRoomConfigToMember(room: Room | AutomatedRoom, memberId: string, client:  Socket, isAutomatedChannel: boolean = false) {
 
     if (isAutomatedChannel) {
       client.emit(MessageTypes.USER_CONFIG, {
@@ -402,7 +402,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
 
   }
 
-  private sendPlaylistToMember(room: Room | AutomatedRoom, client: socketio.Socket) {
+  private sendPlaylistToMember(room: Room | AutomatedRoom, client:  Socket) {
     const playlist = toRepresentation(room.currentPlaylist);
     client.emit(MessageTypes.PLAYLIST_UPDATE, playlist);
   }
@@ -424,7 +424,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     this.server.in(roomId).emit(MessageTypes.MEDIA_EVENT, mediaEvent);
   }
 
-  private leaveCommunityRoom(name: string, client: socketio.Socket, member: Member) {
+  private leaveCommunityRoom(name: string, client:  Socket, member: Member) {
     const room = this.roomService.getRoomByName(name);
 
     if (this.tracker.isClientInRoom(client, room.id)) {
@@ -446,7 +446,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     }
   }
 
-  private leaveAutomatedRoom(client: socketio.Socket, automatedRoom: AutomatedRoom, member: Member) {
+  private leaveAutomatedRoom(client:  Socket, automatedRoom: AutomatedRoom, member: Member) {
     if (this.tracker.isClientInRoom(client, automatedRoom.id)) {
 
       automatedRoom.leave(member);
@@ -463,7 +463,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     }
   }
 
-  private joinCommunityRoom(room: Room, member: Member, client: socketio.Socket) {
+  private joinCommunityRoom(room: Room, member: Member, client:  Socket) {
     room.enter(member);
     client.join(room.id);
 
@@ -479,7 +479,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     this.logger.log(`[${member.username}] joined [${room.name}]`)
   }
 
-  private joinAutomatedRoom(automatedRoom: AutomatedRoom, member: Member, client: socketio.Socket) {
+  private joinAutomatedRoom(automatedRoom: AutomatedRoom, member: Member, client:  Socket) {
     automatedRoom.enter(member);
     client.join(automatedRoom.id);
 
