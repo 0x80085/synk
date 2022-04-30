@@ -1,4 +1,5 @@
-import { Module, HttpModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { ScheduleModule } from '@nestjs/schedule';
 
 import { RedditController } from './controllers/reddit.controller';

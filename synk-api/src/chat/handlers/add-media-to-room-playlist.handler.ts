@@ -1,4 +1,5 @@
-import { BadRequestException, ForbiddenException, HttpService } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, } from "@nestjs/common";
+import { HttpService } from '@nestjs/axios';
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { InjectRepository } from "@nestjs/typeorm";
 import { of } from "rxjs";

@@ -1,4 +1,5 @@
-import { Injectable, HttpService, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
 
 import { map, tap, catchError, filter, mergeAll, mergeMap, toArray } from 'rxjs/operators';
 import { from, of, OperatorFunction, Subject } from 'rxjs';
