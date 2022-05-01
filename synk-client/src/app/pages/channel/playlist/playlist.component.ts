@@ -22,6 +22,7 @@ const SUPPORTED_MEDIA_HOSTS = [
   'youtube.com',
   //'soundcloud.com',
   'twitch.tv',
+  'www.twitch.tv',
   //'vimeo.com',
   //'archive.org',
   // 'dailymotion.com',
@@ -262,9 +263,9 @@ export class PlaylistComponent implements OnDestroy, OnInit {
     try {
       const { host } = new URL(value)
 
-      // if (SUPPORTED_MEDIA_HOSTS.indexOf(host) === -1) {
-      //   throw new Error();
-      // }
+      if (SUPPORTED_MEDIA_HOSTS.indexOf(host) === -1) {
+        throw new Error();
+      }
 
       // if (!YouTubeGetID(value)) {
       //   throw new Error();
