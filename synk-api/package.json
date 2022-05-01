@@ -61,7 +61,8 @@
     "typeorm": "^0.2.29",
     "typeorm-store": "^1.2.0",
     "uuid": "^8.3.2",
-    "youtube-v3-api": "^1.1.1"
+    "youtube-v3-api": "^1.1.1",
+    "graceful-fs":"4.2.10"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.2.5",
