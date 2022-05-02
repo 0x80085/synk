@@ -35,7 +35,7 @@ Getting the YT namespace error in the client? Execute `npm i @types/youtube` in 
 
 ### Run with Docker
 
-> **Warning**: Running with Docker is not actively maitained/tested. These steps might work locally but haven't been used/run recently by the maintainer. 
+> **Warning**: Running with Docker is not actively maintained/tested. These steps might work locally but haven't been used/run recently by the maintainer. 
 
 >No need to have postgres installed when using Docker, the compose file will spin up a PostGres DB  container
 

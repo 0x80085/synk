@@ -37,7 +37,7 @@ $ npm run start:dev
 
 Nestjs/TypeORM has built-in migration features, they're similar to dotnet's Entity Framework migration commands. [Find more info about the features in Nest's docs](https://docs.nestjs.com/techniques/database#migrations)
 
-In this project 2 commands can be used to generate or 
+This project exposes some shortcuts for the add migration and run migration commands: 
 
 `db:migrate:run` : Runs all migrations in an attempt to update the DB to latest migration. **Best to run this before starting the Synk API**
 
