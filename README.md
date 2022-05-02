@@ -10,7 +10,11 @@
 
 ## Install
 
-Run `npm i` in all folders that contain a package.json
+Prerequisites: 
+- Have `yarn` installed
+- node >= v12 installed  
+
+Run `yarn` in all folders that contain a package.json
 
 ## Prerequisites
 
@@ -30,6 +34,8 @@ Run `npm start` in the top level folder to start the Server and Client with conc
 Getting the YT namespace error in the client? Execute `npm i @types/youtube` in the synk-client folder.
 
 ### Run with Docker
+
+> **Warning**: Running with Docker is not actively maitained/tested. These steps might work locally but haven't been used/run recently by the maintainer. 
 
 >No need to have postgres installed when using Docker, the compose file will spin up a PostGres DB  container
 
