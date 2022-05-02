@@ -1,3 +1,5 @@
+# THIS FILE IS NOT ACTIVELY MAINTAINED
+
 # Build the WebApp
 
 FROM node:13 AS build-ngx

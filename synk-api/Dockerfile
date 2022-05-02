@@ -1,5 +1,7 @@
 FROM node:lts-alpine AS build
 
+# THIS FILE IS NOT ACTIVELY MAINTAINED
+
 ###################
 ## BUILD STAGE
 ###################
