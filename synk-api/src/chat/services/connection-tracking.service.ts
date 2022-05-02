@@ -1,5 +1,3 @@
-import * as socketio from 'socket.io';
-
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
@@ -11,6 +9,7 @@ import { SerializedUserData } from '../../auth/local.serializer';
 import { Member } from '../../domain/entity/Member';
 import { AuthenticatedGuard } from 'src/auth/guards/authenticated.guard';
 import { MessageTypes } from '../gateways/message-types.enum';
+import { Socket, Server } from 'socket.io';
 
 @Injectable()
 export class ConnectionTrackingService {
@@ -20,7 +19,7 @@ export class ConnectionTrackingService {
     /**
      *  [ key => ipAddress, value => { MemberId, socket } ]
      */
-    clients = new Map<string, { memberId: string, client: socketio.Socket }[]>();
+    clients = new Map<string, { memberId: string, client:  Socket }[]>();
     globallyBannedIps = new Map<string, string>();
 
     /**
@@ -32,10 +31,10 @@ export class ConnectionTrackingService {
         @InjectRepository(Member)
         private memberRepository: Repository<Member>,) { }
 
-    getIpFromSocket = (client: socketio.Socket) => client.handshake.headers['x-forwarded-for'] || client.handshake.address
+    getIpFromSocket = (client:  Socket) => client.handshake.headers['x-forwarded-for'] as string || client.handshake.address
     getIpFromRequest = (req: any) => req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
-    trackMemberConnection(client: socketio.Socket) {
+    trackMemberConnection(client:  Socket) {
         const clientIp = this.getIpFromSocket(client);
         this.logger.log(`Connection incoming [${clientIp}]`);
 
@@ -52,7 +51,7 @@ export class ConnectionTrackingService {
         }
     }
 
-    getSocketByMemberId(memberId: string): socketio.Socket {
+    getSocketByMemberId(memberId: string):  Socket {
         // TODO can we make this better? Index on memberId also or not use memberid?
         for (const [, connections] of this.clients) {
             const connection = connections.find(connection => connection.memberId === memberId);
@@ -63,7 +62,7 @@ export class ConnectionTrackingService {
         return null;
     }
 
-    getSocketsByMemberIdAndIpAddress(memberId: string, ip: string): socketio.Socket[] {
+    getSocketsByMemberIdAndIpAddress(memberId: string, ip: string):  Socket[] {
         // TODO can we make this better? Index on memberId also or not use memberid?
         for (const [, connections] of this.clients) {
             const connection = connections
@@ -75,7 +74,7 @@ export class ConnectionTrackingService {
         }
     }
 
-    async getMemberBySocket(socket: socketio.Socket): Promise<Member> {
+    async getMemberBySocket(socket:  Socket): Promise<Member> {
         try {
             const memberId = this.getMemberId(socket);
             return await this.memberRepository.findOneOrFail(memberId);
@@ -84,7 +83,7 @@ export class ConnectionTrackingService {
         }
     }
 
-    isClientInRoom(client: socketio.Socket, roomId: string) {
+    isClientInRoom(client:  Socket, roomId: string) {
         const memberId = this.getMemberId(client);
         const ipaddress = this.getIpFromSocket(client);
         const roomsOfMember = this.memberInRoomTracker.get(memberId);
@@ -107,7 +106,7 @@ export class ConnectionTrackingService {
         return roomsOfMember.some(e => e.roomId === roomId && e.socketId === socketId);
     }
 
-    memberJoinsRoom(client: socketio.Socket, roomId: string) {
+    memberJoinsRoom(client:  Socket, roomId: string) {
         const memberId = this.getMemberId(client)
         const roomsOfMember = this.memberInRoomTracker.get(memberId)
         const socketId = client.id;
@@ -119,7 +118,7 @@ export class ConnectionTrackingService {
         }
     }
 
-    memberLeavesRoom(client: socketio.Socket, roomId: string) {
+    memberLeavesRoom(client:  Socket, roomId: string) {
         const memberId = this.getMemberId(client)
         const roomsOfMember = this.memberInRoomTracker.get(memberId)
         const socketId = client.id;
@@ -131,7 +130,7 @@ export class ConnectionTrackingService {
         }
     }
 
-    memberDisconnects(client: socketio.Socket) {
+    memberDisconnects(client:  Socket) {
         try {
             const socketId = client.id;
             const ipAddress = this.getIpFromSocket(client);
@@ -157,19 +156,19 @@ export class ConnectionTrackingService {
 
     }
 
-    private getMemberId = (client: socketio.Socket): string => ((client.handshake as any).session.passport.user.id);
+    private getMemberId = (client:  Socket): string => ((client.handshake as any).session.passport.user.id);
 
-    private createNewIPTrackingRecord(memberId: string, clientIp: string, client: socketio.Socket) {
+    private createNewIPTrackingRecord(memberId: string, clientIp: string, client:  Socket) {
         this.clients.set(clientIp, [{ memberId, client }]);
     }
 
-    private saveToExistingIPTrackingRecord(memberId: string, clientIp: string, client: socketio.Socket) {
+    private saveToExistingIPTrackingRecord(memberId: string, clientIp: string, client:  Socket) {
         const existingEntry = this.clients.get(clientIp);
         const newEntry = { memberId, client };
         this.clients.set(clientIp, [...existingEntry, newEntry]);
     }
 
-    private throwIfNotAuthenicated(client: socketio.Socket) {
+    private throwIfNotAuthenicated(client:  Socket) {
 
         const hasValidSessionData = AuthenticatedGuard.validateSession(client.handshake);
 
@@ -180,7 +179,7 @@ export class ConnectionTrackingService {
         }
     }
 
-    private throwIfBanned(client: socketio.Socket) {
+    private throwIfBanned(client:  Socket) {
         const clientIp = this.getIpFromSocket(client);
         if (this.globallyBannedIps.get(clientIp)) {
             this.logger.log(`Denied connection for banned IP [${clientIp}]`);

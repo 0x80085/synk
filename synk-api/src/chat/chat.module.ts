@@ -1,4 +1,5 @@
-import { HttpModule, Module } from '@nestjs/common';
+import {  Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { APP_GUARD } from '@nestjs/core';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ThrottlerGuard } from '@nestjs/throttler';

@@ -1,12 +1,12 @@
-import SocketIO from "socket.io";
 import { Member } from "src/domain/entity";
 import { Room } from "../room/room";
+import { Socket, Server } from 'socket.io';
 
 export class AddMediaToRoomCommand {
     constructor(
         public readonly url: string,
         public readonly member: Member,
         public readonly room: Room,
-        public readonly socket: SocketIO.Socket,
-        public readonly socketServer: SocketIO.Server) { }
+        public readonly socket: Socket,
+        public readonly socketServer: Server) { }
 }

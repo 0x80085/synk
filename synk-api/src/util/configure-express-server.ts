@@ -1,6 +1,6 @@
 import * as morgan from 'morgan';
-import * as helmet from 'helmet';
 import * as compression from 'compression';
+import helmet from 'helmet'
 import { NestExpressApplication } from '@nestjs/platform-express/interfaces';
 
 export function configureExpressServer(app: NestExpressApplication) {
