@@ -20,9 +20,11 @@ interface PlaylistItem {
 const SUPPORTED_MEDIA_HOSTS = [
   'youtu.be',
   'youtube.com',
-  //'soundcloud.com',
+  'www.youtu.be',
+  'www.youtube.com',
   'twitch.tv',
   'www.twitch.tv',
+  //'soundcloud.com',
   //'vimeo.com',
   //'archive.org',
   // 'dailymotion.com',
