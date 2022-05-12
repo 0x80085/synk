@@ -7,6 +7,7 @@ import { shareReplay, switchMap, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { AppStateService } from '../../app-state.service';
 import { SocketService } from '../../socket.service';
+import { SUPPRESS_ERR_FEEDBACK_HEADER } from './interceptors/auth-error.interceptor';
 
 export const VALIDNAME_RGX = new RegExp(/^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/);
 interface LoginInfo {
@@ -123,9 +124,17 @@ export class AuthService {
         { withCredentials: true });
   }
 
-  getUser() {
+  getUser(suppressFeedback = false) {
+    
+    let headers;
+    if (suppressFeedback) {
+      headers = new HttpHeaders();
+      headers = headers.set(SUPPRESS_ERR_FEEDBACK_HEADER, 'true')
+    }
+
     return this.http.get<User>(`${environment.api}/account`, {
-      withCredentials: true
+      withCredentials: true,
+      headers
     }).pipe(
       tap(res => {
         this.state.isLoggedInSubject.next(true);

@@ -16,6 +16,8 @@ export class ApiError {
   status: number
 }
 
+export const SUPPRESS_ERR_FEEDBACK_HEADER = 'app_suppress_feedback';
+
 @Injectable()
 export class RequestLogInterceptor implements HttpInterceptor {
 
@@ -31,6 +33,10 @@ export class RequestLogInterceptor implements HttpInterceptor {
       catchError((error: any) =>
         of(error).pipe(
           tap(err => {
+
+            if (request.headers.has(SUPPRESS_ERR_FEEDBACK_HEADER)) {
+              return;
+            }
 
             const apiError = err as ApiError;
             console.log(err);
