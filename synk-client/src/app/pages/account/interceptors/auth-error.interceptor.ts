@@ -29,12 +29,22 @@ export class RequestLogInterceptor implements HttpInterceptor {
   intercept(
     request: HttpRequest<any>, next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    return next.handle(request).pipe(
+
+    let suppressFeedback = request.headers.has(SUPPRESS_ERR_FEEDBACK_HEADER);
+
+    let clonedRequest = request.clone({ ...request });
+    
+    if (suppressFeedback) {   
+      let newHeaders = request.headers.delete(SUPPRESS_ERR_FEEDBACK_HEADER)
+      clonedRequest = request.clone({ ...request, headers: newHeaders });
+    }
+
+    return next.handle(clonedRequest).pipe(
       catchError((error: any) =>
         of(error).pipe(
           tap(err => {
 
-            if (request.headers.has(SUPPRESS_ERR_FEEDBACK_HEADER)) {
+            if (suppressFeedback) {
               return;
             }
 
@@ -52,7 +62,7 @@ export class RequestLogInterceptor implements HttpInterceptor {
                 this.notification.error(`Something went wrong...`, `Here's some tea 🍵`);
                 break;
               default:
-                this.notification.error( apiError.error.error, apiError.error.message,)
+                this.notification.error(apiError.error.error, apiError.error.message,)
                 break;
             }
 
