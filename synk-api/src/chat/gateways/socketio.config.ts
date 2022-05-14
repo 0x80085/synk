@@ -28,5 +28,13 @@ export const SOCKET_IO_CONFIG: GatewayMetadata = {
    * Even 1MiB seems like a generous limit...
    */
   // tslint:disable-next-line: no-bitwise
-  maxHttpBufferSize: 1 << 20
+  maxHttpBufferSize: 1 << 20,
+
+  // ???
+  cors: {
+    origin: ["http://localhost", "synk.moe"],
+    // methods: ["GET", "POST"],
+    // allowedHeaders: ["my-custom-header"],
+    credentials: true
+  }
 };

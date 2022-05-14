@@ -7,7 +7,6 @@ export enum Roles {
     moderator = "moderator",
     admin = "admin",
     member = "member",
-    leader = "leader",
 }
 
 @Entity()

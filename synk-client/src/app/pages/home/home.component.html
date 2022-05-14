@@ -1,26 +1,22 @@
-<div nz-row [nzGutter]="[25, 25]">
-  <div nz-col nzSpan="24">
-    <nz-carousel nzEffect="scrollx" nzAutoPlay>
-      <div nz-carousel-content style="display: flex">
-        <app-sushi-banner></app-sushi-banner>
-      </div>
-      <div nz-carousel-content style="display: flex">
-        <app-popcorn-banner></app-popcorn-banner>
-      </div>
-      <div nz-carousel-content style="display: flex">
-        <app-neko-banner></app-neko-banner>
-      </div>
-    </nz-carousel>
+<nz-alert  nzBanner nzType="info"  nzIconType="experiment" nzShowIcon nzCloseable [nzMessage]="underConstructionBanner"></nz-alert>
+<ng-template #underConstructionBanner> 
+ <span nz-typography>Welcome to synk.moe, a place to watch videos and chat with friends! This website is in early development stage. <a routerLink="/about">Check the about page</a> for more info. </span>
+</ng-template>
+<div class="content-wrapper">
+  <div nz-row [nzGutter]="[25, 25]">
+    <div nz-col nzSpan="24">
+      <nz-carousel nzEffect="scrollx" nzAutoPlay>
+        <div nz-carousel-content>
+          <app-sushi-banner></app-sushi-banner>
+        </div>
+        <div nz-carousel-content>
+          <app-popcorn-banner></app-popcorn-banner>
+        </div>
+        <div nz-carousel-content>
+          <app-neko-banner></app-neko-banner>
+        </div>
+      </nz-carousel>
+    </div>
   </div>
-</div>
-<div nz-row [nzGutter]="[25, 25]">
-  <div nz-col nzSpan="24">
-    <h1 nz-typography>Channel Directory</h1>
-  </div>
-  <div nz-col nzSpan="24" style="text-align: center">
-    <p nz-typography><strong>Public channels</strong></p>
-  </div>
-  <div nz-col nzSpan="24">
-    <app-overview></app-overview>
-  </div>
+  <app-overview></app-overview>
 </div>

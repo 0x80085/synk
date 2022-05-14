@@ -2,15 +2,19 @@
 
 > Watch videos in sync and chat with friends
 
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/0x80085/synk/graphs/commit-activity) [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://tldrlegal.com/license/mit-license) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com) [![GitHub contributors](https://img.shields.io/github/contributors/0x80085/synk)](https://github.com/0x80085/synk/graphs/contributors/) [![Dockerized](https://img.shields.io/static/v1?label=&message=Dockerized&logo=docker&color=0db7ed)](https://www.docker.com/) [![Open Source Love svg2](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://www.gnu.org/philosophy/floss-and-foss.en.html)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/0x80085/synk/graphs/commit-activity) [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://tldrlegal.com/license/mit-license) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com) [![GitHub contributors](https://img.shields.io/github/contributors/0x80085/synk)](https://github.com/0x80085/synk/graphs/contributors/)  [![Open Source Love svg2](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://www.gnu.org/philosophy/floss-and-foss.en.html)
 
 ## Live Demo
 
-[![Website synk.moe](https://img.shields.io/website-up-down-green-red/http/synk.moe.svg)](https://synk.moe/)
+[![Website synk.moe](https://img.shields.io/website-up-down-green-red/https/synk.moe.svg?style=for-the-badge&label=synk.moe)](https://synk.moe/)
 
 ## Install
 
-Run `npm i` in all folders that contain a package.json
+Prerequisites: 
+- Have `yarn` installed
+- node >= v12 installed  
+
+Run `yarn` in all folders that contain a package.json
 
 ## Prerequisites
 
@@ -23,11 +27,15 @@ Run `npm i` in all folders that contain a package.json
 
 ### Run from command line
 
-Run `npm start` in the top level folder to start the Server and Client.
+Run `npm start` in the top level folder to start the Server and Client with concurrently.
 
-Getting the YT namespace error? Execute `npm i @types/youtube`.
+**...Or** to start the client and server seperately, cd into synk-api and synk-client folders and run `npm start` 
+
+Getting the YT namespace error in the client? Execute `npm i @types/youtube` in the synk-client folder.
 
 ### Run with Docker
+
+> **Warning**: Running with Docker is not actively maintained/tested. These steps might work locally but haven't been used/run recently by the maintainer. 
 
 >No need to have postgres installed when using Docker, the compose file will spin up a PostGres DB  container
 
@@ -45,38 +53,25 @@ Or use the shortcut in package.json:
 
 ### Shared tech
 
-[![made-with-Typescript](https://img.shields.io/badge/Typescript-1f425f.svg)](https://www.typescriptlang.org/)
-[![made-with-SocketIO](https://img.shields.io/badge/SocketIO-1f425f.svg)](https://socket.io/)
+[![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Socket.io](https://img.shields.io/badge/Socket.io-black?style=for-the-badge&logo=socket.io&badgeColor=010101)](https://socket.io)
 
-### Front end
+### Frontend
 
-[![made-with-Angular](https://img.shields.io/badge/Angular-1f425f.svg)](https://angular.io/)
-[![made-with-Ant-Design](https://img.shields.io/badge/Ant%20Design-1f425f.svg)](https://ng.ant.design/)
-[![made-with-Plyr](https://img.shields.io/badge/Plyr-1f425f.svg)](https://plyr.io/)
+[![Angular](https://img.shields.io/badge/angular-%23DD0031.svg?style=for-the-badge&logo=angular&logoColor=white)](https://angular.io)
+[![Ant-Design](https://img.shields.io/badge/-AntDesign-%230170FE?style=for-the-badge&logo=ant-design&logoColor=white)](https://ng.ant.design)
+[![made-with-Plyr](https://img.shields.io/badge/Plyr-1f425f.svg?style=for-the-badge)](https://plyr.io/)
 
-### Back end
+### Backend
 
-[![made-with-TypeORM](https://img.shields.io/badge/TypeORM-1f425f.svg)](https://github.com/typeorm/typeorm)
-[![made-with-ExpressJS](https://img.shields.io/badge/ExpressJS-1f425f.svg)](https://expressjs.com/)
-[![made-with-Passport](https://img.shields.io/badge/Passport-1f425f.svg)](http://www.passportjs.org/)
+[![NestJS](https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com)
+[![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB)](https://expressjs.com)
+[![made-with-TypeORM](https://img.shields.io/badge/TypeORM-1f425f.svg?style=for-the-badge)](https://github.com/typeorm/typeorm)
+[![made-with-Passport](https://img.shields.io/badge/Passport-1f425f.svg?style=for-the-badge)](http://www.passportjs.org/)
 
-## Todo
 
-- More docs
-- Moderation of channel
-- Custom emoji support , gif, bot
-- Channel customization support
-- Rate limiting
-- Refactor Middleware Sockets to make it more readable
-- Playlist control
+### Contributing
 
-## Under construction at time of writing
+Join the discord channel and help with testing or developing this project
 
-- disconnect socket/ session expire tests
-- user update + config settings
-- user channels management
-- fix scroll issue on chatbox
-- admin functions
-- make sessions more stable (testing)
-- ratelimiting, manage user access, and security
-- Add html5 player
+[![Discord](https://img.shields.io/discord/732990730355867678.svg?style=for-the-badge&label=Synk&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/EaYUq7Ws8m)

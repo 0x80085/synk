@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { OverviewlistItem, OverviewService } from '../overview.service';
-import { catchError, share } from 'rxjs/operators';
-import { AppStateService } from '../../../app-state.service';
+import { ChannelOverviewItem, OverviewService } from '../overview.service';
+import { catchError, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-overview',
@@ -10,10 +9,18 @@ import { AppStateService } from '../../../app-state.service';
   styleUrls: ['overview.component.scss']
 })
 export class OverviewComponent {
+  
+  communityRooms$: Observable<ChannelOverviewItem[]> = this.overviewService.getChannels()
+    .pipe(
+      catchError(() => of([])
+      )
+    );
 
-  data$: Observable<OverviewlistItem[]> = this.overviewService.getChannels().pipe(share(),catchError(() => of([])));
+  automatedRooms$: Observable<ChannelOverviewItem[]> = this.overviewService.getAutomatedChannels()
+    .pipe(
+      catchError(() => of([])
+      )
+    );
 
-  isLoggedIn$ = this.state.isLoggedIn$.pipe(share());
-
-  constructor(private overviewService: OverviewService, private state: AppStateService) { }
+  constructor(private overviewService: OverviewService) { }
 }

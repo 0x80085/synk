@@ -1,7 +1,14 @@
-import { Component, ViewChild, EventEmitter } from '@angular/core';
+import { Component, ViewChild, EventEmitter, Output } from '@angular/core';
 import { BaseMediaComponent } from '../base-media.component';
 
 import { PlyrComponent as PlyrComp } from "ngx-plyr";
+
+
+export function isVimeoUrl(url: string) {
+  const regx = /^(?:https?:\/\/)?(?:www\.|go\.)?vimeo\.com\/([a-z0-9_]+)($|\?)/
+  return regx.test(url);
+}
+
 
 @Component({
   selector: 'app-plyr',
@@ -16,7 +23,11 @@ export class PlyrComponent implements BaseMediaComponent {
   src: string;
   videoSources: Plyr.Source[] = [];
 
-  videoEnded: EventEmitter<unknown> = new EventEmitter();
+  @Output()
+  mediaEnded: EventEmitter<unknown> = new EventEmitter();
+
+  @Output()
+  mediaNotPlayable: EventEmitter<unknown> = new EventEmitter();
 
   constructor() { }
 
@@ -55,12 +66,27 @@ export class PlyrComponent implements BaseMediaComponent {
       this.src = url;
     }
     if (this.plyr && !this.plyr.player.playing) {
-      this.plyr.player.source = { sources: [{ src: this.src }], type: 'video' };
+
+      if (isVimeoUrl(url)) {
+        this.plyr.player.source = {
+          type: 'video',
+          sources: [
+            {
+              src: this.src,
+              provider: 'vimeo',
+            },
+          ],
+        };
+
+      } else {
+        this.plyr.player.source = { sources: [{ src: this.src }], type: 'video' };
+      }
     }
   }
 
-  initPlayer(){
+
+
+  initPlayer() {
     this.play(this.src);
   }
-
 }

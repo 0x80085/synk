@@ -37,11 +37,9 @@
       <li nz-submenu nzOpen nzTitle="Manage" nzIcon="dashboard">
         <ul>
           <li nz-menu-item class="item" nzMatchRouter>
-            <i nz-icon nzType="crown" nzTheme="outline"></i>
             <a routerLink="/account/admin"> Admin</a>
           </li>
           <li nz-menu-item class="item" nzMatchRouter>
-            <i nz-icon nzType="bug" nzTheme="outline"></i>
             <a routerLink="/debug"> Test player</a>
           </li>
         </ul>
@@ -52,16 +50,11 @@
       style="position: absolute; bottom: 10px; right:20px;">?</button>
   </nz-sider>
   <nz-layout>
-    <nz-alert  nzBanner nzType="info"  nzIconType="experiment" nzShowIcon nzCloseable [nzMessage]="underConstructionBanner"></nz-alert>
     <nz-content>
       <router-outlet></router-outlet>
     </nz-content>
   </nz-layout>
 </nz-layout>
-
-<ng-template #underConstructionBanner> 
- <span nz-typography>This website is under active development. <a routerLink="/about">Check the about page</a> for more info. </span>
-</ng-template>
 
 <ng-template #logo>
   <ng-container *ngIf="isLoggedIn | async; then userLoggedIn; else userNotLoggedIn">
@@ -70,7 +63,7 @@
 
 <ng-template #userNotLoggedIn>
   <i nz-icon nzType="meh" style="cursor: pointer;" (click)="isCollapsed = !isCollapsed" nzTheme="fill" nz-tooltip
-    nzTooltipTitle="Log in for the full experience!"></i>
+    nzTooltipTitle="Log in to access and create rooms!"></i>
 </ng-template>
 
 <ng-template #userLoggedIn>
@@ -78,8 +71,8 @@
 </ng-template>
 
 <ng-template #socketDisonnected>
-  <i nz-icon nzType="smile" style="cursor: pointer;" (click)="isCollapsed = !isCollapsed" nzTheme="fill" nz-tooltip
-    [nzTooltipTitle]="(user$ | async)?.username"></i>
+  <i nz-icon nzType="smile" style="cursor: pointer;" (click)="isCollapsed = !isCollapsed" nzTheme="fill"
+   nz-tooltip nzTooltipTitle="Not connected to chat server"></i>
 </ng-template>
 
 <ng-template #socketConnected>

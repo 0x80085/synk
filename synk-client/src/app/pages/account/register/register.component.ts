@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from '../auth.service';
+import { AuthService, VALIDNAME_RGX } from '../auth.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 @Component({
@@ -13,6 +13,12 @@ export class RegisterComponent implements OnInit {
 
   registerSuccess = false;
   isSubmitting = false;
+
+  
+  public get agreesToTermsandConds() : boolean {
+    return this.form.controls['agreesToTermsAndConditions'].value
+  }
+  
 
   constructor(
     private fb: FormBuilder,
@@ -28,14 +34,22 @@ export class RegisterComponent implements OnInit {
           Validators.required,
           Validators.maxLength(15),
           Validators.minLength(3),
-          Validators.pattern(/^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/)
+          Validators.pattern(VALIDNAME_RGX)
         ]
       ],
       password: [
         null,
-        [Validators.required, Validators.maxLength(20), Validators.minLength(5)]
+        [
+          Validators.required,
+          Validators.maxLength(20),
+          Validators.minLength(5)]
       ],
-      remember: [true]
+      agreesToTermsAndConditions: [
+        false,
+        [
+          Validators.required
+        ]
+      ]
     });
   }
 
@@ -47,8 +61,8 @@ export class RegisterComponent implements OnInit {
     }
 
     const creds = {
-      username: this.form.controls.username.value,
-      password: this.form.controls.password.value
+      username: this.form.controls.username.value.trim(),
+      password: this.form.controls.password.value.trim()
     };
 
     this.isSubmitting = true;
@@ -59,11 +73,12 @@ export class RegisterComponent implements OnInit {
         this.isSubmitting = false;
       },
       err => {
+        console.error(err);
         this.notification.create(
           'error',
           'Registration failed',
           `
-          AAaaaaah
+          Something went wrong... (???)
         `
         );
         this.isSubmitting = false;

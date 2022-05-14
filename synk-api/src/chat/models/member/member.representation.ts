@@ -1,4 +1,5 @@
 import { Member } from "../../../domain/entity";
+import { AutomatedRoom } from "../automated-room/automated-room";
 import { Room } from "../room/room";
 
 export interface MemberRepresentation {
@@ -11,9 +12,9 @@ export interface MemberRepresentation {
     isLeader: boolean;
 }
 
-export function getMemberSummary({ id, username, avatarUrl, isAdmin }: Member,room? :Room): MemberRepresentation {
+export function getMemberSummary({ id, username, avatarUrl, isAdmin }: Member,room? :Room | AutomatedRoom): MemberRepresentation {
     const isModerator = room ? room.moderators.findIndex(mod => mod.member.id === id) !== -1 : false;
-    const isOwner = room ? room.owner.id === id : false;
+    const isOwner = room ? room.owner && room.owner.id === id : false;
     const isLeader = room ? room.leader && room.leader.id === id : false;
 
     return {

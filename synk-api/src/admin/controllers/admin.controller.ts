@@ -1,5 +1,5 @@
-import { Controller, Delete, Get, InternalServerErrorException, Param, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Delete, Get, InternalServerErrorException, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { SerializedUserData } from 'src/auth/local.serializer';
 import { ChannelService } from 'src/chat/services/channel.service';
@@ -77,6 +77,54 @@ export class AdminController {
     getConnections(
     ) {
         return this.adminService.getConnections();
+    }
+
+    @Post('/start-scrape-subreddit/:channelName/:subreddit')
+    @UseGuards(AdminGuard)
+    @ApiOperation({ summary: 'Start Video Scrape Run' })
+    @ApiParam({ name: 'subreddit' })
+    @ApiParam({ name: 'channelName' })
+    startScrape(
+        @Param('subreddit') subreddit: string,
+        @Param('channelName') channelName: string
+    ) {
+
+        this.roomService.automatedRooms.find(it => it.name === channelName)?.startSubredditScraperRun(subreddit);
+    }
+
+    @Post('/start-auto-playback/:name')
+    @UseGuards(AdminGuard)
+    @ApiOperation({ summary: 'Start automated room playback for given automated channel' })
+    @ApiParam({ name: 'name' })
+    startAutomatedRoomPlayback(@Param('name') name: string) {
+
+        this.roomService.automatedRooms.find(it => it.name === name)?.startPlaying();
+    }
+
+    @Post('/stop-auto-playback/:name')
+    @UseGuards(AdminGuard)
+    @ApiParam({ name: 'name' })
+    @ApiOperation({ summary: 'Stop automated room playback for given automated channel' })
+    stopAutomatedRoomPlayback(@Param('name') name: string) {
+
+        this.roomService.automatedRooms.find(it => it.name === name)?.stopPlaying();
+    }
+
+    @Post('/play-next-auto-playback/:name')
+    @UseGuards(AdminGuard)
+    @ApiParam({ name: 'name' })
+    @ApiOperation({ summary: 'Play next media for given automated channel' })
+    playNextAutomatedRoomPlaylist(@Param('name') name: string) {
+        this.roomService.automatedRooms.find(it => it.name === name)?.playNext()
+    }
+
+    @Post('/clear-playlist/:name')
+    @UseGuards(AdminGuard)
+    @ApiParam({ name: 'name' })
+    @ApiOperation({ summary: 'Clear playlist and stop automated room playback for given automated channel' })
+    clearAutomatedRoomPlaylist(@Param('name') name: string) {
+        this.roomService.automatedRooms.find(it => it.name === name)?.stopPlaying();
+        this.roomService.automatedRooms.find(it => it.name === name)?.currentPlaylist.clear();
     }
 
 }

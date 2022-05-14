@@ -1,29 +1,38 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 
-export interface OverviewlistItem {
+export interface ChannelOverviewItem {
   name: string;
   description: string;
   connectedMemberCount: number;
-  nowPlaying: string;
-}
-
-export interface ChannelDraft {
-  name: string;
-  description: string;
+  nowPlaying: {
+    url: string,
+    title: string
+    length:number
+    currentTime:number
+};
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class OverviewService {
+
   constructor(private http: HttpClient) { }
 
   getChannels() {
 
-    return this.http.get<OverviewlistItem[]>(
+    return this.http.get<ChannelOverviewItem[]>(
       `${environment.api}/channels/all`,
+      { withCredentials: true },
+    );
+  }
+
+  getAutomatedChannels() {
+    
+    return this.http.get<ChannelOverviewItem[]>(
+      `${environment.api}/channels/automated`,
       { withCredentials: true },
     );
   }

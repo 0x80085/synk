@@ -1,7 +1,8 @@
 import { EventEmitter } from '@angular/core';
 
 export interface BaseMediaComponent {
-  videoEnded: EventEmitter<unknown>;
+  mediaEnded: EventEmitter<unknown>;
+  mediaNotPlayable: EventEmitter<unknown>;
   isPlaying(): boolean;
   play(url?: string): void;
   pause(): void;

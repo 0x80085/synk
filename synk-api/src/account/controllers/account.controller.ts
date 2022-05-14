@@ -1,11 +1,13 @@
 
-import { Body, Controller, Delete, Get, Patch, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, ForbiddenException, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Request } from 'express';
+import { Request, Response } from 'express';
+import { AuthService } from 'src/auth/services/auth.service';
 
 import { AuthenticatedGuard } from '../../auth/guards/authenticated.guard';
 import { SerializedUserData } from '../../auth/local.serializer';
 import { Member } from '../../domain/entity';
+import { ChangePasswordInput } from '../models/change-password.input';
 import { UpdateAccountInput } from '../models/update-account.input';
 import { AccountService } from '../services/account.service';
 
@@ -13,7 +15,7 @@ import { AccountService } from '../services/account.service';
 @Controller('account')
 export class AccountController {
 
-    constructor(private accountService: AccountService) { }
+    constructor(private accountService: AccountService, private authService: AuthService) { }
 
     @Get('')
     @UseGuards(AuthenticatedGuard)
@@ -32,10 +34,24 @@ export class AccountController {
     @ApiOperation({ summary: 'Update member account info' })
     async updateAccount(
         @Req() { user }: Request,
-        @Body() input: UpdateAccountInput) {
+        @Body() input: UpdateAccountInput
+    ) {
 
         const { id } = user as SerializedUserData;
         return await this.accountService.updateAccount(id, input);
+
+    }
+
+    @Post('/change-password')
+    @UseGuards(AuthenticatedGuard)
+    @ApiOperation({ summary: 'Change member password' })
+    async updatePassword(
+        @Req() { user }: Request,
+        @Body() { newPassword, oldPassword }: ChangePasswordInput
+    ) {
+
+        const { id } = user as SerializedUserData;
+        return await this.accountService.changePassword(id, oldPassword, newPassword);
 
     }
 
@@ -43,10 +59,23 @@ export class AccountController {
     @UseGuards(AuthenticatedGuard)
     @ApiOperation({ summary: 'Delete member account' })
     async deleteAccount(
-        @Req() { user }: Request) {
+        @Req() req: Request,
+        @Res() res: Response
+    ) {
 
+        const { user } = req;
         const { id } = user as SerializedUserData;
-        return await this.accountService.deleteAccount(id);
+
+        if ((user as SerializedUserData).isAdmin) {
+            throw new ForbiddenException("Cannot delete an admin account");
+        }
+
+        this.authService.disconnectSocketConnections(req);
+        await this.accountService.deleteAccount(id);
+
+        this.authService.logout(req, res);
+
+        res.sendStatus(204);
 
     }
 

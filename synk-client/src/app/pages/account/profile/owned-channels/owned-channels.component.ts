@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { Observable } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 
 import { AuthService, Channel } from '../../auth.service';
-import { tap, take, catchError, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-owned-channels',
@@ -12,27 +13,72 @@ import { tap, take, catchError, switchMap } from 'rxjs/operators';
 })
 export class OwnedChannelsComponent {
 
-  constructor(
-    private auth: AuthService,
-    private notification: NzNotificationService) {
+  form = this.formBuilder.group({
+    channels: this.formBuilder.array([])
+  });
+
+  get channelForms() {
+    return this.form.controls["channels"] as FormArray;
   }
 
-  channels$: Observable<Channel[]> = this.auth.userOwnedChannels$;
+  constructor(
+    private auth: AuthService,
+    private notification: NzNotificationService,
+    private formBuilder: FormBuilder) {
+  }
 
-  deleteChannel(chan: Channel, ev: Event) {
-    if (confirm(`You really want to delete ${chan.name}?`)) {
+  channels$: Observable<Channel[]> = this.auth.userOwnedChannels$.pipe(
+    tap(channels => channels.forEach(chan => this.addChannelForm(chan)))
+  );
+
+  private addChannelForm(channel: Channel) {
+    const channelForm = this.formBuilder.group({
+      description: [
+        channel.description,
+        [
+          Validators.required,
+          Validators.maxLength(250),
+          Validators.minLength(3),
+        ]
+      ],
+      isPublic: [channel.isPublic, Validators.required]
+    });
+    this.channelForms.push(channelForm);
+  }
+
+  deleteChannel(channel: Channel, ev: Event) {
+    if (confirm(`You really want to delete ${channel.name}?`)) {
       ev.preventDefault();
-      this.auth.deleteChannel(chan.id)
+      this.auth.deleteChannel(channel.id)
         .pipe(
           tap(() => this.auth.refreshChannels()),
-          take(1)
-          , catchError((err) => {
-            this.notification.error('Delete failed', 'try again later');
+          tap(() => this.notification.success('Success', `Deleted ${channel.name}`)),
+          catchError((err) => {
+            this.notification.error('Delete failed', 'Try again later');
             return err;
           }))
-        .subscribe(() => this.auth.refreshChannels());
+        .subscribe();
       return false;
     }
+  }
+
+  updateChannel(id: string, control: AbstractControl) {
+    const formGroup = control as FormGroup;
+
+    const description = formGroup.controls.description.value
+    const isPublic = formGroup.controls.isPublic.value
+
+    const updatedChannel = { id, description, isPublic } as Channel;
+
+    this.auth.updateChannel(updatedChannel)
+      .pipe(
+        tap(() => this.auth.refreshChannels()),
+        tap(() => this.notification.success('Success', `Updated `)),
+        catchError((err) => {
+          this.notification.error('Update failed', 'Try again later');
+          return err;
+        }))
+      .subscribe();
   }
 
 }

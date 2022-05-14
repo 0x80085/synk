@@ -11,7 +11,8 @@ import {
   RoomErrors
 } from './models/room.models';
 import { SocketService, RealTimeCommand } from '../../socket.service';
-import { filter, map } from 'rxjs/operators';
+import { filter, map, share, shareReplay, tap } from 'rxjs/operators';
+import { doLog } from 'src/app/utils/custom.operators';
 
 @Injectable()
 export class ChatService {
@@ -19,12 +20,23 @@ export class ChatService {
   roomMessages$ = this.socketService.listenForEvent<Message[]>(RoomCommands.GROUP_MESSAGE);
 
   alreadyJoinedRoomError$ = this.socketService.exceptionEvent$.pipe(
-    filter(({message}) => message === RoomErrors.ALREADY_JOINED)
+    filter(({ message }) => message === RoomErrors.ALREADY_JOINED)
   );
 
-  roomUserConfig$ = this.socketService.listenForEvent<RoomUserConfig>(RoomCommands.USER_CONFIG);
+  roomMaxMemberLimitReachedError$ = this.socketService.exceptionEvent$.pipe(
+    filter(({ message }) => message === RoomErrors.REFUSE_JOIN_ROOM_FULL)
+  );
 
-  roomUserList$ = this.socketService.listenForEvent<RoomUser[]>(RoomCommands.USER_LIST_UPDATE);
+  roomUserConfig$ = this.socketService.listenForEvent<RoomUserConfig>(RoomCommands.USER_CONFIG)
+    .pipe(
+      doLog('chat svc roomUserConfig', true),
+     share()
+    );
+
+  userBecameLeader$ = this.socketService.listenForEvent<{}>(RoomCommands.YOU_ARE_LEADER);
+  userPassedOnLeader$ = this.socketService.listenForEvent<{}>(RoomCommands.LEADER_ROLE_PASSED_ON_SUCCESS);
+
+  roomUserList$ = this.socketService.listenForEvent<RoomUser[]>(RoomCommands.USER_LIST_UPDATE).pipe(shareReplay(1));
 
   constructor(private socketService: SocketService) { }
 

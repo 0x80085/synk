@@ -1,4 +1,5 @@
-import { HttpService, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
 import { map } from 'rxjs/operators';
 import { YoutubeDataAPI } from 'youtube-v3-api';
 
@@ -104,7 +105,7 @@ export class YoutubeV3Service {
                     id,
                     type: 'youtube',
                     title: video.snippet.title,
-                    duration: parseDuration(video.contentDetails.duration),
+                    duration: parseToSeconds(video.contentDetails.duration),
                     meta: {
                         thumbnail: video.snippet.thumbnails.default.url,
                         etag: result.etag,
@@ -150,16 +151,17 @@ export function YouTubeGetID(url: string) {
     return ID as string;
 }
 
-const DURATION_SCALE: [RegExp, number][] = [
-    [/(\d+)D/, 24 * 3600],
-    [/(\d+)H/, 3600],
-    [/(\d+)M/, 60],
-    [/(\d+)S/, 1]
-];
+function parseToSeconds(duration: any) {
+    
+    const durationScale: [RegExp, number][] = [
+        [/(\d+)D/, 24 * 3600],
+        [/(\d+)H/, 3600],
+        [/(\d+)M/, 60],
+        [/(\d+)S/, 1]
+    ];
 
-function parseDuration(duration: any) {
     let time = 0;
-    for (const [regex, scale] of DURATION_SCALE) {
+    for (const [regex, scale] of durationScale) {
         let m;
         // tslint:disable-next-line: no-conditional-assignment
         if (m = duration.match(regex)) {

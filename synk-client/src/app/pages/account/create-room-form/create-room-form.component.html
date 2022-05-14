@@ -1,41 +1,33 @@
 <form nz-form [formGroup]="form" (ngSubmit)="onSubmit()">
   <nz-form-item>
     <nz-form-control nzErrorTip="Please enter a valid channel name">
-      <nz-input-group>
         <input
-          style="border-radius: 7px;"
           type="text"
           nz-input
           formControlName="name"
           placeholder="Channel name"
         />
-      </nz-input-group>
     </nz-form-control>
   </nz-form-item>
   <nz-form-item>
     <nz-form-control nzErrorTip="Please enter a valid channel description">
-      <nz-input-group>
         <input
-          style="border-radius: 7px;"
           type="text"
           nz-input
           formControlName="description"
           placeholder="Channel description"
         />
-      </nz-input-group>
     </nz-form-control>
   </nz-form-item>
   <nz-form-item>
     <nz-form-control>
-      <nz-input-group>
         <label nz-checkbox
           formControlName="isPublic">
           List channel on home page?
         </label>
-      </nz-input-group>
     </nz-form-control>
   </nz-form-item>
-  <button nz-button [nzType]="'primary'">
+  <button nz-button [nzType]="'primary'" [nzLoading]="isSubmitting" >
     Create
   </button>
 </form>

@@ -1,13 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Member } from 'src/domain/entity';
 import { Repository } from 'typeorm';
 
 import { UpdateAccountInput } from '../models/update-account.input';
+import { isValidPassword } from 'src/auth/services/auth.service';
 
 @Injectable()
 export class AccountService {
-
 
     constructor(
         @InjectRepository(Member)
@@ -24,8 +26,35 @@ export class AccountService {
         return member
     }
 
+    async changePassword(id: string, oldPassword: string, newPassword: string) {
+        
+        const trimmedOldPassword = oldPassword.trim();
+        const trimmedNewPassword = newPassword.trim();
+
+        const member = await this.memberRepository.findOneOrFail({ where: { id } });
+        const equalsOldPassword = await bcrypt.compare(trimmedOldPassword, member.passwordHash);
+
+        if (!equalsOldPassword) {
+            throw new BadRequestException("Invalid old password");
+        }
+        
+        if (!isValidPassword(trimmedNewPassword)) {
+            throw new BadRequestException("Invalid new password");
+        }
+
+        const hashedNewPassword = await bcrypt.hash(trimmedNewPassword, 10);
+        member.passwordHash = hashedNewPassword;
+
+        await this.memberRepository.save(member)
+
+    }
+
     getMemberAccount(id: string) {
-        return this.memberRepository.findOneOrFail({ where: { id } });
+        return this.memberRepository.findOneOrFail({ where: { id } })
+            .then(member => {
+                 delete member.passwordHash;
+                 return member;
+             });
     }
 
     async deleteAccount(id: string) {

@@ -66,8 +66,7 @@ export class AppService {
 
   defaultGreeting(): string {
     return `
-    Welcome to Chink TeeVee
-    ==
+    Welcome to Synk.
     `;
   }
 

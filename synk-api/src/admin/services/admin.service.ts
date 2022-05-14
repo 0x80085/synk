@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IPaginationOptions, paginate, Pagination } from 'nestjs-typeorm-paginate';
-import { forkJoin, from, of, pipe } from 'rxjs';
-import { map, switchMap, tap, withLatestFrom } from 'rxjs/operators';
+import { IPaginationOptions, paginateRawAndEntities, Pagination } from 'nestjs-typeorm-paginate';
 import { ConnectionTrackingService } from 'src/chat/services/connection-tracking.service';
 import { Repository } from 'typeorm';
 
@@ -20,11 +18,11 @@ export class AdminService {
     ) { }
 
     async getPaginatedChannels(options: IPaginationOptions): Promise<Pagination<Channel>> {
-        return paginate<Channel>(this.channelRepository, options);
+        return this.getChannelsWithOwner(options);
     }
 
     async getPaginatedMembers(options: IPaginationOptions): Promise<Pagination<Member>> {
-        return paginate<Member>(this.memberRepository, options);
+        return this.getMembersWithChannels(options)
     }
 
     public getConnections() {
@@ -42,6 +40,47 @@ export class AdminService {
 
 
         return { clients, members }
+    }
+
+    private async getChannelsWithOwner(options: IPaginationOptions) {
+        const query = this.channelRepository
+            .createQueryBuilder("channel")
+            .leftJoinAndSelect("channel.owner", "owner")
+            .orderBy('channel.dateCreated', 'DESC');
+
+        const [pagination, rawResults] = await paginateRawAndEntities(query, options);
+        const patchedResults = pagination.items.map((item, _) => {
+            const patchedItem = { ...item };
+            const patchedOwner = { ...patchedItem.owner, passwordHash: null } as Member;
+            patchedItem.owner = patchedOwner as Member;
+            return patchedItem
+        });
+
+        const clone = { ...pagination };
+
+        clone.items = patchedResults;
+
+        return clone;
+    }
+
+    private async getMembersWithChannels(options: IPaginationOptions) {
+        const query = this.memberRepository
+            .createQueryBuilder("member")
+            .leftJoinAndSelect("member.channels", "channels")
+            .orderBy('member.lastSeen', 'DESC');
+
+        const [pagination, rawResults] = await paginateRawAndEntities(query, options);
+        const patchedResults = pagination.items.map((item, _) => {
+            const patchedItem = { ...item };
+            delete patchedItem.passwordHash
+            return patchedItem
+        });
+
+        const clone = { ...pagination };
+
+        clone.items = patchedResults;
+
+        return clone;
     }
 
 }

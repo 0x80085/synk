@@ -41,7 +41,7 @@
 @body-background: #0e0e0e;
 // Base background color for most components
 @component-background: rgb(25, 25, 25);
-@font-family: 'Chinese Quote', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+@font-family: 'Overpass', -apple-system, BlinkMacSystemFont, 'Segoe UI',
   'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue',
   Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
   'Segoe UI Symbol';
@@ -58,8 +58,8 @@
 @font-size-lg: @font-size-base + 2px;
 @font-size-sm: 12px;
 @line-height-base: 1.5;
-@border-radius-base: 8px;
-@border-radius-sm: 7px;
+@border-radius-base: 4px;
+@border-radius-sm: 3px;
 
 // vertical paddings
 @padding-lg: 24px; // containers
@@ -536,7 +536,7 @@
 @alert-success-bg-color: ~`colorPalette('@{success-color}', 1) `;
 @alert-success-icon-color: @success-color;
 @alert-info-border-color: ~`colorPalette('@{info-color}', 3) `;
-@alert-info-bg-color: ~`colorPalette('@{info-color}', 1) `;
+@alert-info-bg-color: #18252a;
 @alert-info-icon-color: @info-color;
 @alert-warning-border-color: ~`colorPalette('@{warning-color}', 3) `;
 @alert-warning-bg-color: ~`colorPalette('@{warning-color}', 1) `;
@@ -557,7 +557,7 @@
 *::-webkit-scrollbar-track
 {
 	-webkit-box-shadow: inset 0 0 2px rgba(0,0,0,0.3);
-	border-radius: 6px;
+	border-radius: 2px;
 	background-color: @component-background;
 }
 
@@ -570,7 +570,13 @@
 *::-webkit-scrollbar-thumb
 {
   border-radius: 8px;
-	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	-webkit-box-shadow: inset 0 0 2px rgba(0,0,0,.3);
 	background-color: @body-background;
   border-right: 1px solid @component-background;
+}
+
+
+// odd tab nav margin problem 
+.ant-tabs-tab+.ant-tabs-tab {
+  margin: 0;
 }

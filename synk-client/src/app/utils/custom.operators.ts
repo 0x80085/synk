@@ -15,7 +15,8 @@ export function doLog<T>(msg: string, doLogInput = false): MonoTypeOperatorFunct
 }
 
 export function debugLog(msg: string, extra?: any, logExtra = false) {
-  if ((window as any).debug) {
+  
+  if ((window as any).debug || window.location.hostname.includes('localhost')) {
     console.log(msg);
     if (logExtra && extra) {
       console.log(extra);

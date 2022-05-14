@@ -4,11 +4,14 @@ export enum MessageTypes {
   GROUP_MESSAGE = 'group message',
   MEDIA_EVENT = 'media event',
   VOTE_SKIP = 'vote skip',
+  VOTE_SKIP_COUNT = 'vote skip count',
   ADD_MEDIA = 'add media',
   REMOVE_MEDIA = 'remove media',
   MOVE_MEDIA = 'move media',
   PURGE_ALL_MEDIA_OF_MEMBER = 'purge all media of member',
   GIVE_LEADER = 'give leader',
+  YOU_ARE_LEADER = 'you are leader',
+  LEADER_ROLE_PASSED_ON_SUCCESS = 'leader role passed on success',
   PLAY_NEXT_MEDIA = 'play next media',
   SHUFFLE_PLAYLIST = 'shuffle playlist',
   KICK_MEMBER = 'kick member',
@@ -25,5 +28,8 @@ export enum MessageTypes {
   INTERNAL_SERVER_ERROR = 'InternalServerErrorException',
   GENERIC_ERROR = 'error',
   CHANGE_MEDIA_POSITION_IN_LIST = "change media position in list",
-  REPOSITION_MEDIA_SUCCESS = "reposition media success"
+  REPOSITION_MEDIA_SUCCESS = "reposition media success",
+  MEDIA_NOT_PLAYBLE = "media not playble",
+  REFUSE_JOIN_ROOM_FULL = "refuse join room full",
+  UPDATE_VOTE_SKIP_RATIO = "update vote skip ratio"
 }

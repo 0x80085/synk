@@ -1,48 +1,76 @@
-<h1 nz-typography>Your stuff</h1>
-<nz-divider></nz-divider>
-<div nz-row>
-  <div
-    nz-col
-    [nzLg]="{ span: 8, offset: 0 }"
-    [nzMd]="{ span: 12, offset: 0 }"
-    [nzXs]="{ span: 24, offset: 0 }"
-  >
-    <h2 nz-typography>Info</h2>
-    <nz-card [nzCover]="coverTemplate" [nzLoading]="!(me$ | async)">
-      <h5 *ngIf="me$ | async">Username:</h5>
-      <pre>{{ me$ | async | username }}</pre>
-      <button
-        *ngIf="me$ | async"
-        nz-button
-        nzType="primary"
-        (click)="onLogout()"
-      >
-        Logout
-      </button>
-      <div *ngIf="!(me$ | async)">Please login</div>
-    </nz-card>
+<div class="content-wrapper">
+  <h1 nz-typography>Your stuff</h1>
+  <nz-divider></nz-divider>
+  <div nz-row>
+    <div nz-col [nzLg]="{ span: 8, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }" [nzXs]="{ span: 24, offset: 0 }">
+      <h2 nz-typography>Info</h2>
+      <nz-card [nzLoading]="!(me$ | async)" [nzActions]="[logoutBtn, deleteAccountButton]">
+        <nz-card-meta [nzTitle]="me$ | async | username" [nzAvatar]="avatarTemplate">
+        </nz-card-meta>
+        <ng-template #avatarTemplate>
+          <nz-avatar nzGap="5" nzIcon="user" nzSize="large" style="background-color: #63c5d2;"></nz-avatar>
+        </ng-template>
+        <p nz-typography>
+          date created:
+          <span nz-typography><code>{{ (me$ | async)?.dateCreated | date }}</code></span>
+        </p>
+        <button *ngIf="me$ | async" nz-button nzDanger nzType="primary"
+          (click)="onClickChangePassword()">
+          Change password
+        </button>
+      </nz-card>
+      <h2 nz-typography style="margin-top: 1rem;">Create channel</h2>
+      <nz-card [nzLoading]="!(me$ | async)">
+        <app-create-room-form></app-create-room-form>
+      </nz-card>
+    </div>
+    <div nz-col [nzLg]="{ span: 16, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }" [nzXs]="{ span: 24, offset: 0 }">
+      <app-owned-channels></app-owned-channels>
+    </div>
   </div>
-  <div
-    nz-col
-    [nzLg]="{ span: 16, offset: 0 }"
-    [nzMd]="{ span: 12, offset: 0 }"
-    [nzXs]="{ span: 24, offset: 0 }"
-  >
-    <app-owned-channels></app-owned-channels>
-  </div>
-</div>
-<div nz-row>
-  <div nz-col 
-  [nzLg]="{ span: 8, offset: 0 }"
-  [nzMd]="{ span: 12, offset: 0 }"
-  [nzXs]="{ span: 24, offset: 0 }">
-    <h2 nz-typography>Create channel</h2>
-    <nz-card [nzLoading]="!(me$ | async)">
-      <app-create-room-form></app-create-room-form>
-    </nz-card>
+  <div nz-row>
+    <div nz-col [nzLg]="{ span: 8, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }" [nzXs]="{ span: 24, offset: 0 }">
+
+    </div>
   </div>
 </div>
 
-<ng-template #coverTemplate>
-  <img alt="example" [src]="me$ | async | placehold" />
+<ng-template #logoutBtn>
+  <button *ngIf="me$ | async" nz-button  nzType="link" (click)="onLogout()">
+    Logout
+  </button>
+</ng-template>
+
+<ng-template #deleteAccountButton>
+  <button *ngIf="me$ | async" nz-button nzDanger  nzType="link" nz-tooltip
+    nzTooltipTitle="This permanently deletes your account. This will not work if you have channels, delete those first."
+    (click)="onDeleteAccount()">
+    Delete account
+  </button>
+</ng-template>
+
+
+<ng-template #changePasswordFormTemplate>
+  <form nz-form [formGroup]="changePasswordForm">
+    <nz-form-item>
+      <nz-form-control nzErrorTip="Please enter a valid password">
+          <input
+            type="text"
+            nz-input
+            formControlName="oldPassword"
+            placeholder="Old password"
+          />
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-control nzErrorTip="Please enter a valid password">
+          <input
+            type="text"
+            nz-input
+            formControlName="newPassword"
+            placeholder="New password"
+          />
+      </nz-form-control>
+    </nz-form-item>
+  </form>
 </ng-template>

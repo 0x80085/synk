@@ -6,7 +6,7 @@ export interface PlayerFeedbackMessage {
   };
 }
 
-enum PlayerError
+export enum PlayerError
 {
     /**
      * The request contained an invalid parameter value.

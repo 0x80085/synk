@@ -3,13 +3,18 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Channel, ChannelConfig, Member, Role, Roles } from '../../domain/entity';
 import { Repository } from 'typeorm';
 import { Room } from '../models/room/room';
+import { AutomatedRoom } from '../models/automated-room/automated-room';
+import { RedditCrawlerService } from 'src/tv/crawlers/reddit.crawler.service';
+import { YoutubeV3Service } from 'src/tv/crawlers/youtube-v3.service';
 
 export const DEFAULT_MAX_USER_COUNT = 100;
 
 @Injectable()
 export class RoomService {
 
-    private roomsList: Room[] = [];
+    private communityRooms: Room[] = [];
+
+    automatedRooms: AutomatedRoom[] = [];
 
     private readonly logger = new Logger(RoomService.name);
 
@@ -18,11 +23,23 @@ export class RoomService {
         private channelRepository: Repository<Channel>,
         @InjectRepository(Member)
         private memberRepository: Repository<Member>,
+        private redditScraper: RedditCrawlerService,
+        private ytService: YoutubeV3Service,
         // @InjectRepository(Role)
         // private roleRepository: Repository<Role>,
         // @InjectRepository(ChannelConfig)
         // private configRepository: Repository<ChannelConfig>,
     ) {
+        const subredditsGeneralInterest = ['videos', 'anime', 'publicfreakout', 'mealtimevideos', 'Documentaries', 'television', 'Whatcouldgowrong', 'gardening', 'instant_regret'];
+        const subredditsTechInterest = ['gaming', 'btc', 'bitcoin', 'cryptocurrency', 'nintendo', 'ps5', 'nintendo switch', 'dataisbeautiful', 'InternetIsBeautiful', 'technology', 'PS4', 'programming', 'xbox', 'technews'];
+        // TODO load automated rooms from DB and start them
+        this.automatedRooms = [
+            new AutomatedRoom("The Daily Scraper", "Random content collected from internet hubs", redditScraper, ytService, subredditsGeneralInterest),
+            new AutomatedRoom("the_wired", "Popular tech videos around the web", redditScraper, ytService, subredditsTechInterest)
+        ];
+
+        this.logger.log(`Created ${this.automatedRooms.length} Automated Channels`)
+
         this.logger.log(`Querying DB for Channels to create room objects from...`)
 
         this.channelRepository
@@ -35,7 +52,7 @@ export class RoomService {
             .then(channels => {
                 this.logger.log(`Discovered ${channels.length} channels, initializing corresponding rooms.`)
                 channels.forEach(channel => {
-                    const room = new Room(channel.id, channel.name, channel.owner, channel.isPublic, channel.password);
+                    const room = new Room(channel.id, channel.name, channel.owner, channel.password);
                     const config = channel.configs?.find(c => c.isActivated);
 
                     room.moderators = channel.roles.
@@ -43,80 +60,72 @@ export class RoomService {
                         .map(({ level, member }) => ({ level, member }))
                     room.maxUsers = config?.maxUsers || DEFAULT_MAX_USER_COUNT;
 
-                    this.roomsList.push(room);
+                    this.communityRooms.push(room);
+
                 })
             })
-            .then(() => this.logger.log(`Initialized Room list, created ${this.roomsList.length} rooms`))
+            .then(() => this.logger.log(`Initialized Room list, created ${this.communityRooms.length} rooms`))
             .catch((error) => this.logger.error(error, 'FAILED to create rooms from channels!!'));
     }
 
-    addRoom({ name, id, isPublic }: Channel, owner: Member, moderators?: { member: Member, level: number }[]) {
-        const room = new Room(id, name, owner, isPublic);
-        this.roomsList.push(room);
+    addRoom({ name, id }: Channel, owner: Member, moderators?: { member: Member, level: number }[]) {
+        const room = new Room(id, name, owner);
+        this.communityRooms.push(room);
         room.moderators = moderators || [];
         room.maxUsers = DEFAULT_MAX_USER_COUNT;
         this.logger.log(`[${owner.username}] created channel [${room.name}] [${id}]!!`);
     }
 
     deleteRoom(requestingMember: Member, roomId: string) {
-        const room = this.getRoomById(roomId);
+        const room = this.getRoomById(roomId) as Room;
         if (!room) {
-            return
+            return;
         }
         if (room.owner.id == requestingMember.id || requestingMember.isAdmin) {
-            this.roomsList = this.roomsList.filter(({ id }) => id != roomId);
+            this.communityRooms = this.communityRooms.filter(({ id }) => id != roomId);
         } else {
             throw new UnauthorizedException();
         }
     }
 
-    joinRoom(name: string, member: Member) {
-        this.roomsList
-            .find(r => r.name === name)
-            ?.enter(member);
-    }
-
     leaveRoom(roomId: string, member: Member) {
-        this.roomsList
+        this.automatedRooms
+            .find(r => r.id === roomId)
+            ?.enter(member);
+
+        this.communityRooms
             .find(r => r.id === roomId)
             ?.leave(member);
-    }
-
-    updateNowPlaying(roomId: string, member: Member, time: number, url: string) {
-        this.roomsList
-            .find(r => r.id === roomId)
-            ?.updateNowPlaying(member, { time, url });
-    }
-
-    voteSkip(roomId: string, member: Member) {
-        this.roomsList
-            .find(r => r.id === roomId)
-            ?.voteSkip(member);
     }
 
     async giveLeader(roomId: string, requestingMember: Member, newLeaderName: string) {
         const targetedMember = await this.memberRepository.findOneOrFail({ where: { username: newLeaderName } });
         // Only mods, admins and leaders can assign other members as leaders
-        this.roomsList
+        this.communityRooms
             .find(r => r.id === roomId)
             ?.makeLeader(requestingMember, targetedMember);
         return targetedMember
     }
 
     getRoomById(id: string,) {
-        return this.roomsList
+        return this.communityRooms
             .find(r => r.id === id);
     }
 
     getRoomByName(name: string,) {
-        return this.roomsList
+        return this.communityRooms
             .find(r => r.name === name);
     }
 
-    updateRoom(roomId: string, name: string, isPublic: boolean, maxUsers: number, password?: string) {
-        this.roomsList
+    getAutomatedRoom(name: string) {
+        return this.automatedRooms
+            .find(r => r.name === name);
+    }
+
+    updateRoom(roomId: string, maxUsers: number, password?: string) {
+        this.communityRooms
             .find(r => r.id === roomId)
-            ?.update(name, isPublic, maxUsers, password);
+            ?.update(maxUsers, password);
     }
 
 }

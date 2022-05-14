@@ -28,14 +28,18 @@ export class LocalSerializer extends PassportSerializer {
     }
 
     async deserializeUser(user: SerializedUserData, done: CallableFunction) {
-        const member = await this.memberRepository
-            .findOneOrFail({ id: user.id })
-            .catch(error => done(error));
+        try {
+            const member = await this.memberRepository
+                .findOneOrFail({ id: user.id })
 
-        member.lastSeen = LocalSerializer.now();
-        await this.memberRepository.save(member);
+            member.lastSeen = LocalSerializer.now();
+            await this.memberRepository.save(member);
 
-        done(null, user);
+            done(null, user);
+        } catch (error) {
+            done(null, null)
+        }
+
     }
 
 }

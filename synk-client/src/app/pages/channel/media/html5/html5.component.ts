@@ -4,6 +4,7 @@ import {
   ElementRef,
   EventEmitter,
   OnDestroy,
+  Output,
   ViewChild
 } from "@angular/core";
 import { BaseMediaComponent } from '../base-media.component';
@@ -24,7 +25,11 @@ export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDest
 
   videoLoaded = false;
 
-  videoEnded: EventEmitter<unknown> = new EventEmitter();
+  @Output()
+  mediaEnded: EventEmitter<unknown> = new EventEmitter();
+  
+  @Output()
+  mediaNotPlayable: EventEmitter<unknown> = new EventEmitter();
 
   setCurrentUrl(url: string): void {
     this.setVideoSrc(url);
@@ -59,11 +64,11 @@ export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDest
 
   ngAfterViewInit(): void {
     this.video.nativeElement.onended = () => {
-      this.videoEnded.next();
+      this.mediaEnded.next(true);
     };
     this.video.nativeElement.onerror = (event: any) => {
       console.log(event);
-      this.videoEnded.next();
+      this.mediaEnded.next(true);
     };
     this.video.nativeElement.onloadeddata = () => {
       this.videoLoaded = true;

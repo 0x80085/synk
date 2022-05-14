@@ -1,4 +1,6 @@
 import { Queue } from "queue-typescript";
+import { timer } from "rxjs";
+import { tap } from "rxjs/operators";
 import { Member } from "src/domain/entity";
 // import { AppService } from "src/app.service";
 
@@ -22,11 +24,19 @@ export class Feed {
 
     queue: Queue<Message> = new Queue();
 
+    clearSystemMessagesSubscription$ = timer(1000, 10000).pipe(
+        tap(_=>  this.clearSystemMessages())
+    ).subscribe()
+
     post({ author, content, isSystemMessage }: RawMessage) {
         this.queue.enqueue({ author, displayText: content, originalText: content, isSystemMessage });
 
         if (this.queue.length > 150) {
-            this.queue.removeTail();
+            this.queue.removeHead();
         }
+    }
+
+    private clearSystemMessages() {
+        this.queue = new Queue(...this.queue.toArray().filter(it => !it.isSystemMessage))
     }
 }

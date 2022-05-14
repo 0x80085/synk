@@ -1,8 +1,8 @@
 import { AfterViewChecked, Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Observable, Subject } from 'rxjs';
-import { filter, map, mapTo, tap } from 'rxjs/operators';
+import { filter, map, mapTo, shareReplay, tap } from 'rxjs/operators';
 
+import { doLog } from 'src/app/utils/custom.operators';
 import { ChatService } from '../chat.service';
 import { Message } from '../models/room.models';
 
@@ -31,24 +31,27 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
       roomName: this.name,
       content: { text: text.trim() }
     })),
-    this.chatServ.sendMessageToRoom(),
+    this.chatService.sendMessageToRoom(),
   ).subscribe();
 
-  messages$: Observable<Message[]> = this.chatServ.roomMessages$;
+  config$ = this.chatService.roomUserConfig$
+
+  loggedInUserIsLeader$ = this.config$.pipe(
+    map(ev => (ev.isLeader)),
+    doLog('chatrom isleader', true), 
+  );
+
+  messages$: Observable<Message[]> = this.chatService.roomMessages$;
 
   scrollDownListenerSub = this.messages$.pipe(
     tap(_ => this.shouldScrollDown = true)
   ).subscribe()
 
-  roomError$ = this.chatServ.alreadyJoinedRoomError$.pipe(
+  roomError$ = this.chatService.alreadyJoinedRoomError$.pipe(
     mapTo(true),
-    tap(() => {
-      this.notification.error('Illegal operation', `Can't join the same room more than once!`);
-    })
   );
 
-  constructor(private chatServ: ChatService,
-    private notification: NzNotificationService
+  constructor(private chatService: ChatService
   ) { }
 
   @HostListener('scroll', ['$event'])
@@ -71,13 +74,13 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
   }
 
   ngOnInit() {
-    this.chatServ.enterRoom(this.name);
+    this.chatService.enterRoom(this.name);
   }
 
   ngOnDestroy() {
     this.sendMessageSub.unsubscribe();
     this.scrollDownListenerSub.unsubscribe();
-    this.chatServ.exit(this.name);
+    this.chatService.exit(this.name);
   }
 
   ngAfterViewChecked() {

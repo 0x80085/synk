@@ -1,3 +1,4 @@
+import { Member } from "src/domain/entity";
 import { MediaTypes, detectMediaType } from "./mediatypes.enum";
 
 export class Media {
@@ -15,11 +16,14 @@ export class Media {
         this.type = detectMediaType(url);
     }
 
-    toRepresentation() {
+    toRepresentation(member?: Member) {
         return {
             title: this.title,
             url: this.url,
-            length: this.length
+            length: this.length,
+            addedBy: member
+                ? { username: member?.username, userId: member.id }
+                : null
         }
     }
 }

@@ -1,4 +1,5 @@
-import { Module, HttpModule, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm/dist/typeorm.module';
 
@@ -13,6 +14,8 @@ import { removeHeaderInfo } from './util/remove-header-info';
 import { AuthModule } from './auth/auth.module';
 import { AccountModule } from './account/account.module';
 import { AdminModule } from './admin/admin.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -44,6 +47,10 @@ import { AdminModule } from './admin/admin.module';
         migrations: [configService.get('TYPEORM_MIGRATIONS')],
       }),
     }),
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 99,
+    }),
     HttpModule,
     ChatModule,
     TvModule,
@@ -52,7 +59,13 @@ import { AdminModule } from './admin/admin.module';
     AdminModule
   ],
   controllers: [AppController],
-  providers: [AppService,],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
+    }
+    ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

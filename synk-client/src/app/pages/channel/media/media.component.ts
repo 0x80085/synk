@@ -15,12 +15,15 @@ import { YoutubeComponent, isValidYTid } from './youtube/youtube.component';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { Html5Component } from './html5/html5.component';
 import { isTwitchChannelUrl, TwitchComponent } from './twitch/twitch.component';
-import { PlyrComponent } from './plyr/plyr.component';
+import { isVimeoUrl, PlyrComponent } from './plyr/plyr.component';
+import { debugLog } from 'src/app/utils/custom.operators';
+
 
 export enum SupportedPlayers {
   YT = 'YT',
   HTML5 = 'HTML5',
   TWITCH = 'TWITCH',
+  VIMEO = "VIMEO"
 }
 
 // tslint:disable-next-line: directive-selector
@@ -37,11 +40,15 @@ export class MediaHostDirective {
 export class MediaComponent {
   @Output() mediaEndedEvent: EventEmitter<any> = new EventEmitter();
 
+  @Output() mediaNotPlayble: EventEmitter<string> = new EventEmitter();
+
   @ViewChild(MediaHostDirective, { static: true }) host: MediaHostDirective;
 
   ref: ComponentRef<BaseMediaComponent>;
 
-  videoEndedSubscription: Subscription;
+  mediaEndedSubscription: Subscription;
+
+  mediaNotPlayableSubscription: Subscription;
 
   isMediaSelected = new BehaviorSubject(false);
 
@@ -61,15 +68,20 @@ export class MediaComponent {
   }
 
   getCurrentTime() {
-    return this.ref.instance.getCurrentTime();
+    try {
+      return this.ref.instance.getCurrentTime();
+    } catch (error) {
+      debugLog("this.ref.instance not available - prob no player rendered.", error, true);
+      return null;
+    }
   }
 
   getCurrentUrl(): string {
     try {
       return this.ref.instance.getCurrentUrl();
     } catch (error) {
-      console.log("this.ref.instance not available - prob no player rendered.");
-      return;
+      debugLog("this.ref.instance not available - prob no player rendered.", error, true);
+      return null;
     }
   }
 
@@ -79,20 +91,24 @@ export class MediaComponent {
 
   private setupMediaPlayer(url: string) {
     this.isMediaSelected.next(true);
-    
+
     const playerType = this.resolveMediaType(url);
-    
+
     this.createPlayerOfType(playerType);
     this.ref.instance.setCurrentUrl(url);
   }
 
   private resolveMediaType(url: string) {
     const isTwitch = isTwitchChannelUrl(url);
+    const isVimeo = isVimeoUrl(url);
     const isYT = isValidYTid(url);
+
     if (isTwitch) {
       return SupportedPlayers.TWITCH;
     } else if (isYT) {
       return SupportedPlayers.YT;
+    } else if (isVimeo) {
+      return SupportedPlayers.VIMEO;
     } else {
       return SupportedPlayers.HTML5;
     }
@@ -105,6 +121,9 @@ export class MediaComponent {
         break;
       case SupportedPlayers.TWITCH:
         this.assemblePlayer(TwitchComponent);
+        break;
+      case SupportedPlayers.VIMEO:
+        this.assemblePlayer(PlyrComponent);
         break;
       default:
         this.assemblePlayer(PlyrComponent);
@@ -127,15 +146,21 @@ export class MediaComponent {
       type
     );
     this.ref = viewContainerRef.createComponent(componentFactory);
-    this.resetVideoEndedSubscription();
+    this.resetMediaEndedSubscription();
+    this.resetMediaNotPlaybleSubscription();
   }
 
-  private resetVideoEndedSubscription() {
-    if (this.videoEndedSubscription) { this.videoEndedSubscription.unsubscribe(); }
-    this.videoEndedSubscription = this.ref.instance.videoEnded.subscribe(ev => {
+  private resetMediaEndedSubscription() {
+    if (this.mediaEndedSubscription) { this.mediaEndedSubscription.unsubscribe(); }
+    this.mediaEndedSubscription = this.ref.instance.mediaEnded.subscribe(ev => {
       this.mediaEndedEvent.emit();
     });
   }
 
-
+  private resetMediaNotPlaybleSubscription() {
+    if (this.mediaNotPlayableSubscription) { this.mediaNotPlayableSubscription.unsubscribe(); }
+    this.mediaNotPlayableSubscription = this.ref.instance.mediaNotPlayable.subscribe((url: string) => {
+      this.mediaNotPlayble.emit(url);
+    });
+  }
 }

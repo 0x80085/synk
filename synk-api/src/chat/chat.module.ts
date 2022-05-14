@@ -1,5 +1,8 @@
-import { Module } from '@nestjs/common';
+import {  Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
+import { APP_GUARD } from '@nestjs/core';
 import { CqrsModule } from '@nestjs/cqrs';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm/dist';
 import { AuthModule } from 'src/auth/auth.module';
 import { TvModule } from 'src/tv/tv.module';
@@ -35,6 +38,7 @@ export const EventHandlers = [
     CqrsModule,
     AuthModule,
     TvModule,
+    HttpModule,
   ],
   controllers: [
     ChannelController
@@ -47,8 +51,12 @@ export const EventHandlers = [
     RoomService,
     RoomMessagesGateway,
     ConnectionTrackingService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
+    }
   ],
-  exports:[
+  exports: [
     ChannelService,
     RoomService,
     ConnectionTrackingService

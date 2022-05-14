@@ -4,14 +4,13 @@
   "description": "Back and Front end for SYNK",
   "main": "index.js",
   "dependencies": {
-    "nodemon": "^1.19.1"
+    "nodemon": "^2.0.16"
   },
   "devDependencies": {
-    "concurrently": "^4.1.1"
+    "concurrently": "^7.1.0"
   },
   "scripts": {
     "start": "npx concurrently \"cd synk-client && ng s --live-reload\" \"cd synk-api && npm start\"",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "docker:run": "docker-compose -f \"docker-compose.yml\" up -d --build"
   },
   "author": "0x80085",

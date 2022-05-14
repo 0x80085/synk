@@ -10,6 +10,8 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { AuthenticatedGuard } from './guards/authenticated.guard';
 import { LocalSerializer } from './local.serializer';
 import { ConnectionTrackingService } from 'src/chat/services/connection-tracking.service';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -25,6 +27,10 @@ import { ConnectionTrackingService } from 'src/chat/services/connection-tracking
     LocalAuthGuard,
     AuthenticatedGuard,
     LocalSerializer,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
+    }    
   ],
   controllers: [AuthController],
   exports: [

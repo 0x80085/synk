@@ -23,7 +23,8 @@ export class AppComponent {
     withLatestFrom(this.state.isAdmin$),
     map(([isAdmin, isLoggedIn]) => isAdmin && isLoggedIn)
   );
-  user$ = this.auth.getUser();
+
+  user$ = this.auth.getUser(true)
 
   constructor(
     private auth: AuthService,

@@ -7,7 +7,9 @@ import { shareReplay, switchMap, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { AppStateService } from '../../app-state.service';
 import { SocketService } from '../../socket.service';
+import { SUPPRESS_ERR_FEEDBACK_HEADER } from './interceptors/auth-error.interceptor';
 
+export const VALIDNAME_RGX = new RegExp(/^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/);
 interface LoginInfo {
   username: string;
   password: string;
@@ -17,6 +19,7 @@ export interface User {
   username: string;
   id: string;
   isAdmin: boolean;
+  dateCreated?: Date;
 }
 
 export interface Channel {
@@ -28,6 +31,13 @@ export interface Channel {
   isLocked: boolean;
   connectedMemberCount: number;
   nowPlaying: string;
+  owner: {
+    id: string;
+    username: string;
+    isAdmin: boolean;
+    dateCreated: Date;
+    lastSeen: Date;
+  }
 }
 
 @Injectable({
@@ -80,7 +90,7 @@ export class AuthService {
 
   logout() {
     return this.http
-      .post(`${environment.api}/auth/logout`, null)
+      .post(`${environment.api}/auth/logout`, null, { withCredentials: true })
       .pipe(
         tap(() => {
           this.state.isLoggedInSubject.next(false);
@@ -91,9 +101,40 @@ export class AuthService {
       );
   }
 
-  getUser() {
+  deleteAccount() {
+    return this.http
+      .delete(`${environment.api}/account`, { withCredentials: true })
+      .pipe(
+        tap(() => {
+          this.state.isLoggedInSubject.next(false);
+          this.socketService.socket.close();
+          this.state.userSubject.next(null);
+          this.router.navigate(['']);
+        }),
+      );
+  }
+
+  changePassword(oldPassword: string, newPassword: string) {
+    return this.http
+      .post(`${environment.api}/account/change-password`,
+        {
+          oldPassword,
+          newPassword
+        },
+        { withCredentials: true });
+  }
+
+  getUser(suppressFeedback = false) {
+    
+    let headers;
+    if (suppressFeedback) {
+      headers = new HttpHeaders();
+      headers = headers.set(SUPPRESS_ERR_FEEDBACK_HEADER, 'true')
+    }
+
     return this.http.get<User>(`${environment.api}/account`, {
-      withCredentials: true
+      withCredentials: true,
+      headers
     }).pipe(
       tap(res => {
         this.state.isLoggedInSubject.next(true);
@@ -105,6 +146,14 @@ export class AuthService {
 
   refreshChannels() {
     this.refreshChannelsSubject.next(true);
+  }
+
+  // TODO Should also be in other service tho
+  updateChannel({ id, isPublic, description }: Channel) {
+    return this.http.patch(
+      `${environment.api}/channels/${id}`,
+      { isPublic, description },
+      { withCredentials: true });
   }
 
   // TODO Should also be in other service tho

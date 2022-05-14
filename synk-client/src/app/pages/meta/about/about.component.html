@@ -1,5 +1,8 @@
 <div nz-row>
-  <div nz-col nzSpan="12" nzOffset="6">
+  <div nz-col  nz-col
+      [nzLg]="{ span: 12, offset: 6 }"
+      [nzMd]="{ span: 12, offset: 6 }"
+      [nzXs]="{ span: 22, offset: 1 }">
     <h1 nz-typography>About Synk</h1>
 
     <ng-template #loading><i nz-icon [nzType]="'loading'"></i></ng-template>
@@ -11,16 +14,18 @@
       ></nz-statistic>
       <ng-template #prefixTpl><i nz-icon nzType="tag"></i></ng-template>
     </p>
-    <p nz-typography>New releases will be announced on the Synk discord</p>
+    <p nz-typography>
+      New releases will be announced on the Synk discord (see below for invite
+      link)
+    </p>
 
     <h1 nz-typography>What is this?</h1>
 
     <p nz-typography>
       Viewers can watch videos together with other connected viewers in
       viewer-maintained channels.
-    <br>
-      Video content can be added from different video hosts (e.g., YouTube,
-      Twitch) and the playback is synchronized for all the viewers in the
+      <br />
+      Video content can be added from YouTube (more media providers will be supported in the future) and the playback is synchronized for all the viewers in the
       channel.
     </p>
     <p nz-typography>
@@ -34,8 +39,7 @@
     </p>
 
     <p nz-typography>
-      This project is intended to be open sourced once I deem it stable enough
-      to release to the public.
+      This project is open source. Feel free to host your own instance. 
     </p>
 
     <h2 nz-typography>Terms and Conditions</h2>
@@ -44,12 +48,30 @@
     </p>
 
     <h2 nz-typography>Community</h2>
+    <p nz-typography>Join the Discord chat!</p>
     <p nz-typography>
-      <a href="https://discord.gg/D6RAFZsCF2">Join the discord!</a>
+      <iframe
+        id="discord-widget"
+        src="https://discord.com/widget?id=732990730355867678&theme=dark"
+        width="350"
+        height="500"
+        allowtransparency="true"
+        frameborder="0"
+        sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
+      ></iframe>
     </p>
 
     <h2 nz-typography>Contribute</h2>
-    <p nz-typography>Link to GH repo once open sourced</p>
+    <p nz-typography>Check out the source code on GitHub</p>
+    <p nz-typography>
+      <a
+        href="https://github.com/0x80085/synk"
+        nz-button
+        nzType="default"
+        nzSize="large"
+        ><i nz-icon nzType="github"></i>GitHub</a
+      >
+    </p>
 
     <h2 nz-typography>Donate</h2>
     <p nz-typography>Well i would be greedy to ask dons this early.</p>

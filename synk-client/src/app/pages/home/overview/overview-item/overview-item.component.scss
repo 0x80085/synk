@@ -1,11 +1,36 @@
-.description {
-  height: 100px;
-  overflow-y: hidden;
-  overflow-x: hidden;
-  word-break: break-word;
+.cover {
+  background-color: #191919;
 
-  &:hover {
-    overflow-y: auto;
+  .placeholder-img-container {
+    text-align: center;
+    .placeholder-cover-img {
+      font-size: 3rem;
+      opacity: 0.3;
+    }
+  }
+
+  img {
+    width: 100%;
+  }
+
+  .inner-cover {
+    padding: 0 24px;
+    height: 5rem;
+
+    .description {
+      height: 100px;
+      overflow-y: hidden;
+      overflow-x: hidden;
+      word-break: break-word;
+
+      &:hover {
+        overflow-y: auto;
+      }
+    }
   }
 }
 
+nz-progress {
+  position: relative;
+  top: -10px;
+}

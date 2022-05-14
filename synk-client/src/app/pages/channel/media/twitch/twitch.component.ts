@@ -16,7 +16,10 @@ export function isTwitchChannelUrl(url: string) {
 export class TwitchComponent implements BaseMediaComponent {
 
   @Output()
-  videoEnded: EventEmitter<unknown> = new EventEmitter();
+  mediaEnded: EventEmitter<unknown> = new EventEmitter();
+  
+  @Output()
+  mediaNotPlayable: EventEmitter<unknown> = new EventEmitter();
 
   player: TwitchPlayer;
 
@@ -32,7 +35,9 @@ export class TwitchComponent implements BaseMediaComponent {
   play(url?: string): void {
     if (url) {
       this.setCurrentUrl(url);
-      this.createPlayer(this.channel);
+      if (!this.player) {
+        this.createPlayer(this.channel);
+      }
     }
     if (this.player && url) {
       this.player.setChannel(this.extractChannelNameFromUrl(url));
@@ -62,7 +67,7 @@ export class TwitchComponent implements BaseMediaComponent {
   }
 
   ngAfterViewInit(): void {
-    this.player.addEventListener(TwitchPlayerEvent.ENDED, () => this.videoEnded.emit());
+    this.player.addEventListener(TwitchPlayerEvent.ENDED, () => this.mediaEnded.emit());
     this.player.setChannel(this.channel);
     this.player.play();
   }

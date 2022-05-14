@@ -1,17 +1,53 @@
-<nz-card [nzTitle]="item.name" [nzHoverable]="true" [nzActions]="[members, nowPlaying]">
+<nz-card [nzTitle]="channel.name" [nzCover]="channelCover" [nzHoverable]="true" [nzActions]="[members]">
   <div class="description">
-    <p nzType="link" nzParagraph nzEllipsis nzEllipsisRows="3">{{ item.description }}</p>
+    <ng-content *ngIf="channel.nowPlaying.url; then nowPlaying; else nothingPlaying"></ng-content>
   </div>
 </nz-card>
 
-<ng-template #members>
-  <button nz-button nzType="link" nz-tooltip [nzTooltipTitle]="item.connectedMemberCount + ' user(s) in room'"
-    style="margin: 0 .5rem; margin-top: 5px;">
-    <i nz-icon nzType="team"></i>{{ item.connectedMemberCount }}
-  </button>
+<ng-template #nowPlaying>
+  <p nz-typography nzParagraph nzEllipsis nzEllipsisRows="3">
+    <span nz-typography nzType="secondary"><i nz-icon nzType="play-circle" nzTheme="outline"></i> Now playing:</span>
+    <span nz-typography nz-tooltip [nzTooltipTitle]="channel.nowPlaying.title">{{ channel.nowPlaying.title }}</span>
+  </p>
 </ng-template>
 
-<ng-template #nowPlaying>
-  <p nz-tooltip [nzTooltipTitle]="item.nowPlaying" nzType="link" [nzContent]="item.nowPlaying" nz-paragraph nzEllipsis nzEllipsisRows="1"
-    style="margin: 0 .5rem; margin-top: 5px;">
+<ng-template #nothingPlaying>
+  <p nzParagraph style="text-align: center;">Nothing playing...</p>
+</ng-template>
+
+<ng-template #channelCover>
+  <div class="cover anti-hover">
+    <div class="inner-cover">
+      <p nz-typography nzType="link" nzParagraph nzEllipsis nzEllipsisRows="3">
+        {{ channel.description }}
+      </p>
+    </div>
+    <ng-content *ngIf="
+        getThumbnailForYoutubeVid();
+        then imageFromYT;
+        else placeholderForImg
+      "></ng-content>
+  </div>
+</ng-template>
+
+<ng-template #placeholderForImg>
+  <div class="placeholder-img-container">
+    <i nz-icon nzType="pause-circle" class="placeholder-cover-img" nzTheme="outline"></i>
+  </div>
+</ng-template>
+
+<ng-template #imageFromYT>
+  <img nz-image nzFallback="https://placeholder.com/320x180" [nzSrc]="getThumbnailForYoutubeVid()"
+    alt="now playing cover image"  />
+  <nz-progress *ngIf="getMediaProgressInPercentage() as progressInPercentage1" [nzPercent]="progressInPercentage1"
+    nzSize="small" [nzStatus]="'active'" [nzStrokeLinecap]="'square'" [nzStrokeColor]="'#ff694e'" [nzShowInfo]="false"></nz-progress>
+</ng-template>
+
+<ng-template #members>
+  <button nz-button nzType="link" nz-tooltip [nzTooltipTitle]="
+      channel.connectedMemberCount + ' user(s) are currently in the chatroom'
+    " style="margin: 0 0.5rem; margin-top: 5px">
+
+    {{ channel.connectedMemberCount }} viewers
+  </button>
 </ng-template>

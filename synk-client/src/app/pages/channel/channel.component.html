@@ -1,38 +1,52 @@
-<div
-  *ngIf="isConnected$ | async; then channelStage; else connectionState"
-></div>
+<ng-content
+  *ngIf="isConnected$ | async; then fullPageFeedbackOrChannelStage; else connectionState"
+></ng-content>
+
+<ng-template #fullPageFeedbackOrChannelStage>
+    <ng-content *ngIf="alreadyJoinedRoomError$ | async; then feedbackJoiningRoomMoreThanOnce; else channelStage">
+
+    </ng-content>
+</ng-template>
 
 <ng-template #channelStage>
-  <div nz-row [nzGutter]="{ xs: 0, sm: 0, md: 24, lg: 32, xl: 32, xxl: 32 }">
+  <div nz-row [nzGutter]="{ xs: 0, sm: 0, md: 0, lg: 0, xl: 0, xxl: 0  }">
     <div
       nz-col
       [nzLg]="{ span: 6, offset: 0 }"
       [nzMd]="{ span: 6, offset: 0 }"
       [nzXs]="{ span: 24, offset: 0 }"
     >
-      <app-chat-room [name]="name" class="hide-on-mobile"></app-chat-room>
+      <app-chat-room [name]="name"></app-chat-room>
     </div>
 
-    <div nz-col nzSpan="18">
+    <div nz-col
+      [nzLg]="{ span: 18, offset: 0 }"
+      [nzMd]="{ span: 18, offset: 0 }"
+      [nzXs]="{ span: 24, offset: 0 }">
       <app-media
         *ngIf="playlist$ | async"
         #player
-        (mediaEndedEvent)="onVideoEnded()"
+        (mediaEndedEvent)="onMediaEnded()"
+        (mediaNotPlayble)="onMediaNotPlayble($event)"
       ></app-media>
     </div>
   </div>
 
-  <div nz-row [nzGutter]="{ xs: 0, sm: 0, md: 24, lg: 32, xl: 32, xxl: 32 }">
-    <div nz-col nzSpan="6" class="mt-1 hide-on-mobile">
+  <div nz-row nzGutter="12">
+    <div nz-col nzSpan="6" class="mt-1">
       <app-connected-members
         (giveLeader)="giveLeader($event)"
       ></app-connected-members>
     </div>
 
-    <div nz-col nzSpan="18" class="mt-1 hide-on-mobile">
+    <div nz-col nzSpan="18" class="mt-1">
       <app-playlist
         [roomName]="name"
-        (playMedia)="player.play($event.mediaUrl)"
+        [isAutomatedRoom]="(roomUserConfig$ | async)?.isAutomatedChannel"
+        [isLeader]="loggedInUserIsLeader"
+        [isOwner]="(roomUserConfig$ | async)?.isOwner"
+        [isSuperAdmin]="isSuperAdmin$ | async"
+        (playMedia)="player.play($event)"
       >
       </app-playlist>
     </div>
@@ -40,23 +54,35 @@
 </ng-template>
 
 <ng-template #connectionState>
-  <div
-    *ngIf="isLoading$ | async; then busyConnecting; else errorConnecting"
-  ></div>
+  <div class="connectionstate">
+    <ng-container
+      *ngIf="isLoading$ | async; then busyConnecting; else errorConnecting"
+    ></ng-container>
+  </div>
 </ng-template>
 
 <ng-template #errorConnecting>
-  <div nz-col nzSpan="24" class="column">
+  <div nz-col nzSpan="24">
     <nz-empty
       [nzNotFoundImage]="disconnectedImg"
-      [nzNotFoundContent]="disconnectedText"
+      [nzNotFoundContent]="pleaseLoginText"
+    >
+    </nz-empty>
+  </div>
+</ng-template>
+
+<ng-template #feedbackJoiningRoomMoreThanOnce>
+  <div nz-col nzSpan="24">
+    <nz-empty
+      [nzNotFoundImage]="forbiddenIcon"
+      [nzNotFoundContent]="cantJoinMoreThanOnceText"
     >
     </nz-empty>
   </div>
 </ng-template>
 
 <ng-template #busyConnecting>
-  <div nz-col nzSpan="24" class="column">
+  <div nz-col nzSpan="24">
     <nz-empty
       [nzNotFoundImage]="busyConnectingImg"
       [nzNotFoundContent]="busyConnectingText"
@@ -70,13 +96,25 @@
     nz-icon
     style="font-size: 5rem; color: rgb(204, 254, 253)"
     nzTheme="fill"
-    nzType="meh"
+    nzType="disconnect"
+    nzTheme="outline"
   ></i>
 </ng-template>
 
-<ng-template #disconnectedText>
-  <h2>Please log in to enter this room</h2>
-  <p>Only logged in users can access rooms</p>
+<ng-template #pleaseLoginText>
+  <h2>Please log in to be able to enter rooms</h2>
+  <p>Only logged in users can access rooms (for now)</p>
+</ng-template>
+
+<ng-template #noServerConnection>
+  <!-- TODO: handle from socketio -->
+  <h2>Can't reach the server</h2>
+  <p>No server connection possible, check back later...</p>
+</ng-template>
+
+<ng-template #cantJoinMoreThanOnceText>
+  <h2>Can't join a room more than once</h2>
+  <p>Maybe you have another browser tab open where you have already joined this room?</p>
 </ng-template>
 
 <ng-template #busyConnectingImg>
@@ -85,6 +123,15 @@
     style="font-size: 5rem; color: rgb(204, 254, 253)"
     nzType="sync"
     [nzSpin]="true"
+  ></i>
+</ng-template>
+
+<ng-template #forbiddenIcon>
+  <i
+    nz-icon
+    style="font-size: 5rem; color: rgb(204, 254, 253)"
+    nzType="stop"
+    nzTheme="outline"
   ></i>
 </ng-template>
 

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { PlyrModule } from 'ngx-plyr';
 
@@ -12,6 +12,7 @@ import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
+import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
 import { ChannelComponent } from './channel.component';
@@ -30,44 +31,44 @@ import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NZ_ICONS } from 'src/app/icons';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
 
 @NgModule({
-  entryComponents: [
-    YoutubeComponent
-  ],
-  declarations: [
-    ChannelComponent,
-    ChatRoomComponent,
-    MediaComponent,
-    MediaHostDirective,
-    YoutubeComponent,
-    PlaylistComponent,
-    Html5Component,
-    PlayerDebugComponent,
-    TwitchComponent,
-    PlyrComponent,
-    ConnectedMembersComponent,
-  ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    PlyrModule,
-    NzListModule,
-    NzDividerModule,
-    NzCardModule,
-    NzFormModule,
-    NzEmptyModule,
-    NzButtonModule,
-    NzInputModule,
-    NzCollapseModule,
-    NzToolTipModule,
-    NzGridModule,
-    NzTypographyModule,
-    NzDividerModule,
-    DragDropModule,
-    NzIconModule.forRoot(NZ_ICONS),
-
-  ],
-  providers: [ChatService]
+    declarations: [
+        ChannelComponent,
+        ChatRoomComponent,
+        MediaComponent,
+        MediaHostDirective,
+        YoutubeComponent,
+        PlaylistComponent,
+        Html5Component,
+        PlayerDebugComponent,
+        TwitchComponent,
+        PlyrComponent,
+        ConnectedMembersComponent,
+    ],
+    imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        PlyrModule,
+        NzListModule,
+        NzDividerModule,
+        NzCardModule,
+        NzFormModule,
+        NzEmptyModule,
+        NzButtonModule,
+        NzInputModule,
+        NzCollapseModule,
+        NzToolTipModule,
+        NzGridModule,
+        NzTypographyModule,
+        NzDividerModule,
+        NzAlertModule,
+        NzTabsModule,
+        DragDropModule,
+        NzIconModule.forRoot(NZ_ICONS),
+    ],
+    providers: [ChatService]
 })
 export class ChannelModule { }

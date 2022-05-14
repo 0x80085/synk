@@ -6,12 +6,6 @@
   max-width: 100vw;
 }
 
-nz-alert {
-  margin-bottom: 12px;
-  ::ng-deep span {
-    color: black;
-  }
-}
 
 
 
@@ -54,9 +48,9 @@ nz-alert {
 }
 
 nz-content {
-  margin: 24px;
-  margin-left: 96px;
+  margin-left: 80px;
 }
+
 ::ng-deep .ant-menu-sub.ant-menu-inline {
   background-color: #191919;
 }
@@ -74,8 +68,6 @@ nz-alert {
 .item:hover {
   background-color: rgb(255, 105, 78);
 }
-
-
 
 .inner-content {
   padding: 24px;

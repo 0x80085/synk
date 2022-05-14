@@ -1,14 +1,15 @@
-import { ConflictException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { Channel, ChannelConfig, Member, Role, Roles } from '../../domain/entity';
-import { CreateChannelInput } from '../controllers/create-channel.input';
+import { UpdateChannelInput } from '../controllers/update-channel.input';
 import { ChannelRepresentation, ChannelShortRepresentation, getChannelShortRepresentation, mergeChannelAndRoom } from '../models/channel/channel.representation';
 import { getMemberSummary } from '../models/member/member.representation';
 import { Room } from '../models/room/room';
 import { DEFAULT_MAX_USER_COUNT, RoomService } from './room.service';
 
+export const VALID_CHANNELNAME_RGX = new RegExp(/^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/);
 @Injectable()
 export class ChannelService {
 
@@ -27,13 +28,19 @@ export class ChannelService {
     ) { }
 
     async createChannel(name: string, ownerId: string, description: string, isPublic: boolean) {
+        
+        const trimmedName = name.trim();
+        this.throwIfInvalidChannelName(name);
+
         const member = await this.memberRepository.findOneOrFail({ where: { id: ownerId } })
 
-        await this.throwIfChannelCannotBeCreated(name, member);
+        const trimmedDescription = description.trim();
+        
+        await this.throwIfChannelCannotBeCreated(trimmedName, member);
 
         const channel = this.channelRepository.create({
-            name,
-            description,
+            name: trimmedName,
+            description: trimmedDescription,
             isPublic,
             owner: member,
             id: uuid(),
@@ -86,27 +93,16 @@ export class ChannelService {
             .then(entries => entries.map(getChannelShortRepresentation));
     }
 
-    async updateChannel(channelId: string, ownerId: string, { description, isPublic, maxUsers, name, password }: CreateChannelInput) {
+    async updateChannel(channelId: string, ownerId: string, { description, isPublic, maxUsers, password }: UpdateChannelInput) {
         const owner = await this.memberRepository.findOneOrFail({ where: { id: ownerId } });
         const channel = await this.channelRepository.findOneOrFail({ where: { owner, id: channelId } });
-        const channelConfig = await this.configRepository.findOneOrFail({ where: { channel } });
         const room = this.roomService.getRoomById(channel.id);
 
-        channel.description = description;
-        channel.isPublic = isPublic;
-        channelConfig.maxUsers = maxUsers;
-        channel.name = name;
-        channel.password = password;
+        this.channelRepository.createQueryBuilder()
+            .update(Channel).set({ isPublic, description }).where("id = :id", { id: channelId })
+            .execute()
 
-        room.name = name;
-        room.isPublic = isPublic;
-        room.maxUsers = maxUsers;
-        room.password = password;
-
-        this.logger.log(`[${channel.owner.username}] updated channel [${channel.name}] [${channel.id}] !!`);
-
-        await this.configRepository.save(channel);
-        await this.configRepository.save(channelConfig);
+        this.roomService.updateRoom(channel.id, maxUsers, null)
     }
 
     getModeratorsOfChannel(channelId: string) {
@@ -169,11 +165,13 @@ export class ChannelService {
         const maxRooms = 200;
         const maxChannelsOwnedByUser = 5;
 
-        const isDupelicateName = await this.channelRepository.count({ where: { name } }).then(count => count > 0);
+        const isDupelicateCommunityChannelName = await this.channelRepository.count({ where: { name } }).then(count => count > 0);
         const hasMaxRoomsBeenReached = await this.channelRepository.count().then(count => count >= maxRooms);
         const hasMaxRoomsBeenReachedForUser = await this.channelRepository.count({ where: { owner: member } }).then(count => count >= maxChannelsOwnedByUser);
 
-        if (isDupelicateName) {
+        const isDupelicateAutomatedChannelName = this.roomService.automatedRooms.some(room => room.name === name);
+
+        if (isDupelicateCommunityChannelName || isDupelicateAutomatedChannelName) {
             throw new ConflictException("A channel's name must be unique");
         }
         if (hasMaxRoomsBeenReached) {
@@ -181,6 +179,12 @@ export class ChannelService {
         }
         if (hasMaxRoomsBeenReachedForUser) {
             throw new ConflictException("User max channel quota reached");
+        }
+    }
+
+    private throwIfInvalidChannelName(name: string) {
+        if (!VALID_CHANNELNAME_RGX.test(name)) {
+            throw new BadRequestException("A channel's name must only contain letters, number and dashes or underscores.");
         }
     }
 }

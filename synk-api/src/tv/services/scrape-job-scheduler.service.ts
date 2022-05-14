@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
-import { RedditCrawlerService } from 'src/tv/crawlers/reddit.crawler.service';
 import { CronJob } from 'cron';
+import { RedditCrawlerService } from 'src/tv/crawlers/reddit.crawler.service';
 
 export enum Status {
     error = 'error',
@@ -13,7 +13,12 @@ export enum Status {
 @Injectable()
 export class ScrapeJobSchedulerService {
 
-    constructor(private scheduler: SchedulerRegistry, private redditScraper: RedditCrawlerService) { }
+
+    constructor(
+        private scheduler: SchedulerRegistry,
+        private redditScraper: RedditCrawlerService
+
+    ) { }
 
     scheduleRecurringRedditScrapeJob(subreddit: string, seconds = 60) {
         const jobId = Math.random().toString().replace('.', '');
@@ -35,8 +40,8 @@ export class ScrapeJobSchedulerService {
         const jobUrl = `http://localhost:3000/scapeddit/${jobId}`;
 
         const operation = () => this.redditScraper.scrapeYTurlsFromSubreddit(subreddit);
-        const seconds = 60;
-        const timeout = setTimeout(operation, seconds);
+        const oneMinute = 1000 * 60;
+        const timeout = setTimeout(operation, oneMinute);
         this.scheduler.addTimeout(jobId, timeout);
 
         return {
