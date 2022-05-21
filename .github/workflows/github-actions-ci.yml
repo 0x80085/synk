@@ -1,11 +1,12 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# This workflow will execute for pull requests
+# a clean installation of node dependencies using Yarn
+# cache/restore them
+# build the source code of client and api
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
 name: Build client & API
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
     branches: [ master ]
 
@@ -29,12 +30,12 @@ jobs:
     - name: Install client deps
       working-directory: synk-client
       run: yarn
-    - name: Install api deps
+    - name: Install API deps
       working-directory: synk-api
       run: yarn
     - name: Build client
       working-directory: synk-client
       run: npm run build
-    - name: Build api
+    - name: Build API
       working-directory: synk-api
       run: npm run build
