@@ -1,0 +1,101 @@
+  name: Release
+
+  on:
+    push:
+      tags:
+        - '*'
+      branches: [ master ]
+
+  jobs:
+    build_release:
+      name: build_release
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v3
+        - name: checkout
+        - name: Use Node.js ${{ matrix.node-version }}
+          uses: actions/setup-node@v3
+          with:
+            node-version: ${{ matrix.node-version }}
+            cache: 'yarn'
+        - name: Install client deps
+          working-directory: synk-client
+          run: yarn
+        - name: Install API deps
+          working-directory: synk-api
+          run: yarn
+        - name: Build client
+          working-directory: synk-client
+          run: npm run build
+        - name: Build API
+          working-directory: synk-api
+          run: npm run build   
+
+        - id: set_var
+          run: |
+            content=`cat ./synk-api/package.json`
+            # the following lines are only required for multi line json
+            content="${content//'%'/'%25'}"
+            content="${content//$'\n'/'%0A'}"
+            content="${content//$'\r'/'%0D'}"
+            # end of optional handling for multi line json
+            echo "::set-output name=packageJson::$content"
+        - run: |
+            echo "${{fromJson(steps.set_var.outputs.packageJson).version}}"
+
+        - name: Archive API Release
+          uses: thedoctor0/zip-release@main
+          with:
+            type: 'zip'
+            filename: 'api.zip'
+            path: './synk-api/dist/'
+
+        - name: Archive client Release
+          uses: thedoctor0/zip-release@main
+          with:
+            type: 'zip'
+            filename: 'client.zip'
+            path: './synk-client/dist/synk-client'
+
+        - name: release
+          uses: actions/create-release@v1
+          id: create_release
+          with:
+            draft: false
+            prerelease: false
+            release_name: ${{ fromJson(steps.set_var.outputs.packageJson).version }}
+            tag_name: ${{ github.ref }}
+          env:
+            GITHUB_TOKEN: ${{ github.token }}
+
+        - name: Release API
+          uses: ncipollo/release-action@v1
+          with:
+            artifacts: "api.zip"
+            token: ${{ secrets.GITHUB_TOKEN }}
+
+        - name: Release client
+          uses: ncipollo/release-action@v1
+          with:
+            artifacts: "client.zip"
+            token: ${{ secrets.GITHUB_TOKEN }}
+
+        # - name: Upload API artifact
+        #   uses: actions/upload-release-asset@v1
+        #   env:
+        #     GITHUB_TOKEN: ${{ github.token }}
+        #   with:
+        #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+        #     asset_path: ./synk-api/dist/api.zip
+        #     asset_name: synk-api.zip
+        #     asset_content_type: application/zip
+
+        # - name: Upload client artifact
+        #   uses: actions/upload-release-asset@v1
+        #   env:
+        #     GITHUB_TOKEN: ${{ github.token }}
+        #   with:
+        #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+        #     asset_path: ./synk-api/dist/client.zip
+        #     asset_name: synk-client.zip
+        #     asset_content_type: application/zip
