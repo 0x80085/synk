@@ -1,0 +1,86 @@
+  name: Release
+
+  on:
+    push:
+      tags: 
+       - "*"
+
+
+  jobs:
+    build_release:
+      name: build_release
+      runs-on: ubuntu-latest
+      steps:
+        
+        - uses: actions/checkout@v3
+          with:
+            fetch-depth: 0
+        
+        - name: Setup Node.js version ${{ matrix.node-version }} and Yarn
+          uses: actions/setup-node@v3
+          with:
+            node-version: ${{ matrix.node-version }}
+            cache: 'yarn'
+        
+        - name: Install client dependencies
+          working-directory: synk-client
+          run: yarn
+        
+        - name: Install API dependencies
+          working-directory: synk-api
+          run: yarn
+        
+        - name: Build client
+          working-directory: synk-client
+          run: npm run build
+        
+        - name: Replace URLs http to https in client artifacts
+          working-directory: synk-client/dist/synk-client
+          run: sed -i -- 's,http://www.youtube.com/iframe_api,https://www.youtube.com/iframe_api,g' *js
+        
+        - name: Build API
+          working-directory: synk-api
+          run: npm run build   
+
+        - name: Read content from API package.json
+          id: set_pkgjson
+          run: |
+            content=`cat ./synk-api/package.json`
+            # the following lines are only required for multi line json
+            content="${content//'%'/'%25'}"
+            content="${content//$'\n'/'%0A'}"
+            content="${content//$'\r'/'%0D'}"
+            # end of optional handling for multi line json
+            echo "::set-output name=packageJson::$content"
+        - name: Set version from API package.json
+          id: set_version
+          run:  echo "::set-output name=version::${{fromJson(steps.set_pkgjson.outputs.packageJson).version}}"
+        - name: Print version
+          run: echo "${{ steps.set_version.outputs.version }}"      
+    
+        - name: Determine build stamp
+          id: set_build_stamp
+          run: |
+            echo "::set-output name=build_stamp::${{ steps.set_version.outputs.version }}.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}"            
+        - name: Print build stamp
+          run: |
+            echo "${{ steps.set_build_stamp.outputs.build_stamp }}"
+        
+        - name: Zip Release api
+          uses: TheDoctor0/zip-release@0.6.2
+          with:
+            filename: "${{ steps.set_build_stamp.outputs.build_stamp }}.release.zip" # default is release.zip
+            path: synk-api/dist
+            directory: .
+
+        - name: Zip Release client
+          uses: TheDoctor0/zip-release@0.6.2
+          with:
+            filename: "${{ steps.set_build_stamp.outputs.build_stamp }}.release.zip" # default is release.zip
+            path: synk-client/dist/synk-client
+            directory: .
+
+        - name: Release
+          uses: softprops/action-gh-release@v1
+          with:
+            files: "${{ steps.set_build_stamp.outputs.build_stamp }}.release.zip"
