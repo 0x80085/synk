@@ -11,6 +11,8 @@
       steps:
         
         - uses: actions/checkout@v3
+          with:
+            fetch-depth: 0
         
         - name: Setup Node.js version ${{ matrix.node-version }} and Yarn
           uses: actions/setup-node@v3
