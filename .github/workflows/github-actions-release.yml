@@ -70,27 +70,16 @@
         - name: Zip Release api
           uses: TheDoctor0/zip-release@0.6.2
           with:
-            # Filename for archive
             filename: "${{ steps.set_build_stamp.outputs.build_stamp }}.release.zip" # default is release.zip
-            # Working directory before zipping
-            directory: synk-api/dist
+            path: synk-api/dist
 
         - name: Zip Release client
           uses: TheDoctor0/zip-release@0.6.2
           with:
-            # Filename for archive
             filename: "${{ steps.set_build_stamp.outputs.build_stamp }}.release.zip" # default is release.zip
-            # Working directory before zipping
-            directory: synk-client/dist/synk-client
+            path: synk-client/dist/synk-client
             
         - name: Release
           uses: softprops/action-gh-release@v1
           with:
             files: "${{ steps.set_build_stamp.outputs.build_stamp }}.release.zip"
-        ##
-       # - name: Release ZIP of client and API artifacts
-       #   uses: ncipollo/release-action@v1
-       #   with:
-       #     artifacts: "${{ steps.set_build_stamp.outputs.build_stamp }}.release.zip"
-       #     token: ${{ secrets.GITHUB_TOKEN }}
-
