@@ -79,10 +79,15 @@
             filename: "${{ steps.set_build_stamp.outputs.build_stamp }}.release.zip" # default is release.zip
             # Working directory before zipping
             directory: synk-client/dist/synk-client
-        
-        - name: Release ZIP of client and API artifacts
-          uses: ncipollo/release-action@v1
+            
+        - name: Release
+          uses: softprops/action-gh-release@v1
           with:
-            artifacts: "${{ steps.set_build_stamp.outputs.build_stamp }}.release.zip"
-            token: ${{ secrets.GITHUB_TOKEN }}
+            files: "${{ steps.set_build_stamp.outputs.build_stamp }}.release.zip"
+        ##
+       # - name: Release ZIP of client and API artifacts
+       #   uses: ncipollo/release-action@v1
+       #   with:
+       #     artifacts: "${{ steps.set_build_stamp.outputs.build_stamp }}.release.zip"
+       #     token: ${{ secrets.GITHUB_TOKEN }}
 
