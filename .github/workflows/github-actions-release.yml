@@ -56,10 +56,11 @@
         - name: Print version
           run: echo "${{ steps.set_version.outputs.version }}"      
         
+        
         - name: Determine build number
           id: set_build_number
           run: |
-            content="${env.GITHUB_RUN_ID}.${env.GITHUB_RUN_ATTEMPT}"
+            content="${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}"
             echo "::set-output name=build_num::$content"         
         - name: Print build number
           run: |
