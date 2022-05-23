@@ -17,8 +17,27 @@
           with:
             node-version: ${{ matrix.node-version }}
             cache: 'yarn'
-            
-        ##
+        
+        - name: Install client dependencies
+          working-directory: synk-client
+          run: yarn
+        
+        - name: Install API dependencies
+          working-directory: synk-api
+          run: yarn
+        
+        - name: Build client
+          working-directory: synk-client
+          run: npm run build
+        
+        - name: Replace URLs http to https in client artifacts
+          working-directory: synk-client/dist/synk-client
+          run: sed -i -- 's,http://www.youtube.com/iframe_api,https://www.youtube.com/iframe_api,g' *js
+        
+        - name: Build API
+          working-directory: synk-api
+          run: npm run build   
+
         - name: Read content from API package.json
           id: set_pkgjson
           run: |
@@ -42,40 +61,16 @@
         - name: Print build stamp
           run: |
             echo "${{ steps.set_build_stamp.outputs.build_stamp }}"
-        
-        ##
-        
-        - name: Install client dependencies
-          working-directory: synk-client
-          run: yarn
-        
-        - name: Install API dependencies
-          working-directory: synk-api
-          run: yarn
-        
-        - name: Build client
-          working-directory: synk-client
-          run: npm run build
-        
-        - name: Replace URLs http to https in client artifacts
-          working-directory: synk-client/dist/synk-client
-          run: sed -i -- 's,http://www.youtube.com/iframe_api,https://www.youtube.com/iframe_api,g' *js
-        
-        - name: Build API
-          working-directory: synk-api
-          run: npm run build   
-        
-###### PUT HERE wat was copoed
             
         - name: Make ZIP of API and client artifacts 
           uses: papeloto/action-zip@v1
           with: 
             files: ./synk-client/dist/synk-client/ ./synk-api/dist/
-            dest: release.zip
+            dest: "${{ steps.set_build_stamp.outputs.build_stamp }}.release.zip"
 
-      #  - name: Release ZIP of client and API artifacts
-      #    uses: ncipollo/release-action@v1
-      #    with:
-      #      artifacts: "release.zip"
-      #      token: ${{ secrets.GITHUB_TOKEN }}
+        - name: Release ZIP of client and API artifacts
+          uses: ncipollo/release-action@v1
+          with:
+            artifacts: "${{ steps.set_build_stamp.outputs.build_stamp }}.release.zip"
+            token: ${{ secrets.GITHUB_TOKEN }}
 
