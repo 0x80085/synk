@@ -23,7 +23,7 @@
             content="${content//$'\n'/'%0A'}"
             content="${content//$'\r'/'%0D'}"
             # end of optional handling for multi line json
-            version=`fromJson($content).version`
+            version=`fromJson(content).version`
             echo "::set-output name=version::$version"
         - name: Print version
           run: |
