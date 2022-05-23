@@ -14,22 +14,6 @@
         
         - uses: actions/checkout@v3
         
-        - name: Read content from API package.json
-          id: set_pkgjson
-          run: |
-            content=`cat ./synk-api/package.json`
-            # the following lines are only required for multi line json
-            content="${content//'%'/'%25'}"
-            content="${content//$'\n'/'%0A'}"
-            content="${content//$'\r'/'%0D'}"
-            # end of optional handling for multi line json
-            echo "::set-output name=packageJson::$content"
-        - name: Set version from API package.json
-          id: set_version
-          run:  echo "::set-output name=version::${{fromJson(steps.set_pkgjson.outputs.packageJson).version}}"
-        - name: Print version
-          run: echo "${{ steps.set_version.outputs.version }}"      
-        
         - name: Setup Node.js version ${{ matrix.node-version }} and Yarn
           uses: actions/setup-node@v3
           with:
@@ -56,18 +40,30 @@
           working-directory: synk-api
           run: npm run build   
         
-        ### PUT READ VERSION STEP BACK HERE
+        - name: Read content from API package.json
+          id: set_pkgjson
+          run: |
+            content=`cat ./synk-api/package.json`
+            # the following lines are only required for multi line json
+            content="${content//'%'/'%25'}"
+            content="${content//$'\n'/'%0A'}"
+            content="${content//$'\r'/'%0D'}"
+            # end of optional handling for multi line json
+            echo "::set-output name=packageJson::$content"
+        - name: Set version from API package.json
+          id: set_version
+          run:  echo "::set-output name=version::${{fromJson(steps.set_pkgjson.outputs.packageJson).version}}"
+        - name: Print version
+          run: echo "${{ steps.set_version.outputs.version }}"      
         
         - name: Determine build number
           id: set_build_number
           run: |
-            dateNow=`$(date +%s)`
-            content="${steps.set_version.outputs.version}.${dateNow}"
-            echo "::set-output name=build_num::$content"
-         
+            content="${env.GITHUB_RUN_ID}.${env.GITHUB_RUN_ATTEMPT}"
+            echo "::set-output name=build_num::$content"         
         - name: Print build number
           run: |
-            echo "${{ steps.set_version.outputs.build_num }}"
+            echo "${{ steps.set_build_number.outputs.build_num }}"
             
         - name: Make ZIP of API and client artifacts 
           uses: papeloto/action-zip@v1
