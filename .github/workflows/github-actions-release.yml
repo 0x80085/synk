@@ -14,8 +14,8 @@
         
         - uses: actions/checkout@v3
         
-        - name: Read version from API package.json
-          id: set_version
+        - name: Read content from API package.json
+          id: set_pkgjson
           run: |
             content=`cat ./synk-api/package.json`
             # the following lines are only required for multi line json
@@ -23,11 +23,12 @@
             content="${content//$'\n'/'%0A'}"
             content="${content//$'\r'/'%0D'}"
             # end of optional handling for multi line json
-            version="${{ fromJson(content).version }}"
-            echo "::set-output name=version::$version"
+            echo "::set-output name=packageJson::$content"
+        - name: Set version from API package.json
+          id: set_version
+          run:  echo "::set-output name=version::${{fromJson(steps.set_pkgjson.outputs.packageJson).version}}"
         - name: Print version
-          run: |
-            echo "${{ steps.set_version.outputs.version }}"      
+          run: echo "${{ steps.set_version.outputs.version }}"      
         
         - name: Setup Node.js version ${{ matrix.node-version }} and Yarn
           uses: actions/setup-node@v3
