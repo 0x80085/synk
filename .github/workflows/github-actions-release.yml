@@ -4,7 +4,6 @@
     push:
       tags: 
        - "*"
-      branches: [ master, tech/gh-release-action ]
 
 
   jobs:
@@ -72,13 +71,15 @@
           with:
             filename: "${{ steps.set_build_stamp.outputs.build_stamp }}.release.zip" # default is release.zip
             path: synk-api/dist
+            directory: .
 
         - name: Zip Release client
           uses: TheDoctor0/zip-release@0.6.2
           with:
             filename: "${{ steps.set_build_stamp.outputs.build_stamp }}.release.zip" # default is release.zip
             path: synk-client/dist/synk-client
-            
+            directory: .
+
         - name: Release
           uses: softprops/action-gh-release@v1
           with:
