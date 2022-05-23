@@ -14,6 +14,21 @@
         
         - uses: actions/checkout@v3
         
+        - name: Read version from API package.json
+          id: set_version
+          run: |
+            content=`cat ./synk-api/package.json`
+            # the following lines are only required for multi line json
+            content="${content//'%'/'%25'}"
+            content="${content//$'\n'/'%0A'}"
+            content="${content//$'\r'/'%0D'}"
+            # end of optional handling for multi line json
+            version=`fromJson($content).version`
+            echo "::set-output name=version::$version"
+        - name: Print version
+          run: |
+            echo "${{ steps.set_version.outputs.version }}"      
+        
         - name: Setup Node.js version ${{ matrix.node-version }} and Yarn
           uses: actions/setup-node@v3
           with:
@@ -40,21 +55,7 @@
           working-directory: synk-api
           run: npm run build   
         
-        - name: Read version from API package.json
-          id: set_version
-          run: |
-            content=`cat ./synk-api/package.json`
-            # the following lines are only required for multi line json
-            content="${content//'%'/'%25'}"
-            content="${content//$'\n'/'%0A'}"
-            content="${content//$'\r'/'%0D'}"
-            # end of optional handling for multi line json
-            version=`fromJson(steps.set_version.outputs.packageJson).version`
-            echo "::set-output name=version::$version"
-        
-        - name: Print version
-          run: |
-            echo "${{ steps.set_version.outputs.version }}"      
+        ### PUT READ VERSION STEP BACK HERE
         
         - name: Determine build number
           id: set_build_number
