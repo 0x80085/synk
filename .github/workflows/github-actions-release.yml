@@ -34,17 +34,12 @@
           run:  echo "::set-output name=version::${{fromJson(steps.set_pkgjson.outputs.packageJson).version}}"
         - name: Print version
           run: echo "${{ steps.set_version.outputs.version }}"      
-        
-        - name: Determine build number
-          id: set_build_number
-          run: |
-            content="${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}"
-            echo "::set-output name=build_num::$content"         
+    
         - name: Determine build stamp
           id: set_build_stamp
           run: |
             buildnumber="${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}"
-            echo "::set-output name=build_stamp::${{ steps.set_version.outputs.version }}.$buildnumber"            
+            echo "::set-output name=build_stamp::${{ steps.set_version.outputs.version }}.${GITHUB_RUN_ID}.${GITHUB_RUN_ATTEMPT}"            
         - name: Print build stamp
           run: |
             echo "${{ steps.set_build_number.outputs.build_stamp }}"
