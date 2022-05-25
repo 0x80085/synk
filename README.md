@@ -19,7 +19,7 @@ Run `yarn` in all folders that contain a package.json
 ## Prerequisites
 
 - NodeJS
-- Postgres DB (see ormconfig for DB user + execute `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";` on the DB server)
+- Postgres DB (see API .env file for DB user + execute `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";` on the DB server)
 - Angular cli
 - Typescript
 
