@@ -91,7 +91,7 @@ export class RoomService {
     leaveRoom(roomId: string, member: Member) {
         this.automatedRooms
             .find(r => r.id === roomId)
-            ?.enter(member);
+            ?.leave(member);
 
         this.communityRooms
             .find(r => r.id === roomId)
