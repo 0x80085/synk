@@ -76,6 +76,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     }
   }
 
+  // eslint-disable-next-line unused-imports/no-unused-vars
   afterInit(server:  Server) {
     this.logger.log('WS server started');
     this.logger.log('Now starting the automated room nowPlaying subscriptions..');
@@ -107,7 +108,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     const room = this.roomService.getRoomByName(roomName);
     const member = await this.tracker.getMemberBySocket(client);
 
-    var { hasChangedMediaUrl } = room.updateNowPlaying(member, { time, url });
+    const { hasChangedMediaUrl } = room.updateNowPlaying(member, { time, url });
 
     if (hasChangedMediaUrl) {
       
@@ -371,7 +372,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     this.server.in(room.id).emit(MessageTypes.VOTE_SKIP_COUNT, { count: room.voteSkipCount, max: room.votesNeededForSkip });
   }
 
-  private sendRoomConfigToMember(room: Room | AutomatedRoom, memberId: string, client:  Socket, isAutomatedChannel: boolean = false) {
+  private sendRoomConfigToMember(room: Room | AutomatedRoom, memberId: string, client:  Socket, isAutomatedChannel = false) {
 
     if (isAutomatedChannel) {
       client.emit(MessageTypes.USER_CONFIG, {

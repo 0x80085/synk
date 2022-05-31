@@ -1,14 +1,11 @@
 import { BadRequestException, ForbiddenException, } from "@nestjs/common";
 import { HttpService } from '@nestjs/axios';
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { InjectRepository } from "@nestjs/typeorm";
 import { of } from "rxjs";
 import { catchError, map, mapTo, switchMap, tap } from "rxjs/operators";
-import { Channel, Video } from "src/domain/entity";
 import { Server } from 'socket.io';
 
 import { YouTubeGetID, YoutubeV3Service } from "src/tv/crawlers/youtube-v3.service";
-import { Repository } from "typeorm";
 import { MessageTypes } from "../gateways/message-types.enum";
 import { AddMediaToRoomCommand } from "../models/commands/add-media-to-room.command";
 import { Media } from "../models/media/media";
@@ -140,9 +137,9 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
 
     private isMediaSourceSupported(url: string) {
         const getDomain = (url: string) => {
-            var regexParse = new RegExp('([a-z\-0-9]{2,63})\.([a-z\.]{2,5})$');
-            var urlParts = regexParse.exec(new URL(url).hostname);
-            const [domain, type] = urlParts
+            const regexParse = new RegExp('([a-z\-0-9]{2,63})\.([a-z\.]{2,5})$');
+            const urlParts = regexParse.exec(new URL(url).hostname);
+            const [domain] = urlParts
             return domain;
         }
 

@@ -1,6 +1,6 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Channel, ChannelConfig, Member, Role, Roles } from '../../domain/entity';
+import { Channel, Member, Roles } from '../../domain/entity';
 import { Repository } from 'typeorm';
 import { Room } from '../models/room/room';
 import { AutomatedRoom } from '../models/automated-room/automated-room';
@@ -91,7 +91,7 @@ export class RoomService {
     leaveRoom(roomId: string, member: Member) {
         this.automatedRooms
             .find(r => r.id === roomId)
-            ?.enter(member);
+            ?.leave(member);
 
         this.communityRooms
             .find(r => r.id === roomId)

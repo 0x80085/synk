@@ -93,10 +93,9 @@ export class ChannelService {
             .then(entries => entries.map(getChannelShortRepresentation));
     }
 
-    async updateChannel(channelId: string, ownerId: string, { description, isPublic, maxUsers, password }: UpdateChannelInput) {
+    async updateChannel(channelId: string, ownerId: string, { description, isPublic, maxUsers }: UpdateChannelInput) {
         const owner = await this.memberRepository.findOneOrFail({ where: { id: ownerId } });
         const channel = await this.channelRepository.findOneOrFail({ where: { owner, id: channelId } });
-        const room = this.roomService.getRoomById(channel.id);
 
         this.channelRepository.createQueryBuilder()
             .update(Channel).set({ isPublic, description }).where("id = :id", { id: channelId })

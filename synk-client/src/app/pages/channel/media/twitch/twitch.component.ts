@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Output } from '@angular/core';
 import { TwitchPlayer, TwitchPlayerEvent } from 'twitch-player';
 
 import { BaseMediaComponent } from '../base-media.component';
@@ -13,7 +13,7 @@ export function isTwitchChannelUrl(url: string) {
   templateUrl: './twitch.component.html',
   styleUrls: ['./twitch.component.scss']
 })
-export class TwitchComponent implements BaseMediaComponent {
+export class TwitchComponent implements BaseMediaComponent, AfterViewInit {
 
   @Output()
   mediaEnded: EventEmitter<unknown> = new EventEmitter();

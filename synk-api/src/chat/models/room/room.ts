@@ -247,7 +247,7 @@ export class Room {
     }
 
     private filterOutMember(members: Member[], member: Member) {
-        var index = members.findIndex(m => m.id === member.id);
+        const index = members.findIndex(m => m.id === member.id);
 
         if (index > -1) {
             return [...members.slice(0, index), ...members.slice(index + 1)];

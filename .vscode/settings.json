@@ -1,0 +1,6 @@
+{
+    "eslint.workingDirectories": [
+      "synk-client",
+      "synk-api"
+    ]
+  }

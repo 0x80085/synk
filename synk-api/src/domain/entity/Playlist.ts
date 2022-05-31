@@ -15,13 +15,13 @@ export class Playlist {
   @Column({ default: false })
   isLocked: boolean;
 
-  @ManyToOne(type => Member, member => member.playlists, { nullable: true })
+  @ManyToOne(() => Member, member => member.playlists, { nullable: true })
   createdBy: Member;
 
-  @ManyToMany(type => Video, video => video.playlist, { onDelete: 'CASCADE' })
+  @ManyToMany(() => Video, video => video.playlist, { onDelete: 'CASCADE' })
   @JoinTable()
   videos: Video[];
 
-  @ManyToOne(type => Channel, channel => channel.playlists, { nullable: true })
+  @ManyToOne(() => Channel, channel => channel.playlists, { nullable: true })
   channel: Channel;
 }

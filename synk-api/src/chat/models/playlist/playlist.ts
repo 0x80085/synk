@@ -35,7 +35,7 @@ export class Playlist {
             media,
             time: this.currentTime
         }
-    };
+    }
 
     length() {
         return this.queue.length;
@@ -67,7 +67,7 @@ export class Playlist {
     }
 
     playNext() {
-        let next = this.activeEntryIndex + 2 > this.length()
+        const next = this.activeEntryIndex + 2 > this.length()
             ? 0
             : this.activeEntryIndex + 1;
         this.setNowPlaying(next);
@@ -75,7 +75,7 @@ export class Playlist {
     }
 
     playPrevious() {
-        let previous = this.activeEntryIndex - 1 >= 0
+        const previous = this.activeEntryIndex - 1 >= 0
             ? this.activeEntryIndex - 1
             : 0;
         this.setNowPlaying(previous);
@@ -170,7 +170,7 @@ export class Playlist {
 
     private insertAndShift(arr: any[], from: number, to: number) {
         const newArray = arr.map(a => ({ ...a }));
-        let cutOut = newArray.splice(from, 1)[0]; // cut the element at index 'from'
+        const cutOut = newArray.splice(from, 1)[0]; // cut the element at index 'from'
         newArray.splice(to, 0, cutOut);            // insert it at index 'to'
         return newArray as { media: Media, addedBy: Member }[];
     }

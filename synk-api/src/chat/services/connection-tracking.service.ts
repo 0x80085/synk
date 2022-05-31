@@ -9,7 +9,7 @@ import { SerializedUserData } from '../../auth/local.serializer';
 import { Member } from '../../domain/entity/Member';
 import { AuthenticatedGuard } from 'src/auth/guards/authenticated.guard';
 import { MessageTypes } from '../gateways/message-types.enum';
-import { Socket, Server } from 'socket.io';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class ConnectionTrackingService {
@@ -97,6 +97,7 @@ export class ConnectionTrackingService {
             .filter(c => c.memberId === memberId && c.client.id !== socketId)
             .map(conn => ({ client: conn.client, isInRoom: !!conn.client.rooms[roomId] }))
 
+        // eslint-disable-next-line unused-imports/no-unused-vars
         const hasOtherActiveSockets = otherConnections.filter(conn => conn.isInRoom && conn.client.connected)
 
         // remove stale 

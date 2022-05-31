@@ -31,19 +31,19 @@ export class Channel {
   @Column()
   dateCreated: Date;
 
-  @ManyToOne(type => Member, member => member.channels, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Member, member => member.channels, { onDelete: 'CASCADE' })
   owner: Member;
 
-  @OneToMany(type => ChannelConfig, config => config.channel, { onDelete: 'CASCADE' })
+  @OneToMany(() => ChannelConfig, config => config.channel, { onDelete: 'CASCADE' })
   configs: ChannelConfig[];
 
-  @OneToMany(type => Playlist, playlist => playlist.channel, { onDelete: 'CASCADE' })
+  @OneToMany(() => Playlist, playlist => playlist.channel, { onDelete: 'CASCADE' })
   playlists: Playlist[];
 
-  @OneToOne(type => Playlist)
+  @OneToOne(() => Playlist)
   @JoinColumn()
   activePlaylist: Playlist;
 
-  @OneToMany(type => Role, role => role.channel, { onDelete: 'CASCADE' })
+  @OneToMany(() => Role, role => role.channel, { onDelete: 'CASCADE' })
   roles: Role[];
 }

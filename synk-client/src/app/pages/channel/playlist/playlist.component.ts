@@ -3,7 +3,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { BehaviorSubject, combineLatest, Subject, Subscription } from 'rxjs';
-import { distinctUntilChanged, map, startWith, tap, withLatestFrom } from 'rxjs/operators';
+import { distinctUntilChanged, map, startWith, tap } from 'rxjs/operators';
 import { debugLog, doLog } from 'src/app/utils/custom.operators';
 import { AuthService } from '../../account/auth.service';
 import { MediaService } from '../media.service';
@@ -89,7 +89,7 @@ export class PlaylistComponent implements OnDestroy, OnInit {
     doLog('playlist update', true),
     tap(ls => {
       const nowPlaying = ls.find(it => it.active === true)
-      if (!!nowPlaying) {
+      if (nowPlaying) {
         this.nowPlayingSubject.next(nowPlaying)
       }
     }),

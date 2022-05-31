@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { filter, map, share, shareReplay } from 'rxjs/operators';
+import { filter, map, shareReplay } from 'rxjs/operators';
 
 import { SocketService } from '../../socket.service';
 import { MediaEvent } from './models/room.models';

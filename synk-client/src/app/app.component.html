@@ -23,7 +23,7 @@
           <li nz-menu-item [hidden]="isLoggedIn | async" class="item" nzMatchRouter>
             <a routerLink="/account/login">Login</a>
           </li>
-          <li nz-menu-item [hidden]="!(isLoggedIn | async)" class="item" nzMatchRouter>
+          <li nz-menu-item [hidden]="(isLoggedIn | async) === false" class="item" nzMatchRouter>
             <a routerLink="/account/me">(You)</a>
           </li>
           <li nz-menu-item [hidden]="isLoggedIn | async" class="item" nzMatchRouter>
@@ -33,7 +33,7 @@
         </ul>
       </li>
     </ul>
-    <ul nz-menu nzMode="inline" [nzInlineCollapsed]="isCollapsed" [hidden]="!(isAdmin$ | async)">
+    <ul nz-menu nzMode="inline" [nzInlineCollapsed]="isCollapsed" [hidden]="(isAdmin$ | async) === false">
       <li nz-submenu nzOpen nzTitle="Manage" nzIcon="dashboard">
         <ul>
           <li nz-menu-item class="item" nzMatchRouter>

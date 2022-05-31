@@ -60,20 +60,7 @@ export class CreateRoomFormComponent implements OnInit {
         this.router.navigate(['/channel', results.name]);
        this.isSubmitting = false
       },
-      err => {
-        // if (err.status === 403) {
-        //   this.notification.create(
-        //     'error',
-        //     `Login to create a channel`,
-        //     `Only known users may create a channel.`
-        //   );
-        //   return;
-        // }
-        // this.notification.create(
-        //   'error',
-        //   `Couldn't create channel`,
-        //   `Something went wrong when trying to create a new channel.\n Try again later.`
-        // );
+      _err => {
        this.isSubmitting = false
       }
     );

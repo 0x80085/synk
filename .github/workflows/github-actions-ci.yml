@@ -22,20 +22,30 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'yarn'
+    
     - name: Install client deps
       working-directory: synk-client
       run: yarn
     - name: Install API deps
       working-directory: synk-api
       run: yarn
-    - name: Build client
+    
+    - name: Lint API code
+      working-directory: synk-api
+      run: npm run lint
+    - name: Lint client code
       working-directory: synk-client
-      run: npm run build
+      run: npm run lint
+    
     - name: Build API
       working-directory: synk-api
+      run: npm run build
+    - name: Build client
+      working-directory: synk-client
       run: npm run build

@@ -23,9 +23,9 @@ export class Role {
     @Column()
     level: number;
 
-    @ManyToOne(type => Member, member => member.roles)
+    @ManyToOne(() => Member, member => member.roles)
     member: Member;
 
-    @ManyToOne(type => Channel, channel => channel.roles)
+    @ManyToOne(() => Channel, channel => channel.roles)
     channel: Channel;
 }

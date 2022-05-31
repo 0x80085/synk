@@ -1,6 +1,6 @@
 import { AfterViewChecked, Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { filter, map, mapTo, shareReplay, tap } from 'rxjs/operators';
+import { filter, map, mapTo, tap } from 'rxjs/operators';
 
 import { doLog } from 'src/app/utils/custom.operators';
 import { ChatService } from '../chat.service';

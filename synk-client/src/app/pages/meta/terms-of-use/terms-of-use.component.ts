@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-terms-of-use',
   templateUrl: './terms-of-use.component.html',
   styleUrls: ['./terms-of-use.component.scss']
 })
-export class TermsOfUseComponent implements OnInit {
+export class TermsOfUseComponent {
 
   constructor() { }
 
@@ -13,8 +13,5 @@ export class TermsOfUseComponent implements OnInit {
     const url = new URL(window.location.href);
     return `${url.protocol}//${url.hostname}`
   };
-
-  ngOnInit(): void {
-  }
 
 }
