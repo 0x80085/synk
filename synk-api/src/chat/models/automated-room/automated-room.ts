@@ -82,7 +82,7 @@ export class AutomatedRoom {
             const { media: nowPlayingMedia, time: nowPlayingTime } = this.currentPlaylist.nowPlaying();
             const { action, seekTo: effectSeekTo, media: effectMedia } = effect;
 
-            let newState = { ...currentState } as LoopState;
+            const newState = { ...currentState } as LoopState;
 
             switch (action) {
                 case LoopActions.play:
@@ -275,7 +275,7 @@ export class AutomatedRoom {
     }
 
     private removeMember(member: Member) {
-        var index = this.members.findIndex(m => m.id === member.id);
+        const index = this.members.findIndex(m => m.id === member.id);
 
         if (index > -1) {
             this.members = [...this.members.slice(0, index), ...this.members.slice(index + 1)];

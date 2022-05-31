@@ -26,7 +26,7 @@ export class AdminService {
     }
 
     public getConnections() {
-        let clients: any[] = [];
+        const clients: any[] = [];
 
         [...this.trackingService.clients]
             .map(([ip, value]) => ({ ip, value: value.map(v => ({ socketId: v.client.id, memberId: v.memberId })) }))
