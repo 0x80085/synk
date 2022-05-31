@@ -89,7 +89,7 @@ export class PlaylistComponent implements OnDestroy, OnInit {
     doLog('playlist update', true),
     tap(ls => {
       const nowPlaying = ls.find(it => it.active === true)
-      if (!!nowPlaying) {
+      if (nowPlaying) {
         this.nowPlayingSubject.next(nowPlaying)
       }
     }),

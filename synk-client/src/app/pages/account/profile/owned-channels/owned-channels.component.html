@@ -1,5 +1,5 @@
 <h2 nz-typography>Channels</h2>
-<nz-card [nzLoading]="!(channels$ | async)">
+<nz-card [nzLoading]="(channels$ | async) === undefined">
   <nz-empty
     *ngIf="(channels$ | async)?.length === 0"
     [nzNotFoundImage]="channelListEmpty"

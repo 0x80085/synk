@@ -66,7 +66,7 @@
                 }
               ]
             },
-            "development":{
+            "development": {
               "buildOptimizer": false,
               "optimization": false,
               "vendorChunk": true,
@@ -125,9 +125,21 @@
               "devServerTarget": "synk-client:serve:production"
             }
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
         }
       }
     }
   },
-  "defaultProject": "synk-client"
+  "defaultProject": "synk-client",
+  "cli": {
+    "defaultCollection": "@angular-eslint/schematics"
+  }
 }

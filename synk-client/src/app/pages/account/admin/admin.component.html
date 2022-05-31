@@ -59,7 +59,7 @@
         </nz-collapse>
       </nz-card>
       <h2 nz-typography>Users</h2>
-      <nz-card [nzLoading]="!(users$ | async)">
+      <nz-card [nzLoading]="(users$ | async) === undefined">
         <nz-pagination [nzPageIndex]="1" [nzTotal]="85" [nzPageSize]="20" [nzShowTotal]="rangeTemplate"
           style="margin-bottom: 1rem">
         </nz-pagination>
@@ -103,7 +103,7 @@
     </div>
     <div nz-col [nzLg]="{ span: 12, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }" [nzXs]="{ span: 24, offset: 0 }">
       <h2 nz-typography>Channels</h2>
-      <nz-card [nzLoading]="!(channels$ | async)">
+      <nz-card [nzLoading]="(channels$ | async) === undefined">
         <nz-pagination [nzPageIndex]="1" [nzTotal]="85" [nzPageSize]="20" [nzShowTotal]="rangeTemplate"
           style="margin-bottom: 1rem">
         </nz-pagination>
@@ -154,7 +154,7 @@
         </nz-collapse>
       </nz-card>
       <h2 nz-typography>Socket connections</h2>
-      <nz-card [nzLoading]="!(connections$ | async)">
+      <nz-card [nzLoading]="(connections$ | async) === undefined">
         <pre> {{ connections$ | async | json }} </pre>
       </nz-card>
     </div>

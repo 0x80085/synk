@@ -27,7 +27,7 @@ export enum SupportedPlayers {
 }
 
 // tslint:disable-next-line: directive-selector
-@Directive({ selector: '[mediaHost]' })
+@Directive({ selector: '[appMediaHost]' })
 export class MediaHostDirective {
   constructor(public viewContainerRef: ViewContainerRef) { }
 }

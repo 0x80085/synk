@@ -10,7 +10,7 @@
     <p nz-typography>(in case you are the leader) click the <i nz-icon nzType="caret-right" nzTheme="outline"></i> icon in the playlist to play the media!</p>
   </div>
 
-  <div nz-col nzSpan="24"  [nzFlex]="'auto'" class="media" [hidden]="!(isMediaSelected | async)">
+  <div nz-col nzSpan="24"  [nzFlex]="'auto'" class="media" [hidden]="(isMediaSelected | async) === false">
     <div mediaHost></div>
   </div>
 </div>
