@@ -1,12 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { map } from 'rxjs/operators';
-import { YoutubeDataAPI } from 'youtube-v3-api';
+import { map } from 'rxjs/operators';  
 
 @Injectable()
 export class YoutubeV3Service {
-
-    api = new YoutubeDataAPI(process.env.YT_V3_API_KEY);
 
     constructor(private httpService: HttpService) { }
 
