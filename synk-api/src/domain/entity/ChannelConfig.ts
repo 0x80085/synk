@@ -43,7 +43,7 @@ export class ChannelConfig {
   @Column()
   maxUsers: number;
 
-  @ManyToOne(type => Channel, channel => channel.configs)
+  @ManyToOne(() => Channel, channel => channel.configs)
   channel: Channel;
 
 }

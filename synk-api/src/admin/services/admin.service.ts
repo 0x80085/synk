@@ -48,7 +48,7 @@ export class AdminService {
             .leftJoinAndSelect("channel.owner", "owner")
             .orderBy('channel.dateCreated', 'DESC');
 
-        const [pagination, rawResults] = await paginateRawAndEntities(query, options);
+        const [pagination] = await paginateRawAndEntities(query, options);
         const patchedResults = pagination.items.map((item, _) => {
             const patchedItem = { ...item };
             const patchedOwner = { ...patchedItem.owner, passwordHash: null } as Member;
@@ -69,7 +69,7 @@ export class AdminService {
             .leftJoinAndSelect("member.channels", "channels")
             .orderBy('member.lastSeen', 'DESC');
 
-        const [pagination, rawResults] = await paginateRawAndEntities(query, options);
+        const [pagination] = await paginateRawAndEntities(query, options);
         const patchedResults = pagination.items.map((item, _) => {
             const patchedItem = { ...item };
             delete patchedItem.passwordHash

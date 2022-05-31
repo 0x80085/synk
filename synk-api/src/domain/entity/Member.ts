@@ -29,16 +29,16 @@ export class Member {
   @Column({ default: null, nullable: true })
   avatarUrl: string;
 
-  @OneToMany(type => Playlist, playlist => playlist.createdBy, { nullable: true, onDelete: 'CASCADE' })
+  @OneToMany(() => Playlist, playlist => playlist.createdBy, { nullable: true, onDelete: 'CASCADE' })
   playlists: Playlist[];
 
-  @OneToMany(type => Video, video => video.addedBy, { nullable: true, onDelete: 'CASCADE' })
+  @OneToMany(() => Video, video => video.addedBy, { nullable: true, onDelete: 'CASCADE' })
   videos: Video[];
 
-  @OneToMany(type => Channel, channel => channel.owner, { nullable: true, onDelete: 'CASCADE' })
+  @OneToMany(() => Channel, channel => channel.owner, { nullable: true, onDelete: 'CASCADE' })
   channels: Channel[];
 
-  @OneToMany(type => Role, role => role.member, { nullable: true, onDelete: 'CASCADE' })
+  @OneToMany(() => Role, role => role.member, { nullable: true, onDelete: 'CASCADE' })
   roles: Role[];
 
 }

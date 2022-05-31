@@ -17,9 +17,9 @@ export class Video {
   @Column()
   dateAdded: Date;
 
-  @OneToMany(type => Member, member => member.videos)
+  @OneToMany(() => Member, member => member.videos)
   addedBy: Member;
 
-  @ManyToMany(type => Playlist, playlist => playlist.videos)
+  @ManyToMany(() => Playlist, playlist => playlist.videos)
   playlist: Playlist;
 }

@@ -76,6 +76,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     }
   }
 
+  // eslint-disable-next-line unused-imports/no-unused-vars
   afterInit(server:  Server) {
     this.logger.log('WS server started');
     this.logger.log('Now starting the automated room nowPlaying subscriptions..');
