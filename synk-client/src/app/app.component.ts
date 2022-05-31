@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
 import { AppStateService } from './app-state.service';
-import { tap, map, withLatestFrom } from 'rxjs/operators';
+import { map, withLatestFrom } from 'rxjs/operators';
 import { SocketService } from './socket.service';
-import { Observable } from 'rxjs';
 import { AuthService } from './pages/account/auth.service';
 
 @Component({

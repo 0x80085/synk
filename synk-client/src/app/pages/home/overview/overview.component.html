@@ -7,7 +7,7 @@
   </div>
   <div nz-col nzSpan="24">
     <nz-list [nzDataSource]="automatedRooms$ | async" [nzRenderItem]="channel"
-      [nzGrid]="{ gutter: 16, xs: 24, sm: 12, md: 6}" [nzLoading]="!(automatedRooms$ | async)" [nzNoResult]="noResults">
+      [nzGrid]="{ gutter: 16, xs: 24, sm: 12, md: 6}" [nzLoading]="(automatedRooms$ | async) === undefined" [nzNoResult]="noResults">
       <ng-template #channel let-channel>
         <nz-list-item [ngClass]="'item'" routerLink="/channel/{{ channel.name }}" [nzContent]="nzContent">
           <ng-template #nzContent>
@@ -22,7 +22,7 @@
   </div>
   <div nz-col nzSpan="24">
     <nz-list [nzDataSource]="communityRooms$ | async" [nzRenderItem]="channel"
-      [nzGrid]="{ gutter: 16, xs: 24, sm: 12, md: 6}" [nzLoading]="!(communityRooms$ | async)" [nzNoResult]="noResults">
+      [nzGrid]="{ gutter: 16, xs: 24, sm: 12, md: 6}" [nzLoading]="(communityRooms$ | async) === undefined" [nzNoResult]="noResults">
       <ng-template #channel let-channel>
         <nz-list-item [ngClass]="'item'" routerLink="/channel/{{ channel.name }}" [nzContent]="nzContent">
           <ng-template #nzContent>

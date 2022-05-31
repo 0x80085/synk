@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { MediaComponent, SupportedPlayers } from '../media/media.component';
 
 @Component({
@@ -6,7 +6,7 @@ import { MediaComponent, SupportedPlayers } from '../media/media.component';
   templateUrl: './player-debug.component.html',
   styleUrls: ['./player-debug.component.scss']
 })
-export class PlayerDebugComponent implements OnInit {
+export class PlayerDebugComponent {
 
   constructor() { }
   @ViewChild(MediaComponent) player: MediaComponent;
@@ -19,9 +19,6 @@ export class PlayerDebugComponent implements OnInit {
     { label: SupportedPlayers.YT, action: () => this.showYoutubePlayer() },
     { label: 'Clear', action: () => this.clear() }
   ];
-
-  ngOnInit(): void {
-  }
 
   play() {
     this.player.play(this.videoUrl);

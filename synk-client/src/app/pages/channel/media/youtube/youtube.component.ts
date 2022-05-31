@@ -141,7 +141,7 @@ export function YouTubeGetID(url) {
     .replace(/(>|<)/gi, '')
     .split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
   if (url[2] !== undefined) {
-    ID = url[2].split(/[^0-9a-z_\-]/i);
+    ID = url[2].split(/[^0-9a-z_-]/i);
     ID = ID[0];
   } else {
     ID = null;
@@ -150,7 +150,8 @@ export function YouTubeGetID(url) {
 }
 
 export function isValidYTid(url: string) {
-  const regx = /http(?:s?):\/\/(?:www\.)?youtu(?:be\.com\/watch\?v=|\.be\/)([\w\-\_]*)(&(amp;)?‌​[\w\?‌​=]*)?/;
+  // eslint-disable-next-line no-irregular-whitespace
+  const regx = /http(?:s?):\/\/(?:www\.)?youtu(?:be\.com\/watch\?v=|\.be\/)([\w\-_]*)(&(amp;)?‌​[\w?‌​=]*)?/;
   return regx.test(url);
 }
 

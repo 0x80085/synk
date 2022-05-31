@@ -2,7 +2,7 @@ import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/
 import { ActivatedRoute } from '@angular/router';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { BehaviorSubject, combineLatest, merge, noop, Observable, of, Subscription, timer } from 'rxjs';
-import { map, mapTo, shareReplay, startWith, switchMap, take, tap } from 'rxjs/operators';
+import { mapTo, shareReplay, startWith, switchMap, take, tap } from 'rxjs/operators';
 import { debugLog } from 'src/app/utils/custom.operators';
 
 
@@ -46,7 +46,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   alreadyJoinedRoomError$ = this.chatService.alreadyJoinedRoomError$;
   roomFullRoomError$ = this.chatService.roomMaxMemberLimitReachedError$; // todo show feedback in HTML, user wont be joined, i hope
 
-  mediaUpdateTimerSubscription: Subscription = timer(1000, 2000).subscribe(val => {
+  mediaUpdateTimerSubscription: Subscription = timer(1000, 2000).subscribe(() => {
     debugLog(`hasplayer? ${!!this.player?.ref}` ,)
     if (this.loggedInUserIsLeader && this.player?.ref) {
       debugLog('mediaUpdateTimerSubscription going to sendMediaUpdate')
@@ -82,7 +82,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   ).subscribe()
 
   errorEventSubscription = this.socketService.connectionError$.pipe(
-    tap(x => {
+    tap(() => {
       this.notification.error('Hmm.. Something went wrong here', 'Maybe try logging in again?');
       this.mediaUpdateTimerSubscription.unsubscribe();
       this.mediaSyncEventSubscription.unsubscribe();

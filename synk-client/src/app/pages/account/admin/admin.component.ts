@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Observable } from 'rxjs';
 import { map, shareReplay, take, tap } from 'rxjs/operators';
 
 import { AdminService, ChannelOverviewItem, UserAccountInfo, UserInfo } from '../admin.service';
-import { Channel, User } from '../auth.service';
+import { Channel } from '../auth.service';
 
 @Component({
   selector: 'app-admin',
@@ -67,11 +67,6 @@ export class AdminComponent {
         .pipe(take(1))
         .subscribe(() => this.notification.success('Success', `Deleted room [${name}]`));
     }
-  }
-
-  ban(user: User, $event) {
-    console.log(`banning user [${user.username}]`);
-    this.notification.success('Success', `Banned user [${user.username}]`);
   }
 
   startScraper(name: string, control: AbstractControl) {

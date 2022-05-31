@@ -11,7 +11,7 @@ import {
   RoomErrors
 } from './models/room.models';
 import { SocketService, RealTimeCommand } from '../../socket.service';
-import { filter, map, share, shareReplay, tap } from 'rxjs/operators';
+import { filter, map, share, shareReplay } from 'rxjs/operators';
 import { doLog } from 'src/app/utils/custom.operators';
 
 @Injectable()

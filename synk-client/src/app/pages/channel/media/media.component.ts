@@ -13,7 +13,6 @@ import {
 import { BaseMediaComponent } from './base-media.component';
 import { YoutubeComponent, isValidYTid } from './youtube/youtube.component';
 import { BehaviorSubject, Subscription } from 'rxjs';
-import { Html5Component } from './html5/html5.component';
 import { isTwitchChannelUrl, TwitchComponent } from './twitch/twitch.component';
 import { isVimeoUrl, PlyrComponent } from './plyr/plyr.component';
 import { debugLog } from 'src/app/utils/custom.operators';
@@ -152,7 +151,7 @@ export class MediaComponent {
 
   private resetMediaEndedSubscription() {
     if (this.mediaEndedSubscription) { this.mediaEndedSubscription.unsubscribe(); }
-    this.mediaEndedSubscription = this.ref.instance.mediaEnded.subscribe(ev => {
+    this.mediaEndedSubscription = this.ref.instance.mediaEnded.subscribe(() => {
       this.mediaEndedEvent.emit();
     });
   }
