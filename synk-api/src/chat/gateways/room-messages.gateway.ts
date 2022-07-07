@@ -65,9 +65,11 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
         }[])
           .filter((conn) => conn.socketId === client.id)
           .forEach(connection => {
-            this.roomService.leaveRoom(connection.roomId, member)
+            const room = this.roomService.getRoomById(connection.roomId);
+            room.leave(member);
+            this.broadcastMemberlistToRoom(room);
           }))
-        .then(() => Object.keys(client.rooms).forEach(roomId => client.leave(roomId))) // todo: test change from leaveAll()
+        .then(() => Object.keys(client.rooms).forEach(roomId => client.leave(roomId)))
         .then(() => this.tracker.memberDisconnects(client))
         .catch(console.log)
 
