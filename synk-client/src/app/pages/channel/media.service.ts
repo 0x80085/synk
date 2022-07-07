@@ -58,6 +58,8 @@ export class MediaService {
       map((mediaUrl) => mediaUrl)
     );
 
+    clearPlaylistSuccessEvent$ = this.socketService.listenForEvent<unknown>(MediaCommands.CLEAR_PLAYLIST_SUCCESS);
+
   onVoteSkipCountEvent$ = this.socketService.listenForEvent<{ count: number, max: number }>(MediaCommands.VOTE_SKIP_COUNT);
 
   constructor(private socketService: SocketService) { }

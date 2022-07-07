@@ -132,6 +132,10 @@ export class PlaylistComponent implements OnDestroy, OnInit {
     tap(_ => this.notification.success('Success', 'Media removed from playlist'))
   ).subscribe();
 
+  private clearPlaylistSuccesFeedbackSubscription = this.mediaService.clearPlaylistSuccessEvent$.pipe(
+    tap(_ => this.notification.success('Success', 'Playlist cleared!'))
+  ).subscribe();
+
   constructor(
     private fb: FormBuilder,
     private mediaService: MediaService,
@@ -204,7 +208,10 @@ export class PlaylistComponent implements OnDestroy, OnInit {
 
   onClearPlaylist() {
     if (this.isSuperAdmin || this.isOwner) {
-      this.mediaService.clearPlaylist(this.roomName);
+
+      if(confirm("Really clear the playlist?")){
+        this.mediaService.clearPlaylist(this.roomName);
+      }
     }
   }
 
@@ -253,6 +260,7 @@ export class PlaylistComponent implements OnDestroy, OnInit {
     this.addMediaSuccesFeedbackSubscription.unsubscribe();
 
     this.removeMediaSuccesFeedbackSubscription.unsubscribe();
+    this.clearPlaylistSuccesFeedbackSubscription.unsubscribe();
     this.removeMediaErrorFeedbackSubscription.unsubscribe();
 
     this.voteSkipCountUpdateSubscription.unsubscribe();

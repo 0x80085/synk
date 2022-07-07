@@ -73,6 +73,7 @@ export class Room {
     leave(member: Member): Member | null {
         const toBeRemoved = this.selectFromMembers(member);
         let newLeader;
+        console.log(`LEAVE ROOM - executing for ${member.username} .`);
 
         if (toBeRemoved) {
             if (this.leader && this.leader.id == member.id) {
@@ -81,7 +82,10 @@ export class Room {
                     const elegibleMembers = this.members.filter(m => m.id !== this.leader.id)
                     newLeader = elegibleMembers[0];
                     this.replaceLeader(elegibleMembers[0])
+                    console.log(`LEAVE ROOM - ${member.username} was leader, assigned new leader ${this.leader?.username}.`);
                 } else {
+                    console.log(`LEAVE ROOM - ${member.username} was last in room, turning lights off.`);
+
                     this.removeLeader();
                     newLeader = null;
 
@@ -94,9 +98,10 @@ export class Room {
 
             this.messages.post({ author: { username: '' } as Member, content: `${member.username} left.`, isSystemMessage: true });
 
+            console.log(`LEAVE ROOM - ${member.username} removed from ${this.name}.`);
             return newLeader;
         } else {
-            console.log(`LEAVE ROOM - ${member.username} not found, not removed.`);
+            console.log(`LEAVE ROOM - ${member.username} not found, not removed from ${this.name}.`);
         }
     }
 
