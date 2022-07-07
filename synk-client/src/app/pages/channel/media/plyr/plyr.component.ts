@@ -84,7 +84,9 @@ export class PlyrComponent implements BaseMediaComponent {
     }
   }
 
-
+  getDuration(): number {
+    return this.plyr.player.duration;
+  }
 
   initPlayer() {
     this.play(this.src);

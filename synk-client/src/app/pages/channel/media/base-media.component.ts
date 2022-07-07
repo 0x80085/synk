@@ -10,4 +10,5 @@ export interface BaseMediaComponent {
   getCurrentTime(): number;
   getCurrentUrl(): string;
   setCurrentUrl(url:string): void;
+  getDuration(): number;
 }

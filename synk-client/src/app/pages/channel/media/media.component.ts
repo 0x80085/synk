@@ -88,6 +88,10 @@ export class MediaComponent {
     return this.ref && this.ref.instance.isPlaying();
   }
 
+  getDuration() {
+    return this.ref && this.ref.instance.getDuration();
+  }
+
   private setupMediaPlayer(url: string) {
     this.isMediaSelected.next(true);
 

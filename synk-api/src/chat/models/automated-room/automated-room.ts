@@ -299,6 +299,7 @@ export class AutomatedRoom {
                 map(urls => urls.map(url => YouTubeGetID(url))),
                 mergeMap(ids => ids.map(id =>
                     this.ytService.getVideoMetaData(id).pipe(
+                        filter(it => !it.isLive),
                         map((data) => ({ url: `https://www.youtube.com/watch?v=${id}`, ...data })),
                         map(({ url, title, duration }) => new Media(url, title, duration)),
                         catchError(() => of(null))

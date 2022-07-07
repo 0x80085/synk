@@ -66,6 +66,10 @@ export class TwitchComponent implements BaseMediaComponent, AfterViewInit {
     this.channel = this.extractChannelNameFromUrl(url);
   }
 
+  getDuration(): number {
+    return this.player.getDuration();
+  }
+
   ngAfterViewInit(): void {
     this.player.addEventListener(TwitchPlayerEvent.ENDED, () => this.mediaEnded.emit());
     this.player.setChannel(this.channel);

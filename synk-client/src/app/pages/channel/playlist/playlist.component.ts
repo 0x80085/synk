@@ -14,7 +14,7 @@ interface PlaylistItem {
   title: string;
   mediaUrl: string;
   length: string;
-  addedBy?: { userId: string, username: string };
+  addedBy?: { memberId: string, username: string };
 }
 
 const SUPPORTED_MEDIA_HOSTS = [
@@ -65,9 +65,10 @@ export class PlaylistComponent implements OnDestroy, OnInit {
 
   nowPlayingSubject: Subject<PlaylistItem> = new Subject()
 
-  nowPlayingChangeEvent$ = this.mediaService.roomMediaEvent$.pipe(
+  nowPlayingUrlChangedEvent$ = this.mediaService.roomMediaEvent$.pipe(
     doLog('nowPlayingChangeEvent$', true),
-    distinctUntilChanged((current, next) => current.mediaUrl === next.mediaUrl),
+    distinctUntilChanged((current, next) => current.url === next.url),
+    tap(_ => this.votedForSkip = false)
   );
 
   loggedInUserId$ = this.auth.getUser().pipe(
@@ -76,15 +77,15 @@ export class PlaylistComponent implements OnDestroy, OnInit {
 
   private playlistUpdateEvent$ = combineLatest([
     this.mediaService.roomPlaylistUpdateEvents$,
-    this.nowPlayingChangeEvent$.pipe(startWith(null))
+    this.nowPlayingUrlChangedEvent$.pipe(startWith(null))
   ]).pipe(
     doLog(' playlistUpdateEvent$', true),
     map(([{ entries }, nowPlaying]) =>
       entries.map(entry => ({
         ...entry,
         mediaUrl: entry.url,
-        active: entry.url === nowPlaying?.mediaUrl,
-        length: new Date(entry.length * 1000).toISOString().substr(11, 8)
+        active: entry.url === nowPlaying?.url,
+        length: new Date(entry.duration * 1000).toISOString().substr(11, 8)
       }))),
     doLog('playlist update', true),
     tap(ls => {
@@ -93,7 +94,6 @@ export class PlaylistComponent implements OnDestroy, OnInit {
         this.nowPlayingSubject.next(nowPlaying)
       }
     }),
-    tap(_ => this.votedForSkip = false)
   );
 
   private playlistUpdateSubscription: Subscription = this.playlistUpdateEvent$
@@ -176,7 +176,7 @@ export class PlaylistComponent implements OnDestroy, OnInit {
     }
 
     this.mediaService.addToPlaylist({
-      mediaUrl: this.addMediaform.controls.mediaUrl.value,
+      url: this.addMediaform.controls.mediaUrl.value,
       roomName: this.roomName,
       currentTime: null
     });
@@ -188,7 +188,7 @@ export class PlaylistComponent implements OnDestroy, OnInit {
   onRemoveMedia(mediaUrl: string) {
     if (confirm(`Want to delete ${mediaUrl}?`)) {
       this.mediaService.removeFromPlaylist({
-        mediaUrl,
+        url: mediaUrl,
         roomName: this.roomName,
         currentTime: null
       });

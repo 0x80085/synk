@@ -16,8 +16,10 @@ export interface PlaylistRepresentation {
 export class MediaRepresentation {
   title: string;
   url: string;
-  length: number;
-  addedBy: { userId: string, username: string }
+  duration: number;
+  addedBy: { memberId: string, username: string };
+  isLive: boolean;
+  currentTime: number;
 }
 
 @Injectable({
@@ -31,7 +33,7 @@ export class MediaService {
     );
 
   roomMediaEvent$ = this.socketService
-    .listenForEvent<MediaEvent>(MediaCommands.MEDIA_EVENT)
+    .listenForEvent<MediaRepresentation>(MediaCommands.MEDIA_EVENT)
     .pipe(
       shareReplay(1)
     );

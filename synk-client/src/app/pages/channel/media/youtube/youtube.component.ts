@@ -90,6 +90,10 @@ export class YoutubeComponent implements BaseMediaComponent, OnInit {
     this.current = url;
   }
 
+  getDuration(): number {
+   return this.player.getDuration();
+  }
+
   onPlayerReady = event => {
     this.player = event.target;
     this.isReady = true;

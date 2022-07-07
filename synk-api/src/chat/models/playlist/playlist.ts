@@ -7,6 +7,8 @@ import { Member } from "../../../domain/entity";
 export interface PlayingState {
     media: Media;
     time: number;
+    isLive: boolean;
+    addedBy?: Member;
 }
 
 export interface UpdatePlayingStateCommand {
@@ -27,13 +29,15 @@ export class Playlist {
     queue: Queue<{ media: Media, addedBy: Member }> = new Queue();
 
     nowPlaying(): PlayingState {
-        const media = this.activeEntryIndex !== null
-            ? this.selectFromQueue(this.activeEntryIndex)?.media
+        const entry = this.activeEntryIndex !== null
+            ? this.selectFromQueue(this.activeEntryIndex)
             : null;
 
         return {
-            media,
-            time: this.currentTime
+            media: entry?.media,
+            time: this.currentTime,
+            isLive: entry?.media?.isLive ?? false,
+            addedBy: entry?.addedBy
         }
     }
 
@@ -135,7 +139,9 @@ export class Playlist {
         this.queue = new Queue(...newList);
     }
 
-    selectFromQueue(selector: Media | string | number) {
+    selectFromQueue(selector: Media | string | number): {
+        media: Media; addedBy: Member;
+    } {
         switch (typeof selector) {
             case "object":
                 if (!!selector.url)
