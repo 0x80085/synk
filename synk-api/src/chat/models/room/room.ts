@@ -240,6 +240,12 @@ export class Room {
         this.password = password;
     }
 
+    clearPlaylist(member: Member) {
+        this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.modAndAbove);
+        this.currentPlaylist.clear();
+        this.messages.post({ isSystemMessage: true, content: `${member.username} cleared the chat.`, author: { username: "" } as any })
+    }
+
     private removeMemberSkipVote(member: Member) {
         if (this.voterIds.includes(member.id)) {
             this.voterIds = this.voterIds.filter(id => id != member.id);

@@ -46,29 +46,29 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     try {
       this.tracker.trackMemberConnection(client);
 
-      client.on("server namespace disconnect", ev => {
-        console.log(ev);
-        console.log("server namespace disconnect ^^^^")
-      })
-      client.on("client namespace disconnect", ev => {
-        console.log(ev);
-        console.log("client namespace disconnect ^^^^")
-      })
+      // client.on("server namespace disconnect", ev => {
+      //   console.log(ev);
+      //   console.log("server namespace disconnect ^^^^")
+      // })
+      // client.on("client namespace disconnect", ev => {
+      //   console.log(ev);
+      //   console.log("client namespace disconnect ^^^^")
+      // })
 
-      client.on("ping timeout", ev => {
-        console.log(ev);
-        console.log("client timed out ^^^^")
-      })
+      // client.on("ping timeout", ev => {
+      //   console.log(ev);
+      //   console.log("client timed out ^^^^")
+      // })
 
-      client.on("transport close", ev => {
-        console.log(ev);
-        console.log("transport close ^^^^")
-      })
+      // client.on("transport close", ev => {
+      //   console.log(ev);
+      //   console.log("transport close ^^^^")
+      // })
 
-      client.on("transport error", ev => {
-        console.log(ev);
-        console.log("transport error ^^^^")
-      })
+      // client.on("transport error", ev => {
+      //   console.log(ev);
+      //   console.log("transport error ^^^^")
+      // })
 
     } catch (error) {
       this.logger.log(error);
@@ -325,6 +325,23 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
       tap(({ room }) => this.broadcastPlaylistToRoom(room)),
       tap(({ room }) => this.broadcastGroupMessageToRoom(room)),
       tap(_ => client.emit(MessageTypes.REMOVE_MEDIA_SUCCESS, url)),
+      catchError(e => {
+        if (e.message === 'Forbidden') { throw new WsException(MessageTypes.FORBIDDEN); }
+        throw new WsException(MessageTypes.GENERIC_ERROR);
+      })
+    )
+  }
+
+  @SubscribeMessage(MessageTypes.CLEAR_PLAYLIST)
+  async handleClearPlaylist(client: Socket, { roomName }: { roomName: string }) {
+    this.logger.log('handelClearPlaylist');
+
+    return from(this.tracker.getMemberBySocket(client)).pipe(
+      map(member => ({ member, room: this.roomService.getRoomByName(roomName) })),
+      tap(({ room, member }) => room.clearPlaylist(member)),
+      tap(({ room }) => this.broadcastPlaylistToRoom(room)),
+      tap(({ room }) => this.broadcastGroupMessageToRoom(room)),
+      tap(_ => client.emit(MessageTypes.CLEAR_PLAYLIST_SUCCESS)),
       catchError(e => {
         if (e.message === 'Forbidden') { throw new WsException(MessageTypes.FORBIDDEN); }
         throw new WsException(MessageTypes.GENERIC_ERROR);

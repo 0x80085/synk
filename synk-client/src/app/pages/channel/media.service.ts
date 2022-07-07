@@ -98,4 +98,8 @@ export class MediaService {
   reportMediaNotPlayable(ev: { roomName: string, mediaUrl: string }) {
     this.socketService.socket.emit(MediaCommands.MEDIA_NOT_PLAYBLE, ev);
   }
+
+  clearPlaylist(roomName: string) {
+    this.socketService.socket.emit(MediaCommands.CLEAR_PLAYLIST, { roomName })
+  }
 }

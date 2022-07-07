@@ -14,5 +14,7 @@ export enum MediaCommands {
   MEDIA_NOT_PLAYBLE = "media not playble",
   VOTE_SKIP_COUNT = "vote skip count",
   VOTE_SKIP = "vote skip",
-  UPDATE_VOTE_SKIP_RATIO = "update vote skip ratio"
+  UPDATE_VOTE_SKIP_RATIO = "update vote skip ratio",
+  CLEAR_PLAYLIST = "clear playlist",
+  CLEAR_PLAYLIST_SUCCESS = "clear playlist success"
 }

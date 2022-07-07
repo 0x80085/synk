@@ -202,6 +202,12 @@ export class PlaylistComponent implements OnDestroy, OnInit {
     }
   }
 
+  onClearPlaylist() {
+    if (this.isSuperAdmin || this.isOwner) {
+      this.mediaService.clearPlaylist(this.roomName);
+    }
+  }
+
   onUpdateVoteSkipRatio() {
     if (this.updateSkipRatioForm.invalid) {
       return;
