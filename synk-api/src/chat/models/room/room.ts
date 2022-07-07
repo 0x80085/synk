@@ -1,5 +1,6 @@
 import { ForbiddenException } from '@nestjs/common';
 import { MessageTypes } from 'src/chat/gateways/message-types.enum';
+import { YouTubeGetID } from 'src/tv/crawlers/youtube-v3.service';
 import { Member, Roles } from '../../../domain/entity';
 import { Feed } from '../feed/feed';
 import { Media } from '../media/media';
@@ -99,19 +100,34 @@ export class Room {
         }
     }
 
-    updateNowPlaying(member: Member, { url, time }: UpdatePlayingStateCommand): {nowPlaying: UpdatePlayingStateCommand,hasChangedMediaUrl: boolean} {
+    updateNowPlaying(member: Member, { url, time }: UpdatePlayingStateCommand): { nowPlaying: UpdatePlayingStateCommand, hasChangedMediaUrl: boolean } {
         this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.updateNowPlaying);
 
-        const isMediaUrlDifferentFromNowPlaying = this.currentPlaylist.nowPlaying().media?.url !== url;
+        const currentUrl = this.currentPlaylist.nowPlaying().media?.url;
 
+        let isMediaUrlDifferentFromNowPlaying = true;
+
+        if (currentUrl) {
+            const ytId = YouTubeGetID(currentUrl)
+            const ytIdUpdate = YouTubeGetID(url)
+            if (currentUrl !== url) {
+                isMediaUrlDifferentFromNowPlaying = true;
+            }
+            if (ytId === ytIdUpdate) {
+                isMediaUrlDifferentFromNowPlaying = false;
+            }
+        } else {
+            isMediaUrlDifferentFromNowPlaying = false;
+        }
+        
         if (isMediaUrlDifferentFromNowPlaying) {
             this.voteSkipCount = 0;
             this.voterIds = [];
         }
         return {
-            nowPlaying : this.currentPlaylist.updateNowPlaying(url, time),
+            nowPlaying: this.currentPlaylist.updateNowPlaying(url, time),
             hasChangedMediaUrl: isMediaUrlDifferentFromNowPlaying
-         };
+        };
     }
 
     addMediaToPlaylist(member: Member, media: Media) {
