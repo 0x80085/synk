@@ -51,7 +51,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     }
   }
 
-  handleDisconnect(client:  Socket) {
+  handleDisconnect(client: Socket) {
     try {
       console.log('handleDisconnect for ' + client.handshake.address);
       const memberId = (client.handshake as any).session.passport.user.id;
@@ -66,8 +66,20 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
           .filter((conn) => conn.socketId === client.id)
           .forEach(connection => {
             const room = this.roomService.getRoomById(connection.roomId);
+            const wasRoomLeader = room.leader?.id === member.id;
+
             room.leave(member);
+
+            if (wasRoomLeader) {
+              const currentLeader = room.leader;
+              if (currentLeader) {
+                const client = this.tracker.getSocketByMemberId(room.leader.id);
+                this.sendRoomConfigToMember(room, room.leader.id, client, false);
+              }
+            }
+
             this.broadcastMemberlistToRoom(room);
+
           }))
         .then(() => Object.keys(client.rooms).forEach(roomId => client.leave(roomId)))
         .then(() => this.tracker.memberDisconnects(client))
