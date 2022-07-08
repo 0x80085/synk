@@ -1,5 +1,8 @@
 export class MediaRepresentation {
     title: string;
     url: string;
-    length: number;
+    duration: number;
+    addedBy: { memberId: string, username: string };
+    isLive: boolean;
+    currentTime: number;
 }

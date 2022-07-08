@@ -16,8 +16,10 @@ export interface PlaylistRepresentation {
 export class MediaRepresentation {
   title: string;
   url: string;
-  length: number;
-  addedBy: { userId: string, username: string }
+  duration: number;
+  addedBy: { memberId: string, username: string };
+  isLive: boolean;
+  currentTime: number;
 }
 
 @Injectable({
@@ -31,7 +33,7 @@ export class MediaService {
     );
 
   roomMediaEvent$ = this.socketService
-    .listenForEvent<MediaEvent>(MediaCommands.MEDIA_EVENT)
+    .listenForEvent<MediaRepresentation>(MediaCommands.MEDIA_EVENT)
     .pipe(
       shareReplay(1)
     );
@@ -55,6 +57,8 @@ export class MediaService {
     .pipe(
       map((mediaUrl) => mediaUrl)
     );
+
+    clearPlaylistSuccessEvent$ = this.socketService.listenForEvent<unknown>(MediaCommands.CLEAR_PLAYLIST_SUCCESS);
 
   onVoteSkipCountEvent$ = this.socketService.listenForEvent<{ count: number, max: number }>(MediaCommands.VOTE_SKIP_COUNT);
 
@@ -95,5 +99,9 @@ export class MediaService {
 
   reportMediaNotPlayable(ev: { roomName: string, mediaUrl: string }) {
     this.socketService.socket.emit(MediaCommands.MEDIA_NOT_PLAYBLE, ev);
+  }
+
+  clearPlaylist(roomName: string) {
+    this.socketService.socket.emit(MediaCommands.CLEAR_PLAYLIST, { roomName })
   }
 }

@@ -6,6 +6,7 @@ export interface PlaylistRepresentation {
     name: string;
     entries: MediaRepresentation[];
     nowPlaying: MediaRepresentation;
+    isLive: boolean;
 }
 
 export function toRepresentation(list: Playlist): PlaylistRepresentation {
@@ -13,6 +14,7 @@ export function toRepresentation(list: Playlist): PlaylistRepresentation {
         id: list.id,
         name: list.name,
         entries: list.queue.toArray().map(it => it.media.toRepresentation(it.addedBy)),
-        nowPlaying: list.nowPlaying().media
+        nowPlaying: list.nowPlaying().media?.toRepresentation(),
+        isLive: list.nowPlaying().isLive
     }
 }

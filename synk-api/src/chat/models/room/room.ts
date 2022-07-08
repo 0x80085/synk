@@ -1,5 +1,6 @@
 import { ForbiddenException } from '@nestjs/common';
 import { MessageTypes } from 'src/chat/gateways/message-types.enum';
+import { YouTubeGetID } from 'src/tv/crawlers/youtube-v3.service';
 import { Member, Roles } from '../../../domain/entity';
 import { Feed } from '../feed/feed';
 import { Media } from '../media/media';
@@ -72,6 +73,7 @@ export class Room {
     leave(member: Member): Member | null {
         const toBeRemoved = this.selectFromMembers(member);
         let newLeader;
+        console.log(`LEAVE ROOM - executing for ${member.username} .`);
 
         if (toBeRemoved) {
             if (this.leader && this.leader.id == member.id) {
@@ -80,7 +82,10 @@ export class Room {
                     const elegibleMembers = this.members.filter(m => m.id !== this.leader.id)
                     newLeader = elegibleMembers[0];
                     this.replaceLeader(elegibleMembers[0])
+                    console.log(`LEAVE ROOM - ${member.username} was leader, assigned new leader ${this.leader?.username}.`);
                 } else {
+                    console.log(`LEAVE ROOM - ${member.username} was last in room, turning lights off.`);
+
                     this.removeLeader();
                     newLeader = null;
 
@@ -93,25 +98,41 @@ export class Room {
 
             this.messages.post({ author: { username: '' } as Member, content: `${member.username} left.`, isSystemMessage: true });
 
+            console.log(`LEAVE ROOM - ${member.username} removed from ${this.name}.`);
             return newLeader;
         } else {
-            console.log(`LEAVE ROOM - ${member.username} not found, not removed.`);
+            console.log(`LEAVE ROOM - ${member.username} not found, not removed from ${this.name}.`);
         }
     }
 
-    updateNowPlaying(member: Member, { url, time }: UpdatePlayingStateCommand): {nowPlaying: UpdatePlayingStateCommand,hasChangedMediaUrl: boolean} {
+    updateNowPlaying(member: Member, { url, time }: UpdatePlayingStateCommand): { nowPlaying: UpdatePlayingStateCommand, hasChangedMediaUrl: boolean } {
         this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.updateNowPlaying);
 
-        const isMediaUrlDifferentFromNowPlaying = this.currentPlaylist.nowPlaying().media?.url !== url;
+        const currentUrl = this.currentPlaylist.nowPlaying().media?.url;
 
+        let isMediaUrlDifferentFromNowPlaying = true;
+
+        if (currentUrl) {
+            const ytId = YouTubeGetID(currentUrl)
+            const ytIdUpdate = YouTubeGetID(url)
+            if (currentUrl !== url) {
+                isMediaUrlDifferentFromNowPlaying = true;
+            }
+            if (ytId === ytIdUpdate) {
+                isMediaUrlDifferentFromNowPlaying = false;
+            }
+        } else {
+            isMediaUrlDifferentFromNowPlaying = false;
+        }
+        
         if (isMediaUrlDifferentFromNowPlaying) {
             this.voteSkipCount = 0;
             this.voterIds = [];
         }
         return {
-            nowPlaying : this.currentPlaylist.updateNowPlaying(url, time),
+            nowPlaying: this.currentPlaylist.updateNowPlaying(url, time),
             hasChangedMediaUrl: isMediaUrlDifferentFromNowPlaying
-         };
+        };
     }
 
     addMediaToPlaylist(member: Member, media: Media) {
@@ -238,6 +259,12 @@ export class Room {
     update(maxUsers: number, password?: string) {
         this.maxUsers = maxUsers;
         this.password = password;
+    }
+
+    clearPlaylist(member: Member) {
+        this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.modAndAbove);
+        this.currentPlaylist.clear();
+        this.messages.post({ isSystemMessage: true, content: `${member.username} cleared the chat.`, author: { username: "" } as any })
     }
 
     private removeMemberSkipVote(member: Member) {

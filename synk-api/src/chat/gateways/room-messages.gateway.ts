@@ -17,6 +17,7 @@ import { Member, Roles } from '../../domain/entity';
 import { AutomatedRoom } from '../models/automated-room/automated-room';
 import { AddMediaToRoomCommand } from '../models/commands/add-media-to-room.command';
 import { Media } from '../models/media/media';
+import { MediaRepresentation } from '../models/media/media.representation';
 import { getMemberSummary } from '../models/member/member.representation';
 import { toRepresentation } from '../models/playlist/playlist.representation';
 import { Room } from '../models/room/room';
@@ -41,9 +42,34 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     private commandBus: CommandBus,
   ) { }
 
-  handleConnection(client:  Socket) {
+  handleConnection(client: Socket) {
     try {
       this.tracker.trackMemberConnection(client);
+
+      // client.on("server namespace disconnect", ev => {
+      //   console.log(ev);
+      //   console.log("server namespace disconnect ^^^^")
+      // })
+      // client.on("client namespace disconnect", ev => {
+      //   console.log(ev);
+      //   console.log("client namespace disconnect ^^^^")
+      // })
+
+      // client.on("ping timeout", ev => {
+      //   console.log(ev);
+      //   console.log("client timed out ^^^^")
+      // })
+
+      // client.on("transport close", ev => {
+      //   console.log(ev);
+      //   console.log("transport close ^^^^")
+      // })
+
+      // client.on("transport error", ev => {
+      //   console.log(ev);
+      //   console.log("transport error ^^^^")
+      // })
+
     } catch (error) {
       this.logger.log(error);
       this.logger.log(`^^^ Failed to handleConnection from [${this.tracker.getIpFromSocket(client)}]`);
@@ -51,7 +77,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     }
   }
 
-  handleDisconnect(client:  Socket) {
+  handleDisconnect(client: Socket) {
     try {
       console.log('handleDisconnect for ' + client.handshake.address);
       const memberId = (client.handshake as any).session.passport.user.id;
@@ -65,9 +91,23 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
         }[])
           .filter((conn) => conn.socketId === client.id)
           .forEach(connection => {
-            this.roomService.leaveRoom(connection.roomId, member)
+            const room = this.roomService.getRoomById(connection.roomId);
+            const wasRoomLeader = room.leader?.id === member.id;
+
+            room.leave(member);
+
+            if (wasRoomLeader) {
+              const currentLeader = room.leader;
+              if (currentLeader) {
+                const client = this.tracker.getSocketByMemberId(room.leader.id);
+                this.sendRoomConfigToMember(room, room.leader.id, client, false);
+              }
+            }
+
+            this.broadcastMemberlistToRoom(room);
+
           }))
-        .then(() => Object.keys(client.rooms).forEach(roomId => client.leave(roomId))) // todo: test change from leaveAll()
+        .then(() => Object.keys(client.rooms).forEach(roomId => client.leave(roomId)))
         .then(() => this.tracker.memberDisconnects(client))
         .catch(console.log)
 
@@ -77,7 +117,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   // eslint-disable-next-line unused-imports/no-unused-vars
-  afterInit(server:  Server) {
+  afterInit(server: Server) {
     this.logger.log('WS server started');
     this.logger.log('Now starting the automated room nowPlaying subscriptions..');
     this.listenForAutomatedRoomUpdates();
@@ -104,14 +144,19 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   @SubscribeMessage(MessageTypes.MEDIA_EVENT)
-  async handleUpdateNowPlaying(client:  Socket, { roomName, currentTime: time, mediaUrl: url }: { roomName: string, mediaUrl: string, currentTime: any }) {
+  async handleUpdateNowPlaying(client: Socket, { roomName, currentTime: time, url: url }: {
+    url: string;
+    currentTime: number;
+    roomName: string;
+    isLive?: boolean
+  }) {
     const room = this.roomService.getRoomByName(roomName);
     const member = await this.tracker.getMemberBySocket(client);
 
     const { hasChangedMediaUrl } = room.updateNowPlaying(member, { time, url });
 
     if (hasChangedMediaUrl) {
-      
+
       this.broadcastVoteSkipResultsToRoom(room);
     }
     this.broadcastNowPlayingToRoom(room);
@@ -119,7 +164,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   @SubscribeMessage(MessageTypes.JOIN_ROOM)
-  async handleJoinRoom(client:  Socket, name: string) {
+  async handleJoinRoom(client: Socket, name: string) {
 
     const automatedRoom = this.roomService.getAutomatedRoom(name);
 
@@ -170,7 +215,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   @SubscribeMessage(MessageTypes.EXIT_ROOM)
-  async handleLeaveRoom(client:  Socket, name: string) {
+  async handleLeaveRoom(client: Socket, name: string) {
     this.logger.log('handleLeaveRoom');
 
     const member = await this.tracker.getMemberBySocket(client)
@@ -186,7 +231,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   @SubscribeMessage(MessageTypes.VOTE_SKIP)
-  async handleVoteSkip(client:  Socket, name: string) {
+  async handleVoteSkip(client: Socket, name: string) {
     this.logger.log('handleVoteSkip');
 
     const member = await this.tracker.getMemberBySocket(client);
@@ -225,7 +270,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   // }
 
   @SubscribeMessage(MessageTypes.GIVE_LEADER)
-  async handleGiveLeader(requestingMemberSocket:  Socket, { to, roomName }: { to: string, roomName: string }) {
+  async handleGiveLeader(requestingMemberSocket: Socket, { to, roomName }: { to: string, roomName: string }) {
     this.logger.log('handleGiveLeader');
 
     try {
@@ -256,13 +301,13 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   @SubscribeMessage(MessageTypes.ADD_MEDIA)
-  handleAddMedia(client:  Socket, { roomName, mediaUrl }: { roomName: string, mediaUrl: string }) {
+  handleAddMedia(client: Socket, { roomName, url }: { roomName: string, url: string }) {
     this.logger.log('handleAddMedia');
 
     return from(this.tracker.getMemberBySocket(client)).pipe(
       map(member => ({ member, room: this.roomService.getRoomByName(roomName) })),
       switchMap(({ member, room }) =>
-        from(this.commandBus.execute<AddMediaToRoomCommand>(new AddMediaToRoomCommand(mediaUrl, member, room, client, this.server))).pipe(
+        from(this.commandBus.execute<AddMediaToRoomCommand>(new AddMediaToRoomCommand(url, member, room, client, this.server))).pipe(
           tap(({ room }) => this.broadcastGroupMessageToRoom(room)),
           catchError(e => {
             throw new WsException(e.message);
@@ -271,15 +316,32 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   @SubscribeMessage(MessageTypes.REMOVE_MEDIA)
-  async handleRemoveMedia(client:  Socket, { roomName, mediaUrl }: { roomName: string, mediaUrl: string }) {
+  async handleRemoveMedia(client: Socket, { roomName, url }: { roomName: string, url: string }) {
     this.logger.log('handelRemoveMedia');
 
     return from(this.tracker.getMemberBySocket(client)).pipe(
       map(member => ({ member, room: this.roomService.getAutomatedRoom(roomName) || this.roomService.getRoomByName(roomName) })),
-      tap(({ room, member }) => room.removeMediaFromPlaylist(member, mediaUrl)),
+      tap(({ room, member }) => room.removeMediaFromPlaylist(member, url)),
       tap(({ room }) => this.broadcastPlaylistToRoom(room)),
       tap(({ room }) => this.broadcastGroupMessageToRoom(room)),
-      tap(_ => client.emit(MessageTypes.REMOVE_MEDIA_SUCCESS, mediaUrl)),
+      tap(_ => client.emit(MessageTypes.REMOVE_MEDIA_SUCCESS, url)),
+      catchError(e => {
+        if (e.message === 'Forbidden') { throw new WsException(MessageTypes.FORBIDDEN); }
+        throw new WsException(MessageTypes.GENERIC_ERROR);
+      })
+    )
+  }
+
+  @SubscribeMessage(MessageTypes.CLEAR_PLAYLIST)
+  async handleClearPlaylist(client: Socket, { roomName }: { roomName: string }) {
+    this.logger.log('handelClearPlaylist');
+
+    return from(this.tracker.getMemberBySocket(client)).pipe(
+      map(member => ({ member, room: this.roomService.getRoomByName(roomName) })),
+      tap(({ room, member }) => room.clearPlaylist(member)),
+      tap(({ room }) => this.broadcastPlaylistToRoom(room)),
+      tap(({ room }) => this.broadcastGroupMessageToRoom(room)),
+      tap(_ => client.emit(MessageTypes.CLEAR_PLAYLIST_SUCCESS)),
       catchError(e => {
         if (e.message === 'Forbidden') { throw new WsException(MessageTypes.FORBIDDEN); }
         throw new WsException(MessageTypes.GENERIC_ERROR);
@@ -288,15 +350,15 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   @SubscribeMessage(MessageTypes.CHANGE_MEDIA_POSITION_IN_LIST)
-  async handleChangeMediaPositionInList(client:  Socket, { roomName, mediaUrl, newPosition }: { roomName: string, mediaUrl: string, newPosition: number }) {
+  async handleChangeMediaPositionInList(client: Socket, { roomName, url, newPosition }: { roomName: string, url: string, newPosition: number }) {
     this.logger.log('handleChangeMediaPositionInList');
 
     return from(this.tracker.getMemberBySocket(client)).pipe(
       map(member => ({ member, room: this.roomService.getRoomByName(roomName) })),
-      tap(({ room, member }) => room.moveMediaPositionInPlaylist(member, mediaUrl, newPosition)),
+      tap(({ room, member }) => room.moveMediaPositionInPlaylist(member, url, newPosition)),
       tap(({ room }) => this.broadcastPlaylistToRoom(room)),
       tap(({ room }) => this.broadcastGroupMessageToRoom(room)),
-      tap(_ => client.emit(MessageTypes.REPOSITION_MEDIA_SUCCESS, mediaUrl)),
+      tap(_ => client.emit(MessageTypes.REPOSITION_MEDIA_SUCCESS, url)),
       catchError(e => {
         if (e.message === 'Forbidden') { throw new WsException(MessageTypes.FORBIDDEN); }
         throw new WsException(MessageTypes.GENERIC_ERROR);
@@ -305,7 +367,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   @SubscribeMessage(MessageTypes.MEDIA_NOT_PLAYBLE)
-  async handleVideoNotPlayable(client:  Socket, { roomName, mediaUrl }: { roomName: string, mediaUrl: string }) {
+  async handleVideoNotPlayable(client: Socket, { roomName, url }: { roomName: string, url: string }) {
     this.logger.log('handleVideoNotPlayable');
 
     return from(this.tracker.getMemberBySocket(client)).pipe(
@@ -317,8 +379,8 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
         })),
       map(({ room, automatedroom }) => ({
         target: room
-          ? room.currentPlaylist?.selectFromQueue(mediaUrl)
-          : automatedroom?.currentPlaylist?.selectFromQueue(mediaUrl),
+          ? room.currentPlaylist?.selectFromQueue(url)
+          : automatedroom?.currentPlaylist?.selectFromQueue(url),
         room,
         automatedroom
       })),
@@ -331,7 +393,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
         room
           ? this.broadcastPlaylistToRoom(room)
           : this.broadcastPlaylistToRoom(automatedroom)),
-      tap(_ => client.emit(MessageTypes.REMOVE_MEDIA_SUCCESS, mediaUrl)),
+      tap(_ => client.emit(MessageTypes.REMOVE_MEDIA_SUCCESS, url)),
       catchError(e => {
         if (e.message === 'Forbidden') { throw new WsException(MessageTypes.FORBIDDEN); }
         throw new WsException(MessageTypes.GENERIC_ERROR);
@@ -361,10 +423,9 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   private broadcastNowPlayingToRoom(room: Room) {
-    const mediaEvent = {
-      mediaUrl: room.currentPlaylist.nowPlaying()?.media?.url,
-      currentTime: room.currentPlaylist.nowPlaying().time
-    }
+    const nowPlaying = room.currentPlaylist.nowPlaying();
+    const mediaEvent: MediaRepresentation = nowPlaying?.media?.toRepresentation(nowPlaying?.addedBy, nowPlaying?.time);
+
     this.server.in(room.id).emit(MessageTypes.MEDIA_EVENT, mediaEvent);
   }
 
@@ -372,7 +433,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     this.server.in(room.id).emit(MessageTypes.VOTE_SKIP_COUNT, { count: room.voteSkipCount, max: room.votesNeededForSkip });
   }
 
-  private sendRoomConfigToMember(room: Room | AutomatedRoom, memberId: string, client:  Socket, isAutomatedChannel = false) {
+  private sendRoomConfigToMember(room: Room | AutomatedRoom, memberId: string, client: Socket, isAutomatedChannel = false) {
 
     if (isAutomatedChannel) {
       client.emit(MessageTypes.USER_CONFIG, {
@@ -403,7 +464,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
 
   }
 
-  private sendPlaylistToMember(room: Room | AutomatedRoom, client:  Socket) {
+  private sendPlaylistToMember(room: Room | AutomatedRoom, client: Socket) {
     const playlist = toRepresentation(room.currentPlaylist);
     client.emit(MessageTypes.PLAYLIST_UPDATE, playlist);
   }
@@ -418,14 +479,11 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   private broadcastNowPlayingToAutonomousRoom(roomId: string, { media, time }: { media: Media; time: number; }): void {
-    const mediaEvent = {
-      mediaUrl: media.url,
-      currentTime: time
-    }
+    const mediaEvent = media.toRepresentation(null, time);
     this.server.in(roomId).emit(MessageTypes.MEDIA_EVENT, mediaEvent);
   }
 
-  private leaveCommunityRoom(name: string, client:  Socket, member: Member) {
+  private leaveCommunityRoom(name: string, client: Socket, member: Member) {
     const room = this.roomService.getRoomByName(name);
 
     if (this.tracker.isClientInRoom(client, room.id)) {
@@ -447,7 +505,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     }
   }
 
-  private leaveAutomatedRoom(client:  Socket, automatedRoom: AutomatedRoom, member: Member) {
+  private leaveAutomatedRoom(client: Socket, automatedRoom: AutomatedRoom, member: Member) {
     if (this.tracker.isClientInRoom(client, automatedRoom.id)) {
 
       automatedRoom.leave(member);
@@ -464,7 +522,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     }
   }
 
-  private joinCommunityRoom(room: Room, member: Member, client:  Socket) {
+  private joinCommunityRoom(room: Room, member: Member, client: Socket) {
     room.enter(member);
     client.join(room.id);
 
@@ -480,7 +538,7 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
     this.logger.log(`[${member.username}] joined [${room.name}]`)
   }
 
-  private joinAutomatedRoom(automatedRoom: AutomatedRoom, member: Member, client:  Socket) {
+  private joinAutomatedRoom(automatedRoom: AutomatedRoom, member: Member, client: Socket) {
     automatedRoom.enter(member);
     client.join(automatedRoom.id);
 

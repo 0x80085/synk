@@ -31,5 +31,7 @@ export enum MessageTypes {
   REPOSITION_MEDIA_SUCCESS = "reposition media success",
   MEDIA_NOT_PLAYBLE = "media not playble",
   REFUSE_JOIN_ROOM_FULL = "refuse join room full",
-  UPDATE_VOTE_SKIP_RATIO = "update vote skip ratio"
+  UPDATE_VOTE_SKIP_RATIO = "update vote skip ratio",
+  CLEAR_PLAYLIST = "clear playlist",
+  CLEAR_PLAYLIST_SUCCESS = "clear playlist success"
 }

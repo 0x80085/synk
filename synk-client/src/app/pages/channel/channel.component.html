@@ -26,7 +26,7 @@
       <app-media
         *ngIf="playlist$ | async"
         #player
-        (mediaEndedEvent)="onMediaEnded()"
+        (mediaEndedEvent)="mediaEndedSubject.next(null)"
         (mediaNotPlayble)="onMediaNotPlayble($event)"
       ></app-media>
     </div>

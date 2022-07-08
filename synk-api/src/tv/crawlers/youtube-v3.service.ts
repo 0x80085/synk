@@ -1,6 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { map } from 'rxjs/operators';  
+import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+
+export interface YoutubeMetadata {
+    id: string;
+    type: string;
+    title: any;
+    duration: number;
+    isLive: boolean;
+    meta: {
+        thumbnail: any;
+        etag: any;
+        blocked: boolean;
+        allowed: boolean;
+    };
+}
 
 @Injectable()
 export class YoutubeV3Service {
@@ -10,10 +25,10 @@ export class YoutubeV3Service {
     /**
      * 
      * @param id youtube video id 
-     * @returns metadata of YT video if found
+     * @returns Observable of metadata of YT video if found
      * (code taken from cytube thx guise :3)
      */
-    getVideoMetaData(id: string) {
+    getVideoMetaData(id: string): Observable<YoutubeMetadata> {
         const API_KEY = process.env.YT_V3_API_KEY;
 
         if (!API_KEY) {
@@ -98,11 +113,15 @@ export class YoutubeV3Service {
                         throw new Error(`This video is not available (status=${video.status.uploadStatus})`);
                 }
 
+                const durationInSeconds = parseToSeconds(video.contentDetails.duration);
+                const isLive = video.snippet.liveBroadcastContent === 'live' && durationInSeconds === 0;
+
                 const data = {
                     id,
                     type: 'youtube',
                     title: video.snippet.title,
-                    duration: parseToSeconds(video.contentDetails.duration),
+                    duration: durationInSeconds,
+                    isLive,
                     meta: {
                         thumbnail: video.snippet.thumbnails.default.url,
                         etag: result.etag,
@@ -149,7 +168,7 @@ export function YouTubeGetID(url: string) {
 }
 
 function parseToSeconds(duration: any) {
-    
+
     const durationScale: [RegExp, number][] = [
         [/(\d+)D/, 24 * 3600],
         [/(\d+)H/, 3600],

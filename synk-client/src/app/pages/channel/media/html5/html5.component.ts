@@ -17,6 +17,7 @@ import { BaseMediaComponent } from '../base-media.component';
 export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDestroy {
 
   constructor() { }
+
   @ViewChild("video", { static: false }) private video: ElementRef;
 
   src: string;
@@ -60,6 +61,11 @@ export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDest
   }
   getCurrentUrl(): string {
     return this.src;
+  }
+
+  getDuration(): number {
+    const player = this.video.nativeElement as HTMLVideoElement;
+    return player.duration;
   }
 
   ngAfterViewInit(): void {

@@ -10,9 +10,10 @@ export interface RoomMessage {
 }
 
 export interface MediaEvent {
-  mediaUrl: string;
+  url: string;
   currentTime: number;
   roomName: string;
+  isLive?: boolean
 }
 
 export enum Roles {

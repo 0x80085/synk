@@ -1,17 +1,17 @@
 import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { BehaviorSubject, combineLatest, merge, noop, Observable, of, Subscription, timer } from 'rxjs';
-import { mapTo, shareReplay, startWith, switchMap, take, tap } from 'rxjs/operators';
+import { BehaviorSubject, merge, noop, Observable, of, Subject, Subscription, timer } from 'rxjs';
+import { map, shareReplay, startWith, switchMap, tap, withLatestFrom } from 'rxjs/operators';
 import { debugLog } from 'src/app/utils/custom.operators';
 
 
 import { AppStateService } from '../../app-state.service';
 import { SocketService } from '../../socket.service';
 import { ChatService } from './chat.service';
-import { MediaService, PlaylistRepresentation } from './media.service';
+import { MediaRepresentation, MediaService, PlaylistRepresentation } from './media.service';
 import { MediaComponent } from './media/media.component';
-import { MediaEvent, RoomUser, RoomUserConfig } from './models/room.models';
+import { RoomUser, RoomUserConfig } from './models/room.models';
 
 @Component({
   selector: 'app-channel',
@@ -26,15 +26,20 @@ export class ChannelComponent implements OnInit, OnDestroy {
 
   loggedInUserIsLeader = false;
 
-  activeItemSubject: BehaviorSubject<string> = new BehaviorSubject(null);
-  activeItem$ = this.activeItemSubject.pipe(shareReplay(1));
+  activeItemSubject: BehaviorSubject<MediaRepresentation> = new BehaviorSubject(null);
+  activeItem$: Observable<MediaRepresentation> = this.activeItemSubject.pipe(
+    shareReplay(1)
+  );
+
+  mediaEndedSubject = new Subject();
+
 
   isConnected$ = merge(this.socketService.isConnected$, this.state.isLoggedIn$);
   isSuperAdmin$ = this.state.isAdmin$;
 
   isLoading$ = merge(
-    this.socketService.reconnectionError$.pipe(mapTo(true)),
-    this.isConnected$.pipe(mapTo(false)),
+    this.socketService.reconnectionError$.pipe(map(() => true)),
+    this.isConnected$.pipe(map(() => false)),
   ).pipe(startWith(false));
 
   members$: Observable<RoomUser[]> = this.chatService.roomUserList$;
@@ -44,15 +49,44 @@ export class ChannelComponent implements OnInit, OnDestroy {
   roomUserConfig$: Observable<RoomUserConfig> = this.chatService.roomUserConfig$.pipe(shareReplay(1))
 
   alreadyJoinedRoomError$ = this.chatService.alreadyJoinedRoomError$;
-  roomFullRoomError$ = this.chatService.roomMaxMemberLimitReachedError$; // todo show feedback in HTML, user wont be joined, i hope
+  roomFullRoomError$ = this.chatService.roomMaxMemberLimitReachedError$; // todo show feedback
 
-  mediaUpdateTimerSubscription: Subscription = timer(1000, 2000).subscribe(() => {
-    debugLog(`hasplayer? ${!!this.player?.ref}` ,)
-    if (this.loggedInUserIsLeader && this.player?.ref) {
-      debugLog('mediaUpdateTimerSubscription going to sendMediaUpdate')
-      this.sendMediaUpdate();
-    }
-  });
+  mediaUpdateTimerSubscription: Subscription = timer(1000, 2000)
+    .pipe(
+      withLatestFrom(this.activeItem$),
+      tap(([, media]) => console.log('media update', media)),
+      tap(([, media]) => {
+        debugLog(`hasplayer? ${!!this.player?.ref}`,)
+        if (this.loggedInUserIsLeader && this.player?.ref) {
+          debugLog('mediaUpdateTimerSubscription going to sendMediaUpdate')
+          this.sendMediaUpdate(media);
+        }
+      }),
+    )
+    .subscribe();
+
+  mediaEndedSubscription: Subscription = this.mediaEndedSubject
+    .pipe(
+      withLatestFrom(this.playlist$),
+      tap(([, { entries }]) => {
+        try {
+          console.log('onMediaEnded()');
+          const nowPlayingUrl = this.player.getCurrentUrl();
+          
+          const i = entries.findIndex(entry => entry.url === nowPlayingUrl);
+          const next = entries[i + 1] || entries[0];
+
+          console.log('next', next);
+          this.activeItemSubject.next(next);
+
+          this.player.play(next.url);
+
+        } catch (error) {
+
+        }
+      })
+    )
+    .subscribe();
 
   mediaSyncEventSubscription = this.mediaService.roomMediaEvent$.pipe(
     switchMap((event) =>
@@ -69,8 +103,8 @@ export class ChannelComponent implements OnInit, OnDestroy {
   });
 
   isUserLeaderFeedbackSubscription = merge(
-    this.chatService.userBecameLeader$.pipe(mapTo(true)),
-    this.chatService.userPassedOnLeader$.pipe(mapTo(false))
+    this.chatService.userBecameLeader$.pipe(map(() => true)),
+    this.chatService.userPassedOnLeader$.pipe(map(() => false))
   ).pipe(
     tap(isLeader => {
       this.loggedInUserIsLeader = isLeader;
@@ -107,19 +141,6 @@ export class ChannelComponent implements OnInit, OnDestroy {
     this.name = this.route.snapshot.paramMap.get('name');
   }
 
-  onMediaEnded() {
-    combineLatest([this.activeItem$, this.playlist$])
-      .pipe(take(1)) // if needed - maybe not
-      .subscribe(([nowPlayingUrl, { entries }]) => {
-        const i = entries.findIndex(entry => entry.url === nowPlayingUrl);
-        const next = entries[i + 1] || entries[0];
-
-        this.activeItemSubject.next(next.url);
-
-        this.player.play(next.url);
-      });
-  }
-
   onMediaNotPlayble(url: string) {
     this.mediaService.reportMediaNotPlayable({ roomName: this.name, mediaUrl: url })
   }
@@ -129,7 +150,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
     this.chatService.giveLeader({ member, roomName: this.name });
   }
 
-  private sendMediaUpdate() {
+  private sendMediaUpdate(media: MediaRepresentation) {
     try {
       const isPaused = !this.player.isPlaying();
       const mediaUrl = this.player.getCurrentUrl();
@@ -137,11 +158,18 @@ export class ChannelComponent implements OnInit, OnDestroy {
         // Dont update when leader paused video.
         return;
       }
-      this.activeItemSubject.next(mediaUrl);
+
+      const normalizedCurrentTime = media?.isLive
+        ? 0
+        : this.player.getCurrentTime();
+
+      this.activeItemSubject.next(media);
+
       this.mediaService.sendMediaEvent({
-        mediaUrl,
-        currentTime: this.player.getCurrentTime(),
-        roomName: this.name
+        url: mediaUrl,
+        currentTime: normalizedCurrentTime,
+        roomName: this.name,
+
       });
     } catch (error) {
       console.log(error);
@@ -150,10 +178,11 @@ export class ChannelComponent implements OnInit, OnDestroy {
   }
 
   private timeOfLatestAttemptAtPlayerLaunch = new Date();
-  private syncPlayer({ currentTime, mediaUrl }: MediaEvent, nowPlayingUrl: string) {
+  private syncPlayer(media: MediaRepresentation, nowPlayingUrl: string) {
+    const { currentTime, url } = media;
     let didSync = false
     try {
-      const isUrlOutOfSync = nowPlayingUrl !== mediaUrl;
+      const isUrlOutOfSync = nowPlayingUrl !== url;
       const isTimeOutOfSync = this.isCurrentTimeOutOfSync(currentTime);
       const isPlaying = this.player.isPlaying();
       const wasLastLaunchTwoSecondsAgo = (new Date().getTime() - this.timeOfLatestAttemptAtPlayerLaunch.getTime()) >= 2000;
@@ -163,7 +192,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
           this.timeOfLatestAttemptAtPlayerLaunch = new Date();
           debugLog('!isPlaying, player.play');
 
-          this.player.play(mediaUrl);
+          this.player.play(url);
 
           didSync = true;
 
@@ -171,8 +200,8 @@ export class ChannelComponent implements OnInit, OnDestroy {
           this.timeOfLatestAttemptAtPlayerLaunch = new Date();
           debugLog('isUrlOutOfSync, player.play');
 
-          this.player.play(mediaUrl)
-          this.activeItemSubject.next(mediaUrl);
+          this.player.play(url)
+          this.activeItemSubject.next(media);
 
           didSync = true;
         } else if (isTimeOutOfSync) {

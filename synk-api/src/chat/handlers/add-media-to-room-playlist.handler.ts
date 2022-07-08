@@ -79,7 +79,7 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
     private getMetadataFromYoutubeApi(id: string) {
         return this.ytService.getVideoMetaData(id).pipe(
             map((data) => ({ url: `https://www.youtube.com/watch?v=${id}`, ...data })),
-            map(({ url, title, duration }) => new Media(url, title, duration)),
+            map(({ url, title, duration, isLive }) => new Media(url, title, duration, isLive)),
             catchError((e) => {
                 console.log(e);
                 throw new Error("AddMediaException");
