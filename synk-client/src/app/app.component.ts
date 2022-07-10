@@ -3,6 +3,7 @@ import { AppStateService } from './app-state.service';
 import { map, withLatestFrom } from 'rxjs/operators';
 import { SocketService } from './socket.service';
 import { AuthService } from './pages/account/auth.service';
+import { NavigationEnd, Router, RouterEvent } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -28,7 +29,15 @@ export class AppComponent {
   constructor(
     private auth: AuthService,
     private state: AppStateService,
-    private socketService: SocketService
-  ) { }
+    private socketService: SocketService,
+    private router: Router
+  ) {
+    this.router.events.subscribe((event: RouterEvent) => {
+      if (event instanceof NavigationEnd) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+
+  }
 
 }
