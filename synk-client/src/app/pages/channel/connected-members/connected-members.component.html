@@ -3,7 +3,7 @@
 
 <ng-template #notIsLeader>
 
-  <nz-list [nzBordered]="(members$  | async)" nzSize="small" [nzLoading]="(members$  | async) === undefined"
+  <nz-list [nzBordered]="(members$  | async)" nzSize="small" [nzLoading]="(members$  | async) === null"
   [nzDataSource]="members$ | async" [nzRenderItem]="member" [nzNoResult]="'No items'">
   
   <ng-template #member let-member>
@@ -28,7 +28,7 @@
 
 <ng-template #isLeader>
 
-  <nz-list [nzBordered]="(members$  | async)" nzSize="small" [nzLoading]="(members$  | async) === undefined"
+  <nz-list [nzBordered]="(members$  | async)" nzSize="small" [nzLoading]="(members$  | async) === null"
   [nzDataSource]="members$ | async" [nzRenderItem]="member" [nzNoResult]="'No items'">
   
   <ng-template #member let-member>
