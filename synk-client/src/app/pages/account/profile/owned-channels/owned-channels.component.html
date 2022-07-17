@@ -1,10 +1,7 @@
 <h2 nz-typography>Channels</h2>
 <nz-card [nzLoading]="(channels$ | async) === null">
-  <nz-empty
-    *ngIf="(channels$ | async)?.length === 0"
-    [nzNotFoundImage]="channelListEmpty"
-    nzNotFoundContent="It's empty in here..."
-  >
+  <nz-empty *ngIf="(channels$ | async)?.length === 0" [nzNotFoundImage]="channelListEmpty"
+    nzNotFoundContent="It's empty in here...">
   </nz-empty>
 
   <ng-template #channelListEmpty>
@@ -13,32 +10,106 @@
 
   <nz-collapse *ngIf="(channels$ | async)?.length > 0" [formGroup]="form">
     <ng-container formArrayName="channels">
-      <nz-collapse-panel
-        *ngFor="let channel of channels$ | async; let i = index"
-        [nzHeader]="channel.name"
-        [nzExtra]="actions"
-        [nzExpandedIcon]="expandIcon"
-      >
-      <ng-template #expandIcon>
-        <i nz-icon style="margin-right: 20px;" nzType="video-camera"></i>
-      </ng-template>
-        <form
-          nz-form
-          [formGroup]="channelForms.controls[i]"
-          (ngSubmit)="updateChannel(channel.id, channelForms.controls[i])"
-        >
+      <nz-collapse-panel *ngFor="let channel of channels$ | async; let i = index" [nzHeader]="channel.name"
+        [nzExtra]="actions" [nzExpandedIcon]="expandIcon">
+        <ng-template #expandIcon>
+          <i nz-icon style="margin-right: 20px;" nzType="video-camera"></i>
+        </ng-template>
+        <form nz-form [formGroup]="channelForms.controls[i]"
+          (ngSubmit)="updateChannel(channel.id, channelForms.controls[i])">
+
+          <!--  -->
+          <div nz-row [nzGutter]="[0, 8]">
+            <div nz-col [nzLg]="{ span: 12, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }"
+              [nzXs]="{ span: 24, offset: 0 }">
+              Description
+            </div>
+            <div nz-col [nzLg]="{ span: 12, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }"
+              [nzXs]="{ span: 24, offset: 0 }">
+              <nz-form-item style="margin-bottom: 0;">
+                <nz-form-control nzErrorTip="Please input a valid description">
+                  <input type="text" nz-input placeholder="description" formControlName="description" />
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          <nz-divider></nz-divider>
+          <div nz-row [nzGutter]="[0, 8]">
+            <div nz-col [nzLg]="{ span: 12, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }"
+              [nzXs]="{ span: 24, offset: 0 }">
+              Public 
+            </div>
+            <div nz-col [nzLg]="{ span: 12, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }"
+              [nzXs]="{ span: 24, offset: 0 }">
+              <nz-form-item style="margin-bottom: 0;">
+                <nz-form-control>
+                  <nz-input-group>
+                    <label nz-checkbox formControlName="isPublic">
+                      List channel on home page?
+                    </label>
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+          
+          <nz-divider></nz-divider>
+          <div nz-row [nzGutter]="[0, 8]">
+            <div nz-col [nzLg]="{ span: 12, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }"
+              [nzXs]="{ span: 24, offset: 0 }">
+              Date created
+            </div>
+            <div nz-col [nzLg]="{ span: 12, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }"
+              [nzXs]="{ span: 24, offset: 0 }">
+              {{ channel.dateCreated | date }}
+            </div>
+          </div>
+      
+          <nz-divider></nz-divider>
+          <div nz-row [nzGutter]="[0, 8]">
+            <div nz-col [nzLg]="{ span: 12, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }"
+              [nzXs]="{ span: 24, offset: 0 }">
+              Current viewer count
+            </div>
+            <div nz-col [nzLg]="{ span: 12, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }"
+              [nzXs]="{ span: 24, offset: 0 }">
+              {{ channel.connectedMemberCount }}
+            </div>
+          </div>
+
+                
+          <nz-divider></nz-divider>
+          <div nz-row [nzGutter]="[0, 8]">
+            <div nz-col [nzLg]="{ span: 12, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }"
+              [nzXs]="{ span: 24, offset: 0 }">
+              Now playing
+            </div>
+            <div nz-col [nzLg]="{ span: 12, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }"
+              [nzXs]="{ span: 24, offset: 0 }">
+              {{ channel.nowPlaying?.title || "nothing playing" }}
+            </div>
+          </div>
+
+          <nz-divider></nz-divider>
+          <div nz-row [nzGutter]="[0, 8]">
+            <div nz-col [nzLg]="{ span: 12, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }"
+              [nzXs]="{ span: 24, offset: 0 }">
+              <button nz-button nzType="primary" type="submit" style="margin-top: 1rem;">
+                Save changes
+              </button>
+            </div>
+          </div>
+
+          <!--  -->
+
+<!-- 
           <nz-table [nzData]="[channel]" [nzShowPagination]="false">
             <tr>
               <th>description</th>
               <td>
                 <nz-form-item style="margin-bottom: 0;">
                   <nz-form-control nzErrorTip="Please input a valid description">
-                    <input
-                      type="text"
-                      nz-input
-                      placeholder="description"
-                      formControlName="description"
-                    />
+                    <input type="text" nz-input placeholder="description" formControlName="description" />
                   </nz-form-control>
                 </nz-form-item>
               </td>
@@ -72,27 +143,19 @@
           </nz-table>
           <button nz-button nzType="primary" type="submit" style="margin-top: 1rem;">
             Save changes
-          </button>
+          </button> -->
+        
+        
+        
         </form>
 
         <ng-template #actions>
-          <a
-            nz-button
-            nzType="link"
-            nz-tooltip
-            nzTooltipTitle="Go to channel"
-            [routerLink]="['/channel', channel.name]"
-          >
+          <a nz-button nzType="link" nz-tooltip nzTooltipTitle="Go to channel"
+            [routerLink]="['/channel', channel.name]">
             <i nz-icon nzType="login"></i>
           </a>
-          <a
-            nz-button
-            nzDanger
-            nzType="link"
-            nz-tooltip
-            nzTooltipTitle="Delete this channel"
-            (click)="deleteChannel(channel, $event)"
-          >
+          <a nz-button nzDanger nzType="link" nz-tooltip nzTooltipTitle="Delete this channel"
+            (click)="deleteChannel(channel, $event)">
             <i nz-icon nzTheme="fill" nzType="delete"></i>
           </a>
         </ng-template>
