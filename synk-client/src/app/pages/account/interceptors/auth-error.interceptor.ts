@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
+import { debugLog } from 'src/app/utils/custom.operators';
 import { AuthService } from '../auth.service';
 
 export class ApiError {
@@ -45,6 +46,7 @@ export class RequestLogInterceptor implements HttpInterceptor {
           tap(err => {
 
             if (suppressFeedback) {
+              debugLog('suppressed error', err, true);
               return;
             }
 
@@ -62,7 +64,13 @@ export class RequestLogInterceptor implements HttpInterceptor {
                 this.notification.error(`Something went wrong...`, `Here's some tea 🍵`);
                 break;
               default:
-                this.notification.error(apiError.error.error, apiError.error.message,)
+                if (err.status === 0 || !err.status) {                
+                  const title = apiError?.error?.error ||  "Communication error";
+                  const msg = apiError?.error?.message || "Are you connected to the internet?";
+                  this.notification.error(title, msg);
+                  break;
+                }
+                debugLog('RequestLogInterceptor was not sure what to do.')
                 break;
             }
 
