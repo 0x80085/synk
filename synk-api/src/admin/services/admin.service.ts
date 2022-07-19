@@ -29,15 +29,9 @@ export class AdminService {
         const clients: any[] = [];
 
         [...this.trackingService.clients]
-            .map(([ip, value]) => ({ ip, value: value.map(v => ({ socketId: v.client.id, memberId: v.memberId })) }))
-            .map(({ ip, value }) => {
-                value.forEach(it => {
-                    clients.push({ ip, ...it })
-                })
-            });
+            .map(([, value]) => ({ value: value.map(v => ({ socketId: v.client.id, memberId: v.memberId })) }));
 
         const members = [...this.trackingService.memberInRoomTracker].map(([memberId, roomConnections]) => ({ memberId, roomConnections }))
-
 
         return { clients, members }
     }
