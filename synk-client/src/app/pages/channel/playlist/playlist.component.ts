@@ -237,7 +237,7 @@ export class PlaylistComponent implements OnDestroy, OnInit {
 
     const movedMediaValue = this.localPlaylist[previousIndex];
 
-    this.mediaService.changePositionInPlaylist({ roomName: this.roomName, mediaUrl: movedMediaValue.mediaUrl, newPosition: event.currentIndex })
+    this.mediaService.changePositionInPlaylist({ roomName: this.roomName, url: movedMediaValue.mediaUrl, newPosition: event.currentIndex })
   }
 
   onShuffle() {
