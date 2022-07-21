@@ -27,7 +27,7 @@
             </nz-button-group>
           </div>
           <div nz-col [nzXs]="{ span: 12 }" [nzLg]="{ span: 4 }">
-            <i nz-icon nzType="clock-circle" nzTheme="outline"></i>Duration: {{ nowPlayingMedia?.length}}
+            <i nz-icon nzType="clock-circle" nzTheme="outline"></i> Duration: {{ nowPlayingMedia?.length}}
           </div>
         </div>
         <nz-divider></nz-divider>
@@ -36,15 +36,17 @@
       <nz-tabset>
         <nz-tab nzTitle="Playlist">
 
-          <ng-container *ngIf="isOwner || isSuperAdmin || isLeader ; then dragToOrderPlaylist; else staticPlaylist;">
+          <ng-container *ngIf="isOwner || isSuperAdmin ; then dragToOrderPlaylist; else staticPlaylist;">
           </ng-container>
 
           <ng-template #dragToOrderPlaylist>
-            <button nz-button *ngIf="isSuperAdmin || isOwner" nzDanger (click)="onClearPlaylist()">
-              <i nz-icon nzType="delete"></i>
-              Clear playlist
-            </button>
-            <nz-divider></nz-divider>
+            <div class="playlist-controls" *ngIf="isSuperAdmin || isOwner">
+              <button nz-button nzDanger (click)="onClearPlaylist()">
+                <i nz-icon nzType="delete"></i>
+                Clear playlist
+              </button>
+              <nz-divider></nz-divider>
+            </div>
             <nz-list [nzBordered]="localPlaylist" nzSize="small" [nzLoading]="!localPlaylist" [nzDataSource]="localPlaylist"
             [nzRenderItem]="item" [nzNoResult]="noItems" cdkDropList (cdkDropListDropped)="drop($event)">
             <ng-template #item let-item>
@@ -70,7 +72,7 @@
                   [nzTooltipTitle]="item.active ? 'now playing' : isLeader ? 'start video' : ''">
                   <i nz-icon [nzType]="item.active ? 'play-circle' : 'caret-right'"></i>
                 </button>
-                  <button *ngIf="!item.active && ((!!item.addedBy && ((loggedInUserId$ |async) === item.addedBy.userId) || isOwner || isSuperAdmin))" nz-button nzSize="small" nzDanger nzType="link" (click)="onRemoveMedia(item.mediaUrl)" nz-tooltip
+                  <button *ngIf="!item.active" nz-button nzSize="small" nzDanger nzType="link" (click)="onRemoveMedia(item.mediaUrl)" nz-tooltip
                     nzTooltipTitle="Remove from list">
                     <i nz-icon nzType="delete"></i>
                   </button>
@@ -111,10 +113,13 @@
                   [nzTooltipTitle]="item.active ? 'now playing' : isLeader ? 'start video' : ''">
                   <i nz-icon [nzType]="item.active ? 'play-circle' : 'caret-right'"></i>
                 </button>
-                <button *ngIf="!item.active && (!!item.addedBy && ((loggedInUserId$ |async) === item.addedBy.userId))" nz-button nzSize="small" nzDanger nzType="link" (click)="onRemoveMedia(item.mediaUrl)" nz-tooltip
-                nzTooltipTitle="Remove from list">
-                    <i nz-icon nzType="delete"></i>
-                  </button>
+                <ng-container *ngIf="loggedInMemberId$ | async as loggedInMemberId">    
+                  <button *ngIf="!item.active && (loggedInMemberId === item.addedBy?.memberId)" nz-button nzSize="small" nzDanger nzType="link" (click)="onRemoveMedia(item.mediaUrl)" nz-tooltip
+                  nzTooltipTitle="Remove from list">
+                      <i nz-icon nzType="delete"></i>
+                    </button>
+                </ng-container>
+
               </ng-template>
               <ng-template #contentTitle>
                 <div class="content">

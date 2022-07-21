@@ -2,9 +2,9 @@
   <h1 nz-typography>Your stuff</h1>
   <nz-divider></nz-divider>
   <div nz-row>
-    <div nz-col [nzLg]="{ span: 8, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }" [nzXs]="{ span: 24, offset: 0 }">
+    <div nz-col [nzLg]="{ span: 8, offset: 0 }" [nzMd]="{ span: 8, offset: 0 }" [nzXs]="{ span: 24, offset: 0 }">
       <h2 nz-typography>Info</h2>
-      <nz-card [nzLoading]="(me$ | async) === undefined" [nzActions]="[logoutBtn, deleteAccountButton]">
+      <nz-card [nzLoading]="(me$ | async) === null" [nzActions]="[logoutBtn, deleteAccountButton]">
         <nz-card-meta [nzTitle]="me$ | async | username" [nzAvatar]="avatarTemplate">
         </nz-card-meta>
         <ng-template #avatarTemplate>
@@ -20,17 +20,12 @@
         </button>
       </nz-card>
       <h2 nz-typography style="margin-top: 1rem;">Create channel</h2>
-      <nz-card [nzLoading]="(me$ | async) === undefined">
+      <nz-card [nzLoading]="(me$ | async) === null">
         <app-create-room-form></app-create-room-form>
       </nz-card>
     </div>
-    <div nz-col [nzLg]="{ span: 16, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }" [nzXs]="{ span: 24, offset: 0 }">
+    <div nz-col [nzLg]="{ span: 16, offset: 0 }" [nzMd]="{ span: 16, offset: 0 }" [nzXs]="{ span: 24, offset: 0 }">
       <app-owned-channels></app-owned-channels>
-    </div>
-  </div>
-  <div nz-row>
-    <div nz-col [nzLg]="{ span: 8, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }" [nzXs]="{ span: 24, offset: 0 }">
-
     </div>
   </div>
 </div>

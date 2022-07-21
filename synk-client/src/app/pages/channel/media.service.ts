@@ -93,11 +93,11 @@ export class MediaService {
     this.socketService.socket.emit(MediaCommands.UPDATE_VOTE_SKIP_RATIO, { name, ratio });
   }
 
-  changePositionInPlaylist(ev: { roomName: string, mediaUrl: string, newPosition: number }) {
+  changePositionInPlaylist(ev: { roomName: string, url: string, newPosition: number }) {
     this.socketService.socket.emit(MediaCommands.CHANGE_MEDIA_POSITION_IN_LIST, ev);
   }
 
-  reportMediaNotPlayable(ev: { roomName: string, mediaUrl: string }) {
+  reportMediaNotPlayable(ev: { roomName: string, url: string }) {
     this.socketService.socket.emit(MediaCommands.MEDIA_NOT_PLAYBLE, ev);
   }
 

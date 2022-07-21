@@ -142,7 +142,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   }
 
   onMediaNotPlayble(url: string) {
-    this.mediaService.reportMediaNotPlayable({ roomName: this.name, mediaUrl: url })
+    this.mediaService.reportMediaNotPlayable({ roomName: this.name, url })
   }
 
 

@@ -7,6 +7,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzStatisticModule } from 'ng-zorro-antd/statistic';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NZ_ICONS } from 'src/app/icons';
 
@@ -23,6 +24,7 @@ import { TermsOfUseComponent } from './terms-of-use/terms-of-use.component';
     NzGridModule,
     NzTypographyModule,
     NzButtonModule,
+    NzToolTipModule,
     NzIconModule.forRoot(NZ_ICONS),
   ]
 })

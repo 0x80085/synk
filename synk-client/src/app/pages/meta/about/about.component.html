@@ -1,5 +1,5 @@
 <div nz-row>
-  <div nz-col  nz-col
+  <div nz-col
       [nzLg]="{ span: 12, offset: 6 }"
       [nzMd]="{ span: 12, offset: 6 }"
       [nzXs]="{ span: 22, offset: 1 }">
@@ -12,7 +12,9 @@
         [nzTitle]="'Version'"
         [nzPrefix]="prefixTpl"
       ></nz-statistic>
-      <ng-template #prefixTpl><i nz-icon nzType="tag"></i></ng-template>
+      <ng-template #prefixTpl>
+        <i nz-icon nzType="tag" nz-tooltip [nzTooltipTitle]="'Full version: ' + version"></i>
+      </ng-template>
     </p>
     <p nz-typography>
       New releases will be announced on the Synk discord (see below for invite
