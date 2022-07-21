@@ -264,7 +264,7 @@ export class Room {
     clearPlaylist(member: Member) {
         this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.modAndAbove);
         this.currentPlaylist.clear();
-        this.messages.post({ isSystemMessage: true, content: `${member.username} cleared the chat.`, author: { username: "" } as any })
+        this.messages.post({ isSystemMessage: true, content: `${member.username} cleared the playlist.`, author: { username: "" } as any })
     }
 
     private removeMemberSkipVote(member: Member) {
