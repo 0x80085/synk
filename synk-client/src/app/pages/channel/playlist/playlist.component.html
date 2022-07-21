@@ -36,7 +36,7 @@
       <nz-tabset>
         <nz-tab nzTitle="Playlist">
 
-          <ng-container *ngIf="isOwner || isSuperAdmin || isLeader ; then dragToOrderPlaylist; else staticPlaylist;">
+          <ng-container *ngIf="isOwner || isSuperAdmin ; then dragToOrderPlaylist; else staticPlaylist;">
           </ng-container>
 
           <ng-template #dragToOrderPlaylist>
