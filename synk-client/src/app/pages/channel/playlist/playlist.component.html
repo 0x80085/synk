@@ -40,11 +40,13 @@
           </ng-container>
 
           <ng-template #dragToOrderPlaylist>
-            <button nz-button *ngIf="isSuperAdmin || isOwner" nzDanger (click)="onClearPlaylist()">
-              <i nz-icon nzType="delete"></i>
-              Clear playlist
-            </button>
-            <nz-divider></nz-divider>
+            <div class="playlist-controls" *ngIf="isSuperAdmin || isOwner">
+              <button nz-button nzDanger (click)="onClearPlaylist()">
+                <i nz-icon nzType="delete"></i>
+                Clear playlist
+              </button>
+              <nz-divider></nz-divider>
+            </div>
             <nz-list [nzBordered]="localPlaylist" nzSize="small" [nzLoading]="!localPlaylist" [nzDataSource]="localPlaylist"
             [nzRenderItem]="item" [nzNoResult]="noItems" cdkDropList (cdkDropListDropped)="drop($event)">
             <ng-template #item let-item>
