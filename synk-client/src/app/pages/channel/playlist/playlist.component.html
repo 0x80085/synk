@@ -72,7 +72,7 @@
                   [nzTooltipTitle]="item.active ? 'now playing' : isLeader ? 'start video' : ''">
                   <i nz-icon [nzType]="item.active ? 'play-circle' : 'caret-right'"></i>
                 </button>
-                  <button *ngIf="!item.active && ((!!item.addedBy && ((loggedInUserId$ |async) === item.addedBy.userId) || isOwner || isSuperAdmin))" nz-button nzSize="small" nzDanger nzType="link" (click)="onRemoveMedia(item.mediaUrl)" nz-tooltip
+                  <button *ngIf="!item.active" nz-button nzSize="small" nzDanger nzType="link" (click)="onRemoveMedia(item.mediaUrl)" nz-tooltip
                     nzTooltipTitle="Remove from list">
                     <i nz-icon nzType="delete"></i>
                   </button>
@@ -113,10 +113,13 @@
                   [nzTooltipTitle]="item.active ? 'now playing' : isLeader ? 'start video' : ''">
                   <i nz-icon [nzType]="item.active ? 'play-circle' : 'caret-right'"></i>
                 </button>
-                <button *ngIf="!item.active && (!!item.addedBy && ((loggedInUserId$ |async) === item.addedBy.userId))" nz-button nzSize="small" nzDanger nzType="link" (click)="onRemoveMedia(item.mediaUrl)" nz-tooltip
-                nzTooltipTitle="Remove from list">
-                    <i nz-icon nzType="delete"></i>
-                  </button>
+                <ng-container *ngIf="loggedInMemberId$ | async as loggedInMemberId">    
+                  <button *ngIf="!item.active && (loggedInMemberId === item.addedBy?.memberId)" nz-button nzSize="small" nzDanger nzType="link" (click)="onRemoveMedia(item.mediaUrl)" nz-tooltip
+                  nzTooltipTitle="Remove from list">
+                      <i nz-icon nzType="delete"></i>
+                    </button>
+                </ng-container>
+
               </ng-template>
               <ng-template #contentTitle>
                 <div class="content">

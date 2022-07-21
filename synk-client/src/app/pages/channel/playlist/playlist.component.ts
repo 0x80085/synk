@@ -71,7 +71,7 @@ export class PlaylistComponent implements OnDestroy, OnInit {
     tap(_ => this.votedForSkip = false)
   );
 
-  loggedInUserId$ = this.auth.getUser().pipe(
+  loggedInMemberId$ = this.auth.getUser().pipe(
     map(({ id }) => id)
   )
 
