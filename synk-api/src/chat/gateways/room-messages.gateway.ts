@@ -92,7 +92,8 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
           .filter((conn) => conn.socketId === client.id)
           .forEach(connection => {
             const room = this.roomService.getRoomById(connection.roomId);
-            const wasRoomLeader = room.leader?.id === member.id;
+            const autoRoom = this.roomService.getAutomatedRoom(connection.roomId);
+            const wasRoomLeader = room?.leader?.id === member.id || autoRoom?.leader?.id === member.id;
 
             room.leave(member);
 
