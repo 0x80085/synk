@@ -1,0 +1,15 @@
+:host {
+    display: block;
+}
+
+.logo {
+    width: 1.5rem;
+    height: 1.5rem;
+    opacity: 0.7;
+    transition: all cubic-bezier(0.215, 0.610, 0.355, 1);
+
+    &:hover{
+        opacity: 1;
+
+    }
+}

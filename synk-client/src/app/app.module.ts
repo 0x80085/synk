@@ -25,12 +25,13 @@ import { MetaModule } from './pages/meta/meta.module';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { NavLogoComponent } from './nav-logo/nav-logo.component';
 
 
 registerLocaleData(en);
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, NavLogoComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,

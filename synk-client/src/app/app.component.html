@@ -1,13 +1,6 @@
 <nz-layout class="app-layout">
   <nz-sider class="menu-sidebar" nzCollapsible nzWidth="256px" [(nzCollapsed)]="isCollapsed" [nzTrigger]="null">
-    <div class="sidebar-logo">
-      <span>
-        <ng-container *ngIf="(isLoggedIn | async); then userLoggedIn; else userNotLoggedIn"></ng-container>
-        <h1 style="cursor: pointer;" (click)="isCollapsed = !isCollapsed">
-          {{ hostName }}
-        </h1>
-      </span>
-    </div>
+    <app-nav-logo (clicked)="isCollapsed = !isCollapsed"  style="margin: 1rem 0;"></app-nav-logo>
     <ul nz-menu nzMode="inline" [nzInlineCollapsed]="isCollapsed">
       <li nz-submenu nzOpen nzTitle="Explore" nzIcon="compass">
         <ul>
@@ -55,11 +48,6 @@
     </nz-content>
   </nz-layout>
 </nz-layout>
-
-<ng-template #logo>
-  <ng-container *ngIf="isLoggedIn | async; then userLoggedIn; else userNotLoggedIn">
-  </ng-container>
-</ng-template>
 
 <ng-template #userNotLoggedIn>
   <i nz-icon nzType="meh" style="cursor: pointer;" (click)="isCollapsed = !isCollapsed" nzTheme="fill" nz-tooltip
