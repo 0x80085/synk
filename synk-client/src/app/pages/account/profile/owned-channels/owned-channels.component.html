@@ -15,10 +15,8 @@
         <ng-template #expandIcon>
           <i nz-icon style="margin-right: 20px;" nzType="video-camera"></i>
         </ng-template>
-        <form nz-form [formGroup]="channelForms.controls[i]"
+        <form nz-form [formGroup]="getFormGroup(channelForms.controls[i])"
           (ngSubmit)="updateChannel(channel.id, channelForms.controls[i])">
-
-          <!--  -->
           <div nz-row [nzGutter]="[0, 8]">
             <div nz-col [nzLg]="{ span: 12, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }"
               [nzXs]="{ span: 24, offset: 0 }">

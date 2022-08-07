@@ -19,7 +19,7 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
 
   msgBoxValue: string;
 
-  submitPressedSubject: Subject<{ ev?: KeyboardEvent, text: string }> = new Subject();
+  submitPressedSubject: Subject<{ ev?: any, text: string }> = new Subject();
   shouldScrollDown: boolean;
 
   sendMessageSub = this.submitPressedSubject.pipe(

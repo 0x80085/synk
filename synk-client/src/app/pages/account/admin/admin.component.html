@@ -15,7 +15,7 @@
               <tr>
                 <th>Actions</th>
                 <td>
-                  <form nz-form [formGroup]="automatedChannelForms.controls[i]"
+                  <form nz-form [formGroup]="getFormGroup(automatedChannelForms.controls[i])"
                     (ngSubmit)="startScraper(channel.name, automatedChannelForms.controls[i])">
                     <nz-form-item style="margin-bottom: 0;">
                       <nz-form-control>

@@ -40,6 +40,22 @@ export interface Channel {
   }
 }
 
+export interface ChannelShortRepresentation {
+  id: string;
+  name: string;
+  description: string;
+  connectedMemberCount: number;
+  nowPlaying: {
+      url: string,
+      title: string
+      length:number
+      currentTime:number
+  };
+  isPublic: boolean;
+  dateCreated: Date;
+  isLocked: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -50,7 +66,7 @@ export class AuthService {
   // TODO Should be in some other service tho
   userOwnedChannels$ = this.refreshChannelsSubject.pipe(
     switchMap(() =>
-      this.http.get<Channel[]>(`${environment.api}/channels/mine`, { withCredentials: true })
+      this.http.get<ChannelShortRepresentation[]>(`${environment.api}/channels/mine`, { withCredentials: true })
     )).pipe(
       shareReplay(1)
     );

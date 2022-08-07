@@ -29,6 +29,10 @@ export class AdminComponent {
     return this.form.controls["automatedChannels"] as FormArray;
   }
 
+  getFormGroup(control: AbstractControl) {
+    return control as FormGroup;
+  }
+
   automatedChannels$ = this.adminService.getAutomatedChannels()
     .pipe(
       tap(channels => channels.forEach(chan => this.addChannelForm(chan))),

@@ -61,7 +61,7 @@
               </button>
               <nz-divider></nz-divider>
             </div>
-            <nz-list [nzBordered]="localPlaylist" nzSize="small" [nzLoading]="!localPlaylist" [nzDataSource]="localPlaylist"
+            <nz-list [nzBordered]="localPlaylist !== null" nzSize="small" [nzLoading]="!localPlaylist" [nzDataSource]="localPlaylist"
             [nzRenderItem]="item" [nzNoResult]="noItems" cdkDropList (cdkDropListDropped)="drop($event)">
             <ng-template #item let-item>
               <nz-list-item style="border-bottom: 1px solid rgb(25, 25, 25)"
@@ -102,7 +102,7 @@
           </ng-template>
         
           <ng-template #staticPlaylist>
-            <nz-list [nzBordered]="localPlaylist" nzSize="small" [nzLoading]="!localPlaylist" [nzDataSource]="localPlaylist"
+            <nz-list [nzBordered]="localPlaylist !== null" nzSize="small" [nzLoading]="!localPlaylist" [nzDataSource]="localPlaylist"
             [nzRenderItem]="item" [nzNoResult]="noItems">
             <ng-template #item let-item>
               <nz-list-item style="border-bottom: 1px solid rgb(25, 25, 25)"
