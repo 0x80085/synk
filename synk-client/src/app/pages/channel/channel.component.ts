@@ -34,7 +34,7 @@ export class ChannelComponent implements OnInit, OnDestroy {
   mediaEndedSubject = new Subject();
 
 
-  isConnected$ = merge(this.socketService.isConnected$, this.state.isLoggedIn$);
+  isConnected$ = merge(this.socketService.isConnected$, this.state.isLoggedInAndConnected$);
   isSuperAdmin$ = this.state.isAdmin$;
 
   isLoading$ = merge(

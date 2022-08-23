@@ -11,7 +11,7 @@ import { SocketService } from './socket.service';
 export class AppStateService {
 
   isLoggedInSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  isLogged$ = this.isLoggedInSubject.pipe(shareReplay(1));
+  isLoggedIn$ = this.isLoggedInSubject.pipe(shareReplay(1));
 
   userSubject: BehaviorSubject<User> = new BehaviorSubject({ id: 'missingno', username: '-----', isAdmin: false });
   me$ = this.userSubject.pipe();
@@ -23,10 +23,10 @@ export class AppStateService {
     catchError(() => of(false))
   );
 
-  isLoggedIn$ = merge(
+  isLoggedInAndConnected$ = merge(
     this.me$.pipe(map(me => !!me)),
     this.socketService.isConnected$,
-    this.isLogged$
+    this.isLoggedIn$
   );
 
   constructor(private socketService: SocketService) { }

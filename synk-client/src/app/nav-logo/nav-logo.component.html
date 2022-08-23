@@ -1,30 +1,33 @@
 <div>
     <div (click)="clicked.emit()">
-        <ng-container *ngIf="(state$ | async)?.loggedIn; then userLoggedIn; else userNotLoggedIn;"></ng-container>
+        <div style="width: 100%; display: flex; margin: 0; padding: 0; justify-content: center; align-items: center;">
+            <div class="logo-wrapper">
+                <img class="logo" src="assets/synk-nav-logo.svg" alt="logo">
+                <ng-container *ngIf="(state$ | async) as connectionState; ">
+                    <div class="connection-indicator" [ngClass]="{
+                        'not-logged-in': !connectionState.loggedIn,
+                        'logged-in': connectionState.loggedIn && connectionState.socketConnected,
+                        'reconnecting': connectionState.loggedIn && !connectionState.socketConnected
+                    }">
+                        <ng-container *ngIf="!connectionState.loggedIn">
+                            <i nz-icon nzType="meh" nzTheme="outline" nz-tooltip
+                                nzTooltipTitle="Log in to access and create rooms!"></i>
+                        </ng-container>
+                        <ng-container *ngIf="connectionState.loggedIn && connectionState.socketConnected">
+                            <i nz-icon nzType="smile" nzTheme="outline" nz-tooltip
+                            [nzTooltipTitle]="'Good to see you, ' + connectionState.username"></i>
+                        </ng-container>
+                        <ng-container *ngIf="connectionState.loggedIn && !connectionState.socketConnected">
+                            <i nz-icon nzType="sync" nzTheme="fill" nz-tooltip
+                            nzTooltipTitle="Reconnecting..."></i>
+                        </ng-container>
+                        <!-- <ng-container *ngIf="connectionState.loggedIn && !connectionState.socketConnected">
+                            <i nz-icon nzType="disconnect" nzTheme="fill" nz-tooltip
+                            nzTooltipTitle="Couldn't connect to server..."></i>
+                        </ng-container> -->
+                    </div>
+                </ng-container>
+            </div>
+        </div>
     </div>
 </div>
-
-<ng-template #userNotLoggedIn>
-    <div style="width: 100%; display: flex; margin: 0; padding: 0; justify-content: center; align-items: center;">
-        <img class="logo" src="assets/synk-nav-logo.svg" alt="logo">
-    </div>
-    <!-- <i nz-icon nzType="meh" style="cursor:a pointer;" nzTheme="fill" nz-tooltip
-        nzTooltipTitle="Log in to access and create rooms!"></i> -->
-</ng-template>
-
-<ng-template #userLoggedIn>
-    <div style="width: 100%; display: flex; margin: 0; padding: 0; justify-content: center; align-items: center;">
-        <img class="logo" src="assets/synk-nav-logo.svg" alt="logo">
-    </div>
-</ng-template>
-
-
-<ng-template #socketDisonnected>
-    <!-- <i nz-icon nzType="smile" style="cursor: pointer;" nzTheme="fill" nz-tooltip
-        nzTooltipTitle="Not connected to chat server"></i> -->
-</ng-template>
-
-<ng-template #socketConnected>
-    <!-- <i nz-icon [style.color]=" '#00ff00'" nzType="smile" style="cursor: pointer;" nzTheme="fill" nz-tooltip
-        [nzTooltipTitle]="(state$ | async)?.username"></i> -->
-</ng-template>
