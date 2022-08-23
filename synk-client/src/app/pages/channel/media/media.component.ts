@@ -22,7 +22,7 @@ export enum SupportedPlayers {
   YT = 'YT',
   HTML5 = 'HTML5',
   TWITCH = 'TWITCH',
-  VIMEO = "VIMEO"
+  VIMEO = 'VIMEO'
 }
 
 // tslint:disable-next-line: directive-selector

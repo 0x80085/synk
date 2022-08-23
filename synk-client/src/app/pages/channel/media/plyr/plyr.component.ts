@@ -68,6 +68,8 @@ export class PlyrComponent implements BaseMediaComponent {
     if (this.plyr && !this.plyr.player.playing) {
 
       if (isVimeoUrl(url)) {
+        this.plyr.player.autoplay = true;
+
         this.plyr.player.source = {
           type: 'video',
           sources: [

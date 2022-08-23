@@ -22,8 +22,14 @@ const SUPPORTED_MEDIA_HOSTS = [
   'youtube.com',
   'www.youtu.be',
   'www.youtube.com',
+  
   'twitch.tv',
   'www.twitch.tv',
+
+  'vimeo.com',
+  'www.vimeo.com',
+
+  'cdn.lbryplayer.xyz',
   //'soundcloud.com',
   //'vimeo.com',
   //'archive.org',
