@@ -1,7 +1,8 @@
-import { Component, ViewChild, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { BaseMediaComponent } from '../base-media.component';
 
 import { PlyrComponent as PlyrComp } from "ngx-plyr";
+import { debugLog } from 'src/app/utils/custom.operators';
 
 
 export function isVimeoUrl(url: string) {
@@ -31,9 +32,41 @@ export class PlyrComponent implements BaseMediaComponent {
 
   constructor() { }
 
+  onPlayingHandler() {
+    // const hasPlayer = Boolean(this.plyr);
+    // const plyrSources = this.plyr?.player?.source?.sources || [];
+    // const isCurrentDifferentFromRequested = !hasPlayer || plyrSources.every(it => it.src !== url);
+
+    // if (isCurrentDifferentFromRequested) {
+    //   debugLog('isDifferentFromCurrent')
+    //   this.setCurrentUrl(url);
+    //   (this.plyr.player.play() as Promise<void>)
+    //     .then(it => console.log(it)
+    //     )
+    //     .catch(e => console.log(e)
+    //     );
+    //   // } else if(this.plyr && this.plyr.player.source.sources.every(it => it.src !== url)){
+    //   //   this.plyr.player.play();
+    //   // } else {
+    //   //   debugLog('PlyrComponent else { }')
+    // } else if (this.plyr && !this.isPlaying()) {
+    //   this.plyr.player.play();
+    // }
+  }
+
   play(url?: string): void {
-    this.setCurrentUrl(url);
-    if (this.plyr && !this.isPlaying()) {
+    const hasPlayer = Boolean(this.plyr);
+    const plyrSources = this.plyr?.player?.source?.sources || [];
+    const isCurrentDifferentFromRequested = !hasPlayer || plyrSources.every(it => it.src !== url);
+
+    if (hasPlayer && isCurrentDifferentFromRequested) {
+      debugLog('isDifferentFromCurrent')
+
+      this.setCurrentUrl(url);
+      this.plyr?.player?.play()
+
+    } else if (hasPlayer && !this.isPlaying()) {
+
       this.plyr.player.play();
     }
   }
@@ -64,25 +97,30 @@ export class PlyrComponent implements BaseMediaComponent {
     }
     if (url !== this.src) {
       this.src = url;
-    }
-    if (this.plyr && !this.plyr.player.playing) {
-
-      if (isVimeoUrl(url)) {
-        this.plyr.player.autoplay = true;
-
-        this.plyr.player.source = {
-          type: 'video',
-          sources: [
-            {
-              src: this.src,
-              provider: 'vimeo',
-            },
-          ],
-        };
-
-      } else {
-        this.plyr.player.source = { sources: [{ src: this.src }], type: 'video' };
+      if (this.plyr) {
+        this.setPlyrSource(url);
       }
+    }
+  }
+
+  private setPlyrSource(url: string) {
+    this.plyr.player.autoplay = true;
+
+    if (isVimeoUrl(url)) {
+      this.plyr.player.source = null;
+      this.plyr.player.source = {
+        type: 'video',
+        sources: [
+          {
+            src: url,
+            provider:'vimeo',
+          },
+        ],
+      };
+
+    } else {
+      this.plyr.player.source = null;
+      this.plyr.player.source = { sources: [{ src: url }], type: 'video' };
     }
   }
 

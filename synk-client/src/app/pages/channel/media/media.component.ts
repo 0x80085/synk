@@ -96,6 +96,7 @@ export class MediaComponent {
     this.isMediaSelected.next(true);
 
     const playerType = this.resolveMediaType(url);
+    debugLog(`${playerType} media type detected`)
 
     this.createPlayerOfType(playerType);
     this.ref.instance.setCurrentUrl(url);
