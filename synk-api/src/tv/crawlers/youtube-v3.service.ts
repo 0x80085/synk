@@ -29,122 +29,33 @@ export class YoutubeV3Service {
      * (code taken from cytube thx guise :3)
      */
     getVideoMetaData(id: string): Observable<YoutubeMetadata> {
-        const API_KEY = process.env.YT_V3_API_KEY;
-
-        if (!API_KEY) {
-            throw new Error('API key not set for YouTube v3 API');
-        }
-
-        const params = `key=${API_KEY}&part=contentDetails%2Cstatus%2Csnippet&id=${id}`;
-        const url = `https://www.googleapis.com/youtube/v3/videos?${params}`;
+        const url = `https://inv.vern.cc/api/v1/videos/${id}`;
         const headers = {};
 
         return this.httpService.get(url, { headers }).pipe(
             map(res => {
-                switch (res.status) {
-                    case 400:
-                        console.error('YouTube API returned Bad Request: %s', res.data);
-                        throw new Error('Error calling YouTube API: Bad Request');
-                    case 403:
-                        console.error('YouTube API returned Forbidden: %s', res.data);
-                        throw Error("403");
-                    case 500:
-                    case 503:
-                        throw new Error('YouTube API is unavailable.  Please try again later.');
-                    default:
-                        try {
-                            res.data.items[0].snippet.localized.title
-                        } catch (error) {
-
-                        }
-                        if (res.status !== 200) {
-                            throw new Error(`Error calling YouTube API: HTTP ${res.status}`);
-                        }
-                        break;
-                }
-
                 const result = res.data;
-
-                // Sadly, as of the v3 API, YouTube doesn't tell you *why* the request failed.
-                if (result.items.length === 0) {
-                    throw new Error('Video does not exist or is private');
-                }
-
-                const video = result.items[0];
-
-                if (!video.status || !video.contentDetails || !video.snippet) {
-                    console.log(`Incomplete video; assuming deleted video with id=${video.id}`, video.id);
-                    throw new Error('This video is unavailable');
-                }
-
-                if (!video.status.embeddable) {
-                    throw new Error('The uploader has made this video non-embeddable');
-                }
-
-                switch (video.status.uploadStatus) {
-                    case 'deleted':
-                        throw new Error('This video has been deleted');
-                    case 'failed':
-                        throw new Error(
-                            'This video is unavailable: ' +
-                            video.status.failureReason
-                        );
-                    case 'rejected':
-                        throw new Error(
-                            'This video is unavailable: ' +
-                            video.status.rejectionReason
-                        );
-                    case 'processed':
-                        break;
-                    case 'uploaded':
-                        // For VODs, we must wait for 'processed' before the video
-                        // metadata is correct.  For livestreams, the status is
-                        // 'uploaded' while the stream is live, and the metadata
-                        // is presumably correct (we don't care about duration
-                        // for livestreams anyways)
-                        // See calzoneman/sync#710
-                        if (video.snippet.liveBroadcastContent !== 'live') {
-                            throw new Error(
-                                'This video has not been processed yet.'
-                            );
-                        }
-                        break;
-                    default:
-                        throw new Error(`This video is not available (status=${video.status.uploadStatus})`);
-                }
-
-                const durationInSeconds = parseToSeconds(video.contentDetails.duration);
-                const isLive = video.snippet.liveBroadcastContent === 'live' && durationInSeconds === 0;
+                const video = result;
+                const durationInSeconds = video.lengthSeconds;
+                const isLive = video.liveNow;
 
                 const data = {
                     id,
                     type: 'youtube',
-                    title: video.snippet.title,
+                    title: video.title,
                     duration: durationInSeconds,
                     isLive,
                     meta: {
-                        thumbnail: video.snippet.thumbnails.default.url,
-                        etag: result.etag,
+                        thumbnail: video.videoThumbnails.find(it => it.quality === "medium").url,
+                        etag: null,
                         blocked: false,
                         allowed: true,
                     }
                 };
-
-                if (video.contentDetails.regionRestriction) {
-                    const restriction = video.contentDetails.regionRestriction;
-                    if (restriction.blocked) {
-                        data.meta.blocked = restriction.blocked;
-                    }
-                    if (restriction.allowed) {
-                        data.meta.allowed = restriction.allowed;
-                    }
-                }
-
-                return data;
+                return data
             })
-        );
+        )
     }
-
 }
 
 export function YouTubeGetID(url: string) {
@@ -165,26 +76,4 @@ export function YouTubeGetID(url: string) {
         ID = ytID;
     }
     return ID as string;
-}
-
-function parseToSeconds(duration: any) {
-
-    const durationScale: [RegExp, number][] = [
-        [/(\d+)D/, 24 * 3600],
-        [/(\d+)H/, 3600],
-        [/(\d+)M/, 60],
-        [/(\d+)S/, 1]
-    ];
-
-    let time = 0;
-    for (const [regex, scale] of durationScale) {
-        let m;
-        // tslint:disable-next-line: no-conditional-assignment
-        if (m = duration.match(regex)) {
-            // tslint:disable-next-line: radix
-            time += parseInt(m[1]) * scale;
-        }
-    }
-
-    return time;
 }

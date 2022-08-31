@@ -40,7 +40,7 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
                 switchMap(({ room, ytVideoId }) =>
                     !Boolean(ytVideoId)
                         ? this.getMetadataFromElsewhere(trimmedUrl).pipe(map(media => ({ media, room })))
-                        : this.getMetadataFromYoutubeApi(ytVideoId).pipe(map(media => ({ media, room })))
+                        : this.getMetadataFromInvidousApi(ytVideoId).pipe(map(media => ({ media, room })))
                 ),
                 tap(({ room, media }) => room.addMediaToPlaylist(member, media)),
                 // tap(async ({ room, media }) => {
@@ -77,6 +77,16 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
     }
 
     private getMetadataFromYoutubeApi(id: string) {
+        return this.ytService.getVideoMetaData(id).pipe(
+            map((data) => ({ url: `https://www.youtube.com/watch?v=${id}`, ...data })),
+            map(({ url, title, duration, isLive }) => new Media(url, title, duration, isLive)),
+            catchError((e) => {
+                console.log(e);
+                throw new Error("AddMediaException");
+            }))
+    }
+    
+    private getMetadataFromInvidousApi(id: string) {
         return this.ytService.getVideoMetaData(id).pipe(
             map((data) => ({ url: `https://www.youtube.com/watch?v=${id}`, ...data })),
             map(({ url, title, duration, isLive }) => new Media(url, title, duration, isLive)),
