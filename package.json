@@ -11,7 +11,8 @@
   },
   "scripts": {
     "start": "npx concurrently \"cd synk-client && ng s --live-reload\" \"cd synk-api && npm start\"",
-    "docker:run": "docker-compose -f \"docker-compose.yml\" up -d --build"
+    "docker:run": "docker-compose -f \"docker-compose.yml\" up -d --build",
+    "build": "npx concurrently \"cd synk-client && npm run build\" \"cd synk-api && npm run build\""
   },
   "author": "0x80085",
   "license": "MIT"
