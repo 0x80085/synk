@@ -22,7 +22,7 @@ const SUPPORTED_MEDIA_HOSTS = [
   'youtube.com',
   'www.youtu.be',
   'www.youtube.com',
-  
+
   'twitch.tv',
   'www.twitch.tv',
 
@@ -31,7 +31,6 @@ const SUPPORTED_MEDIA_HOSTS = [
 
   'cdn.lbryplayer.xyz',
   //'soundcloud.com',
-  //'vimeo.com',
   //'archive.org',
   // 'dailymotion.com',
   // 'twitter.com',
@@ -67,7 +66,7 @@ export class PlaylistComponent implements OnDestroy, OnInit {
 
   localPlaylist: PlaylistItem[] = [];
 
-  supportedMediaHosts = SUPPORTED_MEDIA_HOSTS;
+  supportedMediaHostsFormatted = SUPPORTED_MEDIA_HOSTS.join(', ');
 
   nowPlayingSubject: Subject<PlaylistItem> = new Subject()
 
@@ -215,7 +214,7 @@ export class PlaylistComponent implements OnDestroy, OnInit {
   onClearPlaylist() {
     if (this.isSuperAdmin || this.isOwner) {
 
-      if(confirm("Really clear the playlist?")){
+      if (confirm("Really clear the playlist?")) {
         this.mediaService.clearPlaylist(this.roomName);
       }
     }

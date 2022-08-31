@@ -192,7 +192,7 @@
 
 <ng-template #addMediaInfo>
   <p nz-typography>
-    Only media from the following urls are supported: {{supportedMediaHosts | json }} <br /> 
+    Only media from the following urls are supported: {{ supportedMediaHostsFormatted }}. <br /> 
   Support for other types of media can be requested via the Github repo or Discord chat.<br /> 
   <strong>If you are currently the leader,</strong>
   press the <i nz-icon [nzType]="'caret-right'"></i> on a playlist item to play it and other members' media player will
