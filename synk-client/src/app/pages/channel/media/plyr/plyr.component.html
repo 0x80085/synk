@@ -1,2 +1,12 @@
-<div plyr style="width: 100%; height: 95%;" plyrTitle="Video 1" [plyrPlaysInline]="true" [plyrSources]="videoSources"
-  (plyrInit)="initPlayer()" (plyrEnded)="mediaEnded.next(true)"></div>
+<div plyr 
+    style="width: 100%; height: 95%;"
+    plyrTitle="Synk" 
+    [plyrPlaysInline]="true" 
+    [plyrSources]="videoSources"
+    (plyrInit)="initPlayer($event)"
+    (plyrEnded)="mediaEnded.next(true)"
+    (plyrCanPlay)="onCanPlay()"
+    (plyrLoadedData)="onLoadedData()"
+    (plyrReady)="onReady()"
+    (plyrError)="onError($event)"
+></div>

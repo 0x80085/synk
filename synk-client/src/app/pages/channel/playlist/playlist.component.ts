@@ -30,8 +30,10 @@ const SUPPORTED_MEDIA_HOSTS = [
   'www.vimeo.com',
 
   'cdn.lbryplayer.xyz',
-  //'soundcloud.com',
-  //'archive.org',
+  'lbryplayer.xyz',
+  
+  'archive.org',
+
   // 'dailymotion.com',
   // 'twitter.com',
   // 'reddit.com',

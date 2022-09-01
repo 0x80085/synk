@@ -32,43 +32,48 @@ export class PlyrComponent implements BaseMediaComponent {
 
   constructor() { }
 
-  onPlayingHandler() {
-    // const hasPlayer = Boolean(this.plyr);
-    // const plyrSources = this.plyr?.player?.source?.sources || [];
-    // const isCurrentDifferentFromRequested = !hasPlayer || plyrSources.every(it => it.src !== url);
+  play(url?: string): void {
 
-    // if (isCurrentDifferentFromRequested) {
-    //   debugLog('isDifferentFromCurrent')
-    //   this.setCurrentUrl(url);
-    //   (this.plyr.player.play() as Promise<void>)
-    //     .then(it => console.log(it)
-    //     )
-    //     .catch(e => console.log(e)
-    //     );
-    //   // } else if(this.plyr && this.plyr.player.source.sources.every(it => it.src !== url)){
-    //   //   this.plyr.player.play();
-    //   // } else {
-    //   //   debugLog('PlyrComponent else { }')
-    // } else if (this.plyr && !this.isPlaying()) {
-    //   this.plyr.player.play();
-    // }
+    console.log('play');
+
+    let source: Plyr.Source = null;
+
+    if (isVimeoUrl(url)) {
+      source = {
+        src: url,
+        provider: 'vimeo',
+      };
+    } else {
+      source = { src: url, type: 'video/mp4', };
+    }
+
+    this.videoSources = new Array(source);
   }
 
-  play(url?: string): void {
-    const hasPlayer = Boolean(this.plyr);
-    const plyrSources = this.plyr?.player?.source?.sources || [];
-    const isCurrentDifferentFromRequested = !hasPlayer || plyrSources.every(it => it.src !== url);
+  initPlayer(player: Plyr) {
+    console.log('initplayer');
+    console.log(player.source);
 
-    if (hasPlayer && isCurrentDifferentFromRequested) {
-      debugLog('isDifferentFromCurrent')
+  }
 
-      this.setCurrentUrl(url);
-      this.plyr?.player?.play()
+  onCanPlay() {
+    console.log('onCanPlay');
 
-    } else if (hasPlayer && !this.isPlaying()) {
+    console.log(this.videoSources)
 
-      this.plyr.player.play();
-    }
+    // this.plyr.player.play();
+  }
+  onReady() {
+    console.log('onReady');
+    
+    this.plyr.player.play();
+  }
+  onLoadedData() {
+    console.log('onLoadedData');
+
+  }
+  onError(error: any) {
+    console.log(error);
   }
 
   isPlaying(): boolean {
@@ -92,43 +97,43 @@ export class PlyrComponent implements BaseMediaComponent {
   }
 
   setCurrentUrl(url: string): void {
-    if (!url) {
-      return;
-    }
-    if (url !== this.src) {
-      this.src = url;
-      if (this.plyr) {
-        this.setPlyrSource(url);
-      }
-    }
+    // if (!url) {
+    //   return;
+    // }
+    // if (url !== this.src) {
+    //   this.src = url;
+    //   if (this.plyr) {
+    //     this.setPlyrSource(url);
+    //   }
+    // }
   }
 
   private setPlyrSource(url: string) {
-    this.plyr.player.autoplay = true;
 
-    if (isVimeoUrl(url)) {
-      this.plyr.player.source = null;
-      this.plyr.player.source = {
-        type: 'video',
-        sources: [
-          {
-            src: url,
-            provider:'vimeo',
-          },
-        ],
-      };
+    // if (isVimeoUrl(url)) {
+    //   this.plyr.player.source = null;
+    //   this.plyr.player.source = {
+    //     type: 'video',
+    //     sources: [
+    //       {
+    //         src: url,
+    //         provider: 'vimeo',
+    //       },
+    //     ],
+    //   };
 
-    } else {
-      this.plyr.player.source = null;
-      this.plyr.player.source = { sources: [{ src: url }], type: 'video' };
-    }
+    // } else {
+    //   this.plyr.player.source = null;
+    //   this.plyr.player.source = { sources: [{ src: url }], type: 'video' };
+    // }
+
+    // console.log('plyr source ', this.plyr.player.source);
+
   }
 
   getDuration(): number {
     return this.plyr.player.duration;
   }
 
-  initPlayer() {
-    this.play(this.src);
-  }
+
 }
