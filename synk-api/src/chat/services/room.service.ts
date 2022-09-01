@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { Room } from '../models/room/room';
 import { AutomatedRoom } from '../models/automated-room/automated-room';
 import { RedditCrawlerService } from 'src/tv/crawlers/reddit.crawler.service';
-import { YoutubeV3Service } from 'src/tv/crawlers/youtube-v3.service';
+import { MediaMetaDataService } from 'src/tv/crawlers/media-metadata.service';
 
 export const DEFAULT_MAX_USER_COUNT = 100;
 
@@ -24,7 +24,7 @@ export class RoomService {
         @InjectRepository(Member)
         private memberRepository: Repository<Member>,
         private redditScraper: RedditCrawlerService,
-        private ytService: YoutubeV3Service,
+        private ytService: MediaMetaDataService,
         // @InjectRepository(Role)
         // private roleRepository: Repository<Role>,
         // @InjectRepository(ChannelConfig)

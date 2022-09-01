@@ -18,7 +18,7 @@ export interface YoutubeMetadata {
 }
 
 @Injectable()
-export class YoutubeV3Service {
+export class MediaMetaDataService {
 
     constructor(private httpService: HttpService) { }
 

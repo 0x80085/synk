@@ -1,6 +1,6 @@
 import { ForbiddenException } from '@nestjs/common';
 import { MessageTypes } from 'src/chat/gateways/message-types.enum';
-import { YouTubeGetID } from 'src/tv/crawlers/youtube-v3.service';
+import { YouTubeGetID } from 'src/tv/crawlers/media-metadata.service';
 import { Member, Roles } from '../../../domain/entity';
 import { Feed } from '../feed/feed';
 import { Media } from '../media/media';

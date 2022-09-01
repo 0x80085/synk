@@ -4,7 +4,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 
 import { RedditController } from './controllers/reddit.controller';
 import { RedditCrawlerService } from './crawlers/reddit.crawler.service';
-import { YoutubeV3Service } from './crawlers/youtube-v3.service';
+import { MediaMetaDataService } from './crawlers/media-metadata.service';
 import { ScrapeJobSchedulerService } from './services/scrape-job-scheduler.service';
 
 import { CqrsModule } from '@nestjs/cqrs';
@@ -24,11 +24,11 @@ export const QueryCommandHandlers = [CrawlSubredditHandler];
     providers: [
         RedditCrawlerService,
         ScrapeJobSchedulerService,
-        YoutubeV3Service,
+        MediaMetaDataService,
         ...QueryCommandHandlers,
     ],
     exports: [
-        YoutubeV3Service,
+        MediaMetaDataService,
         RedditCrawlerService
     ]
 })

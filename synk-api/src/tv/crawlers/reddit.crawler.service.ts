@@ -5,7 +5,7 @@ import { map, tap, catchError, filter, mergeAll, mergeMap, toArray } from 'rxjs/
 import { from, of, OperatorFunction, Subject } from 'rxjs';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { Media } from 'src/chat/models/media/media';
-import { YouTubeGetID, YoutubeV3Service } from './youtube-v3.service';
+import { YouTubeGetID, MediaMetaDataService } from './media-metadata.service';
 
 const MAX_CONCURRENT_SCRAPES = 5;
 const ONE_HOUR = 3600;
@@ -28,7 +28,7 @@ export class RedditCrawlerService {
 
     constructor(
         private httpService: HttpService,
-        private ytService: YoutubeV3Service
+        private ytService: MediaMetaDataService
     ) { }
 
     registerTargetsForChannel(channelName: string, subreddits: string[]) {

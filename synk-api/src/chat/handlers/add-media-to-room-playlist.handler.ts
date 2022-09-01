@@ -5,7 +5,7 @@ import { of } from "rxjs";
 import { catchError, map, mapTo, switchMap, tap } from "rxjs/operators";
 import { Server } from 'socket.io';
 
-import { YouTubeGetID, YoutubeV3Service } from "src/tv/crawlers/youtube-v3.service";
+import { YouTubeGetID, MediaMetaDataService } from "src/tv/crawlers/media-metadata.service";
 import { MessageTypes } from "../gateways/message-types.enum";
 import { AddMediaToRoomCommand } from "../models/commands/add-media-to-room.command";
 import { Media } from "../models/media/media";
@@ -16,7 +16,7 @@ import { allowedMediaSourceHosts as supportedMediaSourceHosts } from "./allowed-
 @CommandHandler(AddMediaToRoomCommand)
 export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomCommand> {
     constructor(
-        private ytService: YoutubeV3Service,
+        private ytService: MediaMetaDataService,
         private httpService: HttpService,
         // @InjectRepository(Channel)
         // private channelRepository: Repository<Channel>,
@@ -75,16 +75,6 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
             throw new Error("AddMediaException");
         }
     }
-
-    private getMetadataFromYoutubeApi(id: string) {
-        return this.ytService.getVideoMetaData(id).pipe(
-            map((data) => ({ url: `https://www.youtube.com/watch?v=${id}`, ...data })),
-            map(({ url, title, duration, isLive }) => new Media(url, title, duration, isLive)),
-            catchError((e) => {
-                console.log(e);
-                throw new Error("AddMediaException");
-            }))
-    }
     
     private getMetadataFromInvidousApi(id: string) {
         return this.ytService.getVideoMetaData(id).pipe(
@@ -125,7 +115,7 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
                 map(headers => headers["content-type"]),
                 tap(console.log),
                 map(contentType => this.isSupportedMediaType(contentType)),
-                mapTo(new Media(url, "no title was given", 0))
+                mapTo(new Media(url, url, 0))
             )
 
 
