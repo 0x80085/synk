@@ -1,8 +1,8 @@
-import { BadRequestException, ForbiddenException, } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, UnsupportedMediaTypeException, } from "@nestjs/common";
 import { HttpService } from '@nestjs/axios';
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { of } from "rxjs";
-import { catchError, map, mapTo, switchMap, tap } from "rxjs/operators";
+import { of, throwError } from "rxjs";
+import { catchError, map, switchMap, tap } from "rxjs/operators";
 import { Server } from 'socket.io';
 
 import { YouTubeGetID, MediaMetaDataService } from "src/tv/crawlers/media-metadata.service";
@@ -75,7 +75,7 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
             throw new Error("AddMediaException");
         }
     }
-    
+
     private getMetadataFromInvidousApi(id: string) {
         return this.ytService.getVideoMetaData(id).pipe(
             map((data) => ({ url: `https://www.youtube.com/watch?v=${id}`, ...data })),
@@ -87,41 +87,45 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
     }
 
     private getMetadataFromElsewhere(url: string) {
-        // if (url.endsWith('.mp4')) {
-
-        // Maybe ffmpeg/node-ffprobe can be used to get metadata 
-
-        // return this.httpService.get(url).pipe(
-        //     tap(res => console.log(res)),
-        //     switchMap(res => {
-        //         if (res.headers.get('content-type') === "video/mp4" || res.headers.get('mime-type') === "video/mp4") {
-        //             console.log(res.headers.get('content-type'));
-        //             console.log(res.headers.get('mime-type'));
-        //             // somehow get metadata duration title etc
-        //             return of(new Media(url, "no title was given", 100));
-        //         }
-        //     })
-        // )
-
-        if (new URL(url).host === 'www.twitch.tv' || new URL(url).host === 'twitch.tv') {
+        const hostName = new URL(url).host;
+        if (
+            hostName === 'www.twitch.tv' ||
+            hostName === 'twitch.tv' ||
+            hostName === 'www.vimeo.com' ||
+            hostName === 'vimeo.com'
+        ) {
             return of(new Media(url, url, 100));
         }
 
-        // Do request only to check media type is smth playable
-        return this.httpService.get(url, { headers: { 'Range': 'bytes=0-16' } })
+        return this.httpService.get(url, { headers: { 'Range': 'bytes=0-512' } })
             .pipe(
-                map(res => res.headers),
-                tap(console.log),
-                map(headers => headers["content-type"]),
-                tap(console.log),
-                map(contentType => this.isSupportedMediaType(contentType)),
-                mapTo(new Media(url, url, 0))
-            )
+                switchMap(res =>
+                    of(res).pipe(
+                        map(res => res.headers),
+                        tap(console.log),
+                        map(headers => headers["content-type"]),
+                        tap(console.log),
+                        map(contentType => this.isSupportedMediaType(contentType)),
+                        switchMap(isSupported => isSupported
+                            ? of(res)
+                            : throwError(() => new UnsupportedMediaTypeException(url + " is not an acceptable media type"))),
+                        map(_ => {
+
+                            const HEADER_FLAG = Buffer.from("mvhd");
+
+                            const buffer = Buffer.from(res.data, "binary");
+
+                            const start = buffer.indexOf(HEADER_FLAG) + 17;
+                            const timeScale = buffer.readUInt32BE(start);
+                            const duration = buffer.readUInt32BE(start + 4);
+                            const movieLength = Math.floor(duration / timeScale);
 
 
-        // }
-
-        return of(new Media(url, "no title was given", 100));
+                            return new Media(url, `Custom Media [${url}]`, movieLength);
+                        }),
+                        catchError(_ => of(new Media(url, `Custom Media [${url}]`, 0)))
+                    ),
+                ))
     }
 
     private isSupportedMediaType(contentType: any): boolean {
