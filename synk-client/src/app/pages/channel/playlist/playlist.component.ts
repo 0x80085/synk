@@ -31,7 +31,7 @@ const SUPPORTED_MEDIA_HOSTS = [
 
   'cdn.lbryplayer.xyz',
   'lbryplayer.xyz',
-  
+
   'archive.org',
 
   // 'dailymotion.com',
@@ -285,14 +285,15 @@ export class PlaylistComponent implements OnDestroy, OnInit {
 
     try {
       const { host } = new URL(value)
+      const extractHostnameRegex = /(?<![^\/]\/)\b\w+\.\b\w{2,3}(?:\.\b\w{2})?(?=$|\/)/gm;
+      const urlParts = extractHostnameRegex.exec(host);
+      const [domain] = urlParts;
+      console.log(urlParts);
 
-      if (SUPPORTED_MEDIA_HOSTS.indexOf(host) === -1) {
+
+      if (SUPPORTED_MEDIA_HOSTS.indexOf(domain) === -1) {
         throw new Error();
       }
-
-      // if (!YouTubeGetID(value)) {
-      //   throw new Error();
-      // }
     } catch {
       validUrl = false;
     }
