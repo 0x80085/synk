@@ -116,7 +116,10 @@ export class Playlist {
     }
 
     updateCurrentTime(seconds: number) {
-        if (seconds >= 0 && seconds < this.nowPlaying().media.length) {
+        if (seconds >= 0
+            // Some videos have duration (aka length) 0 bc we dont know it
+            // && seconds < this.nowPlaying().media.length
+        ) {
             this.currentTime = seconds;
         }
     }
