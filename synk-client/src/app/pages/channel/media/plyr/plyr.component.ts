@@ -82,7 +82,6 @@ export class PlyrComponent implements BaseMediaComponent {
 
   onTimeUpdate(event: Plyr.PlyrEvent) {
     this.currentTime = event.detail.plyr.currentTime;
-    console.log(this.getCurrentTime());
   }
 
   getCurrentTime(): number {
