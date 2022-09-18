@@ -5,10 +5,10 @@ import { YouTubeGetID, MediaMetaDataService } from "../crawlers/media-metadata.s
 
 @CommandHandler(GetYtMetadataForUrlCommand)
 export class GetYtMetadataForUrl implements ICommandHandler<GetYtMetadataForUrlCommand> {
-    constructor(private ytApi: MediaMetaDataService) { }
+    constructor(private metadataService: MediaMetaDataService) { }
 
     async execute({ url }: GetYtMetadataForUrlCommand) {
         const id = YouTubeGetID(url);
-        return this.ytApi.getVideoMetaData(id);
+        return this.metadataService.getVideoMetaData(id);
     }
 }

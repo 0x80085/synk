@@ -57,6 +57,10 @@
             </nz-table>
           </nz-collapse-panel>
         </nz-collapse>
+        <nz-divider></nz-divider>
+        <button nz-button (click)="startScrapeJobManually()">
+          Manually start scrape job
+        </button>
       </nz-card>
       <h2 nz-typography>Users</h2>
       <nz-card [nzLoading]="(users$ | async) === null">

@@ -29,7 +29,7 @@ export class MediaMetaDataService {
      * (code taken from cytube thx guise :3)
      */
     getVideoMetaData(id: string): Observable<YoutubeMetadata> {
-        const url = `https://inv.vern.cc/api/v1/videos/${id}`;
+        const url = `${getRandomInvidiousApiUrl()}/api/v1/videos/${id}`;
         const headers = {};
 
         return this.httpService.get(url, { headers }).pipe(
@@ -56,6 +56,20 @@ export class MediaMetaDataService {
             })
         )
     }
+}
+
+function getRandomInvidiousApiUrl() {
+    const invidiousInstanceUrls = [
+        'https://inv.vern.cc',
+        'https://invidious.nerdvpn.de',
+        'https://invidious.snopyta.org',
+        'https://invidious.namazso.eu',
+        'https://inv.riverside.rocks',
+        'https://invidious.flokinet.to',
+        'https://y.com.sb'
+    ];
+    const randIndex = Math.floor(Math.random() * invidiousInstanceUrls.length);
+    return invidiousInstanceUrls[randIndex];
 }
 
 export function YouTubeGetID(url: string) {

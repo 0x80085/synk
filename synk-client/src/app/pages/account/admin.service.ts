@@ -97,6 +97,7 @@ export interface ConnectionsResponse {
   providedIn: 'root'
 })
 export class AdminService {
+  
   deleteRoom(id: string) {
     return this.http.delete(`${environment.api}/admin/channels/${id}`, {
       withCredentials: true
@@ -163,6 +164,10 @@ export class AdminService {
   }
   playNext(name: string) {
     return this.http.post(`${environment.api}/admin/play-next-auto-playback/${name}`, null, { withCredentials: true })
+  }
+  
+  startScrapeJobManually() {
+    return this.http.post(`${environment.api}/admin/start-crawler-job`, null, { withCredentials: true })
   }
 
 }

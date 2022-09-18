@@ -43,7 +43,7 @@ export class RedditCrawlerService {
                 subreddits
             })
             registeredEntry = this.crawlTargetsPerChannel
-            .find(target => target.channelName === channelName)
+                .find(target => target.channelName === channelName)
         }
 
         this.logger.log(`Registered targets for ${channelName} (${registeredEntry.subreddits.length}):\n ${registeredEntry.subreddits.toString()} `)
@@ -92,27 +92,26 @@ export class RedditCrawlerService {
             tap(partialResults => {
                 this.logger.log(partialResults.length + ' URLs found (partialResults)')
             })
-        ).subscribe(
-            partialResults => {
+        ).subscribe({
+            next: partialResults => {
                 allResults = allResults.concat(partialResults);
             },
-            err => {
-                // handle error
+            error: err => {
                 this.logger.error('err while scraping ..', err)
             },
-            () => {
+            complete: () => {
                 this.crawlTargetsPerChannel.forEach(({ channelName, subreddits }) => {
                     const results = allResults
                         .filter(res => subreddits.includes(res.origin))
                         .reduce((mediaList, originAndMedia) => mediaList.concat(originAndMedia.media), [] as Media[]);
-                    
+
                     this.logger.log(`ScrapeJob for ${channelName} found ${results.length} results`)
 
                     this.crawlResultsSubject.next({ channelName, results });
                 })
 
             }
-        );
+        });
     }
 
     private filterForMedia(): OperatorFunction<any, string[]> {

@@ -119,4 +119,12 @@ export class AdminComponent {
       .subscribe()
   }
 
+  startScrapeJobManually() {
+    this.adminService.startScrapeJobManually()
+      .pipe(
+        tap(() => this.notification.success('Success', `Started scrape job`))
+      )
+      .subscribe()
+  }
+
 }

@@ -4,6 +4,7 @@ import { Pagination } from 'nestjs-typeorm-paginate';
 import { SerializedUserData } from 'src/auth/local.serializer';
 import { ChannelService } from 'src/chat/services/channel.service';
 import { RoomService } from 'src/chat/services/room.service';
+import { RedditCrawlerService } from 'src/tv/crawlers/reddit.crawler.service';
 import { Channel, Member } from '../../domain/entity';
 import { AdminGuard } from '../guards/admin.guard';
 import { AdminService } from '../services/admin.service';
@@ -15,7 +16,8 @@ export class AdminController {
     constructor(
         private adminService: AdminService,
         private channelService: ChannelService,
-        private roomService: RoomService
+        private roomService: RoomService,
+        private scrapeSubredditsJob: RedditCrawlerService
     ) { }
 
     @Get('/channels')
@@ -99,6 +101,14 @@ export class AdminController {
     startAutomatedRoomPlayback(@Param('name') name: string) {
 
         this.roomService.automatedRooms.find(it => it.name === name)?.startPlaying();
+    }
+
+    @Post('/start-crawler-job')
+    @UseGuards(AdminGuard)
+    @ApiOperation({ summary: 'Start subreddit crawl job' })
+    startRedditCrawlJob() {
+
+        this.scrapeSubredditsJob.scrapeSubredditsJob()
     }
 
     @Post('/stop-auto-playback/:name')
