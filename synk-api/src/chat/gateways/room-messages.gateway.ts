@@ -91,9 +91,11 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
         }[])
           .filter((conn) => conn.socketId === client.id)
           .forEach(connection => {
-            const room = this.roomService.getRoomById(connection.roomId);
+
+            const communityRoom = this.roomService.getRoomById(connection.roomId);
             const autoRoom = this.roomService.getAutomatedRoom(connection.roomId);
-            const wasRoomLeader = room?.leader?.id === member.id || autoRoom?.leader?.id === member.id;
+            const room = (communityRoom || autoRoom);
+            const wasRoomLeader = room?.leader?.id === member.id;
 
             room.leave(member);
 
@@ -404,11 +406,11 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
           })
         )
         : of(null)),
-        catchError(e => {
-          this.logger.error("Handle unplayable media failed")
-          this.logger.error(e)
-          throw new WsException(MessageTypes.GENERIC_ERROR);
-        })
+      catchError(e => {
+        this.logger.error("Handle unplayable media failed")
+        this.logger.error(e)
+        throw new WsException(MessageTypes.GENERIC_ERROR);
+      })
     )
   }
 
