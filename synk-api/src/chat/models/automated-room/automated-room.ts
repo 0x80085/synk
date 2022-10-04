@@ -38,6 +38,7 @@ export class AutomatedRoom {
     members: Member[] = [];
     messages: Feed = new Feed();
     currentPlaylist: Playlist = new Playlist('default', null, new Date());
+    subredditsToScrape: string[];
 
     leader = null
     owner = null
@@ -174,6 +175,7 @@ export class AutomatedRoom {
         this.name = name
         this.description = description
         this.id = name
+        this.subredditsToScrape = subredditsToScrape
 
         this.redditScraper.registerTargetsForChannel(this.name, subredditsToScrape);
     }

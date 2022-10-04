@@ -17,6 +17,7 @@ export interface ChannelOverviewItem {
   name: string;
   description: string;
   connectedMemberCount: number;
+  subredditsToScrape: string[];
   dateCreated: Date;
   nowPlaying: {
     url: string,

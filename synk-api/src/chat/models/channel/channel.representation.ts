@@ -30,6 +30,7 @@ export interface ChannelShortRepresentation {
     isPublic: boolean;
     dateCreated: Date;
     isLocked: boolean;
+    subredditsToScrape?: string[];
 }
 
 export function getChannelRepresentation(channel: Channel, room?: Room): ChannelRepresentation {

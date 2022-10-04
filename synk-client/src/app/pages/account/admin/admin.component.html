@@ -43,16 +43,16 @@
                 </td>
               </tr>
               <tr>
-                <th>dateCreated</th>
-                <td>{{ channel.dateCreated | date }}</td>
+                <th>Subreddits</th>
+                <td>{{ channel.subredditsToScrape.join(', ') }}</td>
               </tr>
               <tr>
-                <th>connectedMemberCount</th>
-                <td>{{ channel.connectedMemberCount }}</td>
-              </tr>
-              <tr>
-                <th>nowPlaying</th>
+                <th>Now playing</th>
                 <td>{{ channel.nowPlaying?.title || "nothing playing" }}</td>
+              </tr>
+              <tr>
+                <th>Viewers</th>
+                <td>{{ channel.connectedMemberCount }}</td>
               </tr>
             </nz-table>
           </nz-collapse-panel>

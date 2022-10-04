@@ -32,7 +32,7 @@ export class ChannelController {
     @ApiOperation({ summary: 'Get all automated channels' })
     async getAutomatedChannels(): Promise<ChannelShortRepresentation[]> {
 
-        return this.roomService.automatedRooms.map(({ id, name, members, currentPlaylist, description }) => ({
+        return this.roomService.automatedRooms.map(({ id, name, members, currentPlaylist, description, subredditsToScrape }) => ({
             id,
             name,
             connectedMemberCount: members.length,
@@ -42,7 +42,8 @@ export class ChannelController {
                 currentTime: currentPlaylist.nowPlaying().time,
                 length: currentPlaylist.nowPlaying().media?.length
             },
-            description
+            description,
+            subredditsToScrape
         } as ChannelShortRepresentation))
 
     }
