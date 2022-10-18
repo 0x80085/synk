@@ -62,7 +62,6 @@ function getRandomInvidiousApiUrl() {
     const invidiousInstanceUrls = [
         'https://inv.vern.cc',
         'https://invidious.nerdvpn.de',
-        'https://invidious.snopyta.org',
         'https://invidious.namazso.eu',
         'https://inv.riverside.rocks',
         'https://invidious.flokinet.to',
