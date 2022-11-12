@@ -1,7 +1,7 @@
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { RedditCrawlerService } from "../crawlers/reddit.crawler.service";
+import { RedditCrawlerService } from "../crawlers/reddit-crawler.service";
 import { CrawlSubredditCommand } from "../models/commands/crawl-subreddit.command";
 import { CrawlSubredditResult } from "../models/results/crawl-subreddit.result";
 

@@ -3,7 +3,7 @@ import { BehaviorSubject, merge, of, Subject, Subscription, timer } from "rxjs";
 import { catchError, filter, map, mapTo, mergeAll, mergeMap, tap, toArray, withLatestFrom } from "rxjs/operators";
 
 import { Member } from "src/domain/entity/Member";
-import { RedditCrawlerService } from "src/tv/crawlers/reddit.crawler.service";
+import { RedditCrawlerService } from "src/tv/crawlers/reddit-crawler.service";
 import { YouTubeGetID, MediaMetaDataService } from "src/tv/crawlers/media-metadata.service";
 import { Feed } from "../feed/feed";
 import { Media } from "../media/media";

@@ -4,7 +4,7 @@ import { Channel, Member, Roles } from '../../domain/entity';
 import { Repository } from 'typeorm';
 import { Room } from '../models/room/room';
 import { AutomatedRoom } from '../models/automated-room/automated-room';
-import { RedditCrawlerService } from 'src/tv/crawlers/reddit.crawler.service';
+import { RedditCrawlerService } from 'src/tv/crawlers/reddit-crawler.service';
 import { MediaMetaDataService } from 'src/tv/crawlers/media-metadata.service';
 
 export const DEFAULT_MAX_USER_COUNT = 100;

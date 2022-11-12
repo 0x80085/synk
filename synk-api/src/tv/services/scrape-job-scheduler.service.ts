@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
-import { RedditCrawlerService } from 'src/tv/crawlers/reddit.crawler.service';
+import { RedditCrawlerService } from 'src/tv/crawlers/reddit-crawler.service';
 
 export enum Status {
     error = 'error',

@@ -4,7 +4,7 @@ import { Pagination } from 'nestjs-typeorm-paginate';
 import { SerializedUserData } from 'src/auth/local.serializer';
 import { ChannelService } from 'src/chat/services/channel.service';
 import { RoomService } from 'src/chat/services/room.service';
-import { RedditCrawlerService } from 'src/tv/crawlers/reddit.crawler.service';
+import { RedditCrawlerService } from 'src/tv/crawlers/reddit-crawler.service';
 import { Channel, Member } from '../../domain/entity';
 import { AdminGuard } from '../guards/admin.guard';
 import { AdminService } from '../services/admin.service';
