@@ -33,6 +33,7 @@ import { NZ_ICONS } from 'src/app/icons';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
+import { InvidiousUrlFormComponent } from './admin/invidious-url-form/invidious-url-form.component';
 
 @NgModule({
   declarations: [
@@ -43,7 +44,8 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
     PlaceholdPipe,
     UsernamePipe,
     OwnedChannelsComponent,
-    AdminComponent],
+    AdminComponent,
+    InvidiousUrlFormComponent],
   imports: [
     RouterModule,
     CommonModule,

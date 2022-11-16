@@ -1,0 +1,19 @@
+nz-form-item {
+  margin-bottom: .5rem;
+}
+
+
+.add-button{
+  width: 100%;
+}
+
+.anticon {
+  position: absolute;
+  top: .5rem;
+  right: .5rem;
+
+  &:hover {
+    color: crimson;
+    cursor: pointer;
+  }
+}

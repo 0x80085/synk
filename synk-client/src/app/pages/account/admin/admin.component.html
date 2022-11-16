@@ -61,6 +61,8 @@
         <button nz-button (click)="startScrapeJobManually()">
           Manually start scrape job
         </button>
+        <nz-divider></nz-divider>
+        <app-invidious-url-form></app-invidious-url-form>
       </nz-card>
       <h2 nz-typography>Users</h2>
       <nz-card [nzLoading]="(users$ | async) === null">

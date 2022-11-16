@@ -20,6 +20,15 @@ export interface YoutubeMetadata {
 @Injectable()
 export class MediaMetaDataService {
 
+    invidiousInstanceUrls = [
+        'https://inv.vern.cc',
+        'https://invidious.nerdvpn.de',
+        'https://invidious.namazso.eu',
+        'https://inv.riverside.rocks',
+        'https://invidious.flokinet.to',
+        'https://y.com.sb'
+    ];
+
     constructor(private httpService: HttpService) { }
 
     /**
@@ -29,7 +38,7 @@ export class MediaMetaDataService {
      * (code taken from cytube thx guise :3)
      */
     getVideoMetaData(id: string): Observable<YoutubeMetadata> {
-        const url = `${getRandomInvidiousApiUrl()}/api/v1/videos/${id}`;
+        const url = `${getRandom(this.invidiousInstanceUrls)}/api/v1/videos/${id}`;
         const headers = {};
 
         return this.httpService.get(url, { headers }).pipe(
@@ -58,17 +67,9 @@ export class MediaMetaDataService {
     }
 }
 
-function getRandomInvidiousApiUrl() {
-    const invidiousInstanceUrls = [
-        'https://inv.vern.cc',
-        'https://invidious.nerdvpn.de',
-        'https://invidious.namazso.eu',
-        'https://inv.riverside.rocks',
-        'https://invidious.flokinet.to',
-        'https://y.com.sb'
-    ];
-    const randIndex = Math.floor(Math.random() * invidiousInstanceUrls.length);
-    return invidiousInstanceUrls[randIndex];
+function getRandom(list: any[]) {
+    const randIndex = Math.floor(Math.random() * list.length);
+    return list[randIndex];
 }
 
 export function YouTubeGetID(url: string) {

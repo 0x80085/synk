@@ -1,9 +1,10 @@
-import { Controller, Delete, Get, InternalServerErrorException, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, InternalServerErrorException, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { SerializedUserData } from 'src/auth/local.serializer';
 import { ChannelService } from 'src/chat/services/channel.service';
 import { RoomService } from 'src/chat/services/room.service';
+import { MediaMetaDataService } from 'src/tv/crawlers/media-metadata.service';
 import { RedditCrawlerService } from 'src/tv/crawlers/reddit-crawler.service';
 import { Channel, Member } from '../../domain/entity';
 import { AdminGuard } from '../guards/admin.guard';
@@ -17,7 +18,8 @@ export class AdminController {
         private adminService: AdminService,
         private channelService: ChannelService,
         private roomService: RoomService,
-        private scrapeSubredditsJob: RedditCrawlerService
+        private scrapeSubredditsJob: RedditCrawlerService,
+        private mediaMetaDataService: MediaMetaDataService
     ) { }
 
     @Get('/channels')
@@ -135,6 +137,22 @@ export class AdminController {
     clearAutomatedRoomPlaylist(@Param('name') name: string) {
         this.roomService.automatedRooms.find(it => it.name === name)?.stopPlaying();
         this.roomService.automatedRooms.find(it => it.name === name)?.currentPlaylist.clear();
+    }
+
+    @Get('/invidious-urls/')
+    @UseGuards(AdminGuard)
+    @ApiOperation({ summary: 'Returns all Invidious URLs' })
+    getInvidiousUrls() {
+        return this.mediaMetaDataService.invidiousInstanceUrls;
+    }
+
+    @Patch('/invidious-urls/')
+    @UseGuards(AdminGuard)
+    @ApiOperation({ summary: 'Patch Invidious URLs' })
+    SaveInvidiousUrls(
+        @Body() input: string[]
+    ) {
+        return this.mediaMetaDataService.invidiousInstanceUrls = input;
     }
 
 }
