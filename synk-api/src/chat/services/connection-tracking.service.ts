@@ -77,7 +77,7 @@ export class ConnectionTrackingService {
     async getMemberBySocket(socket:  Socket): Promise<Member> {
         try {
             const memberId = this.getMemberId(socket);
-            return await this.memberRepository.findOneOrFail(memberId);
+            return await this.memberRepository.findOneOrFail({where :{id:memberId}});
         } catch (error) {
             throw new WsException(MessageTypes.NOT_AUTHENTICATED);
         }

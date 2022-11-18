@@ -12,7 +12,7 @@ export function getSSLCert(logger: Logger): HttpsOptions {
     try {
 
         if (!pathToKey || !pathToCert || !pathToChain) {
-            throw new Error('WARN no path to SSL certificate found, SLL can not be used');
+            throw new Error('WARN no path to SSL certificate found, SSL can not be used');
         }
 
         const privateKey = fs.readFileSync(pathToKey, 'utf8');
@@ -26,7 +26,7 @@ export function getSSLCert(logger: Logger): HttpsOptions {
         };
 
     } catch (e) {
-        logger.info(`getSSLCert failed to find SLL certificates`);
+        logger.info(`getSSLCert failed to find SSL certificates`);
         logger.info(e);
         logger.info(`no file at ${pathToKey}`);
         logger.info(`no file at ${pathToCert}`);
