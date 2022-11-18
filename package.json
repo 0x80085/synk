@@ -1,17 +1,19 @@
 {
   "name": "synk",
-  "version": "0.4.5",
+  "version": "0.4.9",
   "description": "Back and Front end for SYNK",
   "main": "index.js",
   "dependencies": {
+    "@nestjs/cli": "^9.1.5",
     "nodemon": "^2.0.16"
   },
   "devDependencies": {
     "concurrently": "^7.1.0"
   },
   "scripts": {
-    "start": "npx concurrently \"cd synk-client && ng s --live-reload\" \"cd synk-api && npm start\"",
-    "docker:run": "docker-compose -f \"docker-compose.yml\" up -d --build"
+    "start": "npx concurrently \"cd synk-client && npx ng s --live-reload\" \"cd synk-api && npm start\"",
+    "docker:run": "docker-compose -f \"docker-compose.yml\" up -d --build",
+    "build": "npx concurrently \"cd synk-client && npm run build\" \"cd synk-api && npm run build\""
   },
   "author": "0x80085",
   "license": "MIT"

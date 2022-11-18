@@ -9,7 +9,7 @@ import {
   WebSocketServer,
   WsException
 } from '@nestjs/websockets';
-import { from, Subscription } from 'rxjs';
+import { from, of, Subscription } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { Socket, Server } from 'socket.io';
 
@@ -91,8 +91,11 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
         }[])
           .filter((conn) => conn.socketId === client.id)
           .forEach(connection => {
-            const room = this.roomService.getRoomById(connection.roomId);
-            const wasRoomLeader = room.leader?.id === member.id;
+
+            const communityRoom = this.roomService.getRoomById(connection.roomId);
+            const autoRoom = this.roomService.getAutomatedRoom(connection.roomId);
+            const room = (communityRoom || autoRoom);
+            const wasRoomLeader = room?.leader?.id === member.id;
 
             room.leave(member);
 
@@ -384,18 +387,28 @@ export class RoomMessagesGateway implements OnGatewayInit, OnGatewayConnection, 
         room,
         automatedroom
       })),
-      tap(({ target: { media }, room, automatedroom }) =>
-        // todo community room should tell it's leader to play diff video
-        room
-          ? room.currentPlaylist?.remove(media)
-          : automatedroom?.handleUnplayableMedia(media)),
-      tap(({ room, automatedroom }) =>
-        room
-          ? this.broadcastPlaylistToRoom(room)
-          : this.broadcastPlaylistToRoom(automatedroom)),
-      tap(_ => client.emit(MessageTypes.REMOVE_MEDIA_SUCCESS, url)),
+      switchMap(it => Boolean(it?.target)
+        // Add if has media
+        ? of(it).pipe(
+          tap(({ target: { media }, room, automatedroom }) =>
+            // todo community room should tell it's leader to play diff video
+            room
+              ? room.currentPlaylist?.remove(media)
+              : automatedroom?.handleUnplayableMedia(media)),
+          tap(({ room, automatedroom }) =>
+            room
+              ? this.broadcastPlaylistToRoom(room)
+              : this.broadcastPlaylistToRoom(automatedroom)),
+          tap(_ => client.emit(MessageTypes.REMOVE_MEDIA_SUCCESS, url)),
+          catchError(e => {
+            if (e.message === 'Forbidden') { throw new WsException(MessageTypes.FORBIDDEN); }
+            throw new WsException(MessageTypes.GENERIC_ERROR);
+          })
+        )
+        : of(null)),
       catchError(e => {
-        if (e.message === 'Forbidden') { throw new WsException(MessageTypes.FORBIDDEN); }
+        this.logger.error("Handle unplayable media failed")
+        this.logger.error(e)
         throw new WsException(MessageTypes.GENERIC_ERROR);
       })
     )

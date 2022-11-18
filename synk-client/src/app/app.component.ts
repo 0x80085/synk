@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { AppStateService } from './app-state.service';
 import { map, withLatestFrom } from 'rxjs/operators';
 import { SocketService } from './socket.service';
-import { AuthService } from './pages/account/auth.service';
 import { NavigationEnd, Router, RouterEvent } from '@angular/router';
 
 @Component({
@@ -14,9 +13,7 @@ export class AppComponent {
 
   isCollapsed = true;
 
-  hostName = window.location.hostname;
-
-  isLoggedIn = this.state.isLoggedIn$;
+  isLoggedIn = this.state.isLoggedInAndConnected$;
   isConnected = this.socketService.isConnected$;
 
   isAdmin$ = this.isLoggedIn.pipe(
@@ -24,17 +21,14 @@ export class AppComponent {
     map(([isAdmin, isLoggedIn]) => isAdmin && isLoggedIn)
   );
 
-  user$ = this.auth.getUser(true)
-
   constructor(
-    private auth: AuthService,
     private state: AppStateService,
     private socketService: SocketService,
     private router: Router
   ) {
     this.router.events.subscribe((event: RouterEvent) => {
       if (event instanceof NavigationEnd) {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0 });
       }
     });
 

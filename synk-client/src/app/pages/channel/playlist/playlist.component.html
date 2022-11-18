@@ -3,31 +3,45 @@
       <ng-container *ngIf="nowPlayingSubject | async as nowPlayingMedia;">
         <div nz-row nz-row [nzGutter]="[6, 12]">
           <div nz-col [nzXs]="{ span: 24 }" [nzLg]="{ span: 12 }">
-            <span nz-typography nzType="secondary"><i nz-icon nzType="play-circle"></i></span> {{nowPlayingMedia?.title}}
-            <a
-              nz-button
-              nzType="link"
-              nz-tooltip
-              [nzTooltipTitle]="'Open media link in new tab'"
-              [href]="nowPlayingMedia?.mediaUrl"
-              target="blank"
-            >
-              <i nz-icon nzType="link"></i>
-            </a>
-          </div>
-          <div nz-col [nzXs]="{ span: 12 }" [nzLg]="{ span: 8 }">
-            <nz-button-group>
-              <button nz-button [disabled]="votedForSkip || isLeader" nzDanger (click)="onVoteSkip()">
-                <i nz-icon nzType="forward"></i>
-                Voteskip
-              </button>
-              <button nz-button nzDanger nzGhost [disabled]="votedForSkip || isLeader" nzType="primary">
-                {{ voteSkips | async }} / {{ maxVoteSkips | async }}
-              </button>
-            </nz-button-group>
+          <p nz-typography>  
+            <span nz-typography nzType="secondary">
+                <i nz-icon nzType="play-circle"></i>
+            </span> 
+            <span nz-typography> {{nowPlayingMedia?.title}}</span>
+          </p>
           </div>
           <div nz-col [nzXs]="{ span: 12 }" [nzLg]="{ span: 4 }">
-            <i nz-icon nzType="clock-circle" nzTheme="outline"></i> Duration: {{ nowPlayingMedia?.length}}
+           <p nz-typography>
+             <span nz-typography>
+               <span nz-typography nzType="secondary">
+                 <i nz-icon nzType="clock-circle" nzTheme="outline"></i> 
+               </span> 
+                Duration: {{ nowPlayingMedia?.length}}
+             </span>
+           </p>
+          </div>
+          <div nz-col [nzXs]="{ span: 12 }" [nzLg]="{ span: 8 }">
+            <p nz-typography>
+            <ng-container *ngIf="!isLeader">
+                <a nz-button [disabled]="votedForSkip" nzType="link" nzDanger (click)="onVoteSkip()">
+                  <i nz-icon nzType="forward"></i>
+                  Voteskip
+                </a>
+                <span nz-typography>Skips: {{ voteSkips | async }} / {{ maxVoteSkips | async }}</span>
+              </ng-container>
+              <span nz-typography>
+              <a
+                  nz-button
+                  nzType="link"
+                  nz-tooltip
+                  [nzTooltipTitle]="'Open media link in new tab'"
+                  [href]="nowPlayingMedia?.mediaUrl"
+                  target="blank"
+                >
+                <i nz-icon nzType="link"></i>
+              </a>
+            </span>
+            </p>
           </div>
         </div>
         <nz-divider></nz-divider>
@@ -47,7 +61,7 @@
               </button>
               <nz-divider></nz-divider>
             </div>
-            <nz-list [nzBordered]="localPlaylist" nzSize="small" [nzLoading]="!localPlaylist" [nzDataSource]="localPlaylist"
+            <nz-list [nzBordered]="localPlaylist !== null" nzSize="small" [nzLoading]="!localPlaylist" [nzDataSource]="localPlaylist"
             [nzRenderItem]="item" [nzNoResult]="noItems" cdkDropList (cdkDropListDropped)="drop($event)">
             <ng-template #item let-item>
               <nz-list-item style="border-bottom: 1px solid rgb(25, 25, 25)"
@@ -55,7 +69,7 @@
                 [nzActions]="[opAction]" cdkDrag>
               </nz-list-item>
               <ng-template #opAction>
-                <button nz-button nzSize="small" nzType="link"  nz-tooltip [nzTooltipTitle]="'Added by: ' + item.addedBy.username" *ngIf="item.addedBy">
+                <button nz-button nzSize="small" nzType="link"  nz-tooltip [nzTooltipTitle]="'Added by ' + item.addedBy.username" *ngIf="item.addedBy">
                   <i nz-icon nzType="user"></i>
                 </button>
                 <a
@@ -88,7 +102,7 @@
           </ng-template>
         
           <ng-template #staticPlaylist>
-            <nz-list [nzBordered]="localPlaylist" nzSize="small" [nzLoading]="!localPlaylist" [nzDataSource]="localPlaylist"
+            <nz-list [nzBordered]="localPlaylist !== null" nzSize="small" [nzLoading]="!localPlaylist" [nzDataSource]="localPlaylist"
             [nzRenderItem]="item" [nzNoResult]="noItems">
             <ng-template #item let-item>
               <nz-list-item style="border-bottom: 1px solid rgb(25, 25, 25)"
@@ -96,7 +110,7 @@
                 [nzActions]="[opAction]">
               </nz-list-item>
               <ng-template #opAction>
-                <button nz-button nzSize="small" nzType="link"  nz-tooltip [nzTooltipTitle]="'Added by: ' + item.addedBy.username" *ngIf="item.addedBy">
+                <button nz-button nzSize="small" nzType="link"  nz-tooltip [nzTooltipTitle]="'Added by ' + item.addedBy.username" *ngIf="item.addedBy">
                   <i nz-icon nzType="user"></i>
                 </button>
                 <a
@@ -178,7 +192,7 @@
 
 <ng-template #addMediaInfo>
   <p nz-typography>
-    Only media from the following urls are supported: {{supportedMediaHosts | json }} <br /> 
+    Only media from the following urls are supported: {{ supportedMediaHostsFormatted }}. <br /> 
   Support for other types of media can be requested via the Github repo or Discord chat.<br /> 
   <strong>If you are currently the leader,</strong>
   press the <i nz-icon [nzType]="'caret-right'"></i> on a playlist item to play it and other members' media player will

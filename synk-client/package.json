@@ -1,9 +1,9 @@
 {
   "name": "synk-client",
-  "version": "0.4.5",
+  "version": "0.4.9",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --configuration development",
     "build": "ng build --configuration production",
     "test": "ng test",
     "lint": "ng lint",

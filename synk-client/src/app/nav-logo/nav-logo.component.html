@@ -1,0 +1,33 @@
+<div>
+    <div (click)="clicked.emit()">
+        <div style="width: 100%; display: flex; margin: 0; padding: 0; justify-content: center; align-items: center;">
+            <div class="logo-wrapper">
+                <img class="logo" src="assets/synk-nav-logo.svg" alt="logo">
+                <ng-container *ngIf="(state$ | async) as connectionState; ">
+                    <div class="connection-indicator" [ngClass]="{
+                        'not-logged-in': !connectionState.loggedIn,
+                        'logged-in': connectionState.loggedIn && connectionState.socketConnected,
+                        'reconnecting': connectionState.loggedIn && !connectionState.socketConnected
+                    }">
+                        <ng-container *ngIf="!connectionState.loggedIn">
+                            <i nz-icon nzType="meh" nzTheme="outline" nz-tooltip
+                                nzTooltipTitle="Log in to access and create rooms!"></i>
+                        </ng-container>
+                        <ng-container *ngIf="connectionState.loggedIn && connectionState.socketConnected">
+                            <i nz-icon nzType="smile" nzTheme="outline" nz-tooltip
+                            [nzTooltipTitle]="'Good to see you, ' + connectionState.username"></i>
+                        </ng-container>
+                        <ng-container *ngIf="connectionState.loggedIn && !connectionState.socketConnected">
+                            <i nz-icon nzType="sync" nzTheme="fill" nz-tooltip
+                            nzTooltipTitle="Reconnecting..."></i>
+                        </ng-container>
+                        <!-- <ng-container *ngIf="connectionState.loggedIn && !connectionState.socketConnected">
+                            <i nz-icon nzType="disconnect" nzTheme="fill" nz-tooltip
+                            nzTooltipTitle="Couldn't connect to server..."></i>
+                        </ng-container> -->
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</div>

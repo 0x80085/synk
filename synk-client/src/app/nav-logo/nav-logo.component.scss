@@ -1,0 +1,59 @@
+:host {
+  display: block;
+  cursor: pointer;
+}
+
+.logo-wrapper {
+  position: relative;
+
+  .logo {
+    width: 1.5rem;
+    height: 1.5rem;
+    opacity: 0.7;
+    transition: all cubic-bezier(0.215, 0.61, 0.355, 1);
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  .connection-indicator {
+    position: absolute;
+
+    top: -0.2rem;
+    left: 1.1rem;
+
+    width: 0.9rem;
+    height: 0.9rem;
+
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+
+    background-color: transparent;
+    border-radius: 1rem;
+    border: 2px solid #191919;
+
+    &.not-logged-in {
+      background-color: grey;
+    }
+
+    &.logged-in {
+      background-color: greenyellow;
+    }
+
+    &.reconnecting {
+      background-color: blue;
+    }
+
+    &.connection-error {
+      background-color: red;
+    }
+
+    i {
+      transform: scale(0.9);
+      color: #191919;
+    }
+  }
+}

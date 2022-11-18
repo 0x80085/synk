@@ -15,7 +15,7 @@
               <tr>
                 <th>Actions</th>
                 <td>
-                  <form nz-form [formGroup]="automatedChannelForms.controls[i]"
+                  <form nz-form [formGroup]="getFormGroup(automatedChannelForms.controls[i])"
                     (ngSubmit)="startScraper(channel.name, automatedChannelForms.controls[i])">
                     <nz-form-item style="margin-bottom: 0;">
                       <nz-form-control>
@@ -43,20 +43,26 @@
                 </td>
               </tr>
               <tr>
-                <th>dateCreated</th>
-                <td>{{ channel.dateCreated | date }}</td>
+                <th>Subreddits</th>
+                <td>{{ channel.subredditsToScrape.join(', ') }}</td>
               </tr>
               <tr>
-                <th>connectedMemberCount</th>
-                <td>{{ channel.connectedMemberCount }}</td>
-              </tr>
-              <tr>
-                <th>nowPlaying</th>
+                <th>Now playing</th>
                 <td>{{ channel.nowPlaying?.title || "nothing playing" }}</td>
+              </tr>
+              <tr>
+                <th>Viewers</th>
+                <td>{{ channel.connectedMemberCount }}</td>
               </tr>
             </nz-table>
           </nz-collapse-panel>
         </nz-collapse>
+        <nz-divider></nz-divider>
+        <button nz-button (click)="startScrapeJobManually()">
+          Manually start scrape job
+        </button>
+        <nz-divider></nz-divider>
+        <app-invidious-url-form></app-invidious-url-form>
       </nz-card>
       <h2 nz-typography>Users</h2>
       <nz-card [nzLoading]="(users$ | async) === null">

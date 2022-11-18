@@ -1,0 +1,36 @@
+<ng-container *ngIf="invidiousUrls$ | async; then list; else loading">
+
+</ng-container>
+
+<ng-template #loading>
+  <p>
+    loading...
+  </p>
+</ng-template>
+
+<ng-template #list>
+<h2>
+  Invidious URLs
+</h2>
+  <form nz-form [formGroup]="invidiousUrlsForm" (ngSubmit)="submitForm()">
+    <nz-form-item *ngFor="let control of listOfControl; let i = index">
+      <nz-form-control>
+        <input nz-input placeholder="URL here" [formControlName]="'url_control_' + i" [value]="control" />
+        <span nz-icon nzType="delete" class="dynamic-delete-button" (click)="removeField(control, $event)"></span>
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-control [nzXs]="24" [nzSm]="24">
+        <button nz-button nzType="dashed" class="add-button" (click)="addField($event)">
+          Add field
+        </button>
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-control>
+        <button nz-button nzType="primary">Submit</button>
+      </nz-form-control>
+    </nz-form-item>
+  </form>
+
+</ng-template>

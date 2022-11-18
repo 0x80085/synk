@@ -1,6 +1,6 @@
 import { ForbiddenException } from '@nestjs/common';
 import { MessageTypes } from 'src/chat/gateways/message-types.enum';
-import { YouTubeGetID } from 'src/tv/crawlers/youtube-v3.service';
+import { YouTubeGetID } from 'src/tv/crawlers/media-metadata.service';
 import { Member, Roles } from '../../../domain/entity';
 import { Feed } from '../feed/feed';
 import { Media } from '../media/media';
@@ -204,12 +204,6 @@ export class Room {
         }
     }
 
-    banMember({ id }: Member, by: Member, reason: string) {
-        this.throwIfNotPermitted(by, ROOM_ACTION_PERMISSIONS.banHammer);
-
-        this.bannedMemberIds.push({ id, date: new Date(), reason });
-    }
-
     makeLeader(member: Member, newLeader: Member) {
         this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.changeLeader);
 
@@ -262,9 +256,9 @@ export class Room {
     }
 
     clearPlaylist(member: Member) {
-        this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.modAndAbove);
+        this.throwIfNotPermitted(member, ROOM_ACTION_PERMISSIONS.clearPlaylist);
         this.currentPlaylist.clear();
-        this.messages.post({ isSystemMessage: true, content: `${member.username} cleared the chat.`, author: { username: "" } as any })
+        this.messages.post({ isSystemMessage: true, content: `${member.username} cleared the playlist.`, author: { username: "" } as any })
     }
 
     private removeMemberSkipVote(member: Member) {

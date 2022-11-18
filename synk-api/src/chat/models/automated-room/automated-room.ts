@@ -3,8 +3,8 @@ import { BehaviorSubject, merge, of, Subject, Subscription, timer } from "rxjs";
 import { catchError, filter, map, mapTo, mergeAll, mergeMap, tap, toArray, withLatestFrom } from "rxjs/operators";
 
 import { Member } from "src/domain/entity/Member";
-import { RedditCrawlerService } from "src/tv/crawlers/reddit.crawler.service";
-import { YouTubeGetID, YoutubeV3Service } from "src/tv/crawlers/youtube-v3.service";
+import { RedditCrawlerService } from "src/tv/crawlers/reddit-crawler.service";
+import { YouTubeGetID, MediaMetaDataService } from "src/tv/crawlers/media-metadata.service";
 import { Feed } from "../feed/feed";
 import { Media } from "../media/media";
 import { Playlist, UpdatePlayingStateCommand } from "../playlist/playlist";
@@ -38,6 +38,7 @@ export class AutomatedRoom {
     members: Member[] = [];
     messages: Feed = new Feed();
     currentPlaylist: Playlist = new Playlist('default', null, new Date());
+    subredditsToScrape: string[];
 
     leader = null
     owner = null
@@ -168,12 +169,13 @@ export class AutomatedRoom {
         name: string,
         description: string,
         private redditScraper: RedditCrawlerService,
-        private ytService: YoutubeV3Service,
+        private ytService: MediaMetaDataService,
         subredditsToScrape: string[]
     ) {
         this.name = name
         this.description = description
         this.id = name
+        this.subredditsToScrape = subredditsToScrape
 
         this.redditScraper.registerTargetsForChannel(this.name, subredditsToScrape);
     }

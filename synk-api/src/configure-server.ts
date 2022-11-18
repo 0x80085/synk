@@ -9,7 +9,7 @@ import { getSSLCert } from './util/get-ssl-certs';
 import { Logger } from './util/logger';
 import { configureExpressServer } from './util/configure-express-server';
 import { SessionIOAdapter } from './chat/SessionIOAdapter';
-import { getConnection } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { Session } from './domain/entity/Session';
 import { TypeormStore } from 'typeorm-store';
 
@@ -34,7 +34,7 @@ export async function configureServer(logger: Logger) {
 
   configureExpressServer(app);
 
-  const sessionConfig = configureSession();
+  const sessionConfig = await configureSession();
 
   app.use(sessionConfig);
   app.useWebSocketAdapter(new SessionIOAdapter(app, sessionConfig));
@@ -46,7 +46,7 @@ export async function configureServer(logger: Logger) {
   return { app, port };
 }
 
-function configureSession() {
+async function configureSession() {
 
   // Setup express-session for Passport Local strategy 
   const sessionSecret = process.env.SESSION_SECRET;
@@ -55,8 +55,27 @@ function configureSession() {
   const secure = process.env.SESSION_HTTPS === 'TRUE';
   const cookieMaxAge = +process.env.SESSION_COOKIE_MAXAGE;
 
-  const sessionRepo = getConnection().getRepository(Session);
+  const dbConnection = new DataSource({
+    type: process.env.TYPEORM_CONNECTION as any|| 'postgres',
+    host: process.env.TYPEORM_HOST || 'localhost',
+    port: +process.env.TYPEORM_PORT || 5432,
+    username: process.env.TYPEORM_USERNAME || 'user',
+    password: process.env.TYPEORM_PASSWORD || 'complexpassword',
+    database: process.env.TYPEORM_DATABASE || 'synk',
+    logging: process.env.TYPEORM_LOGGING == 'true' || true,
+    synchronize:false,
+    entities: [
+      Session],
+  })
+
+  await dbConnection.initialize()
+
+  const sessionRepo = dbConnection.getRepository(Session);
   const sessionStore = new TypeormStore({ repository: sessionRepo });
+
+  console.log('ok i guess - ######');
+  console.log(!!sessionStore);
+  
 
   return session(
     {

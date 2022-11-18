@@ -1,14 +1,13 @@
-import { Component, ViewChild, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { BaseMediaComponent } from '../base-media.component';
 
 import { PlyrComponent as PlyrComp } from "ngx-plyr";
-
+import * as Plyr from 'plyr';
 
 export function isVimeoUrl(url: string) {
   const regx = /^(?:https?:\/\/)?(?:www\.|go\.)?vimeo\.com\/([a-z0-9_]+)($|\?)/
   return regx.test(url);
 }
-
 
 @Component({
   selector: 'app-plyr',
@@ -29,13 +28,44 @@ export class PlyrComponent implements BaseMediaComponent {
   @Output()
   mediaNotPlayable: EventEmitter<unknown> = new EventEmitter();
 
+  private currentTime = 0;
+
   constructor() { }
 
   play(url?: string): void {
-    this.setCurrentUrl(url);
-    if (this.plyr && !this.isPlaying()) {
-      this.plyr.player.play();
+
+    console.log('play');
+
+    let source: Plyr.Source = null;
+
+    if (isVimeoUrl(url)) {
+      source = {
+        src: url,
+        provider: 'vimeo',
+      };
+    } else {
+      source = { src: url, type: 'video/mp4', };
     }
+
+    this.videoSources = new Array(source);
+  }
+
+  initPlayer(_: Plyr) {
+  }
+
+  onCanPlay() {
+  }
+
+  onReady() {
+    this.plyr.player.play();
+  }
+
+  onLoadedData() {
+
+  }
+
+  onError(error: any) {
+    console.log(error);
   }
 
   isPlaying(): boolean {
@@ -50,8 +80,12 @@ export class PlyrComponent implements BaseMediaComponent {
     this.plyr.player.currentTime = to;
   }
 
+  onTimeUpdate(event: Plyr.PlyrEvent) {
+    this.currentTime = event.detail.plyr.currentTime;
+  }
+
   getCurrentTime(): number {
-    return this.plyr.player.currentTime;
+    return this.currentTime;
   }
 
   getCurrentUrl(): string {
@@ -59,36 +93,11 @@ export class PlyrComponent implements BaseMediaComponent {
   }
 
   setCurrentUrl(url: string): void {
-    if (!url) {
-      return;
-    }
-    if (url !== this.src) {
-      this.src = url;
-    }
-    if (this.plyr && !this.plyr.player.playing) {
-
-      if (isVimeoUrl(url)) {
-        this.plyr.player.source = {
-          type: 'video',
-          sources: [
-            {
-              src: this.src,
-              provider: 'vimeo',
-            },
-          ],
-        };
-
-      } else {
-        this.plyr.player.source = { sources: [{ src: this.src }], type: 'video' };
-      }
-    }
+    this.src = url
   }
 
   getDuration(): number {
     return this.plyr.player.duration;
   }
 
-  initPlayer() {
-    this.play(this.src);
-  }
 }

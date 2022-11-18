@@ -29,6 +29,10 @@ export class AdminComponent {
     return this.form.controls["automatedChannels"] as FormArray;
   }
 
+  getFormGroup(control: AbstractControl) {
+    return control as FormGroup;
+  }
+
   automatedChannels$ = this.adminService.getAutomatedChannels()
     .pipe(
       tap(channels => channels.forEach(chan => this.addChannelForm(chan))),
@@ -111,6 +115,14 @@ export class AdminComponent {
     this.adminService.playNext(name)
       .pipe(
         tap(() => this.notification.success('Success', `Playing next video`))
+      )
+      .subscribe()
+  }
+
+  startScrapeJobManually() {
+    this.adminService.startScrapeJobManually()
+      .pipe(
+        tap(() => this.notification.success('Success', `Started scrape job`))
       )
       .subscribe()
   }

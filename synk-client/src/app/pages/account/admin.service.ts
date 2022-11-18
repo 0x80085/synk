@@ -17,6 +17,8 @@ export interface ChannelOverviewItem {
   name: string;
   description: string;
   connectedMemberCount: number;
+  subredditsToScrape: string[];
+  dateCreated: Date;
   nowPlaying: {
     url: string,
     title: string
@@ -96,6 +98,7 @@ export interface ConnectionsResponse {
   providedIn: 'root'
 })
 export class AdminService {
+
   deleteRoom(id: string) {
     return this.http.delete(`${environment.api}/admin/channels/${id}`, {
       withCredentials: true
@@ -132,7 +135,7 @@ export class AdminService {
     );
   }
 
-  getAutomatedChannels() {    
+  getAutomatedChannels() {
     return this.http.get<ChannelOverviewItem[]>(
       `${environment.api}/channels/automated`,
       { withCredentials: true },
@@ -162,6 +165,18 @@ export class AdminService {
   }
   playNext(name: string) {
     return this.http.post(`${environment.api}/admin/play-next-auto-playback/${name}`, null, { withCredentials: true })
+  }
+
+  startScrapeJobManually() {
+    return this.http.post(`${environment.api}/admin/start-crawler-job`, null, { withCredentials: true })
+  }
+
+  getInvidiousUrls(): Observable<string[]> {
+    return this.http.get<string[]>(`${environment.api}/admin/invidious-urls`, { withCredentials: true })
+  }
+
+  patchInvidiousUrls(urls:string[]) {
+    return this.http.patch(`${environment.api}/admin/invidious-urls`, urls, { withCredentials: true })
   }
 
 }

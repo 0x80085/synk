@@ -16,6 +16,7 @@ export class PlayerDebugComponent {
   playerActions = [
     { label: SupportedPlayers.HTML5, action: () => this.showHtml5Player() },
     { label: SupportedPlayers.TWITCH, action: () => this.showTwitchPlayer() },
+    { label: SupportedPlayers.VIMEO, action: () => this.showVimeoPlayer() },
     { label: SupportedPlayers.YT, action: () => this.showYoutubePlayer() },
     { label: 'Clear', action: () => this.clear() }
   ];
@@ -34,6 +35,10 @@ export class PlayerDebugComponent {
 
   private showHtml5Player() {
     this.player.play("https://cdn.lbryplayer.xyz/api/v3/streams/free/Pandemic-Explained-David-Icke/5c9719a0dfb7b8d72bb9b8558ec07e7afcae3ea7/be58c0");
+  }
+
+  private showVimeoPlayer() {
+    this.player.play("https://vimeo.com/737031772");
   }
 
   private clear() {

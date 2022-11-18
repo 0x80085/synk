@@ -4,7 +4,7 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Observable } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
-import { AuthService, Channel } from '../../auth.service';
+import { AuthService, Channel, ChannelShortRepresentation } from '../../auth.service';
 
 @Component({
   selector: 'app-owned-channels',
@@ -21,17 +21,21 @@ export class OwnedChannelsComponent {
     return this.form.controls["channels"] as FormArray;
   }
 
+  getFormGroup(control: AbstractControl) {
+    return control as FormGroup;
+  }
+
   constructor(
     private auth: AuthService,
     private notification: NzNotificationService,
     private formBuilder: FormBuilder) {
   }
 
-  channels$: Observable<Channel[]> = this.auth.userOwnedChannels$.pipe(
+  channels$: Observable<ChannelShortRepresentation[]> = this.auth.userOwnedChannels$.pipe(
     tap(channels => channels.forEach(chan => this.addChannelForm(chan)))
   );
 
-  private addChannelForm(channel: Channel) {
+  private addChannelForm(channel: ChannelShortRepresentation) {
     const channelForm = this.formBuilder.group({
       description: [
         channel.description,
@@ -46,7 +50,7 @@ export class OwnedChannelsComponent {
     this.channelForms.push(channelForm);
   }
 
-  deleteChannel(channel: Channel, ev: Event) {
+  deleteChannel(channel: ChannelShortRepresentation, ev: Event) {
     if (confirm(`You really want to delete ${channel.name}?`)) {
       ev.preventDefault();
       this.auth.deleteChannel(channel.id)

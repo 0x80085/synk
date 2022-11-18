@@ -30,7 +30,7 @@ export class LocalSerializer extends PassportSerializer {
     async deserializeUser(user: SerializedUserData, done: CallableFunction) {
         try {
             const member = await this.memberRepository
-                .findOneOrFail({ id: user.id })
+                .findOneOrFail({ where: { id: user.id }})
 
             member.lastSeen = LocalSerializer.now();
             await this.memberRepository.save(member);

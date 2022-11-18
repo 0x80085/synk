@@ -4,8 +4,8 @@ import { Channel, Member, Roles } from '../../domain/entity';
 import { Repository } from 'typeorm';
 import { Room } from '../models/room/room';
 import { AutomatedRoom } from '../models/automated-room/automated-room';
-import { RedditCrawlerService } from 'src/tv/crawlers/reddit.crawler.service';
-import { YoutubeV3Service } from 'src/tv/crawlers/youtube-v3.service';
+import { RedditCrawlerService } from 'src/tv/crawlers/reddit-crawler.service';
+import { MediaMetaDataService } from 'src/tv/crawlers/media-metadata.service';
 
 export const DEFAULT_MAX_USER_COUNT = 100;
 
@@ -24,14 +24,14 @@ export class RoomService {
         @InjectRepository(Member)
         private memberRepository: Repository<Member>,
         private redditScraper: RedditCrawlerService,
-        private ytService: YoutubeV3Service,
+        private ytService: MediaMetaDataService,
         // @InjectRepository(Role)
         // private roleRepository: Repository<Role>,
         // @InjectRepository(ChannelConfig)
         // private configRepository: Repository<ChannelConfig>,
     ) {
         const subredditsGeneralInterest = ['videos', 'anime', 'publicfreakout', 'mealtimevideos', 'Documentaries', 'television', 'Whatcouldgowrong', 'gardening', 'instant_regret'];
-        const subredditsTechInterest = ['gaming', 'btc', 'bitcoin', 'cryptocurrency', 'nintendo', 'ps5', 'nintendo switch', 'dataisbeautiful', 'InternetIsBeautiful', 'technology', 'PS4', 'programming', 'xbox', 'technews'];
+        const subredditsTechInterest = ['gaming', 'btc', 'bitcoin', 'cryptocurrency', 'nintendo', 'ps5', 'dataisbeautiful', 'InternetIsBeautiful', 'technology', 'PS4', 'programming', 'xbox', 'technews'];
         // TODO load automated rooms from DB and start them
         this.automatedRooms = [
             new AutomatedRoom("The Daily Scraper", "Random content collected from internet hubs", redditScraper, ytService, subredditsGeneralInterest),

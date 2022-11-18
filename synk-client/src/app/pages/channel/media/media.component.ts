@@ -22,7 +22,7 @@ export enum SupportedPlayers {
   YT = 'YT',
   HTML5 = 'HTML5',
   TWITCH = 'TWITCH',
-  VIMEO = "VIMEO"
+  VIMEO = 'VIMEO'
 }
 
 // tslint:disable-next-line: directive-selector
@@ -96,6 +96,7 @@ export class MediaComponent {
     this.isMediaSelected.next(true);
 
     const playerType = this.resolveMediaType(url);
+    debugLog(`${playerType} media type detected`)
 
     this.createPlayerOfType(playerType);
     this.ref.instance.setCurrentUrl(url);

@@ -22,11 +22,18 @@ const SUPPORTED_MEDIA_HOSTS = [
   'youtube.com',
   'www.youtu.be',
   'www.youtube.com',
+
   'twitch.tv',
   'www.twitch.tv',
-  //'soundcloud.com',
-  //'vimeo.com',
-  //'archive.org',
+
+  'vimeo.com',
+  'www.vimeo.com',
+
+  'cdn.lbryplayer.xyz',
+  'lbryplayer.xyz',
+
+  'archive.org',
+
   // 'dailymotion.com',
   // 'twitter.com',
   // 'reddit.com',
@@ -61,7 +68,7 @@ export class PlaylistComponent implements OnDestroy, OnInit {
 
   localPlaylist: PlaylistItem[] = [];
 
-  supportedMediaHosts = SUPPORTED_MEDIA_HOSTS;
+  supportedMediaHostsFormatted = SUPPORTED_MEDIA_HOSTS.join(', ');
 
   nowPlayingSubject: Subject<PlaylistItem> = new Subject()
 
@@ -209,7 +216,7 @@ export class PlaylistComponent implements OnDestroy, OnInit {
   onClearPlaylist() {
     if (this.isSuperAdmin || this.isOwner) {
 
-      if(confirm("Really clear the playlist?")){
+      if (confirm("Really clear the playlist?")) {
         this.mediaService.clearPlaylist(this.roomName);
       }
     }
@@ -278,14 +285,15 @@ export class PlaylistComponent implements OnDestroy, OnInit {
 
     try {
       const { host } = new URL(value)
+      const extractHostnameRegex = /(?<![^\/]\/)\b\w+\.\b\w{2,3}(?:\.\b\w{2})?(?=$|\/)/gm;
+      const urlParts = extractHostnameRegex.exec(host);
+      const [domain] = urlParts;
+      console.log(urlParts);
 
-      if (SUPPORTED_MEDIA_HOSTS.indexOf(host) === -1) {
+
+      if (SUPPORTED_MEDIA_HOSTS.indexOf(domain) === -1) {
         throw new Error();
       }
-
-      // if (!YouTubeGetID(value)) {
-      //   throw new Error();
-      // }
     } catch {
       validUrl = false;
     }
