@@ -5,6 +5,7 @@ import { BadRequestException, ConflictException, Injectable, Logger, NotFoundExc
 import { Repository } from 'typeorm';
 import { Response, Request } from 'express';
 
+
 import { Member } from 'src/domain/entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConnectionTrackingService } from 'src/chat/services/connection-tracking.service';
@@ -58,8 +59,12 @@ export class AuthService {
         await this.memberRepo.save(user);
     }
 
-    logout(request: Request, response: Response){
-        request.logout()
+   async logout(request: any, response: Response){
+        const logoutError = await new Promise((resolve) =>
+        request.logOut({ keepSessionInfo: false }, (error) =>
+          resolve(error),
+        ),
+      );
         request.session = null
         response.clearCookie('io')
         response.clearCookie('connect.sid')

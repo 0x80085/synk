@@ -35,12 +35,12 @@ export class AuthController {
 
     @Post('/logout')
     @ApiOperation({ summary: 'Log out' })
-    logout(
+    async logout(
         @Req() req: Request,
         @Res() res: Response
     ) {
         try {
-            this.authService.logout(req, res);
+            await this.authService.logout(req, res);
 
             this.logger.log(`Member logged out?`);
 
