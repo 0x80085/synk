@@ -30,8 +30,10 @@ import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzPopoverModule } from 'ng-zorro-antd/popover';
 import { NZ_ICONS } from 'src/app/icons';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { PickerModule } from '@ctrl/ngx-emoji-mart';
 
 @NgModule({
     declarations: [
@@ -66,7 +68,9 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
         NzDividerModule,
         NzAlertModule,
         NzTabsModule,
+        NzPopoverModule,
         DragDropModule,
+        PickerModule,
         NzIconModule.forRoot(NZ_ICONS),
     ],
     providers: [ChatService]

@@ -1,5 +1,5 @@
 import { AfterViewChecked, Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import {  Observable, Subject } from 'rxjs';
 import { filter, map, mapTo, tap } from 'rxjs/operators';
 
 import { doLog } from 'src/app/utils/custom.operators';
@@ -38,7 +38,7 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
 
   loggedInUserIsLeader$ = this.config$.pipe(
     map(ev => (ev.isLeader)),
-    doLog('chatrom isleader', true), 
+    doLog('chatrom isleader', true),
   );
 
   messages$: Observable<Message[]> = this.chatService.roomMessages$;
@@ -71,6 +71,12 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
     } catch (error) {
       console.log(error);
     }
+  }
+
+  isEmojiPickerOpen = false;
+
+  addEmoji(emoji: any){
+    console.log(emoji);
   }
 
   ngOnInit() {

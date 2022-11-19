@@ -18,7 +18,7 @@
           <ng-container *ngIf="!message.isSystemMessage; then username; else system;"></ng-container>
           <ng-container *ngIf="!message.isSystemMessage; else systemMessage;">
             {{ message.text }}
-          </ng-container>          
+          </ng-container>
 
           <ng-template #systemMessage>
             <span nz-typography><small>{{ message.text }}</small></span>
@@ -40,14 +40,16 @@
         </textarea>
     </div>
   </div>
+  <i nz-icon nzType="smile" nz-popover [nzPopoverContent]="contentTemplate" nzPopoverTitle="Pick em"></i>
+  <ng-template #contentTemplate>
+    <emoji-mart [darkMode]="true" [exclude]="['people',  'recent']" (emojiClick)="addEmoji($event)" ></emoji-mart>
+  </ng-template>
 </ng-template>
 
 <ng-template #error>
-
   <p *ngIf="roomError$ | async">Error joining room..</p>
-
 </ng-template>
- 
+
 <ng-template #youAreLeaderText>
   <span nz-typography nz-tooltip nzTooltipTitle="Being a leader means your media player state is sent to other members of the room, enabling synchronized playback across member's devices. Everyone in the room is now hooked into your playback! Start playing a video to try it out">You are the leader</span>
 </ng-template>
