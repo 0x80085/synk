@@ -1,4 +1,4 @@
-import { Body, Controller, InternalServerErrorException, Logger, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Logger, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Response, Request } from 'express';
 
@@ -43,17 +43,14 @@ export class AuthController {
             await this.authService.logout(req, res);
 
             this.logger.log(`Member logged out?`);
-
+            
+            res.sendStatus(204)
         } catch (error) {
             this.logger.warn(`logout failed`);
             this.logger.warn(error);
 
-            if (Object.keys(error).length !== 0) {
-                throw new InternalServerErrorException();
-            }
+            res.sendStatus(500)            
         }
-
-        res.sendStatus(204)
     }
 }
 

@@ -59,15 +59,24 @@ export class AuthService {
         await this.memberRepo.save(user);
     }
 
-   async logout(request: any, response: Response){
-        const logoutError = await new Promise((resolve) =>
-        request.logOut({ keepSessionInfo: false }, (error) =>
-          resolve(error),
-        ),
-      );
-        request.session = null
-        response.clearCookie('io')
-        response.clearCookie('connect.sid')
+    async logout(request: any, response: Response){
+        // https://www.passportjs.org/concepts/authentication/logout/
+        const logger = this.logger;
+        return await new Promise((resolve, reject) => {
+            request.logOut({ keepSessionInfo: false }, (error) => {
+              if (error) {
+                logger.error('error on logout', error)
+                  console.log(error);
+                  reject(error)
+                }
+                logger.log('logout ok')
+                request.session = null
+                response.clearCookie('io')
+                response.clearCookie('connect.sid')
+                logger.log('clear cookies ok')
+                resolve(true)
+            },);
+        });
     }
 
     private async throwIfUsernameTaken(username: string) {
