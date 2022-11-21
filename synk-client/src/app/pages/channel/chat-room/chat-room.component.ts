@@ -51,6 +51,16 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
     mapTo(true),
   );
 
+  customEmojis = [
+    {
+      name: 'skadinod',
+      shortNames: ['skadinod'],
+      text: '',
+      emoticons: [],
+      keywords:  ['skadi', 'nod'],
+      imageUrl: 'https://media.tenor.com/UDaDt1XToTYAAAAi/skadi-nod-skadi.gif',
+    }];
+
   constructor(private chatService: ChatService
   ) { }
 

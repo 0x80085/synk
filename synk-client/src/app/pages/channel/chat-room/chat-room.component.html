@@ -42,7 +42,7 @@
   </div>
   <i nz-icon nzType="smile" nz-popover [nzPopoverContent]="contentTemplate" nzPopoverTitle="Pick em"></i>
   <ng-template #contentTemplate>
-    <emoji-mart [darkMode]="true" [exclude]="['people',  'recent']" (emojiClick)="addEmoji($event)" ></emoji-mart>
+    <emoji-mart [darkMode]="true" [exclude]="['people','nature','foods','activity','places','objects','symbols','flags']" [custom]="customEmojis" (emojiClick)="addEmoji($event)" ></emoji-mart>
   </ng-template>
 </ng-template>
 
