@@ -1,0 +1,14 @@
+<div class="input">
+  <div class="preview-msg">
+    <p [innerHTML]="inputParsed$ | async"></p>
+  </div>
+  <textarea placeholder="Send a message..." [(ngModel)]="msgBoxValue" (ngModelChange)="inputChangedSubject.next($event)"
+    name="textarea" (keyup.enter)="submitPressedSubject.next({ text:msgBoxValue, ev: $event })">
+    </textarea>
+  <i nz-icon nzType="smile" nz-popover [nzPopoverContent]="contentTemplate" nzPopoverTitle="Pick em"></i>
+  <ng-template #contentTemplate>
+    <emoji-mart [darkMode]="true"
+      [exclude]="['people','nature','foods','activity','places','objects','symbols','flags']" [custom]="customEmojis"
+      (emojiClick)="addEmoji($event)"></emoji-mart>
+  </ng-template>
+</div>

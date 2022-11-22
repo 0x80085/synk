@@ -1,5 +1,5 @@
-import { AfterViewChecked, Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import {  Observable, Subject } from 'rxjs';
+import { AfterViewChecked, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
 import { filter, map, mapTo, tap } from 'rxjs/operators';
 
 import { doLog } from 'src/app/utils/custom.operators';
@@ -16,16 +16,13 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
   @ViewChild('feed', { static: false, read: ElementRef }) private feed: ElementRef;
 
   @Input() name: string;
-
-  msgBoxValue: string;
+  shouldScrollDown: boolean;
 
   submitPressedSubject: Subject<{ ev?: any, text: string }> = new Subject();
-  shouldScrollDown: boolean;
 
   sendMessageSub = this.submitPressedSubject.pipe(
     filter(({ text }) => Boolean(text)),
     filter(({ text }) => Boolean(text.trim())),
-    tap(() => this.msgBoxValue = ''),
     map(({ text }) => text.trim()),
     map((text) => ({
       roomName: this.name,
@@ -38,7 +35,7 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
 
   loggedInUserIsLeader$ = this.config$.pipe(
     map(ev => (ev.isLeader)),
-    doLog('chatrom isleader', true),
+    doLog('chatroom isleader', true),
   );
 
   messages$: Observable<Message[]> = this.chatService.roomMessages$;
@@ -51,28 +48,12 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
     mapTo(true),
   );
 
-  customEmojis = [
-    {
-      name: 'skadinod',
-      shortNames: ['skadinod'],
-      text: '',
-      emoticons: [],
-      keywords:  ['skadi', 'nod'],
-      imageUrl: 'https://media.tenor.com/UDaDt1XToTYAAAAi/skadi-nod-skadi.gif',
-    }];
+  constructor(private chatService: ChatService) { }
 
-  constructor(private chatService: ChatService
-  ) { }
-
-  @HostListener('scroll', ['$event'])
-  onScroll($event: Event): void {
-    console.log($event.target);
-  }
-
-  @HostListener('keydown.enter', ['$event'])
-  onEnter(evt: KeyboardEvent) {
-    evt.preventDefault();
-  }
+  // @HostListener('scroll', ['$event'])
+  // onScroll($event: Event): void {
+  //   console.log($event.target);
+  // }
 
   private scrollChatFeedDown() {
     try {
@@ -83,11 +64,6 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
     }
   }
 
-  isEmojiPickerOpen = false;
-
-  addEmoji(emoji: any){
-    console.log(emoji);
-  }
 
   ngOnInit() {
     this.chatService.enterRoom(this.name);
