@@ -26,30 +26,32 @@ export class MessageInputComponent {
   inputParsed$ = this.inputChangedSubject.pipe(
     map((inputText) => {
       console.log(inputText);
+      let parsedText: string = inputText;
 
       const emojiRegex = /:([\w,\+,\-]+):/gim;
       let match;
-      const emojiKeys = [];
+      // const emojiKeys = [];
       const emojiData: { id: string; index: number }[] = [];
 
       while ((match = emojiRegex.exec(inputText))) {
         // console.log(match);
         // [':sad:', 'sad', index: 12, input: 'hard :cry:  :sad:  ', groups: undefined]
-        emojiKeys.push(...match.slice(1));
+        // emojiKeys.push(...match.slice(1));
         emojiData.push({ id: match[1], index: match.index });
       }
 
       console.log(emojiData);
 
-      emojiKeys.forEach((key) => {
+      emojiData.forEach(({ id: key }) => {
         const emojiMartRef = [
           ...this.emojiService.emojis,
-          ...this.customEmojis.map(({ name, shortNames }) => ({
+          ...this.customEmojis.map(({ name, shortNames, imageUrl }) => ({
             id: name,
             native: null,
             shortName: shortNames[0],
             colons: shortNames[0],
             name,
+            imageUrl,
           })),
         ].find(
           (e) =>
@@ -60,16 +62,24 @@ export class MessageInputComponent {
         if (emojiMartRef) {
           console.log('found emoji:');
           console.warn(emojiMartRef.name);
-
           if (emojiMartRef.native) {
-            // place emoji
+            parsedText = parsedText.replace(
+              `${emojiMartRef.colons}`,
+              emojiMartRef.native
+            );
           } else {
+            parsedText = parsedText.replace(
+              `:${emojiMartRef.colons.replace(':', '')}:`,
+              `<img src="${emojiMartRef.imageUrl}"/>`
+            );
             // place img
           }
+          console.log(emojiMartRef.colons);
+
         }
       });
 
-      return inputText;
+      return parsedText;
     })
   );
 
