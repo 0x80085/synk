@@ -30,13 +30,9 @@ export class MessageInputComponent {
 
       const emojiRegex = /:([\w,\+,\-]+):/gim;
       let match;
-      // const emojiKeys = [];
       const emojiData: { id: string; index: number }[] = [];
 
       while ((match = emojiRegex.exec(inputText))) {
-        // console.log(match);
-        // [':sad:', 'sad', index: 12, input: 'hard :cry:  :sad:  ', groups: undefined]
-        // emojiKeys.push(...match.slice(1));
         emojiData.push({ id: match[1], index: match.index });
       }
 
@@ -72,7 +68,6 @@ export class MessageInputComponent {
               `:${emojiMartRef.colons.replace(':', '')}:`,
               `<img src="${emojiMartRef.imageUrl}"/>`
             );
-            // place img
           }
           console.log(emojiMartRef.colons);
 
