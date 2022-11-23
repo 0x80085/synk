@@ -17,7 +17,8 @@
         <p nz-typography class="message">
           <ng-container *ngIf="!message.isSystemMessage; then username; else system;"></ng-container>
           <ng-container *ngIf="!message.isSystemMessage; else systemMessage;">
-            {{ message.text }}
+            <!-- {{ message.text }} -->
+            <span [innerHTML]="message.parsedText"></span>
           </ng-container>
 
           <ng-template #systemMessage>

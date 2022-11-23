@@ -1,3 +1,5 @@
+.input {
+  position: relative;
 
   textarea {
     display: block;
@@ -8,10 +10,23 @@
     width: 100%;
     height: 2.5rem;
     resize: none;
-    outline: none!important;
+    outline: none !important;
     overflow: auto;
 
     ::placeholder {
       font-size: 0.85rem;
     }
   }
+
+  .emote-menu-btn {
+    position: absolute;
+    right: 0.8rem;
+    top: 0.8rem;
+  }
+
+  .emote-img {
+    display: inline;
+    max-height: 2.2rem;
+    vertical-align: bottom;
+  }
+}
