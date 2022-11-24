@@ -6,7 +6,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { EmojiData } from '@ctrl/ngx-emoji-mart/ngx-emoji';
-import { BehaviorSubject, map, Subject } from 'rxjs';
+import { BehaviorSubject, map, of, Subject, switchMap } from 'rxjs';
 import { EmoteService } from '../../emote.service';
 
 @Component({
@@ -31,7 +31,14 @@ export class MessageInputComponent {
   submitPressedSubject: Subject<{ ev?: any; text: string }> = new Subject();
 
   inputParsed$ = this.inputChangedSubject.pipe(
-    map((inputText) => this.emoteService.parseText(inputText))
+    switchMap((text) =>
+      this.emoteService.getEmoteKeysFromText(text).length === 0
+        ? of(text).pipe(map((it) => ({ renderable: it, hasEmotes: false })))
+        : of(text).pipe(
+            map((inputText) => this.emoteService.parseText(inputText)),
+            map((it) => ({ renderable: it, hasEmotes: true }))
+          )
+    )
   );
 
   constructor(private emoteService: EmoteService) {}

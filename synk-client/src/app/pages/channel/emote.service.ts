@@ -8,6 +8,24 @@ import { CUSTOM_EMOJIS } from './chat-room/message-input/custom-emoji.data';
 export class EmoteService {
   customEmojis = CUSTOM_EMOJIS;
 
+  allEmojisByColonKey = [
+    ...this.emojiService.emojis,
+    ...this.customEmojis.map(({ name, shortNames, imageUrl }) => ({
+      id: name,
+      native: null,
+      shortName: shortNames[0],
+      colons: shortNames[0],
+      name,
+      imageUrl,
+    })),
+  ].reduce(
+    (collector, curentItem) => {
+      collector[curentItem.shortName] = curentItem
+      return collector
+    },
+    {}
+  );
+
   constructor(private emojiService: EmojiService) {}
 
   /**
@@ -23,54 +41,51 @@ export class EmoteService {
   private replaceSelectorsWithGraphic(inputText: string): string {
     let parsedText: string = inputText;
 
-    const emojiRegex = /:([\w,\+,\-]+):/gim;
-    let match;
-    const emojiData: { id: string; index: number }[] = [];
+    const emoteData: {
+      id: string;
+      index: number;
+    }[] = this.getEmoteKeysFromText(inputText);
 
-    while ((match = emojiRegex.exec(inputText))) {
-      emojiData.push({ id: match[1], index: match.index });
-    }
+    console.log(emoteData);
 
-    console.log(emojiData);
-
-    if (emojiData.length == 0) {
+    if (emoteData.length == 0) {
       return parsedText;
     }
+    const uniqueEmotes = [...new Set(emoteData)];
 
-    emojiData.forEach(({ id: key }) => {
-      const emojiMartRef = [
-        ...this.emojiService.emojis,
-        ...this.customEmojis.map(({ name, shortNames, imageUrl }) => ({
-          id: name,
-          native: null,
-          shortName: shortNames[0],
-          colons: shortNames[0],
-          name,
-          imageUrl,
-        })),
-      ].find(
-        (e) =>
-          e.id === key ||
-          e.shortName === key ||
-          (e.colons && e.colons.replace(':', '') === key)
-      );
-      if (emojiMartRef) {
-        console.log('found emoji:');
-        console.warn(emojiMartRef.name);
-        if (emojiMartRef.native) {
-          parsedText = parsedText.replace(
-            `:${emojiMartRef.shortName}:`,
-            emojiMartRef.native
-          );
-        } else {
-          parsedText = parsedText.replace(
-            `:${emojiMartRef.colons.replace(':', '')}:`,
-            `<img class="emote-img" src="${emojiMartRef.imageUrl}"/>`
-          );
-        }
-        console.log(emojiMartRef.colons);
+    uniqueEmotes.forEach(({ id }) => {
+      const emoteRef = this.allEmojisByColonKey[id];
+      if (emoteRef) {
+        parsedText = this.replaceKeyWithEmoteGraphic(emoteRef, parsedText);
       }
     });
+
     return parsedText;
+  }
+
+  private replaceKeyWithEmoteGraphic(emoteRef: any, parsedText: string) {
+    if (emoteRef.native) {
+      parsedText = parsedText.replace(
+        `:${emoteRef.shortName}:`,
+        emoteRef.native
+      );
+    } else {
+      parsedText = parsedText.replace(
+        `:${emoteRef.colons.replace(':', '')}:`,
+        `<img class="emote-img" src="${emoteRef.imageUrl}"/>`
+      );
+    }
+    return parsedText;
+  }
+
+  getEmoteKeysFromText(inputText: string) {
+    const emojiRegex = /:([\w,\+,\-]+):/gim;
+    let match;
+    const emoteData: { id: string; index: number }[] = [];
+
+    while ((match = emojiRegex.exec(inputText))) {
+      emoteData.push({ id: match[1], index: match.index });
+    }
+    return emoteData;
   }
 }

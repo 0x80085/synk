@@ -1,6 +1,6 @@
 <div class="input">
-  <nz-card *ngIf="inputParsed$ | async" style="padding-top: 0; margin-bottom: .5rem;" class="preview-msg">
-    <pre [innerHTML]="inputParsed$ | async"></pre>
+  <nz-card *ngIf="(inputParsed$ | async).hasEmotes" style="padding-top: 0; margin-bottom: .5rem;" class="preview-msg">
+    <pre [innerHTML]="(inputParsed$ | async).renderable"></pre>
   </nz-card>
   <textarea placeholder="Send a message..." [(ngModel)]="msgBoxValue" (ngModelChange)="inputChangedSubject.next($event)"
     name="textarea" (keyup.enter)="onSubmit()">
