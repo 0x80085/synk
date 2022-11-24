@@ -10,7 +10,17 @@ export class EmoteService {
 
   constructor(private emojiService: EmojiService) {}
 
+  /**
+   * Replaces :words_like_this:, :this: :+or: :-this_one: (if known emote) with renderable content for emote
+   * @param inputText text to parse to html
+   * @returns parsed text
+   */
   parseText(inputText: string) {
+    let parsedText: string = this.replaceSelectorsWithGraphic(inputText);
+    return parsedText;
+  }
+
+  private replaceSelectorsWithGraphic(inputText: string): string {
     let parsedText: string = inputText;
 
     const emojiRegex = /:([\w,\+,\-]+):/gim;
