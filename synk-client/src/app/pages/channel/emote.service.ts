@@ -72,7 +72,7 @@ export class EmoteService {
     } else {
       parsedText = parsedText.replace(
         `:${emoteRef.colons.replace(':', '')}:`,
-        `<img class="emote-img" src="${emoteRef.imageUrl}"/>`
+        `<img class="emote-img" title="${emoteRef.colons.replace(':', '')}" src="${emoteRef.imageUrl}"/>`
       );
     }
     return parsedText;
