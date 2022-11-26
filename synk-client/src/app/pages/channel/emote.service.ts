@@ -9,7 +9,7 @@ export class EmoteService {
   customEmojis = CUSTOM_EMOJIS;
 
   allEmojisByColonKey = [
-    ...this.emojiService.emojis,
+    ...this.emojiMart.emojis,
     ...this.customEmojis.map(({ name, shortNames, imageUrl }) => ({
       id: name,
       native: null,
@@ -26,7 +26,7 @@ export class EmoteService {
     {}
   );
 
-  constructor(private emojiService: EmojiService) {}
+  constructor(private emojiMart: EmojiService) {}
 
   /**
    * Replaces :words_like_this:, :this: :+or: :-this_one: (if known emote) with renderable content for emote
@@ -72,7 +72,7 @@ export class EmoteService {
     } else {
       parsedText = parsedText.replace(
         `:${emoteRef.colons.replace(':', '')}:`,
-        `<img class="emote-img" title="${emoteRef.colons.replace(':', '')}" src="${emoteRef.imageUrl}"/>`
+        `<img class="emote-img" title="${emoteRef.colons.replace(':', '')}" src="${emoteRef.imageUrl}" loading="lazy"/>`
       );
     }
     return parsedText;

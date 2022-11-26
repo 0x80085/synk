@@ -9,7 +9,8 @@
     class="emote-menu-btn"></i>
   <ng-template #contentTemplate>
     <emoji-mart [darkMode]="true"
-      [exclude]="['people','nature','foods','activity','places','objects','symbols','flags']" [custom]="customEmojis"
+      [include]="['custom','people','nature','foods','activity','places','objects','symbols','flags']"
+      [custom]="customEmojis"
       (emojiClick)="addEmoji($event)"></emoji-mart>
   </ng-template>
 </div>
