@@ -12,16 +12,13 @@
     resize: none;
     outline: none !important;
     overflow: auto;
-
-    ::placeholder {
-      font-size: 0.85rem;
-    }
+    border: none;
   }
 
   .emote-menu-btn {
     position: absolute;
-    right: 0.8rem;
-    top: 0.8rem;
+    right: 0.5rem;
+    top: 0.5rem;
   }
 
   .emote-img {
