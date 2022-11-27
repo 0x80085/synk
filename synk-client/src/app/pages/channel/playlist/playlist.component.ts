@@ -128,8 +128,6 @@ export class PlaylistComponent implements OnDestroy, OnInit {
     tap(({ max }) => this.maxVoteSkips.next(max)),
     tap(({ count, max }) => {
       if (count >= max) {
-        console.log('maxvoteskips reached, trying to play next');
-
         this.skipToNextAsLeader();
       }
     })
@@ -163,7 +161,6 @@ export class PlaylistComponent implements OnDestroy, OnInit {
           ? 0
           : activeItemIndex + 1;
 
-        console.log("skipping to " + this.localPlaylist[nextUpIndex].mediaUrl);
         this.playMedia.emit(this.localPlaylist[nextUpIndex].mediaUrl);
       }
     }
@@ -231,7 +228,6 @@ export class PlaylistComponent implements OnDestroy, OnInit {
     this.updateSkipRatioForm.controls.ratio.patchValue('');
     this.updateSkipRatioForm.controls.ratio.reset();
 
-    console.log(ratio);
     this.mediaService.updateVoteSkipRatio(this.roomName, ratio);
 
   }
@@ -288,8 +284,6 @@ export class PlaylistComponent implements OnDestroy, OnInit {
       const extractHostnameRegex = /(?<![^\/]\/)\b\w+\.\b\w{2,3}(?:\.\b\w{2})?(?=$|\/)/gm;
       const urlParts = extractHostnameRegex.exec(host);
       const [domain] = urlParts;
-      console.log(urlParts);
-
 
       if (SUPPORTED_MEDIA_HOSTS.indexOf(domain) === -1) {
         throw new Error();
