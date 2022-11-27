@@ -1,0 +1,28 @@
+<p nz-typography class="message">
+  <ng-container *ngIf="!message.isSystemMessage; then authorName; else systemAvatar;"></ng-container>
+  <ng-container *ngIf="!message.isSystemMessage; else systemMessage;">
+    <!-- {{ parsedMessage$ | async }} -->
+    <ng-container *ngFor="let messagePart of parsedMessage$ | async;">
+
+      <img *ngIf="!messagePart.emote?.native && messagePart.emote?.imageUrl" [src]="messagePart.emote?.imageUrl" alt=""
+        title="??" class="emote-img" loading="lazy">
+      <ng-container *ngIf="messagePart.emote?.native">{{ messagePart.emote.native }}</ng-container>
+      <ng-container *ngIf="!messagePart.emote">{{ messagePart.text }}</ng-container>
+
+    </ng-container>
+  </ng-container>
+
+
+  <ng-template #systemMessage>
+    <span nz-typography><small>{{ message.text }}</small></span>
+  </ng-template>
+
+  <ng-template #authorName>
+    <span nz-typography><code>{{ message.username }}</code></span>
+  </ng-template>
+
+  <ng-template #systemAvatar>
+    <span
+      nz-typography><code><i nz-icon nzType="robot" nzTheme="outline" nz-tooltip nzTooltipTitle="Message from server"></i></code></span>
+  </ng-template>
+</p>

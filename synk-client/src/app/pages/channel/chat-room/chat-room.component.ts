@@ -51,7 +51,7 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
   );
 
   messages$ = this.chatService.roomMessages$.pipe(
-    map((ls) => ls.map((it) => ({ ...it, parsedText: this.emoteService.parseText(it.text) })))
+    map((ls) => ls.map((it) => ({ ...it })))
   );
 
   scrollDownListenerSub = this.messages$

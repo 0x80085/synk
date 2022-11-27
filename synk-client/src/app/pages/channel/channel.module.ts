@@ -35,6 +35,7 @@ import { NZ_ICONS } from 'src/app/icons';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { PickerModule } from '@ctrl/ngx-emoji-mart';
 import { MessageInputComponent } from './chat-room/message-input/message-input.component';
+import { ChatMessageComponent } from './chat-message/chat-message.component';
 
 @NgModule({
     declarations: [
@@ -50,6 +51,7 @@ import { MessageInputComponent } from './chat-room/message-input/message-input.c
         PlyrComponent,
         ConnectedMembersComponent,
         MessageInputComponent,
+        ChatMessageComponent,
     ],
     imports: [
         CommonModule,
