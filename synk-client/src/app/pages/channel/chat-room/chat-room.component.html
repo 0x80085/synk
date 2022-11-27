@@ -13,28 +13,7 @@
     </div>
     <div class="feed"  #feed>
       <div *ngFor="let message of messages$ | async; last as isLast;">
-
         <app-chat-message [message]="message"></app-chat-message>
-
-        <!-- <p nz-typography class="message">
-          <ng-container *ngIf="!message.isSystemMessage; then username; else system;"></ng-container>
-          <ng-container *ngIf="!message.isSystemMessage; else systemMessage;">
-            {{ message.text }}
-            <span [innerHTML]="message.parsedText"></span>
-          </ng-container>
-
-          <ng-template #systemMessage>
-            <span nz-typography><small>{{ message.text }}</small></span>
-          </ng-template>
-
-          <ng-template #username>
-            <span nz-typography><code>{{ message.username }}</code></span>
-          </ng-template>
-
-          <ng-template #system>
-            <span nz-typography><code><i nz-icon nzType="robot" nzTheme="outline" nz-tooltip nzTooltipTitle="Message from server"></i></code></span>
-          </ng-template>
-        </p> -->
       </div>
     </div>
     <app-message-input (submitMessage)="submitPressedSubject.next({ text:$event, ev: $event })"></app-message-input>
