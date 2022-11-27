@@ -1,0 +1,50 @@
+.input {
+  position: relative;
+
+  textarea {
+    display: block;
+    padding: 0.5rem;
+    padding-right: 2rem;
+    background-color: #0e0e0e;
+    color: #f5f5f5;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    min-height: 2rem;
+    max-height: 5rem;
+    resize: none !important;
+    outline: none !important;
+    border: none;
+  }
+
+  .emote-menu-btn {
+    position: absolute;
+    right: 0.5rem;
+    top: 0.5rem;
+  }
+
+  .emote-img {
+    display: inline;
+    max-height: 3rem;
+    vertical-align: bottom;
+    border-radius: 2px;
+  }
+}
+
+.preview-msg {
+  padding-right: 2rem;
+  margin: 0;
+}
+
+.ant-card-body {
+  padding: 0.5rem;
+  padding-right: 0rem;
+}
+
+.ant-popover-title {
+  display: none;
+}
+
+.ant-popover-inner-content {
+  padding: 0;
+}

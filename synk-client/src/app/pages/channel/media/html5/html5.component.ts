@@ -28,7 +28,7 @@ export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDest
 
   @Output()
   mediaEnded: EventEmitter<unknown> = new EventEmitter();
-  
+
   @Output()
   mediaNotPlayable: EventEmitter<unknown> = new EventEmitter();
 
@@ -72,8 +72,7 @@ export class Html5Component implements BaseMediaComponent, AfterViewInit, OnDest
     this.video.nativeElement.onended = () => {
       this.mediaEnded.next(true);
     };
-    this.video.nativeElement.onerror = (event: any) => {
-      console.log(event);
+    this.video.nativeElement.onerror = (_: any) => {
       this.mediaEnded.next(true);
     };
     this.video.nativeElement.onloadeddata = () => {

@@ -5,7 +5,7 @@
   grid-template-columns: 1fr;
   grid-template-rows: 0.5fr 2fr 1fr;
   gap: 0px 1px;
-  
+
   overflow: hidden;
 
   .header {
@@ -23,30 +23,13 @@
     padding: 0.5rem;
     overflow-y: auto;
     grid-row-end: span 2;
-
-    .message {
-      margin-bottom: .5rem;
-
-      &:hover {
-        background-color: #191919e7;
-      }
-    }
   }
 
-  textarea {
-    display: block;
+  app-chat-message {
+    margin-bottom: 1em;
+  }
+
+  app-message-input {
     padding: 0.5rem;
-    border: 1px solid #191919;
-    background-color: #0e0e0e;
-    color: #f5f5f5;
-    width: 100%;
-    height: 2.5rem;
-    resize: none;
-    outline: none!important;
-    overflow: auto;
-   
-    ::placeholder {
-      font-size: 0.85rem;
-    }
   }
 }

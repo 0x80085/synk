@@ -1,68 +1,72 @@
-import { AfterViewChecked, Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import {
+  AfterViewChecked,
+  Component,
+  ElementRef,
+  Input,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import { Subject } from 'rxjs';
 import { filter, map, mapTo, tap } from 'rxjs/operators';
 
 import { doLog } from 'src/app/utils/custom.operators';
 import { ChatService } from '../chat.service';
-import { Message } from '../models/room.models';
+import { EmoteService } from '../emote.service';
 
 @Component({
   selector: 'app-chat-room',
   templateUrl: './chat-room.component.html',
-  styleUrls: ['./chat-room.component.scss']
+  styleUrls: ['./chat-room.component.scss'],
 })
 export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
-
-  @ViewChild('feed', { static: false, read: ElementRef }) private feed: ElementRef;
+  @ViewChild('feed', { static: false, read: ElementRef })
+  private feed: ElementRef;
 
   @Input() name: string;
-
-  msgBoxValue: string;
-
-  submitPressedSubject: Subject<{ ev?: any, text: string }> = new Subject();
   shouldScrollDown: boolean;
 
-  sendMessageSub = this.submitPressedSubject.pipe(
-    filter(({ text }) => Boolean(text)),
-    filter(({ text }) => Boolean(text.trim())),
-    tap(() => this.msgBoxValue = ''),
-    map(({ text }) => text.trim()),
-    map((text) => ({
-      roomName: this.name,
-      content: { text: text.trim() }
-    })),
-    this.chatService.sendMessageToRoom(),
-  ).subscribe();
+  submitPressedSubject: Subject<{ ev?: any; text: string }> = new Subject();
 
-  config$ = this.chatService.roomUserConfig$
+  sendMessageSub = this.submitPressedSubject
+    .pipe(
+      filter(({ text }) => Boolean(text)),
+      filter(({ text }) => Boolean(text.trim())),
+      map(({ text }) => text.trim()),
+      map((text) => ({
+        roomName: this.name,
+        content: { text: text.trim() },
+      })),
+      this.chatService.sendMessageToRoom()
+    )
+    .subscribe();
+
+  config$ = this.chatService.roomUserConfig$;
 
   loggedInUserIsLeader$ = this.config$.pipe(
-    map(ev => (ev.isLeader)),
-    doLog('chatrom isleader', true), 
+    map((ev) => ev.isLeader),
+    doLog('chatroom isleader', true)
   );
 
-  messages$: Observable<Message[]> = this.chatService.roomMessages$;
-
-  scrollDownListenerSub = this.messages$.pipe(
-    tap(_ => this.shouldScrollDown = true)
-  ).subscribe()
-
-  roomError$ = this.chatService.alreadyJoinedRoomError$.pipe(
-    mapTo(true),
+  messages$ = this.chatService.roomMessages$.pipe(
+    map((ls) => ls.map((it) => ({ ...it })))
   );
 
-  constructor(private chatService: ChatService
-  ) { }
+  scrollDownListenerSub = this.messages$
+    .pipe(tap((_) => (this.shouldScrollDown = true)))
+    .subscribe();
 
-  @HostListener('scroll', ['$event'])
-  onScroll($event: Event): void {
-    console.log($event.target);
-  }
+  roomError$ = this.chatService.alreadyJoinedRoomError$.pipe(mapTo(true));
 
-  @HostListener('keydown.enter', ['$event'])
-  onEnter(evt: KeyboardEvent) {
-    evt.preventDefault();
-  }
+  constructor(
+    private chatService: ChatService,
+    private emoteService: EmoteService
+  ) {}
+
+  // @HostListener('scroll', ['$event'])
+  // onScroll($event: Event): void {
+  //   console.log($event.target);
+  // }
 
   private scrollChatFeedDown() {
     try {
@@ -85,7 +89,7 @@ export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
 
   ngAfterViewChecked() {
     if (this.shouldScrollDown) {
-      this.scrollChatFeedDown()
+      this.scrollChatFeedDown();
       this.shouldScrollDown = false;
     }
   }

@@ -62,7 +62,6 @@ export class SocketService {
     return (src: Observable<RealTimeCommand>) =>
       src.pipe(
         withLatestFrom(this.socket$),
-        tap(([{ command, payload }]) => console.log('emitCommannd', command, payload)),
         tap(([{ command, payload }, socket]) => socket.emit(command, payload)),
         map(([rtc, _]) => rtc),
         this.catchSocketErr(),

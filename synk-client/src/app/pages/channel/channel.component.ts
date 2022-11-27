@@ -54,7 +54,6 @@ export class ChannelComponent implements OnInit, OnDestroy {
   mediaUpdateTimerSubscription: Subscription = timer(1000, 2000)
     .pipe(
       withLatestFrom(this.activeItem$),
-      tap(([, media]) => console.log('media update', media)),
       tap(([, media]) => {
         debugLog(`hasplayer? ${!!this.player?.ref}`,)
         if (this.loggedInUserIsLeader && this.player?.ref) {
@@ -70,13 +69,11 @@ export class ChannelComponent implements OnInit, OnDestroy {
       withLatestFrom(this.playlist$),
       tap(([, { entries }]) => {
         try {
-          console.log('onMediaEnded()');
           const nowPlayingUrl = this.player.getCurrentUrl();
-          
+
           const i = entries.findIndex(entry => entry.url === nowPlayingUrl);
           const next = entries[i + 1] || entries[0];
 
-          console.log('next', next);
           this.activeItemSubject.next(next);
 
           this.player.play(next.url);

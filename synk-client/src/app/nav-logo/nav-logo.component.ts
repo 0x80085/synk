@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { catchError, combineLatest, distinctUntilChanged, map, Observable, of, shareReplay, startWith, tap } from 'rxjs';
+import { catchError, combineLatest, distinctUntilChanged, map, Observable, of, shareReplay, startWith } from 'rxjs';
 import { AppStateService } from '../app-state.service';
 import { AuthService } from '../pages/account/auth.service';
 import { SocketService } from '../socket.service';
@@ -42,7 +42,7 @@ export class NavLogoComponent implements OnInit {
   ]).pipe(
     map(([isLoggedIn,isconnected, isSocketConnected_ ,{ isAdmin, username }]) =>
     ({
-      loggedIn: isLoggedIn || isconnected, 
+      loggedIn: isLoggedIn || isconnected,
       socketConnected: isconnected || isSocketConnected_,
       isAdmin: isAdmin,
       username
@@ -52,13 +52,11 @@ export class NavLogoComponent implements OnInit {
     map(it => it as NavState),
     distinctUntilChanged(
       // (prev, now) =>
-      // prev.loggedIn === now.loggedIn 
+      // prev.loggedIn === now.loggedIn
       // || prev.socketConnected === now.socketConnected
       // || prev.username === now.username
       ),
     shareReplay(1),
-
-    tap(console.log),
   )
 
   constructor(

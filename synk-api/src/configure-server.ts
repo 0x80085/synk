@@ -73,10 +73,6 @@ async function configureSession() {
   const sessionRepo = dbConnection.getRepository(Session);
   const sessionStore = new TypeormStore({ repository: sessionRepo });
 
-  console.log('ok i guess - ######');
-  console.log(!!sessionStore);
-  
-
   return session(
     {
       genid: () => {

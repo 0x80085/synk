@@ -34,8 +34,6 @@ export class PlyrComponent implements BaseMediaComponent {
 
   play(url?: string): void {
 
-    console.log('play');
-
     let source: Plyr.Source = null;
 
     if (isVimeoUrl(url)) {

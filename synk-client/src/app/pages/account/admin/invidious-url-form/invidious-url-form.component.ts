@@ -53,7 +53,6 @@ export class InvidiousUrlFormComponent implements OnInit {
       controlInstance: `url_control_${id}`,
     };
     const index = this.listOfControl.push(control);
-    console.log(this.listOfControl[this.listOfControl.length - 1]);
     this.invidiousUrlsForm.addControl(
       this.listOfControl[index - 1].controlInstance,
       new FormControl(null, Validators.required)
@@ -65,7 +64,6 @@ export class InvidiousUrlFormComponent implements OnInit {
     if (this.listOfControl.length > 1) {
       const index = this.listOfControl.indexOf(i);
       this.listOfControl.splice(index, 1);
-      console.log(this.listOfControl);
       this.invidiousUrlsForm.removeControl(i.controlInstance);
     }
   }

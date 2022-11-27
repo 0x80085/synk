@@ -1266,6 +1266,13 @@
   dependencies:
     postcss-value-parser "^4.2.0"
 
+"@ctrl/ngx-emoji-mart@6.2.0":
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/@ctrl/ngx-emoji-mart/-/ngx-emoji-mart-6.2.0.tgz#b265d9e97c3a8227e8eb4f8902b2ab806838fcb8"
+  integrity sha512-NHvWd7hRmcmS5kz6FmKXO7VTyrhuwCaqOvDjMLLSmDnWwTgmsxEXWdO7/fqOmOeyQUPp7zdkYuRhqPwfc1tKTg==
+  dependencies:
+    tslib "^2.3.0"
+
 "@ctrl/tinycolor@^3.3.1":
   version "3.4.1"
   resolved "https://registry.yarnpkg.com/@ctrl/tinycolor/-/tinycolor-3.4.1.tgz#75b4c27948c81e88ccd3a8902047bcd797f38d32"
