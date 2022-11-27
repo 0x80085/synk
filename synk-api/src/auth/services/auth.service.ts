@@ -5,6 +5,7 @@ import { BadRequestException, ConflictException, Injectable, Logger, NotFoundExc
 import { Repository } from 'typeorm';
 import { Response, Request } from 'express';
 
+
 import { Member } from 'src/domain/entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConnectionTrackingService } from 'src/chat/services/connection-tracking.service';
@@ -58,11 +59,24 @@ export class AuthService {
         await this.memberRepo.save(user);
     }
 
-    logout(request: Request, response: Response){
-        request.logout()
-        request.session = null
-        response.clearCookie('io')
-        response.clearCookie('connect.sid')
+    async logout(request: any, response: Response){
+        // https://www.passportjs.org/concepts/authentication/logout/
+        const logger = this.logger;
+        return await new Promise((resolve, reject) => {
+            request.logOut({ keepSessionInfo: false }, (error) => {
+              if (error) {
+                logger.error('error on logout', error)
+                  console.log(error);
+                  reject(error)
+                }
+                logger.log('logout ok')
+                request.session = null
+                response.clearCookie('io')
+                response.clearCookie('connect.sid')
+                logger.log('clear cookies ok')
+                resolve(true)
+            },);
+        });
     }
 
     private async throwIfUsernameTaken(username: string) {

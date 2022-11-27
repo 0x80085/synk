@@ -73,7 +73,7 @@ export class AccountController {
         this.authService.disconnectSocketConnections(req);
         await this.accountService.deleteAccount(id);
 
-        this.authService.logout(req, res);
+        await this.authService.logout(req, res);
 
         res.sendStatus(204);
 
