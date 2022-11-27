@@ -23,14 +23,13 @@
     padding: 0.5rem;
     overflow-y: auto;
     grid-row-end: span 2;
+  }
 
-    .message {
-      margin-bottom: .5rem;
+  app-chat-message {
+    margin-bottom: 1em;
+  }
 
-      &:hover {
-        background-color: #191919e7;
-      }
-    }
+  app-message-input {
+    padding: 0.5rem;
   }
 }
-

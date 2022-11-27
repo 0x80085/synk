@@ -15,7 +15,7 @@
   </ng-template>
 
   <ng-template #authorName>
-    <span nz-typography><code>{{ message.username }}</code></span>
+    <span nz-typography *ngIf="message.username"><code>{{ message.username }}</code></span>
   </ng-template>
 
   <ng-template #systemAvatar>

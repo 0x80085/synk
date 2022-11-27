@@ -6,7 +6,6 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
-  ViewEncapsulation
 } from '@angular/core';
 import { Subject } from 'rxjs';
 import { filter, map, mapTo, tap } from 'rxjs/operators';
@@ -19,7 +18,6 @@ import { EmoteService } from '../emote.service';
   selector: 'app-chat-room',
   templateUrl: './chat-room.component.html',
   styleUrls: ['./chat-room.component.scss'],
-  encapsulation: ViewEncapsulation.None
 })
 export class ChatRoomComponent implements OnDestroy, OnInit, AfterViewChecked {
   @ViewChild('feed', { static: false, read: ElementRef })
