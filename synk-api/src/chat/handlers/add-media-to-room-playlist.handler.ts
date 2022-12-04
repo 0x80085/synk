@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, UnsupportedMediaTypeException, } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Logger, UnsupportedMediaTypeException, } from "@nestjs/common";
 import { HttpService } from '@nestjs/axios';
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { of, throwError } from "rxjs";
@@ -15,6 +15,9 @@ import { allowedMediaSourceHosts as supportedMediaSourceHosts } from "./allowed-
 
 @CommandHandler(AddMediaToRoomCommand)
 export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomCommand> {
+
+    private logger = new Logger(AddMediaToRoomHandler.name);
+
     constructor(
         private ytService: MediaMetaDataService,
         private httpService: HttpService,
@@ -81,7 +84,7 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
             map((data) => ({ url: `https://www.youtube.com/watch?v=${id}`, ...data })),
             map(({ url, title, duration, isLive }) => new Media(url, title, duration, isLive)),
             catchError((e) => {
-                console.log(e);
+                this.logger.error(`Failed to get YT data for ${id}`, e);
                 throw new Error("AddMediaException");
             }))
     }
