@@ -3,8 +3,9 @@ import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Observable } from 'rxjs';
 import { map, shareReplay, take, tap } from 'rxjs/operators';
+import { ChannelOverviewItem, UserAccountInfo, UserInfo } from '../admin.models';
 
-import { AdminService, ChannelOverviewItem, UserAccountInfo, UserInfo } from '../admin.service';
+import { AdminService } from '../admin.service';
 import { Channel } from '../auth.service';
 
 @Component({

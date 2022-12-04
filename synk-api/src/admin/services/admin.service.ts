@@ -4,12 +4,14 @@ import { IPaginationOptions, paginateRawAndEntities, Pagination } from 'nestjs-t
 import { ConnectionTrackingService } from 'src/chat/services/connection-tracking.service';
 import { Repository } from 'typeorm';
 
-import { Channel, Member } from '../../domain/entity';
+import { Channel, GlobalSettings, GLOBAL_SETTINGS_NAME, Member } from '../../domain/entity';
 
 @Injectable()
 export class AdminService {
 
     constructor(
+        @InjectRepository(GlobalSettings)
+        private readonly settingsRepository: Repository<GlobalSettings>,
         @InjectRepository(Channel)
         private readonly channelRepository: Repository<Channel>,
         @InjectRepository(Member)
@@ -17,15 +19,32 @@ export class AdminService {
         private trackingService: ConnectionTrackingService,
     ) { }
 
-    async getPaginatedChannels(options: IPaginationOptions): Promise<Pagination<Channel>> {
+    getPaginatedChannels(options: IPaginationOptions): Promise<Pagination<Channel>> {
         return this.getChannelsWithOwner(options);
     }
 
-    async getPaginatedMembers(options: IPaginationOptions): Promise<Pagination<Member>> {
+    getPaginatedMembers(options: IPaginationOptions): Promise<Pagination<Member>> {
         return this.getMembersWithChannels(options)
     }
 
-    public getConnections() {
+    async getGlobalSettings(){
+        const [settings] = await this.settingsRepository.find({where: {name: GLOBAL_SETTINGS_NAME}});
+        return settings
+    }
+    
+    async patchGlobalSettings(input: GlobalSettings) {
+        const [settings] = await this.settingsRepository.find({where: {name: GLOBAL_SETTINGS_NAME}});
+        if (settings) {
+            await this.settingsRepository.update(settings, input)
+        } else {
+            const nuSettings = this.settingsRepository.create({
+                ...input
+            });
+            await this.settingsRepository.save(nuSettings)
+        }
+    }
+
+    getConnections() {
         const clients: any[] = [];
 
         [...this.trackingService.clients]

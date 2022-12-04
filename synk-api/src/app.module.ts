@@ -47,6 +47,7 @@ import { APP_GUARD } from '@nestjs/core';
         migrations: [configService.get('TYPEORM_MIGRATIONS')],
       }),
     }),
+    TypeOrmModule.forFeature([GlobalSettings]),
     ThrottlerModule.forRoot({
       ttl: 60,
       limit: 99,

@@ -149,10 +149,27 @@ export class AdminController {
     @Patch('/invidious-urls/')
     @UseGuards(AdminGuard)
     @ApiOperation({ summary: 'Patch Invidious URLs' })
-    SaveInvidiousUrls(
+    patchInvidiousUrls(
         @Body() input: string[]
     ) {
         return this.mediaMetaDataService.invidiousInstanceUrls = input;
+    }
+
+    
+    @Get('/global-settings/')
+    @UseGuards(AdminGuard)
+    @ApiOperation({ summary: 'Returns global settings of application' })
+    getGlobalSettings() {
+        return this.adminService.getGlobalSettings();
+    }
+    
+    @Patch('/global-settings/')
+    @UseGuards(AdminGuard)
+    @ApiOperation({ summary: 'Patches global settings of application' })
+    patchGlobalSettings(
+        @Body() input: any
+    ) {
+        return this.adminService.patchGlobalSettings(input);
     }
 
 }

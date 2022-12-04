@@ -63,6 +63,8 @@
         </button>
         <nz-divider></nz-divider>
         <app-invidious-url-form></app-invidious-url-form>
+        <nz-divider></nz-divider>
+        <app-global-settings-form></app-global-settings-form>
       </nz-card>
       <h2 nz-typography>Users</h2>
       <nz-card [nzLoading]="(users$ | async) === null">

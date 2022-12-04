@@ -1,0 +1,49 @@
+<ng-container *ngIf="globalSettings$ | async as globalSettings; else loading">
+  <h2>
+    Global settings
+  </h2>
+  <form nz-form [formGroup]="settingsForm" (ngSubmit)="submitForm()">
+    <nz-form-item *ngFor="let control of listOfControl; let i = index">
+      <nz-form-label [nzFor]="control.controlInstance">
+        {{ labels[i] || '???' }}
+      </nz-form-label>
+      <nz-form-control>
+        <ng-container *ngIf="labels[i] !== 'name'">
+          <input nz-input placeholder="URL here" [formControlName]="'url_control_' + i" [value]="control" nzErrorTip="Please enter a valid value" />
+        </ng-container>
+        <ng-container *ngIf="labels[i] === 'name'">
+          <code>{{globalSettings[labels[i]]}}</code>
+        </ng-container>
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-control>
+        <button nz-button nzType="primary">Submit</button>
+      </nz-form-control>
+    </nz-form-item>
+  </form>
+
+
+
+  <!-- <form nz-form [formGroup]="settingsForm" (ngSubmit)="submitForm()">
+    <nz-form-item *ngFor="let control of listOfControl; let i = index">
+      <nz-form-label [nzFor]="control.controlInstance">
+        {{ (globalSettings$ | async)[i] || '???' }}
+      </nz-form-label>
+      <nz-form-control>
+        <input nz-input placeholder="URL here" [formControlName]="'url_control_' + i" [value]="control" />
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-control>
+        <button nz-button nzType="primary">Submit</button>
+      </nz-form-control>
+    </nz-form-item>
+  </form> -->
+</ng-container>
+
+<ng-template #loading>
+  <p>
+    loading...
+  </p>
+</ng-template>

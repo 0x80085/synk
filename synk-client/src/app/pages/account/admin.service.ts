@@ -93,4 +93,12 @@ export class AdminService {
     return this.http.patch(`${environment.api}/admin/invidious-urls`, urls, { withCredentials: true })
   }
 
+  getGlobalSettings(): Observable< { [key: string]: string; }> {
+    return this.http.get< { [key: string]: string; }>(`${environment.api}/admin/global-settings`, { withCredentials: true })
+  }
+
+  patchGlobalSettings(urls: { [key: string]: string; }) {
+    return this.http.patch(`${environment.api}/admin/global-settings`, urls, { withCredentials: true })
+  }
+
 }
