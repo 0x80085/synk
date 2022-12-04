@@ -1,0 +1,15 @@
+::ng-deep {
+  .ant-popover-title {
+    display: none;
+  }
+
+  .ant-popover-inner-content {
+    padding: 0;
+    background-color: #191919;
+  }
+
+  emoji-preview {
+    display: none;
+  }
+}
+

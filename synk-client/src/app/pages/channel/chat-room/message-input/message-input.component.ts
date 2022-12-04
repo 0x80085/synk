@@ -3,24 +3,19 @@ import {
   EventEmitter,
   HostListener,
   Output,
-  ViewChild,
-  ViewEncapsulation,
+  ViewChild
 } from '@angular/core';
-import { EmojiData } from '@ctrl/ngx-emoji-mart/ngx-emoji';
 import {
   BehaviorSubject,
-  map,
-  of,
-  Subject,
-  switchMap,
+  map, Subject
 } from 'rxjs';
 import { EmoteService } from '../../emote.service';
 import { Message } from '../../models/room.models';
+
 @Component({
   selector: 'app-message-input',
   templateUrl: './message-input.component.html',
-  styleUrls: ['./message-input.component.scss'],
-  encapsulation: ViewEncapsulation.None,
+  styleUrls: ['./message-input.component.scss']
 })
 export class MessageInputComponent {
   @HostListener('keydown.enter', ['$event'])
@@ -33,19 +28,16 @@ export class MessageInputComponent {
   @ViewChild('messageInput', { static: true })
   messageInputElement: HTMLTextAreaElement;
 
-  customEmojis = this.emoteService.customEmojis;
-
   msgBoxValue: string = '';
 
   inputChangedSubject = new BehaviorSubject<string>('');
   submitPressedSubject: Subject<{ ev?: any; text: string }> = new Subject();
 
   inputChange$ = this.inputChangedSubject.pipe(
-    switchMap((text) =>
-    this.emoteService.getEmoteKeysFromText(text).length > 0
-        ? of(text).pipe(map((it) => ({ text: it, hasEmotes: true })))
-        : of(text).pipe(map((it) => ({ text: it, hasEmotes: false })))
-    ),
+    map((text) => ({
+      text,
+      hasEmotes: this.emoteService.getEmoteKeysFromText(text).length > 0,
+    })),
     map(({ text, hasEmotes }) => ({
       hasEmotes,
       text,
@@ -59,7 +51,7 @@ export class MessageInputComponent {
   constructor(private emoteService: EmoteService) {}
 
   addEmoji(event: any) {
-    this.msgBoxValue = this.msgBoxValue + (event.emoji as EmojiData).colons;
+    this.msgBoxValue = this.msgBoxValue + event.colons;
     this.inputChangedSubject.next(this.msgBoxValue);
     (this.messageInputElement as any).nativeElement.focus();
   }

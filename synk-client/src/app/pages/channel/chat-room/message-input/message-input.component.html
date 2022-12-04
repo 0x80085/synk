@@ -5,13 +5,8 @@
   <div>
     <textarea placeholder="Send a message..." [(ngModel)]="msgBoxValue"
       (ngModelChange)="inputChangedSubject.next($event)" name="textarea" (keyup.enter)="onSubmit()" #messageInput>
+    </textarea>
   </div>
-</textarea>
-    <i nz-icon nzType="smile" nz-popover [nzPopoverContent]="contentTemplate" nzPopoverTitle="Pick em"
-      class="emote-menu-btn"></i>
-  </div>
-  <ng-template #contentTemplate>
-    <emoji-mart [darkMode]="true"
-      [include]="['custom','people','nature','foods','activity','places','objects','symbols','flags']"
-      [custom]="customEmojis" (emojiClick)="addEmoji($event)"></emoji-mart>
-  </ng-template>
+  <app-emote-picker (emoteSelect)="addEmoji($event)"></app-emote-picker>
+</div>
+
