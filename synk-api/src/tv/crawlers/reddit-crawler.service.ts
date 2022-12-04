@@ -73,7 +73,7 @@ export class RedditCrawlerService {
                 // todo save the origin and datefound somewhere
                 map(urls => urls.map(url => YouTubeGetID(url))),
                 mergeMap(ids => ids.map(id =>
-                    this.ytService.getVideoMetaData(id).pipe(
+                    this.ytService.getVideoMetaDataWithRetry(id).pipe(
                         map((data) => ({ url: `https://www.youtube.com/watch?v=${id}`, ...data })),
                         map(({ url, title, duration }) => ({ origin: subreddit, media: new Media(url, title, duration) })),
                         catchError((error) =>{

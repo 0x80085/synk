@@ -80,7 +80,7 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
     }
 
     private getMetadataFromInvidousApi(id: string) {
-        return this.ytService.getVideoMetaData(id).pipe(
+        return this.ytService.getVideoMetaDataWithRetry(id).pipe(
             map((data) => ({ url: `https://www.youtube.com/watch?v=${id}`, ...data })),
             map(({ url, title, duration, isLive }) => new Media(url, title, duration, isLive)),
             catchError((e) => {
