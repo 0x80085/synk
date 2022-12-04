@@ -88,7 +88,7 @@ export class RedditCrawlerService {
                 mergeAll(),
                 toArray(),
                 map(entries => entries.filter(entry => entry.media.length < ONE_HOUR)
-                )));
+            )));
 
         let allResults: { origin: string, media: Media }[] = [];
 
