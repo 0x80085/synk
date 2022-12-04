@@ -62,7 +62,7 @@ async function configureSession() {
     username: process.env.TYPEORM_USERNAME || 'user',
     password: process.env.TYPEORM_PASSWORD || 'complexpassword',
     database: process.env.TYPEORM_DATABASE || 'synk',
-    logging: process.env.TYPEORM_LOGGING == 'true',
+    logging: process.env.TYPEORM_LOGGING === 'true',
     synchronize:false,
     entities: [
       Session],
