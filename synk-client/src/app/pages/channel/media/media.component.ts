@@ -16,13 +16,15 @@ import { BehaviorSubject, Subscription } from 'rxjs';
 import { isTwitchChannelUrl, TwitchComponent } from './twitch/twitch.component';
 import { isVimeoUrl, PlyrComponent } from './plyr/plyr.component';
 import { debugLog } from 'src/app/utils/custom.operators';
+import { PlyrIframeComponent } from './plyr-iframe/plyr-iframe.component';
 
 
 export enum SupportedPlayers {
   YT = 'YT',
   HTML5 = 'HTML5',
   TWITCH = 'TWITCH',
-  VIMEO = 'VIMEO'
+  VIMEO = 'VIMEO',
+  IFRAME = 'IFRAME',
 }
 
 // tslint:disable-next-line: directive-selector
@@ -106,6 +108,7 @@ export class MediaComponent {
     const isTwitch = isTwitchChannelUrl(url);
     const isVimeo = isVimeoUrl(url);
     const isYT = isValidYTid(url);
+    const isIframe = /(?:<iframe[^>]*)(?:(?:\/>)|(?:>.*?<\/iframe>))/gi.test(url);
 
     if (isTwitch) {
       return SupportedPlayers.TWITCH;
@@ -113,8 +116,11 @@ export class MediaComponent {
       return SupportedPlayers.YT;
     } else if (isVimeo) {
       return SupportedPlayers.VIMEO;
-    } else {
-      return SupportedPlayers.HTML5;
+    } else if(isIframe){
+      return SupportedPlayers.IFRAME;
+    }
+    else {
+    return SupportedPlayers.HTML5;
     }
   }
 
@@ -128,6 +134,9 @@ export class MediaComponent {
         break;
       case SupportedPlayers.VIMEO:
         this.assemblePlayer(PlyrComponent);
+        break;
+      case SupportedPlayers.IFRAME:
+        this.assemblePlayer(PlyrIframeComponent);
         break;
       default:
         this.assemblePlayer(PlyrComponent);

@@ -37,6 +37,7 @@ import { PickerModule } from '@ctrl/ngx-emoji-mart';
 import { MessageInputComponent } from './chat-room/message-input/message-input.component';
 import { ChatMessageComponent } from './chat-message/chat-message.component';
 import { EmotePickerComponent } from './chat-room/emote-picker/emote-picker.component';
+import { PlyrIframeComponent } from './media/plyr-iframe/plyr-iframe.component';
 
 @NgModule({
     declarations: [
@@ -54,6 +55,7 @@ import { EmotePickerComponent } from './chat-room/emote-picker/emote-picker.comp
         MessageInputComponent,
         ChatMessageComponent,
         EmotePickerComponent,
+        PlyrIframeComponent,
     ],
     imports: [
         CommonModule,

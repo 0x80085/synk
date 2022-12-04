@@ -18,6 +18,7 @@ export class PlayerDebugComponent {
     { label: SupportedPlayers.TWITCH, action: () => this.showTwitchPlayer() },
     { label: SupportedPlayers.VIMEO, action: () => this.showVimeoPlayer() },
     { label: SupportedPlayers.YT, action: () => this.showYoutubePlayer() },
+    { label: 'Iframe', action: () => this.showPlyrIframePlayer() },
     { label: 'Clear', action: () => this.clear() }
   ];
 
@@ -39,6 +40,14 @@ export class PlayerDebugComponent {
 
   private showVimeoPlayer() {
     this.player.play("https://vimeo.com/737031772");
+  }
+
+  private showPlyrIframePlayer() {
+    this.player.play(`<iframe
+    src="https://player.vimeo.com/video/309741585"
+    allowfullscreen
+    allowtransparency
+    allow="autoplay"></iframe>`);
   }
 
   private clear() {
