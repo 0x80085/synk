@@ -16,6 +16,7 @@ import { AccountModule } from './account/account.module';
 import { AdminModule } from './admin/admin.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { GlobalSettingsService } from './global-settings/global-settings.service';
 
 @Module({
   imports: [
@@ -65,7 +66,8 @@ import { APP_GUARD } from '@nestjs/core';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard
-    }
+    },
+    GlobalSettingsService
     ],
 })
 export class AppModule implements NestModule {

@@ -4,19 +4,17 @@ import { IPaginationOptions, paginateRawAndEntities, Pagination } from 'nestjs-t
 import { ConnectionTrackingService } from 'src/chat/services/connection-tracking.service';
 import { Repository } from 'typeorm';
 
-import { Channel, GlobalSettings, GLOBAL_SETTINGS_NAME, Member } from '../../domain/entity';
+import { Channel, Member } from '../../domain/entity';
 
 @Injectable()
 export class AdminService {
 
     constructor(
-        @InjectRepository(GlobalSettings)
-        private readonly settingsRepository: Repository<GlobalSettings>,
         @InjectRepository(Channel)
         private readonly channelRepository: Repository<Channel>,
         @InjectRepository(Member)
         private readonly memberRepository: Repository<Member>,
-        private trackingService: ConnectionTrackingService,
+        private trackingService: ConnectionTrackingService
     ) { }
 
     getPaginatedChannels(options: IPaginationOptions): Promise<Pagination<Channel>> {
@@ -25,23 +23,6 @@ export class AdminService {
 
     getPaginatedMembers(options: IPaginationOptions): Promise<Pagination<Member>> {
         return this.getMembersWithChannels(options)
-    }
-
-    async getGlobalSettings(){
-        const [settings] = await this.settingsRepository.find({where: {name: GLOBAL_SETTINGS_NAME}});
-        return settings
-    }
-    
-    async patchGlobalSettings(input: GlobalSettings) {
-        const [settings] = await this.settingsRepository.find({where: {name: GLOBAL_SETTINGS_NAME}});
-        if (settings) {
-            await this.settingsRepository.update(settings, input)
-        } else {
-            const nuSettings = this.settingsRepository.create({
-                ...input
-            });
-            await this.settingsRepository.save(nuSettings)
-        }
     }
 
     getConnections() {
