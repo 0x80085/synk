@@ -22,24 +22,6 @@
       </nz-form-control>
     </nz-form-item>
   </form>
-
-
-
-  <!-- <form nz-form [formGroup]="settingsForm" (ngSubmit)="submitForm()">
-    <nz-form-item *ngFor="let control of listOfControl; let i = index">
-      <nz-form-label [nzFor]="control.controlInstance">
-        {{ (globalSettings$ | async)[i] || '???' }}
-      </nz-form-label>
-      <nz-form-control>
-        <input nz-input placeholder="URL here" [formControlName]="'url_control_' + i" [value]="control" />
-      </nz-form-control>
-    </nz-form-item>
-    <nz-form-item>
-      <nz-form-control>
-        <button nz-button nzType="primary">Submit</button>
-      </nz-form-control>
-    </nz-form-item>
-  </form> -->
 </ng-container>
 
 <ng-template #loading>
