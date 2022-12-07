@@ -18,7 +18,7 @@
                             [nzTooltipTitle]="'Good to see you, ' + connectionState.username"></i>
                         </ng-container>
                         <ng-container *ngIf="connectionState.loggedIn && !connectionState.socketConnected">
-                            <i nz-icon nzType="sync" nzTheme="fill" nz-tooltip
+                            <i nz-icon nzType="sync" nz-tooltip
                             nzTooltipTitle="Reconnecting..."></i>
                         </ng-container>
                         <!-- <ng-container *ngIf="connectionState.loggedIn && !connectionState.socketConnected">
