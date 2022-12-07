@@ -38,6 +38,7 @@ import { MessageInputComponent } from './chat-room/message-input/message-input.c
 import { ChatMessageComponent } from './chat-message/chat-message.component';
 import { EmotePickerComponent } from './chat-room/emote-picker/emote-picker.component';
 import { PlyrIframeComponent } from './media/plyr-iframe/plyr-iframe.component';
+import { MediaInputComponent } from './playlist/media-input/media-input.component';
 
 @NgModule({
     declarations: [
@@ -56,6 +57,7 @@ import { PlyrIframeComponent } from './media/plyr-iframe/plyr-iframe.component';
         ChatMessageComponent,
         EmotePickerComponent,
         PlyrIframeComponent,
+        MediaInputComponent,
     ],
     imports: [
         CommonModule,

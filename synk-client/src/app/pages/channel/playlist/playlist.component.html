@@ -3,10 +3,10 @@
       <ng-container *ngIf="nowPlayingSubject | async as nowPlayingMedia;">
         <div nz-row nz-row [nzGutter]="[6, 12]">
           <div nz-col [nzXs]="{ span: 24 }" [nzLg]="{ span: 12 }">
-          <p nz-typography>  
+          <p nz-typography>
             <span nz-typography nzType="secondary">
                 <i nz-icon nzType="play-circle"></i>
-            </span> 
+            </span>
             <span nz-typography> {{nowPlayingMedia?.title}}</span>
           </p>
           </div>
@@ -14,8 +14,8 @@
            <p nz-typography>
              <span nz-typography>
                <span nz-typography nzType="secondary">
-                 <i nz-icon nzType="clock-circle" nzTheme="outline"></i> 
-               </span> 
+                 <i nz-icon nzType="clock-circle" nzTheme="outline"></i>
+               </span>
                 Duration: {{ nowPlayingMedia?.length}}
              </span>
            </p>
@@ -100,7 +100,7 @@
             </ng-template>
           </nz-list>
           </ng-template>
-        
+
           <ng-template #staticPlaylist>
             <nz-list [nzBordered]="localPlaylist !== null" nzSize="small" [nzLoading]="!localPlaylist" [nzDataSource]="localPlaylist"
             [nzRenderItem]="item" [nzNoResult]="noItems">
@@ -127,7 +127,7 @@
                   [nzTooltipTitle]="item.active ? 'now playing' : isLeader ? 'start video' : ''">
                   <i nz-icon [nzType]="item.active ? 'play-circle' : 'caret-right'"></i>
                 </button>
-                <ng-container *ngIf="loggedInMemberId$ | async as loggedInMemberId">    
+                <ng-container *ngIf="loggedInMemberId$ | async as loggedInMemberId">
                   <button *ngIf="!item.active && (loggedInMemberId === item.addedBy?.memberId)" nz-button nzSize="small" nzDanger nzType="link" (click)="onRemoveMedia(item.mediaUrl)" nz-tooltip
                   nzTooltipTitle="Remove from list">
                       <i nz-icon nzType="delete"></i>
@@ -144,60 +144,25 @@
             </ng-template>
           </nz-list>
           </ng-template>
-        
+
 
       </nz-tab>
 
         <nz-tab nzTitle="Add media" [nzDisabled]="isAutomatedRoom">
-              <form nz-form [formGroup]="addMediaform" (ngSubmit)="onAddMedia()">
-                <nz-form-item style="margin-bottom: 1rem;">
-                  <nz-form-control nzErrorTip="Please input a valid media URL">
-                    <nz-input-group nzSearch nzSize="large" [nzAddOnAfter]="addMediaSuffixButton">
-                      <input type="text" nz-input placeholder="Enter a link to a video" formControlName="mediaUrl" />
-                    </nz-input-group>
-                  </nz-form-control>
-                </nz-form-item>
-              </form>
-              <nz-alert style="margin-bottom: 1rem" nzType="info" [nzDescription]="addMediaInfo" nzShowIcon></nz-alert>
+
+            <app-media-input [roomName]="roomName" ></app-media-input>
+
         </nz-tab>
 
-        <!-- <nz-tab nzTitle="Settings" [nzDisabled]="!showPlaylistItemActions">
-              <form nz-form [formGroup]="updateSkipRatioForm" (ngSubmit)="onUpdateVoteSkipRatio()">
-                <nz-form-item style="margin-bottom: 1rem;">
-                  <nz-form-control nzErrorTip="Please input a valid ratio">
-                    <nz-input-group nzSearch nzSize="large" [nzAddOnAfter]="updateSkipRatioSuffixButton">
-                      <input type="number" nz-input placeholder="Enter value between 0 and 1 (Ex. 0.4  for 40%)" formControlName="ratio" />
-                    </nz-input-group>
-                  </nz-form-control>
-                </nz-form-item>
-              </form>
-        </nz-tab> -->
-
       </nz-tabset>
-     
+
     </div>
 </div>
-
-<ng-template #addMediaSuffixButton>
-  <button nz-button nzType="primary" type="submit" style="height: auto" nzSearch>
-    Add
-  </button>
-</ng-template>
 
 <ng-template #updateSkipRatioSuffixButton>
   <button nz-button nzType="primary" type="submit" style="height: auto" nzSearch>
     Update
   </button>
-</ng-template>
-
-<ng-template #addMediaInfo>
-  <p nz-typography>
-    Only media from the following urls are supported: {{ supportedMediaHostsFormatted }}. <br /> 
-  Support for other types of media can be requested via the Github repo or Discord chat.<br /> 
-  <strong>If you are currently the leader,</strong>
-  press the <i nz-icon [nzType]="'caret-right'"></i> on a playlist item to play it and other members' media player will
-  sync with your playback state.
-  </p>
 </ng-template>
 
 <ng-template #noItems>
