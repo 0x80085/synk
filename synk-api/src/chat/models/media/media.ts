@@ -1,12 +1,10 @@
 import { Member } from "src/domain/entity";
 import { MediaRepresentation } from "./media.representation";
-import { MediaTypes, detectMediaType } from "./mediatypes.enum";
 
 export class Media {
 
     title: string;
     url: string;
-    type: MediaTypes;
     metaData: any;
     length: number;
     isLive: boolean;
@@ -15,7 +13,6 @@ export class Media {
         this.title = title;
         this.url = url;
         this.length = duration;
-        this.type = detectMediaType(url);
         this.isLive = isLive;
     }
 
