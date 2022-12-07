@@ -91,13 +91,23 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
     }
 
     private getMetadataFromElsewhere(url: string) {
+        const isIframe = /(?:<iframe[^>]*)(?:(?:\/>)|(?:>.*?<\/iframe>))/gi.test(url);
+
+        if (isIframe) {
+            // cannot fetch metadata yet
+            return of(new Media(url, 'Custom object', 100));
+        }
+        
         const hostName = new URL(url).host;
+        // cannot fetch metadata yet
         if (
-            hostName === 'www.twitch.tv' ||
-            hostName === 'twitch.tv' ||
-            hostName === 'www.vimeo.com' ||
-            hostName === 'vimeo.com'
+            hostName !== 'youtu.be' &&
+            hostName !== 'youtube.com' &&
+            hostName !== 'www.youtu.be' &&
+            hostName !== 'www.youtube.com'
+          
         ) {
+            // cannot fetch media yet
             return of(new Media(url, url, 100));
         }
 
@@ -152,11 +162,11 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
         }
 
         try {
-            const domain = getDomain(url)
-            console.log(domain);
-            return this.globalSettingsService.allowedMediaHostingProviders.indexOf(domain) != -1;
+            const domain = getDomain(url) 
+            return this.globalSettingsService.allowedMediaHostingProviders.indexOf(domain) !== -1;
         } catch (error) {
-            return false
+            const isIframe = /(?:<iframe[^>]*)(?:(?:\/>)|(?:>.*?<\/iframe>))/gi.test(url);
+            return isIframe
         }
     }
 }
