@@ -78,7 +78,8 @@ export class MediaInputComponent {
         throw new Error();
       }
     } catch {
-      validUrl = false;
+      const isIframe = /(?:<iframe[^>]*)(?:(?:\/>)|(?:>.*?<\/iframe>))/gi.test(value);
+      validUrl = isIframe;
     }
 
     return validUrl ? null : { invalidUrl: { value: value } };
