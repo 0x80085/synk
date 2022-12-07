@@ -11,7 +11,7 @@ import { AddMediaToRoomCommand } from "../models/commands/add-media-to-room.comm
 import { Media } from "../models/media/media";
 import { toRepresentation } from "../models/playlist/playlist.representation";
 import { Room } from "../models/room/room";
-import { allowedMediaSourceHosts as supportedMediaSourceHosts } from "./allowed-media-hosts";
+import { GlobalSettingsService } from "src/settings/global-settings.service";
 
 @CommandHandler(AddMediaToRoomCommand)
 export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomCommand> {
@@ -21,6 +21,7 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
     constructor(
         private ytService: MediaMetaDataService,
         private httpService: HttpService,
+        private globalSettingsService: GlobalSettingsService
         // @InjectRepository(Channel)
         // private channelRepository: Repository<Channel>,
         // @InjectRepository(Video)
@@ -153,7 +154,7 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
         try {
             const domain = getDomain(url)
             console.log(domain);
-            return supportedMediaSourceHosts.indexOf(domain) != -1;
+            return this.globalSettingsService.allowedMediaHostingProviders.indexOf(domain) != -1;
         } catch (error) {
             return false
         }

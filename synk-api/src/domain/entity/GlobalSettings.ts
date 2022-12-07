@@ -1,7 +1,5 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-export const GLOBAL_SETTINGS_NAME = 'default'
-
 @Entity()
 export class GlobalSettings {
 

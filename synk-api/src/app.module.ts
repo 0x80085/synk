@@ -7,7 +7,16 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ChatModule } from './chat/chat.module';
 import { ChannelController } from './chat/controllers/channel.controller';
-import { Channel, ChannelConfig, GlobalSettings, Playlist, Session, Member, Video, Role } from './domain/entity/index';
+import {
+  Channel,
+  ChannelConfig,
+  GlobalSettings,
+  Playlist,
+  Session,
+  Member,
+  Video,
+  Role,
+} from './domain/entity/index';
 import { RedditController } from './tv/controllers/reddit.controller';
 import { TvModule } from './tv/tv.module';
 import { removeHeaderInfo } from './util/remove-header-info';
@@ -16,13 +25,13 @@ import { AccountModule } from './account/account.module';
 import { AdminModule } from './admin/admin.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
-import { GlobalSettingsService } from './global-settings/global-settings.service';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: ['.env', '.env.example'],
-      isGlobal: true
+      isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -36,15 +45,17 @@ import { GlobalSettingsService } from './global-settings/global-settings.service
         database: configService.get<string>('TYPEORM_DATABASE', 'synk'),
         logging: configService.get('TYPEORM_LOGGING', false),
         synchronize: configService.get('TYPEORM_SYNCHRONIZE', false),
-        entities: [Channel,
+        entities: [
+          Channel,
           ChannelConfig,
           GlobalSettings,
           Playlist,
           Session,
           Member,
           Video,
-          Role],
-        // entities: configService.get('TYPEORM_ENTITIES').split(','), // cannot use bc  Cannot use import statement outside a modu 
+          Role,
+        ],
+        // entities: configService.get('TYPEORM_ENTITIES').split(','), // cannot use bc  Cannot use import statement outside a modu
         migrations: [configService.get('TYPEORM_MIGRATIONS')],
       }),
     }),
@@ -58,21 +69,22 @@ import { GlobalSettingsService } from './global-settings/global-settings.service
     TvModule,
     AuthModule,
     AccountModule,
-    AdminModule
+    AdminModule,
+    SettingsModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard
+      useClass: ThrottlerGuard,
     },
-    GlobalSettingsService
-    ],
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(removeHeaderInfo)
-      .forRoutes(AppController, RedditController, ChannelController)
+    consumer
+      .apply(removeHeaderInfo)
+      .forRoutes(AppController, RedditController, ChannelController);
   }
 }
