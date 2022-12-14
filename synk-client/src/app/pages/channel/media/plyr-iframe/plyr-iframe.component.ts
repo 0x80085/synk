@@ -6,6 +6,28 @@ import * as Plyr from 'plyr';
 import { BehaviorSubject, distinctUntilChanged, map } from 'rxjs';
 import { DomSanitizer } from '@angular/platform-browser';
 
+import { Pipe, PipeTransform} from "@angular/core";
+
+@Pipe({ name: 'safeUrl' })
+export class SafeHtmlPipe implements PipeTransform {
+  constructor(private sanitizer: DomSanitizer) { }
+  transform(url) {
+    console.log(url);
+
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
+}
+
+@Pipe({ name: 'safeHtml' })
+export class SafeUrlPipe implements PipeTransform {
+  constructor(private sanitizer: DomSanitizer) { }
+  transform(url) {
+    console.log(url);
+    // return this.sanitizer.sanitize(SecurityContext.HTML, url);
+    return this.sanitizer.bypassSecurityTrustHtml(url);
+  }
+}
+
 @Component({
   selector: 'app-plyr-iframe',
   templateUrl: './plyr-iframe.component.html',
@@ -25,17 +47,26 @@ export class PlyrIframeComponent implements BaseMediaComponent {
   mediaNotPlayable: EventEmitter<unknown> = new EventEmitter();
 
   private iframeHtmlSubject = new BehaviorSubject(``);
-  iframeHtml$ = this.iframeHtmlSubject.pipe(
+  iframeSrc$ = this.iframeHtmlSubject.pipe(
+
     distinctUntilChanged(),
     map((iframe) => {
+      console.log('parsing iframe');
+
       const parsed: HTMLIFrameElement = new DOMParser()
         .parseFromString(iframe, 'text/html')
         .getElementsByTagName('iframe')[0];
-
-      return `<iframe src="${parsed.src}" allowfullscreen allowtransparency allow="autoplay"></iframe>`
+      console.log(parsed.src);
+      this.src = parsed.src
+        return parsed.src
+      // return `<iframe src="${parsed.src}" allowfullscreen allowtransparency allow="autoplay"></iframe>`
     }),
 
-    map((iframe) => this.sanitizer.bypassSecurityTrustHtml(iframe))
+    // map((iframe) => this.sanitizer.bypassSecurityTrustUrl(iframe)),
+      // map(url =>{
+      //   return `<iframe src="${ this.sanitizer.bypassSecurityTrustUrl(url)}" allowfullscreen allowtransparency allow="autoplay"></iframe>`
+
+      // })
   );
 
   private currentTime = 0;
@@ -81,7 +112,13 @@ export class PlyrIframeComponent implements BaseMediaComponent {
   }
 
   getCurrentUrl(): string {
-    return (this.plyr && this.plyr.player?.source?.sources[0]?.src) || null;
+    try {
+      return this.src
+      return this.plyr && this.plyr?.player?.source?.sources[0]?.src;
+    } catch(e) {
+      console.log(e);
+      return null
+    }
   }
 
   setCurrentUrl(content: string): void {

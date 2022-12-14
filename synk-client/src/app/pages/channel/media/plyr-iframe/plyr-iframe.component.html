@@ -1,2 +1,3 @@
-<div class="plyr__video-embed" id="player" [innerHTML]="(iframeHtml$ | async)">
+<div class="plyr__video-embed" id="player" >
+  <iframe [src]="(iframeSrc$ | async) | safeUrl" frameborder="0" #plyrComp></iframe>
 </div>

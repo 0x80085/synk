@@ -17,7 +17,7 @@ export interface PlaylistRepresentation {
 
 export class MediaRepresentation {
   title: string;
-  url: string;
+  url: any;
   duration: number;
   addedBy: { memberId: string, username: string };
   isLive: boolean;
@@ -25,14 +25,12 @@ export class MediaRepresentation {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MediaService {
-
-  roomPlaylistUpdateEvents$ = this.socketService.listenForEvent<PlaylistRepresentation>(MediaCommands.PLAYLIST_UPDATE)
-    .pipe(
-      shareReplay(1)
-    );
+  roomPlaylistUpdateEvents$ = this.socketService
+    .listenForEvent<PlaylistRepresentation>(MediaCommands.PLAYLIST_UPDATE)
+    .pipe(shareReplay(1));
 
   roomMediaEvent$ = this.socketService
     .listenForEvent<MediaRepresentation>(MediaCommands.MEDIA_EVENT)
@@ -40,39 +38,44 @@ export class MediaService {
       shareReplay(1)
     );
 
-  addMediaErrEvent$ = this.socketService.exceptionEvent$
-    .pipe(
-      filter(({ message }) => message === "AddMediaException")
-    );
+  addMediaErrEvent$ = this.socketService.exceptionEvent$.pipe(
+    filter(({ message }) => message === 'AddMediaException')
+  );
 
-  addMediaSuccessEvent$ = this.socketService.listenForEvent<{ url: string, playlistCount: number }>(MediaCommands.ADD_MEDIA_REQUEST_APPROVED)
-    .pipe(
-      map((mediaUrl) => mediaUrl)
-    );
+  addMediaSuccessEvent$ = this.socketService
+    .listenForEvent<{ url: string; playlistCount: number }>(
+      MediaCommands.ADD_MEDIA_REQUEST_APPROVED
+    )
+    .pipe(map((mediaUrl) => mediaUrl));
 
-  removeMediaErrEvent$ = this.socketService.exceptionEvent$
-    .pipe(
-      filter(({ message }) => message === "forbidden")
-    );
+  removeMediaErrEvent$ = this.socketService.exceptionEvent$.pipe(
+    filter(({ message }) => message === 'forbidden')
+  );
 
-  removeMediaSuccessEvent$ = this.socketService.listenForEvent<{ mediaUrl: string }>(MediaCommands.REMOVE_MEDIA_SUCCESS)
-    .pipe(
-      map((mediaUrl) => mediaUrl)
-    );
+  removeMediaSuccessEvent$ = this.socketService
+    .listenForEvent<{ mediaUrl: string }>(MediaCommands.REMOVE_MEDIA_SUCCESS)
+    .pipe(map((mediaUrl) => mediaUrl));
 
-  clearPlaylistSuccessEvent$ = this.socketService.listenForEvent<unknown>(MediaCommands.CLEAR_PLAYLIST_SUCCESS);
+  clearPlaylistSuccessEvent$ = this.socketService.listenForEvent<unknown>(
+    MediaCommands.CLEAR_PLAYLIST_SUCCESS
+  );
 
-  onVoteSkipCountEvent$ = this.socketService.listenForEvent<{ count: number, max: number }>(MediaCommands.VOTE_SKIP_COUNT);
+  onVoteSkipCountEvent$ = this.socketService.listenForEvent<{
+    count: number;
+    max: number;
+  }>(MediaCommands.VOTE_SKIP_COUNT);
 
-  allowedMediaProviders = this.http.get<string[]>(`${environment.api}/settings/allowed-media-providers`).pipe(shareReplay());
+  allowedMediaProviders = this.http
+    .get<string[]>(`${environment.api}/settings/allowed-media-providers`)
+    .pipe(shareReplay());
 
   constructor(
-      private socketService: SocketService,
-      private http: HttpClient
-    ) { }
+    private socketService: SocketService,
+    private http: HttpClient
+  ) {}
 
   sendMediaEvent(ev: MediaEvent) {
-    debugLog('sendMediaEvent', ev, true)
+    debugLog('sendMediaEvent', ev, true);
     this.socketService.socket.emit(MediaCommands.MEDIA_EVENT, ev);
   }
 
@@ -97,18 +100,28 @@ export class MediaService {
   }
 
   updateVoteSkipRatio(name: string, ratio: number) {
-    this.socketService.socket.emit(MediaCommands.UPDATE_VOTE_SKIP_RATIO, { name, ratio });
+    this.socketService.socket.emit(MediaCommands.UPDATE_VOTE_SKIP_RATIO, {
+      name,
+      ratio,
+    });
   }
 
-  changePositionInPlaylist(ev: { roomName: string, url: string, newPosition: number }) {
-    this.socketService.socket.emit(MediaCommands.CHANGE_MEDIA_POSITION_IN_LIST, ev);
+  changePositionInPlaylist(ev: {
+    roomName: string;
+    url: string;
+    newPosition: number;
+  }) {
+    this.socketService.socket.emit(
+      MediaCommands.CHANGE_MEDIA_POSITION_IN_LIST,
+      ev
+    );
   }
 
-  reportMediaNotPlayable(ev: { roomName: string, url: string }) {
+  reportMediaNotPlayable(ev: { roomName: string; url: string }) {
     this.socketService.socket.emit(MediaCommands.MEDIA_NOT_PLAYBLE, ev);
   }
 
   clearPlaylist(roomName: string) {
-    this.socketService.socket.emit(MediaCommands.CLEAR_PLAYLIST, { roomName })
+    this.socketService.socket.emit(MediaCommands.CLEAR_PLAYLIST, { roomName });
   }
 }
