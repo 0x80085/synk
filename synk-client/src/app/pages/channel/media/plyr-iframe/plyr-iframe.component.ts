@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { BaseMediaComponent } from '../base-media.component';
 
 import { PlyrComponent as PlyrComp } from 'ngx-plyr';
@@ -33,9 +33,13 @@ export class SafeUrlPipe implements PipeTransform {
   templateUrl: './plyr-iframe.component.html',
   styleUrls: ['./plyr-iframe.component.scss'],
 })
-export class PlyrIframeComponent implements BaseMediaComponent {
-  @ViewChild(PlyrComp)
-  plyr: PlyrComp;
+export class PlyrIframeComponent implements BaseMediaComponent, AfterViewInit {
+
+
+  @ViewChild('plyrComp',{ static: true })
+  plyrEl: any;
+
+  plyr: Plyr;
 
   src: string;
   videoSources: Plyr.Source[] = [];
@@ -79,10 +83,14 @@ export class PlyrIframeComponent implements BaseMediaComponent {
 
   initPlayer(_: Plyr) {}
 
+  ngAfterViewInit(): void {
+     this.plyr = new Plyr(this.plyrEl);
+  }
+
   onCanPlay() {}
 
   onReady() {
-    this.plyr.player.play();
+    this.plyr.play();
   }
 
   onLoadedData() {}
@@ -92,15 +100,16 @@ export class PlyrIframeComponent implements BaseMediaComponent {
   }
 
   isPlaying(): boolean {
-    return this.plyr && this.plyr.player.playing;
+    // debugger
+    return this.plyr && this.plyr.playing;
   }
 
   pause(): void {
-    this.plyr.player.pause();
+    this.plyr.pause();
   }
 
   seek(to: number): void {
-    this.plyr.player.currentTime = to;
+    this.plyr.currentTime = to;
   }
 
   onTimeUpdate(event: Plyr.PlyrEvent) {
@@ -114,7 +123,7 @@ export class PlyrIframeComponent implements BaseMediaComponent {
   getCurrentUrl(): string {
     try {
       return this.src
-      return this.plyr && this.plyr?.player?.source?.sources[0]?.src;
+    //  return this.plyr && this.plyr?.player?.source?.sources[0]?.src;
     } catch(e) {
       console.log(e);
       return null
@@ -126,6 +135,6 @@ export class PlyrIframeComponent implements BaseMediaComponent {
   }
 
   getDuration(): number {
-    return this.plyr.player.duration;
+    return this.plyr.duration;
   }
 }

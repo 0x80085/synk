@@ -136,11 +136,13 @@ export class MediaComponent {
         this.assemblePlayer(PlyrComponent);
         break;
       case SupportedPlayers.IFRAME:
+        console.warn('IFRAME ASSEMBLE');
         this.assemblePlayer(PlyrIframeComponent);
         break;
       default:
-        this.assemblePlayer(PlyrComponent);
-        // this.assemblePlayer(Html5Component);
+        console.warn('PLYR ASSEMBLE');
+
+      this.assemblePlayer(PlyrComponent);
         break;
     }
   }
