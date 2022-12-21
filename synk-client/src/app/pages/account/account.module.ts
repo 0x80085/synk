@@ -34,6 +34,7 @@ import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { InvidiousUrlFormComponent } from './admin/invidious-url-form/invidious-url-form.component';
+import { GlobalSettingsFormComponent } from './admin/global-settings-form/global-settings-form.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import { InvidiousUrlFormComponent } from './admin/invidious-url-form/invidious-
     UsernamePipe,
     OwnedChannelsComponent,
     AdminComponent,
-    InvidiousUrlFormComponent],
+    InvidiousUrlFormComponent,
+    GlobalSettingsFormComponent],
   imports: [
     RouterModule,
     CommonModule,

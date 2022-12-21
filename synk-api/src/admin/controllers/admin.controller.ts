@@ -4,6 +4,7 @@ import { Pagination } from 'nestjs-typeorm-paginate';
 import { SerializedUserData } from 'src/auth/local.serializer';
 import { ChannelService } from 'src/chat/services/channel.service';
 import { RoomService } from 'src/chat/services/room.service';
+import { GlobalSettingsService } from 'src/settings/global-settings.service';
 import { MediaMetaDataService } from 'src/tv/crawlers/media-metadata.service';
 import { RedditCrawlerService } from 'src/tv/crawlers/reddit-crawler.service';
 import { Channel, Member } from '../../domain/entity';
@@ -19,7 +20,8 @@ export class AdminController {
         private channelService: ChannelService,
         private roomService: RoomService,
         private scrapeSubredditsJob: RedditCrawlerService,
-        private mediaMetaDataService: MediaMetaDataService
+        private mediaMetaDataService: MediaMetaDataService,
+        private globalSettingsService: GlobalSettingsService,
     ) { }
 
     @Get('/channels')
@@ -149,10 +151,27 @@ export class AdminController {
     @Patch('/invidious-urls/')
     @UseGuards(AdminGuard)
     @ApiOperation({ summary: 'Patch Invidious URLs' })
-    SaveInvidiousUrls(
+    patchInvidiousUrls(
         @Body() input: string[]
     ) {
-        return this.mediaMetaDataService.invidiousInstanceUrls = input;
+        this.mediaMetaDataService.invidiousInstanceUrls = input;
+    }
+
+    
+    @Get('/global-settings/')
+    @UseGuards(AdminGuard)
+    @ApiOperation({ summary: 'Returns global settings of application' })
+    getGlobalSettings() {
+        return this.globalSettingsService.getGlobalSettings();
+    }
+    
+    @Patch('/global-settings/')
+    @UseGuards(AdminGuard)
+    @ApiOperation({ summary: 'Patches global settings of application' })
+    patchGlobalSettings(
+        @Body() input: any
+    ) {
+        return this.globalSettingsService.updateGlobalSettings(input);
     }
 
 }

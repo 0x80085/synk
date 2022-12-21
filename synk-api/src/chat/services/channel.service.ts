@@ -23,7 +23,7 @@ export class ChannelService {
         @InjectRepository(Role)
         private roleRepository: Repository<Role>,
         @InjectRepository(ChannelConfig)
-        private configRepository: Repository<ChannelConfig>,
+        private channelConfigRepository: Repository<ChannelConfig>,
         private roomService: RoomService
     ) { }
 
@@ -47,7 +47,7 @@ export class ChannelService {
             dateCreated: new Date(),
             isLocked: false,
         });
-        const config = this.configRepository.create({
+        const config = this.channelConfigRepository.create({
             name: "default",
             description: "default",
             isActivated: true,
@@ -64,7 +64,7 @@ export class ChannelService {
         })
 
         await this.channelRepository.save(channel);
-        await this.configRepository.save(config);
+        await this.channelConfigRepository.save(config);
 
         this.roomService.addRoom(channel, member);
     }
@@ -147,7 +147,7 @@ export class ChannelService {
 
         // todo also delete from socketio rooms --> use command or so?
         if (channel.owner.id == ownerId || owner.isAdmin) {
-            await this.configRepository.remove(channel.configs);
+            await this.channelConfigRepository.remove(channel.configs);
             await this.channelRepository.remove(channel);
             this.roomService.deleteRoom(owner, channelId);
         }

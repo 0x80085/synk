@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, UnsupportedMediaTypeException, } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Logger, UnsupportedMediaTypeException, } from "@nestjs/common";
 import { HttpService } from '@nestjs/axios';
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { of, throwError } from "rxjs";
@@ -11,13 +11,17 @@ import { AddMediaToRoomCommand } from "../models/commands/add-media-to-room.comm
 import { Media } from "../models/media/media";
 import { toRepresentation } from "../models/playlist/playlist.representation";
 import { Room } from "../models/room/room";
-import { allowedMediaSourceHosts as supportedMediaSourceHosts } from "./allowed-media-hosts";
+import { GlobalSettingsService } from "src/settings/global-settings.service";
 
 @CommandHandler(AddMediaToRoomCommand)
 export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomCommand> {
+
+    private logger = new Logger(AddMediaToRoomHandler.name);
+
     constructor(
         private ytService: MediaMetaDataService,
         private httpService: HttpService,
+        private globalSettingsService: GlobalSettingsService
         // @InjectRepository(Channel)
         // private channelRepository: Repository<Channel>,
         // @InjectRepository(Video)
@@ -77,11 +81,11 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
     }
 
     private getMetadataFromInvidousApi(id: string) {
-        return this.ytService.getVideoMetaData(id).pipe(
+        return this.ytService.getVideoMetaDataWithRetry(id).pipe(
             map((data) => ({ url: `https://www.youtube.com/watch?v=${id}`, ...data })),
             map(({ url, title, duration, isLive }) => new Media(url, title, duration, isLive)),
             catchError((e) => {
-                console.log(e);
+                this.logger.error(`Failed to get YT data for ${id}`, e);
                 throw new Error("AddMediaException");
             }))
     }
@@ -150,7 +154,7 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
         try {
             const domain = getDomain(url)
             console.log(domain);
-            return supportedMediaSourceHosts.indexOf(domain) != -1;
+            return this.globalSettingsService.allowedMediaHostingProviders.indexOf(domain) != -1;
         } catch (error) {
             return false
         }

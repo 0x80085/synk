@@ -1,0 +1,27 @@
+<form nz-form [formGroup]="addMediaform" (ngSubmit)="onAddMedia()" *ngIf="allowedMediaProviders$ | async">
+  <nz-form-item style="margin-bottom: 1rem;">
+    <nz-form-control nzErrorTip="Please input a valid media URL">
+      <nz-input-group nzSearch nzSize="large" [nzAddOnAfter]="addMediaSuffixButton">
+        <input type="text" nz-input placeholder="Enter a link to a video" formControlName="mediaUrl" />
+      </nz-input-group>
+    </nz-form-control>
+  </nz-form-item>
+</form>
+
+<nz-alert style="margin-bottom: 1rem" nzType="info" [nzDescription]="addMediaInfo" nzShowIcon></nz-alert>
+
+<ng-template #addMediaInfo>
+  <p nz-typography>
+    Only media from the following urls are supported: {{ supportedMediaHostsFormatted }}. <br />
+  Support for other types of media can be requested via the Github repo or Discord chat.<br />
+  <strong>If you are currently the leader,</strong>
+  press the <i nz-icon [nzType]="'caret-right'"></i> on a playlist item to play it and other members' media player will
+  sync with your playback state.
+  </p>
+</ng-template>
+
+<ng-template #addMediaSuffixButton>
+  <button nz-button nzType="primary" type="submit" style="height: auto" nzSearch>
+    Add
+  </button>
+</ng-template>

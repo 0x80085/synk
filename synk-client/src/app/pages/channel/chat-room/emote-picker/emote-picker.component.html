@@ -1,0 +1,7 @@
+<i nz-icon nzType="smile" nz-popover [nzPopoverContent]="contentTemplate" nzPopoverTitle="Pick em"
+  class="emote-menu-btn"></i>
+<ng-template #contentTemplate>
+  <emoji-mart [darkMode]="true"
+    [include]="['recent', 'custom','people','nature','foods','activity','places','objects','symbols','flags']"
+    [custom]="customEmojis" (emojiClick)="selectEmoji($event)"></emoji-mart>
+</ng-template>

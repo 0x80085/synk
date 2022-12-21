@@ -1,6 +1,6 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { BehaviorSubject, combineLatest, Subject, Subscription } from 'rxjs';
 import { distinctUntilChanged, map, startWith, tap } from 'rxjs/operators';
@@ -17,35 +17,12 @@ interface PlaylistItem {
   addedBy?: { memberId: string, username: string };
 }
 
-const SUPPORTED_MEDIA_HOSTS = [
-  'youtu.be',
-  'youtube.com',
-  'www.youtu.be',
-  'www.youtube.com',
-
-  'twitch.tv',
-  'www.twitch.tv',
-
-  'vimeo.com',
-  'www.vimeo.com',
-
-  'cdn.lbryplayer.xyz',
-  'lbryplayer.xyz',
-
-  'archive.org',
-
-  // 'dailymotion.com',
-  // 'twitter.com',
-  // 'reddit.com',
-  // 'vk.ru',
-]
-
 @Component({
   selector: 'app-playlist',
   templateUrl: './playlist.component.html',
   styleUrls: ['./playlist.component.scss']
 })
-export class PlaylistComponent implements OnDestroy, OnInit {
+export class PlaylistComponent implements OnDestroy {
 
   @Input() roomName: string;
 
@@ -67,8 +44,6 @@ export class PlaylistComponent implements OnDestroy, OnInit {
   votedForSkip = false;
 
   localPlaylist: PlaylistItem[] = [];
-
-  supportedMediaHostsFormatted = SUPPORTED_MEDIA_HOSTS.join(', ');
 
   nowPlayingSubject: Subject<PlaylistItem> = new Subject()
 
@@ -142,7 +117,6 @@ export class PlaylistComponent implements OnDestroy, OnInit {
   ).subscribe();
 
   constructor(
-    private fb: FormBuilder,
     private mediaService: MediaService,
     private notification: NzNotificationService,
     private auth: AuthService) { }
@@ -164,33 +138,6 @@ export class PlaylistComponent implements OnDestroy, OnInit {
         this.playMedia.emit(this.localPlaylist[nextUpIndex].mediaUrl);
       }
     }
-  }
-
-  ngOnInit() {
-    this.addMediaform = this.fb.group({
-      mediaUrl: [
-        null,
-        [
-          Validators.required,
-          PlaylistComponent.validateIsUrl()
-        ]
-      ]
-    });
-  }
-
-  onAddMedia() {
-    if (this.addMediaform.invalid) {
-      return;
-    }
-
-    this.mediaService.addToPlaylist({
-      url: this.addMediaform.controls.mediaUrl.value,
-      roomName: this.roomName,
-      currentTime: null
-    });
-    this.addMediaform.controls.mediaUrl.patchValue('');
-    this.addMediaform.controls.mediaUrl.reset();
-    this.notification.info('Request Submitted', 'The request to add media to the current list is in progress. You will be updated if the request was (un)succesful');
   }
 
   onRemoveMedia(mediaUrl: string) {
@@ -269,29 +216,4 @@ export class PlaylistComponent implements OnDestroy, OnInit {
     this.voteSkipCountUpdateSubscription.unsubscribe();
   }
 
-  static validateIsUrl(): ValidatorFn {
-    return ({ value }: AbstractControl): ValidationErrors | null => {
-
-      return PlaylistComponent.isValidMediaUrl(value)
-    }
-  }
-
-  static isValidMediaUrl(value: string) {
-    let validUrl = true;
-
-    try {
-      const { host } = new URL(value)
-      const extractHostnameRegex = /(?<![^\/]\/)\b\w+\.\b\w{2,3}(?:\.\b\w{2})?(?=$|\/)/gm;
-      const urlParts = extractHostnameRegex.exec(host);
-      const [domain] = urlParts;
-
-      if (SUPPORTED_MEDIA_HOSTS.indexOf(domain) === -1) {
-        throw new Error();
-      }
-    } catch {
-      validUrl = false;
-    }
-
-    return validUrl ? null : { invalidUrl: { value: value } };
-  }
 }

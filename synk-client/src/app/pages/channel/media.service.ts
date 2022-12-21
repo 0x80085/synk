@@ -5,6 +5,8 @@ import { SocketService } from '../../socket.service';
 import { MediaEvent } from './models/room.models';
 import { MediaCommands } from './models/media.models';
 import { debugLog } from 'src/app/utils/custom.operators';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 export interface PlaylistRepresentation {
   id: string;
@@ -58,11 +60,16 @@ export class MediaService {
       map((mediaUrl) => mediaUrl)
     );
 
-    clearPlaylistSuccessEvent$ = this.socketService.listenForEvent<unknown>(MediaCommands.CLEAR_PLAYLIST_SUCCESS);
+  clearPlaylistSuccessEvent$ = this.socketService.listenForEvent<unknown>(MediaCommands.CLEAR_PLAYLIST_SUCCESS);
 
   onVoteSkipCountEvent$ = this.socketService.listenForEvent<{ count: number, max: number }>(MediaCommands.VOTE_SKIP_COUNT);
 
-  constructor(private socketService: SocketService) { }
+  allowedMediaProviders = this.http.get<string[]>(`${environment.api}/settings/allowed-media-providers`).pipe(shareReplay());
+
+  constructor(
+      private socketService: SocketService,
+      private http: HttpClient
+    ) { }
 
   sendMediaEvent(ev: MediaEvent) {
     debugLog('sendMediaEvent', ev, true)

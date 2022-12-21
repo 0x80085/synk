@@ -14,18 +14,18 @@ export class AdminService {
         private readonly channelRepository: Repository<Channel>,
         @InjectRepository(Member)
         private readonly memberRepository: Repository<Member>,
-        private trackingService: ConnectionTrackingService,
+        private trackingService: ConnectionTrackingService
     ) { }
 
-    async getPaginatedChannels(options: IPaginationOptions): Promise<Pagination<Channel>> {
+    getPaginatedChannels(options: IPaginationOptions): Promise<Pagination<Channel>> {
         return this.getChannelsWithOwner(options);
     }
 
-    async getPaginatedMembers(options: IPaginationOptions): Promise<Pagination<Member>> {
+    getPaginatedMembers(options: IPaginationOptions): Promise<Pagination<Member>> {
         return this.getMembersWithChannels(options)
     }
 
-    public getConnections() {
+    getConnections() {
         const clients: any[] = [];
 
         [...this.trackingService.clients]

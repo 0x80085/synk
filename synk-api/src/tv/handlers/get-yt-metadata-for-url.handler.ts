@@ -9,6 +9,6 @@ export class GetYtMetadataForUrl implements ICommandHandler<GetYtMetadataForUrlC
 
     async execute({ url }: GetYtMetadataForUrlCommand) {
         const id = YouTubeGetID(url);
-        return this.metadataService.getVideoMetaData(id);
+        return this.metadataService.getVideoMetaDataWithRetry(id);
     }
 }

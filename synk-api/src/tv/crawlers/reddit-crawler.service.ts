@@ -53,7 +53,10 @@ export class RedditCrawlerService {
     scrapeYTurlsFromSubreddit(subredditName: string, category: 'all' | 'new' = 'all') {
         return this.httpService.get(this.buildSubredditUrl(subredditName, category)).pipe(
             this.filterForMedia(),
-            catchError(err => { console.error(err); return of(["Error fetching"]) })
+            catchError(err => { 
+                this.logger.error(`scrapeYTurlsFromSubreddit failed to scrape for ${subredditName}`, err); 
+                return of([]); 
+            })
         );
     }
 
@@ -70,10 +73,13 @@ export class RedditCrawlerService {
                 // todo save the origin and datefound somewhere
                 map(urls => urls.map(url => YouTubeGetID(url))),
                 mergeMap(ids => ids.map(id =>
-                    this.ytService.getVideoMetaData(id).pipe(
+                    this.ytService.getVideoMetaDataWithRetry(id).pipe(
                         map((data) => ({ url: `https://www.youtube.com/watch?v=${id}`, ...data })),
                         map(({ url, title, duration }) => ({ origin: subreddit, media: new Media(url, title, duration) })),
-                        catchError(() => of(null))
+                        catchError((error) =>{
+                            this.logger.error(`scrapeSubredditsJob failed to get YT metadata for ${id}`, error) 
+                            return of(null)
+                        })
                     ).pipe(
                         filter((response) => !!response),
                         map(entry => entry as { origin: string, media: Media })
@@ -82,7 +88,7 @@ export class RedditCrawlerService {
                 mergeAll(),
                 toArray(),
                 map(entries => entries.filter(entry => entry.media.length < ONE_HOUR)
-                )));
+            )));
 
         let allResults: { origin: string, media: Media }[] = [];
 

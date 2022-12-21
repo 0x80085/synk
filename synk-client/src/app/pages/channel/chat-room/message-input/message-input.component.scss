@@ -1,5 +1,15 @@
+.ant-card-body {
+  padding: 0.5rem;
+  padding-right: 0rem;
+}
+
 .input {
   position: relative;
+
+  .preview-msg {
+    padding-right: 2rem;
+    margin: 0;
+  }
 
   textarea {
     display: block;
@@ -17,7 +27,7 @@
     border: none;
   }
 
-  .emote-menu-btn {
+  app-emote-picker {
     position: absolute;
     right: 0.5rem;
     top: 0.5rem;
@@ -31,20 +41,3 @@
   }
 }
 
-.preview-msg {
-  padding-right: 2rem;
-  margin: 0;
-}
-
-.ant-card-body {
-  padding: 0.5rem;
-  padding-right: 0rem;
-}
-
-.ant-popover-title {
-  display: none;
-}
-
-.ant-popover-inner-content {
-  padding: 0;
-}

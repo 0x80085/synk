@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { SettingsModule } from 'src/settings/settings.module';
 import { TvModule } from 'src/tv/tv.module';
 
 import { AuthModule } from '../auth/auth.module';
@@ -14,6 +15,7 @@ import { AdminService } from './services/admin.service';
     TypeOrmModule.forFeature([Member, Channel, ChannelConfig, Role]),
     AuthModule,
     ChatModule,
+    SettingsModule,
     TvModule
   ],
   controllers: [AdminController],
