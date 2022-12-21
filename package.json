@@ -4,7 +4,6 @@
   "description": "Back and Front end for SYNK",
   "main": "index.js",
   "dependencies": {
-    "@nestjs/cli": "^9.1.5",
     "nodemon": "^2.0.16"
   },
   "devDependencies": {
