@@ -2,6 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
 import { Observable, of } from 'rxjs';
 import { catchError, map, retry, switchMap } from 'rxjs/operators';
+import { getRandom } from 'src/util/getRandom';
 
 export interface YoutubeMetadata {
   id: string;
@@ -128,11 +129,6 @@ export class MediaMetaDataService {
     };
     return data;
   }
-}
-
-function getRandom(list: any[]) {
-  const randIndex = Math.floor(Math.random() * list.length);
-  return list[randIndex];
 }
 
 export function YouTubeGetID(url: string) {

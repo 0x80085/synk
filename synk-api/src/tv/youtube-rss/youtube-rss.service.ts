@@ -1,10 +1,22 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { catchError, filter, from, map, mergeAll, mergeMap, Observable, of, Subject, tap, toArray } from 'rxjs';
+import {
+  catchError,
+  filter,
+  from,
+  map,
+  mergeAll,
+  mergeMap,
+  of,
+  Subject,
+  tap,
+  toArray,
+} from 'rxjs';
 import { Media } from 'src/chat/models/media/media';
+import { getRandom } from 'src/util/getRandom';
 
-import { MediaMetaDataService, YouTubeGetID } from '../crawlers/media-metadata.service';
+import { MediaMetaDataService } from '../crawlers/media-metadata.service';
 
 const MAX_CONCURRENT_SCRAPES = 5;
 const ONE_HOUR = 3600;
@@ -13,7 +25,10 @@ const ONE_HOUR = 3600;
 export class YoutubeRssService {
   private readonly logger = new Logger(YoutubeRssService.name);
 
-  YoutubeRssResultsSubject = new Subject<{ channelName: string, results: Media[] }>()
+  YoutubeRssResultsSubject = new Subject<{
+    channelName: string;
+    results: Media[];
+  }>();
 
   private youtubeCreatorTargetsPerChannel: {
     channelName: string;
@@ -21,17 +36,17 @@ export class YoutubeRssService {
   }[] = [
     {
       channelName: 'The Daily Scraper',
-      youtubers: ['serpentZA'],
+      youtubers: [],
     },
   ];
 
   constructor(
     private httpService: HttpService,
-    private ytService: MediaMetaDataService,
+    private metaDataService: MediaMetaDataService,
   ) {}
 
-  @Cron(CronExpression.EVERY_6_HOURS, { name: 'bidaily_scraper' })
-  scrapeSubredditsJob() {
+  @Cron(CronExpression.EVERY_6_HOURS, { name: 'bidaily_rss_updater' })
+  fetchRssUpdatesJob() {
     this.logger.debug('Fetching RSS updates');
 
     const youtubers = this.youtubeCreatorTargetsPerChannel.reduce(
@@ -42,12 +57,11 @@ export class YoutubeRssService {
 
     const scrapeWorkers = uniqSubreddits.map((youtuber) =>
       this.geRssUpdatesForYoutuber(youtuber).pipe(
-        // todo save the origin and datefound somewhere
-        map((urls) => urls.map((url) => YouTubeGetID(url))),
+        map((response) => this.parseToYoutubeIds(response)),
         mergeMap(
           (ids) =>
             ids.map((id) =>
-              this.ytService
+              this.metaDataService
                 .getVideoMetaDataWithRetry(id)
                 .pipe(
                   map((data) => ({
@@ -60,7 +74,7 @@ export class YoutubeRssService {
                   })),
                   catchError((error) => {
                     this.logger.error(
-                      `scrapeSubredditsJob failed to get YT metadata for ${id}`,
+                      `fetchRssUpdatesJob failed to get YT metadata for ${id}`,
                       error,
                     );
                     return of(null);
@@ -100,35 +114,78 @@ export class YoutubeRssService {
           this.logger.error('err while scraping ..', err);
         },
         complete: () => {
-          this.youtubeCreatorTargetsPerChannel.forEach(({ channelName, youtubers }) => {
-            const results = allResults
-              .filter((res) => youtubers.includes(res.origin))
-              .reduce(
-                (mediaList, originAndMedia) =>
-                  mediaList.concat(originAndMedia.media),
-                [] as Media[],
+          this.youtubeCreatorTargetsPerChannel.forEach(
+            ({ channelName, youtubers }) => {
+              const results = allResults
+                .filter((res) => youtubers.includes(res.origin))
+                .reduce(
+                  (mediaList, originAndMedia) =>
+                    mediaList.concat(originAndMedia.media),
+                  [] as Media[],
+                );
+
+              this.logger.log(
+                `ScrapeJob for ${channelName} found ${results.length} results`,
               );
 
-            this.logger.log(
-              `ScrapeJob for ${channelName} found ${results.length} results`,
-            );
-
-            this.YoutubeRssResultsSubject.next({ channelName, results });
-          });
+              this.YoutubeRssResultsSubject.next({ channelName, results });
+            },
+          );
         },
       });
   }
 
-  geRssUpdatesForYoutuber(youtuber: string): Observable<any> { // todo fix type
+  private parseToYoutubeIds(response: any) {
+    const ytIdRegex = /(<yt:videoId>)(?<videoId>.+)(<\/yt:videoId>)/gim;
+    const videoIds = [];
+    for (const match of response.data.matchAll(ytIdRegex)) {
+      videoIds.push(match.groups.videoId);
+    }
+    return videoIds;
+  }
+
+  registerTargetsForChannel(channelName: string, youtubers: string[]) {
+    let registeredEntry = this.youtubeCreatorTargetsPerChannel.find(
+      (target) => target.channelName === channelName,
+    );
+
+    if (registeredEntry) {
+      registeredEntry.youtubers = [
+        ...new Set([...registeredEntry.youtubers, ...youtubers]),
+      ];
+    } else {
+      this.youtubeCreatorTargetsPerChannel.push({
+        channelName,
+        youtubers,
+      });
+      registeredEntry = this.youtubeCreatorTargetsPerChannel.find(
+        (target) => target.channelName === channelName,
+      );
+    }
+
+    this.logger.log(
+      `Registered targets for ${channelName} (${
+        registeredEntry.youtubers.length
+      }):\n ${registeredEntry.youtubers.toString()} `,
+    );
+  }
+
+  geRssUpdatesForYoutuber(youtuber: string) {
+    // todo fix type
     return this.httpService.get(this.buildRssUrl(youtuber)).pipe(
       catchError((err) => {
         this.logger.error(`Fetch RSS updates failed for ${youtuber}`, err);
-        return of([]);
+        return of({ data: '' }); // fake response
       }),
     );
   }
 
-  buildRssUrl(youtuber: string): string {
-    throw new Error('Method not implemented.');
+  buildRssUrl(channelId: string): string {
+    const url = `${getRandom(
+      this.metaDataService.invidiousInstanceUrls,
+    )}/feed/channel/${channelId}`;
+    this.logger.log(`fetching RSS updates at ${url}`);
+
+    return url;
   }
 }

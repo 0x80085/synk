@@ -6,6 +6,8 @@ import { Room } from '../models/room/room';
 import { AutomatedRoom } from '../models/automated-room/automated-room';
 import { RedditCrawlerService } from 'src/tv/crawlers/reddit-crawler.service';
 import { MediaMetaDataService } from 'src/tv/crawlers/media-metadata.service';
+import { YoutubeRssService } from 'src/tv/youtube-rss/youtube-rss.service';
+import { AUTOMATED_ROOMS } from './automated-rooms.default';
 
 export const DEFAULT_MAX_USER_COUNT = 100;
 
@@ -25,17 +27,37 @@ export class RoomService {
         private memberRepository: Repository<Member>,
         private redditScraper: RedditCrawlerService,
         private ytService: MediaMetaDataService,
+        private youtubeRss: YoutubeRssService,
         // @InjectRepository(Role)
         // private roleRepository: Repository<Role>,
         // @InjectRepository(ChannelConfig)
         // private configRepository: Repository<ChannelConfig>,
     ) {
-        const subredditsGeneralInterest = ['videos', 'anime', 'publicfreakout', 'mealtimevideos', 'Documentaries', 'television', 'Whatcouldgowrong', 'gardening', 'instant_regret'];
-        const subredditsTechInterest = ['gaming', 'btc', 'bitcoin', 'cryptocurrency', 'nintendo', 'ps5', 'dataisbeautiful', 'InternetIsBeautiful', 'technology', 'PS4', 'programming', 'xbox', 'technews'];
         // TODO load automated rooms from DB and start them
         this.automatedRooms = [
-            new AutomatedRoom("The Daily Scraper", "Random content collected from internet hubs", redditScraper, ytService, subredditsGeneralInterest),
-            new AutomatedRoom("the_wired", "Popular tech videos around the web", redditScraper, ytService, subredditsTechInterest)
+            new AutomatedRoom(AUTOMATED_ROOMS.dailyScraper.name,
+                 AUTOMATED_ROOMS.dailyScraper.description ,
+                 redditScraper,
+                 youtubeRss,
+                 ytService,
+                 AUTOMATED_ROOMS.dailyScraper.subreddits,
+                 AUTOMATED_ROOMS.dailyScraper.youtubers),
+
+            new AutomatedRoom(AUTOMATED_ROOMS.theWired.name,
+                 AUTOMATED_ROOMS.theWired.description ,
+                 redditScraper,
+                 youtubeRss,
+                 ytService,
+                 AUTOMATED_ROOMS.theWired.subreddits,
+                 AUTOMATED_ROOMS.theWired.youtubers),
+
+            new AutomatedRoom(AUTOMATED_ROOMS.synked.name,
+                 AUTOMATED_ROOMS.synked.description ,
+                 redditScraper,
+                 youtubeRss,
+                 ytService,
+                 AUTOMATED_ROOMS.synked.subreddits,
+                 AUTOMATED_ROOMS.synked.youtubers)
         ];
 
         this.logger.log(`Created ${this.automatedRooms.length} Automated Channels`)
