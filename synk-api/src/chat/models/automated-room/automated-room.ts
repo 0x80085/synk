@@ -57,6 +57,7 @@ export class AutomatedRoom {
     scrapeResultsSubscription = this.redditScraper.crawlResultsSubject.pipe(
         filter(it => it.channelName === this.name),
         map(it => it.results),
+        filter(results => results.length > 0),
         tap(() => this.stopPlaying()),
         tap(() => this.currentPlaylist.clear()),
         tap(results => this.addBulkToPlaylist(results)),
@@ -69,6 +70,7 @@ export class AutomatedRoom {
     rssUpdateResultsSubscription = this.youtubeRss.YoutubeRssResultsSubject.pipe(
         filter(it => it.channelName === this.name),
         map(it => it.results),
+        filter(results => results.length > 0),
         tap(() => this.stopPlaying()),
         tap(() => this.currentPlaylist.clear()),
         tap(results => this.addBulkToPlaylist(results)),
