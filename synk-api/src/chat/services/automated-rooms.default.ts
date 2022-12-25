@@ -18,7 +18,12 @@ export const AUTOMATED_ROOMS = {
         subreddits: [],
         youtubers: [
             'UCaJ84U5xsjX9KT1mIF3B22w', // revsaysdesu 
-            // 'UCaJ84U5xsjX9KT1mIF3B22w', // revsaysdesu 
+            'UC91V6D3nkhP89wUb9f_h17g', // MeatCanyon 
+            'UCaq2N6CicFNvsbPN4V-MwqA', // callum uption 
+            'UC-AQKm7HUNMmxjdS371MSwg', // channel 5 andrew
+            'UCtMVHI3AJD4Qk4hcbZnI9ZQ', // mutahar
+            'UC7YOGHUfC1Tb6E4pudI9STA', // mental outlaw
+            'UCFQMnBA3CS502aghlcr0_aw', // cofeezilla
         ]
     }
 };
