@@ -44,7 +44,12 @@
     }
 
     &.reconnecting {
-      background-color: blue;
+      background-color: white;
+
+      i {
+        transform: scale(0.5);
+        color: #191919;
+      }
     }
 
     &.connection-error {

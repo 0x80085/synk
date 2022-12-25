@@ -7,6 +7,7 @@ import { RoomService } from 'src/chat/services/room.service';
 import { GlobalSettingsService } from 'src/settings/global-settings.service';
 import { MediaMetaDataService } from 'src/tv/crawlers/media-metadata.service';
 import { RedditCrawlerService } from 'src/tv/crawlers/reddit-crawler.service';
+import { YoutubeRssService } from 'src/tv/youtube-rss/youtube-rss.service';
 import { Channel, Member } from '../../domain/entity';
 import { AdminGuard } from '../guards/admin.guard';
 import { AdminService } from '../services/admin.service';
@@ -20,6 +21,7 @@ export class AdminController {
         private channelService: ChannelService,
         private roomService: RoomService,
         private scrapeSubredditsJob: RedditCrawlerService,
+        private youtubeRss: YoutubeRssService,
         private mediaMetaDataService: MediaMetaDataService,
         private globalSettingsService: GlobalSettingsService,
     ) { }
@@ -113,6 +115,13 @@ export class AdminController {
     startRedditCrawlJob() {
 
         this.scrapeSubredditsJob.scrapeSubredditsJob()
+    }
+
+    @Post('/start-rss-fetch-job')
+    @UseGuards(AdminGuard)
+    @ApiOperation({ summary: 'Start RSS update fetch job' })
+    startRssFetchJob() {
+        this.youtubeRss.fetchRssUpdatesJob()
     }
 
     @Post('/stop-auto-playback/:name')

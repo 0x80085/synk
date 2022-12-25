@@ -9,6 +9,7 @@ import { ScrapeJobSchedulerService } from './services/scrape-job-scheduler.servi
 
 import { CqrsModule } from '@nestjs/cqrs';
 import { CrawlSubredditHandler } from './handlers/crawl-subreddit.handler';
+import { YoutubeRssService } from './youtube-rss/youtube-rss.service';
 
 export const QueryCommandHandlers = [CrawlSubredditHandler];
 
@@ -26,10 +27,12 @@ export const QueryCommandHandlers = [CrawlSubredditHandler];
         ScrapeJobSchedulerService,
         MediaMetaDataService,
         ...QueryCommandHandlers,
+        YoutubeRssService,
     ],
     exports: [
         MediaMetaDataService,
-        RedditCrawlerService
+        RedditCrawlerService,
+        YoutubeRssService,
     ]
 })
 export class TvModule { }

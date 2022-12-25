@@ -8,6 +8,7 @@ import { YouTubeGetID, MediaMetaDataService } from "src/tv/crawlers/media-metada
 import { Feed } from "../feed/feed";
 import { Media } from "../media/media";
 import { Playlist, UpdatePlayingStateCommand } from "../playlist/playlist";
+import { YoutubeRssService } from "src/tv/youtube-rss/youtube-rss.service";
 
 const oneSecond = 1000;
 
@@ -39,6 +40,7 @@ export class AutomatedRoom {
     messages: Feed = new Feed();
     currentPlaylist: Playlist = new Playlist('default', null, new Date());
     subredditsToScrape: string[];
+    youtubersOfInterest: string[];
 
     leader = null
     owner = null
@@ -53,6 +55,18 @@ export class AutomatedRoom {
     loopStateSubject: BehaviorSubject<LoopState> = new BehaviorSubject({ currentTime: 0, media: null, isPlaying: false } as LoopState);
 
     scrapeResultsSubscription = this.redditScraper.crawlResultsSubject.pipe(
+        filter(it => it.channelName === this.name),
+        map(it => it.results),
+        tap(() => this.stopPlaying()),
+        tap(() => this.currentPlaylist.clear()),
+        tap(results => this.addBulkToPlaylist(results)),
+        tap(() => this.startPlaying()),
+    ).subscribe(
+        res => this.logger.log(`${res.length} URLs found by scrape`),
+        err => this.logger.error("scrape job error occured!", err),
+    )
+ 
+    rssUpdateResultsSubscription = this.youtubeRss.YoutubeRssResultsSubject.pipe(
         filter(it => it.channelName === this.name),
         map(it => it.results),
         tap(() => this.stopPlaying()),
@@ -169,15 +183,19 @@ export class AutomatedRoom {
         name: string,
         description: string,
         private redditScraper: RedditCrawlerService,
+        private youtubeRss: YoutubeRssService,
         private ytService: MediaMetaDataService,
-        subredditsToScrape: string[]
+        subredditsToScrape: string[],
+        youtubersOfInterest: string[],
     ) {
         this.name = name
         this.description = description
         this.id = name
         this.subredditsToScrape = subredditsToScrape
+        this.youtubersOfInterest = youtubersOfInterest
 
         this.redditScraper.registerTargetsForChannel(this.name, subredditsToScrape);
+        this.youtubeRss.registerTargetsForChannel(this.name, youtubersOfInterest);
     }
 
     startPlaying() {
