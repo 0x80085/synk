@@ -1,6 +1,6 @@
 {
   "name": "synk-client",
-  "version": "0.4.14",
+  "version": "0.4.15",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --configuration development",
