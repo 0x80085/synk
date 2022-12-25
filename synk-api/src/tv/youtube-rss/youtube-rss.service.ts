@@ -45,7 +45,7 @@ export class YoutubeRssService {
     private metaDataService: MediaMetaDataService,
   ) {}
 
-  @Cron(CronExpression.EVERY_6_HOURS, { name: 'bidaily_rss_updater' })
+  @Cron(CronExpression.EVERY_WEEK, { name: 'bidaily_rss_updater' })
   fetchRssUpdatesJob() {
     this.logger.debug('Fetching RSS updates');
 

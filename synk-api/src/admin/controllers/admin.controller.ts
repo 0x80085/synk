@@ -121,7 +121,6 @@ export class AdminController {
     @UseGuards(AdminGuard)
     @ApiOperation({ summary: 'Start RSS update fetch job' })
     startRssFetchJob() {
-
         this.youtubeRss.fetchRssUpdatesJob()
     }
 

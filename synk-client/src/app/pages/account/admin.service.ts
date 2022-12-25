@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { environment } from '../../../environments/environment';
@@ -82,7 +82,10 @@ export class AdminService {
   }
 
   startScrapeJobManually() {
-    return this.http.post(`${environment.api}/admin/start-crawler-job`, null, { withCredentials: true })
+    return forkJoin([
+      this.http.post(`${environment.api}/admin/start-crawler-job`, null, { withCredentials: true }),
+      this.http.post(`${environment.api}/admin/start-rss-fetch-job`, null, { withCredentials: true }),
+    ])
   }
 
   getInvidiousUrls(): Observable<string[]> {
