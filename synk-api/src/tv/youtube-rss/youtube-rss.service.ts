@@ -15,6 +15,7 @@ import {
 } from 'rxjs';
 import { Media } from 'src/chat/models/media/media';
 import { getRandom } from 'src/util/getRandom';
+import { shuffle } from 'src/util/shuffle';
 
 import { MediaMetaDataService } from '../crawlers/media-metadata.service';
 
@@ -127,8 +128,8 @@ export class YoutubeRssService {
               this.logger.log(
                 `ScrapeJob for ${channelName} found ${results.length} results`,
               );
-
-              this.YoutubeRssResultsSubject.next({ channelName, results });
+              const shuffledResults  = shuffle(results)
+              this.YoutubeRssResultsSubject.next({ channelName, results: shuffledResults });
             },
           );
         },
@@ -170,7 +171,7 @@ export class YoutubeRssService {
     );
   }
 
-  geRssUpdatesForYoutuber(youtuber: string) {
+  private geRssUpdatesForYoutuber(youtuber: string) {
     // todo fix type
     return this.httpService.get(this.buildRssUrl(youtuber)).pipe(
       catchError((err) => {
@@ -180,7 +181,7 @@ export class YoutubeRssService {
     );
   }
 
-  buildRssUrl(channelId: string): string {
+  private buildRssUrl(channelId: string): string {
     const url = `${getRandom(
       this.metaDataService.invidiousInstanceUrls,
     )}/feed/channel/${channelId}`;
