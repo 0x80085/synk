@@ -14,13 +14,22 @@ import {
   toArray,
 } from 'rxjs';
 import { Media } from 'src/chat/models/media/media';
+
 import { getRandom } from 'src/util/getRandom';
 import { shuffle } from 'src/util/shuffle';
-
 import { MediaMetaDataService } from '../crawlers/media-metadata.service';
 
 const MAX_CONCURRENT_SCRAPES = 5;
 const ONE_HOUR = 3600;
+const SEVEN_DAYS_AGO = () => {
+  const today = new Date();
+  const lastWeek = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate() - 7,
+  );
+  return lastWeek;
+};
 
 @Injectable()
 export class YoutubeRssService {
@@ -58,7 +67,8 @@ export class YoutubeRssService {
 
     const scrapeWorkers = uniqSubreddits.map((youtuber) =>
       this.geRssUpdatesForYoutuber(youtuber).pipe(
-        map((response) => this.parseToYoutubeIds(response)),
+        // map((response) => this.parseToYoutubeIds(response)),
+        map((response) => this.getLatestVideoIds(response, SEVEN_DAYS_AGO())),
         mergeMap(
           (ids) =>
             ids.map((id) =>
@@ -128,8 +138,11 @@ export class YoutubeRssService {
               this.logger.log(
                 `ScrapeJob for ${channelName} found ${results.length} results`,
               );
-              const shuffledResults  = shuffle(results)
-              this.YoutubeRssResultsSubject.next({ channelName, results: shuffledResults });
+              const shuffledResults = shuffle(results);
+              this.YoutubeRssResultsSubject.next({
+                channelName,
+                results: shuffledResults,
+              });
             },
           );
         },
@@ -137,12 +150,44 @@ export class YoutubeRssService {
   }
 
   private parseToYoutubeIds(response: any) {
-    const ytIdRegex = /(<yt:videoId>)(?<videoId>.+)(<\/yt:videoId>)/gim;
+    const xml = response.data;
     const videoIds = [];
-    for (const match of response.data.matchAll(ytIdRegex)) {
+    const ytIdRegex = /(<yt:videoId>)(?<videoId>.+)(<\/yt:videoId>)/gim;
+    const publishDateRegex =
+      /(<published>)(?<datePublished>.+)(<\/published>)/gim;
+
+    for (const match of xml.matchAll(ytIdRegex)) {
       videoIds.push(match.groups.videoId);
     }
     return videoIds;
+  }
+
+  private getLatestVideoIds(response: { data: string }, afterDate: Date) {
+    const xml = response.data;
+
+    const ytIdRegex = /(<yt:videoId>)(?<videoId>.+)(<\/yt:videoId>)/gim;
+    const datePublishedRegex =
+      /(<published>)(?<datePublished>.+)(<\/published>)/gim;
+
+    const videoIdMatches = xml.matchAll(ytIdRegex);
+    const publishDateMatches = xml.matchAll(datePublishedRegex);
+
+    const videoList: { id: string; date: Date }[] = [];
+
+    for (const match of videoIdMatches) {
+      videoList.push({ id: match.groups.videoId, date: null });
+    }
+
+    let counter = 0;
+
+    for (const match of publishDateMatches) {
+      videoList[counter].date = new Date(match.groups.datePublished);
+      counter++;
+    }
+
+    return videoList
+      .filter(({ date }) => date.getTime() > afterDate.getTime())
+      .map(({ id }) => id);
   }
 
   registerTargetsForChannel(channelName: string, youtubers: string[]) {
