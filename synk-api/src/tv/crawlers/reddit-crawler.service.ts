@@ -6,6 +6,7 @@ import { from, of, OperatorFunction, Subject } from 'rxjs';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { Media } from 'src/chat/models/media/media';
 import { YouTubeGetID, MediaMetaDataService } from './media-metadata.service';
+import { shuffle } from 'src/util/shuffle';
 
 const MAX_CONCURRENT_SCRAPES = 5;
 const ONE_HOUR = 3600;
@@ -113,7 +114,8 @@ export class RedditCrawlerService {
 
                     this.logger.log(`ScrapeJob for ${channelName} found ${results.length} results`)
 
-                    this.crawlResultsSubject.next({ channelName, results });
+                    const shuffledResults = shuffle(results)
+                    this.crawlResultsSubject.next({ channelName, results: shuffledResults });
                 })
 
             }

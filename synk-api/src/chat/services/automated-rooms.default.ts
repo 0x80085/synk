@@ -24,6 +24,12 @@ export const AUTOMATED_ROOMS = {
             'UCtMVHI3AJD4Qk4hcbZnI9ZQ', // mutahar
             'UC7YOGHUfC1Tb6E4pudI9STA', // mental outlaw
             'UCFQMnBA3CS502aghlcr0_aw', // cofeezilla
+            'UCSt14rZZM0K8Pz5eK5hhVRA', // konbini confessions
+            'UCcukTqc1cJJ4K3c4uzxTzjA', // china show
+            'UCl7mAGnY4jh4Ps8rhhh8XZg', // serpentza
+            'UCakIVH4t7k4vZe1AWPpewgA', // tommy G
+            'UCIcR5StUvA7_pPHoAFLmZaA', // oddheader
+            'UCW6xlqxSY3gGur4PkGPEUeA', // Seytonic
         ]
     }
 };
