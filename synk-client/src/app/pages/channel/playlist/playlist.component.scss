@@ -12,7 +12,7 @@
     text-overflow: ellipsis;
     display: inline-block;
   }
-  
+
   .media-duration {
     display: inline-block;
     text-align: right;
@@ -29,6 +29,11 @@
 
   &.active {
     background-color: #191919;
+
+    .media-title,
+    .media-duration {
+      font-weight: bolder;
+    }
   }
 
   ul {

@@ -80,7 +80,17 @@ export class PlaylistComponent implements OnDestroy {
 
   private playlistUpdateSubscription: Subscription = this.playlistUpdateEvent$
     .pipe(
-      tap(ls => this.localPlaylist = ls),
+      tap(ls => {
+        if (ls.length > 1) {
+          const indexOfActiveItem = ls.findIndex(it => it.active)
+          const partBeforeActive = ls.slice(0,indexOfActiveItem)
+          const partAfterActive = ls.slice(indexOfActiveItem)
+          const listWithActiveOnTop = [...partAfterActive, ...partBeforeActive];
+          this.localPlaylist = listWithActiveOnTop
+        } else {
+          this.localPlaylist = ls
+        }
+      }),
       doLog('playlistUpdateSubscription', true),
     ).subscribe();
 
