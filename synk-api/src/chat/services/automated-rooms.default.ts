@@ -13,8 +13,8 @@ export const AUTOMATED_ROOMS = {
         youtubers: []
     },
     synked: {
-        name: 'synked',
-        description: 'Testing RSS youtube',
+        name: 'The Network',
+        description: 'Weekly Youtube videos from random creators',
         subreddits: [],
         youtubers: [
             'UCaJ84U5xsjX9KT1mIF3B22w', // revsaysdesu 
