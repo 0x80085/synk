@@ -21,12 +21,12 @@ import { MediaMetaDataService } from '../crawlers/media-metadata.service';
 
 const MAX_CONCURRENT_SCRAPES = 5;
 const ONE_HOUR = 3600;
-const SEVEN_DAYS_AGO = () => {
+const nowMinusDays = (days: number) => {
   const today = new Date();
   const lastWeek = new Date(
     today.getFullYear(),
     today.getMonth(),
-    today.getDate() - 7,
+    today.getDate() - days,
   );
   return lastWeek;
 };
@@ -55,7 +55,7 @@ export class YoutubeRssService {
     private metaDataService: MediaMetaDataService,
   ) {}
 
-  @Cron(CronExpression.EVERY_WEEK, { name: 'weekly_rss_updater' })
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT, { name: 'nightly_rss_updater' })
   fetchRssUpdatesJob() {
     this.logger.debug('Fetching RSS updates');
 
@@ -67,8 +67,7 @@ export class YoutubeRssService {
 
     const scrapeWorkers = uniqSubreddits.map((youtuber) =>
       this.geRssUpdatesForYoutuber(youtuber).pipe(
-        // map((response) => this.parseToYoutubeIds(response)),
-        map((response) => this.getLatestVideoIds(response, SEVEN_DAYS_AGO())),
+        map((response) => this.getLatestVideoIds(response, nowMinusDays(1))),
         mergeMap(
           (ids) =>
             ids.map((id) =>
@@ -147,19 +146,6 @@ export class YoutubeRssService {
           );
         },
       });
-  }
-
-  private parseToYoutubeIds(response: any) {
-    const xml = response.data;
-    const videoIds = [];
-    const ytIdRegex = /(<yt:videoId>)(?<videoId>.+)(<\/yt:videoId>)/gim;
-    const publishDateRegex =
-      /(<published>)(?<datePublished>.+)(<\/published>)/gim;
-
-    for (const match of xml.matchAll(ytIdRegex)) {
-      videoIds.push(match.groups.videoId);
-    }
-    return videoIds;
   }
 
   private getLatestVideoIds(response: { data: string }, afterDate: Date) {
