@@ -14,7 +14,7 @@ export const AUTOMATED_ROOMS = {
     },
     synked: {
         name: 'The Network',
-        description: 'Weekly Youtube videos from random creators',
+        description: 'Weekly Youtube videos from popular creators',
         subreddits: [],
         youtubers: [
             'UCaJ84U5xsjX9KT1mIF3B22w', // revsaysdesu 
