@@ -23,12 +23,11 @@ const MAX_CONCURRENT_SCRAPES = 5;
 const ONE_HOUR = 3600;
 const nowMinusDays = (days: number) => {
   const today = new Date();
-  const lastWeek = new Date(
+  return new Date(
     today.getFullYear(),
     today.getMonth(),
     today.getDate() - days,
   );
-  return lastWeek;
 };
 
 @Injectable()
@@ -67,7 +66,7 @@ export class YoutubeRssService {
 
     const scrapeWorkers = uniqSubreddits.map((youtuber) =>
       this.geRssUpdatesForYoutuber(youtuber).pipe(
-        map((response) => this.getLatestVideoIds(response, nowMinusDays(1))),
+        map((response) => this.getLatestVideoIds(response, nowMinusDays(3))),
         mergeMap(
           (ids) =>
             ids.map((id) =>
