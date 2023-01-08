@@ -256,13 +256,7 @@ export class AutomatedRoom {
         this.voterIds.push(member.id);
         this.voteSkipCount = this.voteSkipCount + 1;
 
-        console.log(this.voteSkipCount);
-        console.log(this.voterIds);
-        console.log(this.minRequiredPercentageOfVoteSkippers);
-        console.log(this.votesNeededForSkip);
-
         if (this.voteSkipCount >= this.votesNeededForSkip) {
-            console.log('skipping to next ');
             this.playNext();
             this.voterIds = [];
             this.voteSkipCount = 0;

@@ -80,7 +80,7 @@ export class PlaylistComponent implements OnDestroy {
 
   private playlistUpdateSubscription: Subscription = this.playlistUpdateEvent$
     .pipe(
-      tap(ls => this.localPlaylist = ls),
+      tap(ls => this.localPlaylist = this.showActiveItemOnTop(ls)),
       doLog('playlistUpdateSubscription', true),
     ).subscribe();
 
@@ -120,6 +120,20 @@ export class PlaylistComponent implements OnDestroy {
     private mediaService: MediaService,
     private notification: NzNotificationService,
     private auth: AuthService) { }
+
+  private showActiveItemOnTop(ls: PlaylistItem[]) {
+    let tempList;
+    if (ls.length > 1) {
+      const indexOfActiveItem = ls.findIndex(it => it.active);
+      const partBeforeActive = ls.slice(0, indexOfActiveItem);
+      const partAfterActive = ls.slice(indexOfActiveItem);
+      const listWithActiveOnTop = [...partAfterActive, ...partBeforeActive];
+      tempList = listWithActiveOnTop;
+    } else {
+      tempList = ls;
+    }
+    return tempList
+  }
 
   private skipToNextAsLeader() {
 
