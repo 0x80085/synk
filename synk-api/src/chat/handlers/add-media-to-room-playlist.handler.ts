@@ -145,7 +145,7 @@ export class AddMediaToRoomHandler implements ICommandHandler<AddMediaToRoomComm
 
     private isMediaSourceSupported(url: string) {
         const getDomain = (url: string) => {
-            const regexParse = new RegExp('([a-z\-0-9]{2,63})\.([a-z\.]{2,5})$');
+            const regexParse = /([a-z0-9]{2,63})\.([a-z\.]{2,5})$/i;
             const urlParts = regexParse.exec(new URL(url).hostname);
             const [domain] = urlParts
             return domain;
