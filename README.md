@@ -1,9 +1,13 @@
 # Synk Project
 
-> Watch videos in sync and chat with friends
+Watch videos in sync and chat with friends
 
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/0x80085/synk/graphs/commit-activity) [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://tldrlegal.com/license/mit-license) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com) [![GitHub contributors](https://img.shields.io/github/contributors/0x80085/synk)](https://github.com/0x80085/synk/graphs/contributors/)  [![Open Source Love svg2](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://www.gnu.org/philosophy/floss-and-foss.en.html)
 
+
+[![Build client & API](https://github.com/0x80085/synk/actions/workflows/github-actions-ci.yml/badge.svg)](https://github.com/0x80085/synk/actions/workflows/github-actions-ci.yml)
+[![CodeQL](https://github.com/0x80085/synk/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/0x80085/synk/actions/workflows/github-code-scanning/codeql)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/e3a653afaf754e4c98911e1ca16fcc82)](https://www.codacy.com/gh/0x80085/synk/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=0x80085/synk&amp;utm_campaign=Badge_Grade)
 ## Live Demo
 
 [![Website synk.moe](https://img.shields.io/website-up-down-green-red/https/synk.moe.svg?style=for-the-badge&label=synk.moe)](https://synk.moe/)
