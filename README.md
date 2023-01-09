@@ -8,6 +8,10 @@ Watch videos in sync and chat with friends
 [![Build client & API](https://github.com/0x80085/synk/actions/workflows/github-actions-ci.yml/badge.svg)](https://github.com/0x80085/synk/actions/workflows/github-actions-ci.yml)
 [![CodeQL](https://github.com/0x80085/synk/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/0x80085/synk/actions/workflows/github-code-scanning/codeql)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/e3a653afaf754e4c98911e1ca16fcc82)](https://www.codacy.com/gh/0x80085/synk/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=0x80085/synk&amp;utm_campaign=Badge_Grade)
+
+
+![Website preview](preview.png)
+
 ## Live Demo
 
 [![Website synk.moe](https://img.shields.io/website-up-down-green-red/https/synk.moe.svg?style=for-the-badge&label=synk.moe)](https://synk.moe/)
