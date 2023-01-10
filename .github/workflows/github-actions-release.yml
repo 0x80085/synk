@@ -40,7 +40,7 @@
         
         - name: Build API
           working-directory: synk-api
-          run: npm run build   
+          run: npm run build-release 
 
         - name: Read content from API package.json
           id: set_pkgjson
