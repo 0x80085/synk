@@ -8,6 +8,8 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
+    "build-release": "nest build && yarn run copy-yarn-lock",
+    "copy-yarn-lock": "cp ./yarn.lock ./dist",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
