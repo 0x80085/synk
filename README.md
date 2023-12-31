@@ -1,4 +1,4 @@
-# Synk Project
+# Synk Project ~~(Stopped development due to no interest - abandoned)~~ REOPENED 
 
 Watch videos in sync and chat with friends
 
@@ -80,6 +80,3 @@ Or use the shortcut in package.json:
 
 ### Contributing
 
-Join the discord channel and help with testing or developing this project
-
-[![Discord](https://img.shields.io/discord/732990730355867678.svg?style=for-the-badge&label=Synk&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/EaYUq7Ws8m)

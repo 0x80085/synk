@@ -30,6 +30,7 @@ export const AUTOMATED_ROOMS = {
             'UCakIVH4t7k4vZe1AWPpewgA', // tommy G
             'UCIcR5StUvA7_pPHoAFLmZaA', // oddheader
             'UCW6xlqxSY3gGur4PkGPEUeA', // Seytonic
+            'UCQeRaTukNYft1_6AZPACnog', // Asmong tv
         ]
     }
 };
