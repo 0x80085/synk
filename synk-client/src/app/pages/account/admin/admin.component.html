@@ -68,9 +68,9 @@
       </nz-card>
       <h2 nz-typography>Users</h2>
       <nz-card [nzLoading]="(users$ | async) === null">
-        <nz-pagination [nzPageIndex]="1" [nzTotal]="85" [nzPageSize]="20" [nzShowTotal]="rangeTemplate"
+        <!-- <nz-pagination [nzPageIndex]="1" [nzTotal]="85" [nzPageSize]="20" [nzShowTotal]="rangeTemplate"
           style="margin-bottom: 1rem">
-        </nz-pagination>
+        </nz-pagination> -->
         <ng-template #rangeTemplate let-range="range" let-total>
           {{ range[0] }}-{{ range[1] }} of {{ total }} items
         </ng-template>
@@ -112,9 +112,9 @@
     <div nz-col [nzLg]="{ span: 12, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }" [nzXs]="{ span: 24, offset: 0 }">
       <h2 nz-typography>Channels</h2>
       <nz-card [nzLoading]="(channels$ | async) === null">
-        <nz-pagination [nzPageIndex]="1" [nzTotal]="85" [nzPageSize]="20" [nzShowTotal]="rangeTemplate"
+        <!-- <nz-pagination [nzPageIndex]="1" [nzTotal]="85" [nzPageSize]="20" [nzShowTotal]="rangeTemplate"
           style="margin-bottom: 1rem">
-        </nz-pagination>
+        </nz-pagination> -->
         <ng-template #rangeTemplate let-range="range" let-total>
           {{ range[0] }}-{{ range[1] }} of {{ total }} items
         </ng-template>
