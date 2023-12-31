@@ -133,8 +133,8 @@ export class RedditCrawlerService {
 
     private buildSubredditUrl(subreddit: string, subcategory: string) {
         if (subcategory === "all") {
-            return `https://www.reddit.com/r/${subreddit}.json`
+            return `https://old.reddit.com/r/${subreddit}.json`
         }
-        return `https://www.reddit.com/r/${subreddit}/${subcategory}.json`
+        return `https://old.reddit.com/r/${subreddit}/${subcategory}.json`
     }
 }
