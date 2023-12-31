@@ -1,6 +1,6 @@
 {
   "name": "synk",
-  "version": "0.4.20",
+  "version": "0.4.21",
   "description": "Back and Front end for SYNK",
   "main": "index.js",
   "dependencies": {
