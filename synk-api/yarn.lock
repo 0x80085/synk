@@ -747,13 +747,13 @@
     socket.io "4.5.3"
     tslib "2.4.1"
 
-"@nestjs/platform-ws@^9.2.0":
-  version "9.2.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/platform-ws/-/platform-ws-9.2.0.tgz#63a48869e8092f3f4e1933d6985bebb2e50d01aa"
-  integrity sha512-4HeUxXM1ndboK+SCjKJNwu1FISoOUwLONSK4iOqNtr896KmvN9P2Ykm0dZt0FwNyA+t6mxqYYhmVsdGKH2U7fw==
+"@nestjs/platform-ws@^9.4.0":
+  version "9.4.0"
+  resolved "https://registry.yarnpkg.com/@nestjs/platform-ws/-/platform-ws-9.4.0.tgz#ab7bbb7e47c54ff09c343823f2850a0db262e357"
+  integrity sha512-rNaShI/YYwYAcO8hj1oy2oUlFCC7O3gIvaCIV1fpRGzFu2xBuxzBCeaC5CMmOWea5NoJiNTV3YbHRxbTRt2FOw==
   dependencies:
-    tslib "2.4.1"
-    ws "8.11.0"
+    tslib "2.5.0"
+    ws "8.13.0"
 
 "@nestjs/schedule@^2.1.0":
   version "2.1.0"
@@ -7226,10 +7226,10 @@ write-file-atomic@^3.0.0:
     signal-exit "^3.0.2"
     typedarray-to-buffer "^3.1.5"
 
-ws@8.11.0:
-  version "8.11.0"
-  resolved "https://registry.yarnpkg.com/ws/-/ws-8.11.0.tgz#6a0d36b8edfd9f96d8b25683db2f8d7de6e8e143"
-  integrity sha512-HPG3wQd9sNQoT9xHyNCXoDUa+Xw/VevmY9FoHyQ+g+rrMn4j6FB4np7Z0OhdTgjx6MgQLK7jwSy1YecU1+4Asg==
+ws@8.13.0:
+  version "8.13.0"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.13.0.tgz#9a9fb92f93cf41512a0735c8f4dd09b8a1211cd0"
+  integrity sha512-x9vcZYTrFPC7aSIbj7sRCYo7L/Xb8Iy+pW0ng0wt2vCJv7M9HOMy0UoN3rr+IFC7hb7vXoqS+P9ktyLLLhO+LA==
 
 ws@^7.4.6:
   version "7.5.7"
