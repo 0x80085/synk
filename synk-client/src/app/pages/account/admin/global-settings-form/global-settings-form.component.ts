@@ -20,10 +20,24 @@ export class GlobalSettingsFormComponent {
     tap((_) => this.listOfControl = []),
     tap((_) => Object.keys(this.settingsForm.controls).forEach(it => this.settingsForm.removeControl(it))),
     tap((data) => {
-      this.labels=Object.keys(data)
+      this.labels = Object.keys(data);
+
       Object.values(data).forEach((it, index) => {
-        this.addField();
-        Object.values(this.settingsForm.controls)[index].setValue(it);
+        const notWorkingLabels = [
+          'logoUrl',
+          'maxUsersInRoom',
+          'maxRooms',
+          'maxRoomsPerUser',
+          'homepageAnnouncement',
+          'isRegistrationLocked',
+          'isChannelCreationLocked',
+          'currentTheme',
+        ];
+        if (!notWorkingLabels.some(it => it ===this.labels[index]) ) {
+          this.addField();
+          const controls = Object.values(this.settingsForm.controls);
+          controls[controls.length - 1].setValue(it);
+        }
       });
     })
   );
@@ -43,9 +57,10 @@ export class GlobalSettingsFormComponent {
     if (e) {
       e.preventDefault();
     }
+    const last = this.listOfControl.length - 1;
     const id =
       this.listOfControl.length > 0
-        ? this.listOfControl[this.listOfControl.length - 1].id + 1
+        ? this.listOfControl[last].id + 1
         : 0;
 
     const control = {
