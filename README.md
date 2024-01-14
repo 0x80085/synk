@@ -1,4 +1,4 @@
-# Synk Project ~~(Stopped development due to no interest - abandoned)~~ REOPENED 
+# Synk Project
 
 Watch videos in sync and chat with friends
 
