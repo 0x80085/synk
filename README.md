@@ -12,6 +12,9 @@ Watch videos in sync and chat with friends
 
 ![Website preview](preview.png)
 
+Wanna know what we're working on?
+[Check our project's task board!](https://github.com/users/0x80085/projects/1)
+
 ## Live Demo
 
 [![Website synk.moe](https://img.shields.io/website-up-down-green-red/https/synk.moe.svg?style=for-the-badge&label=synk.moe)](https://synk.moe/)
