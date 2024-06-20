@@ -1,54 +1,88 @@
 <div nz-row nzJustify="center" nzAlign="middle" class="wrapper">
-  <div nz-col [nzLg]="{ span: 8, offset: 0 }" [nzMd]="{ span: 12, offset: 0 }" [nzXs]="{ span: 24, offset: 0 }">
+  <div
+    nz-col
+    [nzLg]="{ span: 8, offset: 0 }"
+    [nzMd]="{ span: 12, offset: 0 }"
+    [nzXs]="{ span: 24, offset: 0 }"
+  >
     <h1>Welcome back!</h1>
     <nz-card nzTitle="Login" *ngIf="!isLoginSuccess">
-      <form nz-form [formGroup]="form" class="login-form" (ngSubmit)="submitForm()">
+      <form
+        nz-form
+        [formGroup]="form"
+        class="login-form"
+        (ngSubmit)="submitForm()"
+      >
         <nz-form-item>
           <nz-form-control nzErrorTip="Please input a valid name">
-            <ng-template #prefixTemplateUser><i nz-icon style="color: rgb(204, 254, 253);" nzType="user"></i>
+            <ng-template #prefixTemplateUser
+              ><i nz-icon style="color: rgb(204, 254, 253)" nzType="user"></i>
             </ng-template>
             <nz-input-group [nzPrefix]="prefixTemplateUser">
-              <input type="text" nz-input formControlName="username" placeholder="Username" />
+              <input
+                type="text"
+                nz-input
+                formControlName="username"
+                placeholder="Username"
+              />
             </nz-input-group>
           </nz-form-control>
         </nz-form-item>
         <nz-form-item>
           <nz-form-control nzErrorTip="Please input a valid password">
-            <ng-template #prefixTemplateLock><i nz-icon style="color: rgb(204, 254, 253);" nzType="lock"></i>
+            <ng-template #prefixTemplateLock
+              ><i nz-icon style="color: rgb(204, 254, 253)" nzType="lock"></i>
             </ng-template>
             <nz-input-group [nzPrefix]="prefixTemplateLock">
-              <input type="password" nz-input formControlName="password" placeholder="Password" />
+              <input
+                type="password"
+                nz-input
+                formControlName="password"
+                placeholder="Password"
+              />
             </nz-input-group>
           </nz-form-control>
         </nz-form-item>
         <nz-form-item>
           <nz-form-control>
-            <button nz-button class="login-form-button" [nzType]="'primary'" [nzLoading]="isSubmitting">
+            <button
+              nz-button
+              class="login-form-button"
+              [nzType]="'primary'"
+              [nzLoading]="isSubmitting"
+            >
               Log in
             </button>
           </nz-form-control>
         </nz-form-item>
-        <div style="text-align:center;">
-          <a [routerLink]="['/account/new']" routerLinkActive="router-link-active">Or register now!</a>
+        <div style="text-align: center">
+          <a nz-button [routerLink]="['/account/new']">Or register now!</a>
         </div>
       </form>
     </nz-card>
-    <nz-card *ngIf="isLoginSuccess" nzTitle="Login success" [nzCover]="coverTemplate" [nzExtra]="extraTemplate"
-      [nzActions]="[successActions]">
-      <nz-card-meta nzTitle="Glad you're back!" nzDescription="Go check out the channels or create one yourself">
+    <nz-card
+      *ngIf="isLoginSuccess"
+      nzTitle="Login success"
+      [nzCover]="coverTemplate"
+      [nzExtra]="extraTemplate"
+      [nzActions]="[successActions]"
+    >
+      <nz-card-meta
+        nzTitle="Glad you're back!"
+        nzDescription="Go check out the channels or create one yourself"
+      >
       </nz-card-meta>
     </nz-card>
     <ng-template #coverTemplate>
-        <img src="assets/sushi.png"
-          class="success-img" />
+      <img src="assets/sushi.png" class="success-img" />
     </ng-template>
     <ng-template #extraTemplate>
-      <i nz-icon style="color: rgb(204, 254, 253);" nzType="smile"></i>
+      <i nz-icon style="color: rgb(204, 254, 253)" nzType="smile"></i>
     </ng-template>
     <ng-template #successActions>
       <button nz-button nzType="primary" [routerLink]="['/']">
         See all channels
-        <i nz-icon style="color: rgb(204, 254, 253);" nzType="right"></i>
+        <i nz-icon style="color: rgb(204, 254, 253)" nzType="right"></i>
       </button>
     </ng-template>
   </div>

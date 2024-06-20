@@ -7,12 +7,9 @@ import { NavigationEnd, Router, RouterEvent } from '@angular/router';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-
-  isCollapsed = true;
-
   isLoggedIn = this.state.isLoggedInAndConnected$;
   isConnected = this.socketService.isConnected$;
 
@@ -26,12 +23,12 @@ export class AppComponent {
     private socketService: SocketService,
     private router: Router
   ) {
-    this.router.events.subscribe((event: RouterEvent) => {
-      if (event instanceof NavigationEnd) {
-        window.scrollTo({ top: 0 });
-      }
-    });
-
+    this.router.events.subscribe(this.scrollUpOnNavigatePage);
   }
 
+  private scrollUpOnNavigatePage(event: RouterEvent) {
+    if (event instanceof NavigationEnd) {
+      window.scrollTo({ top: 0 });
+    }
+  }
 }
