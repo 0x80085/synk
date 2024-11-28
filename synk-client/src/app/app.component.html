@@ -1,46 +1,61 @@
 <nz-layout class="app-layout">
-  <nz-sider class="menu-sidebar" nzCollapsible nzWidth="256px" [(nzCollapsed)]="isCollapsed" [nzTrigger]="null">
-    <app-nav-logo (clicked)="isCollapsed = !isCollapsed"  style="margin: 1rem 0;"></app-nav-logo>
-    <ul nz-menu nzMode="inline" [nzInlineCollapsed]="isCollapsed">
-      <li nz-submenu nzOpen nzTitle="Explore" nzIcon="compass">
-        <ul>
-          <li nz-menu-item class="item" nzMatchRouter>
-            <a routerLink="/home">All Channels</a>
-          </li>
-        </ul>
+  <nz-sider class="menu-sidebar" nzWidth="256px" nzCollapsed>
+    <app-nav-logo style="margin: 1rem 0"></app-nav-logo>
+    <ul nz-menu nzMode="inline">
+      <li nz-menu-item class="item" nzMatchRouter>
+        <a routerLink="/home">
+          <span title="All channels" nz-icon nzType="compass"></span>
+        </a>
       </li>
-    </ul>
-    <ul nz-menu nzMode="inline" [nzInlineCollapsed]="isCollapsed">
-      <li nz-submenu nzOpen nzTitle="Account" nzIcon="user">
-        <ul>
-          <li nz-menu-item [hidden]="isLoggedIn | async" class="item" nzMatchRouter>
-            <a routerLink="/account/login">Login</a>
-          </li>
-          <li nz-menu-item [hidden]="(isLoggedIn | async) === false" class="item" nzMatchRouter>
-            <a routerLink="/account/me">(You)</a>
-          </li>
-          <li nz-menu-item [hidden]="isLoggedIn | async" class="item" nzMatchRouter>
-            <a routerLink="/account/new">Register</a>
-          </li>
+      <li nz-menu-item [hidden]="isLoggedIn | async" class="item" nzMatchRouter>
+        <a routerLink="/account/login">
+          <span title="login" nz-icon nzType="user"></span>
+        </a>
+      </li>
+      <!-- <li nz-menu-item [hidden]="isLoggedIn | async" class="item" nzMatchRouter>
+        <a routerLink="/account/new">Register</a>
+      </li> -->
+      <li
+        nz-menu-item
+        [hidden]="(isLoggedIn | async) === false"
+        class="item"
+        nzMatchRouter
+      >
+        <a routerLink="/account/me"
+          ><span title="login" nz-icon nzType="user"></span
+        ></a>
+      </li>
 
-        </ul>
+      <li
+        nz-menu-item
+        [hidden]="(isAdmin$ | async) === false"
+        class="item"
+        nzMatchRouter
+      >
+        <a routerLink="/account/admin">
+          <span title="admin" nz-icon nzType="dashboard"></span>
+        </a>
       </li>
-    </ul>
-    <ul nz-menu nzMode="inline" [nzInlineCollapsed]="isCollapsed" [hidden]="(isAdmin$ | async) === false">
-      <li nz-submenu nzOpen nzTitle="Manage" nzIcon="dashboard">
-        <ul>
-          <li nz-menu-item class="item" nzMatchRouter>
-            <a routerLink="/account/admin"> Admin</a>
-          </li>
-          <li nz-menu-item class="item" nzMatchRouter>
-            <a routerLink="/debug"> Test player</a>
-          </li>
-        </ul>
+      <li
+        nz-menu-item
+        class="item"
+        [hidden]="(isAdmin$ | async) === false"
+        nzMatchRouter
+      >
+        <a routerLink="/debug">
+          <span title="debug" nz-icon nzType="bug"></span>
+        </a>
       </li>
     </ul>
 
-    <button nz-button nzType="link" routerLink="/about"
-      style="position: absolute; bottom: 10px; right:20px;">?</button>
+    <button
+      nz-button
+      nzType="link"
+      routerLink="/about"
+      style="position: absolute; bottom: 10px; right: 20px"
+    >
+      ?
+    </button>
   </nz-sider>
   <nz-layout>
     <nz-content>
@@ -48,4 +63,3 @@
     </nz-content>
   </nz-layout>
 </nz-layout>
-
