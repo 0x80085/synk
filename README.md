@@ -2,7 +2,7 @@
 
 Watch videos in sync and chat with friends
 
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/0x80085/synk/graphs/commit-activity) [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://tldrlegal.com/license/mit-license) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com) [![GitHub contributors](https://img.shields.io/github/contributors/0x80085/synk)](https://github.com/0x80085/synk/graphs/contributors/)  [![Open Source Love svg2](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://www.gnu.org/philosophy/floss-and-foss.en.html)
+[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://tldrlegal.com/license/mit-license)  [![GitHub contributors](https://img.shields.io/github/contributors/0x80085/synk)](https://github.com/0x80085/synk/graphs/contributors/)  [![Open Source Love svg2](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://www.gnu.org/philosophy/floss-and-foss.en.html)
 
 
 [![Build client & API](https://github.com/0x80085/synk/actions/workflows/github-actions-ci.yml/badge.svg)](https://github.com/0x80085/synk/actions/workflows/github-actions-ci.yml)
@@ -15,7 +15,7 @@ Watch videos in sync and chat with friends
 Wanna know what we're working on?
 [Check our project's task board!](https://github.com/users/0x80085/projects/1)
 
-## Live Demo
+## Live Demo (offline)
 
 [![Website synk.moe](https://img.shields.io/website-up-down-green-red/https/synk.moe.svg?style=for-the-badge&label=synk.moe)](https://synk.moe/)
 
@@ -79,7 +79,4 @@ Or use the shortcut in package.json:
 [![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB)](https://expressjs.com)
 [![made-with-TypeORM](https://img.shields.io/badge/TypeORM-1f425f.svg?style=for-the-badge)](https://github.com/typeorm/typeorm)
 [![made-with-Passport](https://img.shields.io/badge/Passport-1f425f.svg?style=for-the-badge)](http://www.passportjs.org/)
-
-
-### Contributing
 
